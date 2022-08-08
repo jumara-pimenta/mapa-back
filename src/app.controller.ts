@@ -1,12 +1,21 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+
+interface FeatureDto {
+  name: string;
+  pretty_name: string;
+  description: string;
+}
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('/feature')
+  feature(): Array<FeatureDto> {
+    return [
+      {
+        name: 'SONARACCESS',
+        pretty_name: 'Permissão de Acesso',
+        description: 'O usuario pode acessar o módulo Sonar',
+      },
+    ];
   }
 }
