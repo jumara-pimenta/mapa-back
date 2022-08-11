@@ -1,0 +1,26 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_MSSQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Car {
+  id              String   @id @default(uuid())
+  plate           String   @unique
+  company         String
+  type            String
+  lastSurvey      DateTime
+  expiration      DateTime
+  capacity        Int
+  renavam         Int
+  lastMaintenance DateTime
+  note            String
+  isAccessibility Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("cars")
+}
