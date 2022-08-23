@@ -10,6 +10,14 @@ import {
   PrismaMessageError,
 } from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
+import { endOfDay, parseISO, startOfDay } from 'date-fns';
+
+const dateColunsExistInCars = [
+  'lastSurvey',
+  'expiration',
+  'lastMaintenance',
+  'createdAt',
+];
 
 @Injectable()
 export class CarsService {
@@ -36,6 +44,37 @@ export class CarsService {
 
   async findAll(): Promise<Car[]> {
     const cars = await this.prismaService.car.findMany();
+
+    if (cars.length === 0) {
+      throw new NotFoundException(AppMessageError.NO_RESULTS_QUERY);
+    }
+
+    return cars;
+  }
+
+  async search(column: string, value: string): Promise<Car[]> {
+    if (dateColunsExistInCars.includes(column)) {
+      const cars = await this.prismaService.car.findMany({
+        where: {
+          [column]: {
+            gte: startOfDay(parseISO(value)),
+            lte: endOfDay(parseISO(value)),
+          },
+        },
+      });
+
+      if (cars.length === 0) {
+        throw new NotFoundException(AppMessageError.NO_RESULTS_QUERY);
+      }
+
+      return cars;
+    }
+
+    const cars = await this.prismaService.car.findMany({
+      where: {
+        [column]: value,
+      },
+    });
 
     if (cars.length === 0) {
       throw new NotFoundException(AppMessageError.NO_RESULTS_QUERY);

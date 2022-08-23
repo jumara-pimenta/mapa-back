@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CarsService } from './cars.service';
 
@@ -14,5 +14,10 @@ export class CarsController {
   @Get()
   async findAll() {
     return await this.carsService.findAll();
+  }
+
+  @Get('search')
+  async search(@Query('column') column: string, @Query('value') value: string) {
+    return await this.carsService.search(column, value);
   }
 }
