@@ -1,0 +1,30 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[drivers] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [name] NVARCHAR(1000) NOT NULL,
+    [cpf] DECIMAL(32,16) NOT NULL,
+    [cnh] DECIMAL(32,16) NOT NULL,
+    [validation] DATETIME2 NOT NULL,
+    [category] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIME2 NOT NULL CONSTRAINT [drivers_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT [drivers_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [drivers_cpf_key] UNIQUE NONCLUSTERED ([cpf]),
+    CONSTRAINT [drivers_cnh_key] UNIQUE NONCLUSTERED ([cnh])
+);
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

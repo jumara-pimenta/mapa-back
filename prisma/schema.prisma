@@ -24,3 +24,16 @@ model Car {
 
   @@map("cars")
 }
+
+model Driver {
+  id         String   @id @default(uuid())
+  name       String
+  cpf        Decimal  @unique
+  cnh        Decimal  @unique
+  validation DateTime
+  category   String
+
+  createdAt DateTime @default(now())
+
+  @@map("drivers")
+}
