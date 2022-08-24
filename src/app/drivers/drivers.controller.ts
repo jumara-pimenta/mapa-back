@@ -7,8 +7,8 @@ export class DriversController {
   constructor(private readonly driversService: DriversService) {}
 
   @Post()
-  async create(@Body() data: Prisma.DriverCreateInput) {
-    return await this.driversService.create(data);
+  async create(@Body() createDriver: Prisma.DriverCreateInput) {
+    return await this.driversService.create(createDriver);
   }
 
   @Get()

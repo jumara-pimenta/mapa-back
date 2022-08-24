@@ -7,8 +7,8 @@ export class CarsController {
   constructor(private readonly carsService: CarsService) {}
 
   @Post()
-  async create(@Body() createCarDto: Prisma.CarCreateInput) {
-    return await this.carsService.create(createCarDto);
+  async create(@Body() createCar: Prisma.CarCreateInput) {
+    return await this.carsService.create(createCar);
   }
 
   @Get()

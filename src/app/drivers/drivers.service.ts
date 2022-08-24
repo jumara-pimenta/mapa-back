@@ -18,10 +18,10 @@ const dateColunsExistInDrivers = ['validation', 'createdAt'];
 export class DriversService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: Prisma.DriverCreateInput): Promise<Driver> {
+  async create(createDriver: Prisma.DriverCreateInput): Promise<Driver> {
     try {
       const driver = await this.prismaService.driver.create({
-        data,
+        data: createDriver,
       });
       return driver;
     } catch (error) {

@@ -23,10 +23,10 @@ const dateColunsExistInCars = [
 export class CarsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: Prisma.CarCreateInput): Promise<Car> {
+  async create(createCar: Prisma.CarCreateInput): Promise<Car> {
     try {
       const car = await this.prismaService.car.create({
-        data,
+        data: createCar,
       });
       return car;
     } catch (error) {
