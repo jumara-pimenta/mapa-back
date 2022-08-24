@@ -37,3 +37,19 @@ model Driver {
 
   @@map("drivers")
 }
+
+model Employee {
+  id           String   @id @default(uuid())
+  registration Decimal  @unique
+  name         String
+  cpf          Decimal  @unique
+  rg           Decimal  @unique
+  admission    DateTime
+  role         String
+  shift        String
+  costCenter   Decimal
+
+  createdAt DateTime @default(now())
+
+  @@map("employees")
+}
