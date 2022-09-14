@@ -13,7 +13,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY package*.json ./
 
 COPY ./prisma prisma
-COPY ./src src
 
 RUN npm install --only=production --silent
 RUN npx prisma generate
