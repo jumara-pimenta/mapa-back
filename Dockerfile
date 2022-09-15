@@ -15,7 +15,7 @@ COPY ./prisma prisma
 
 RUN npm install --only=production --silent
 RUN npx prisma generate
-RUN prisma migrate dev --name migrations
+RUN npx prisma migrate dev --name migrations
 COPY . .
 
 EXPOSE ${PORT}
