@@ -11,13 +11,13 @@ ENV TZ=America/Manaus
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY package*.json ./
-COPY ./prisma prisma
 
 RUN npm install --only=production --silent
-RUN npx prisma generate
-RUN npx prisma migrate dev --name migrations
+
 COPY . .
+COPY ./prisma prisma
+
+RUN npx prisma migrate dev
 
 EXPOSE ${PORT}
-
 CMD ["node", "dist/main"]
