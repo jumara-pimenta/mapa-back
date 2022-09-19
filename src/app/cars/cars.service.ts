@@ -25,6 +25,7 @@ export class CarsService {
 
   async create(createCar: Prisma.CarCreateInput): Promise<Car> {
     try {
+      console.log(createCar)
       const car = await this.prismaService.car.create({
         data: createCar,
       });

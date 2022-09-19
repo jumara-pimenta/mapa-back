@@ -1,26 +1,19 @@
-import {
-  BadGatewayException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { Employee, Prisma } from '@prisma/client';
-import {
-  PrismaCodeError,
-  AppMessageError,
-  PrismaMessageError,
-} from 'src/constants/exceptions';
+import { BadGatewayException, Injectable, NotFoundException } from '@nestjs/common';
+import { Address, Employee, Prisma } from '@prisma/client';
+import { AppMessageError, PrismaCodeError, PrismaMessageError } from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
+import { domainToASCII } from 'url';
+import { createEmployeeRelation } from './createRelationService';
+import { EmployeeData } from './dto/type';
 
 @Injectable()
 export class EmployeesService {
   constructor(private readonly prismaService: PrismaService) { }
 
-  async create(createEmployee: Prisma.EmployeeCreateInput): Promise<Employee> {
+  async create(createEmployee: EmployeeData): Promise<EmployeeData> {
     try {
-      const employee = await this.prismaService.employee.create({
-        data: createEmployee,
-      });
-      return employee;
+      const employ = await createEmployeeRelation(createEmployee,this.prismaService)
+     return employ
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -33,6 +26,7 @@ export class EmployeesService {
       throw error;
     }
   }
+
   async findAll(): Promise<Employee[]> {
     const employee = await this.prismaService.employee.findMany();
 

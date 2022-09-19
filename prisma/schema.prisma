@@ -49,8 +49,25 @@ model Employee {
   role         String
   shift        String
   costCenter   Decimal
+  createdAt DateTime @default(now())
+  address     Address[]
+  @@map("employees")
+}
 
+model Address {
+  id           String   @id @default(uuid())
+  employee     Employee @relation(fields: [employeeId],references: [id])
+  employeeId   String
+  cep          Decimal  
+  number       Decimal
+  complement   String  
+  neighborhood String  
+  city         String
+  state        String
+  latitude     Decimal
+  longitude    Decimal
+  type         Boolean @default(false)
   createdAt DateTime @default(now())
 
-  @@map("employees")
+  @@map("addresses")
 }

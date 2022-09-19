@@ -9,9 +9,10 @@ import { CarsModule } from './app/cars/cars.module';
 import { PrismaModule } from './database/prisma.module';
 import { DriversModule } from './app/drivers/drivers.module';
 import { EmployeesModule } from './app/employees/employees.module';
+import { AddressesModule } from './app/addresses/addresses.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, CarsModule, DriversModule, EmployeesModule],
+  imports: [ConfigModule.forRoot(), PrismaModule, CarsModule, DriversModule, EmployeesModule, AddressesModule],
   controllers: [AppController],
   providers: [
     {
