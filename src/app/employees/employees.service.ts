@@ -1,11 +1,19 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Employee, Prisma } from '@prisma/client';
-import { PrismaCodeError, PrismaMessageError } from 'src/constants/exceptions';
+import {
+  PrismaCodeError,
+  AppMessageError,
+  PrismaMessageError,
+} from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class EmployeesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async create(createEmployee: Prisma.EmployeeCreateInput): Promise<Employee> {
     try {
@@ -24,5 +32,14 @@ export class EmployeesService {
       }
       throw error;
     }
+  }
+  async findAll(): Promise<Employee[]> {
+    const employee = await this.prismaService.employee.findMany();
+
+    if (employee.length === 0) {
+      throw new NotFoundException(AppMessageError.NO_RESULTS_QUERY);
+    }
+
+    return employee;
   }
 }
