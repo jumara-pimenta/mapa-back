@@ -70,4 +70,5 @@ model Address {
   createdAt DateTime @default(now())
 
   @@map("addresses")
+  
 }
