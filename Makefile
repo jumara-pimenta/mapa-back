@@ -1,7 +1,7 @@
 build:
 	yarn
 	yarn build
-	docker compose up -d --build 
+	docker-compose up -d --build 
 
 .PHONY: build
 
@@ -19,7 +19,7 @@ up:
 .PHONY: up
 
 down: 
-	docker compose down
+	docker-compose down
 
 .PHONY: down
 
