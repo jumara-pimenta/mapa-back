@@ -10,6 +10,7 @@ deploy:
 	git pull
 	yarn
 	yarn build
+	./scripts/automaticmigrate.sh
 	docker-compose up -d --build 
 
 .PHONY: deploy
