@@ -58,6 +58,7 @@ model Address {
   id           String   @id @default(uuid())
   employee     Employee @relation(fields: [employeeId],references: [id])
   employeeId   String
+  street       String
   cep          Decimal  
   number       Decimal
   complement   String  

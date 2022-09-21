@@ -6,6 +6,7 @@ BEGIN TRAN;
 CREATE TABLE [dbo].[addresses] (
     [id] NVARCHAR(1000) NOT NULL,
     [employeeId] NVARCHAR(1000) NOT NULL,
+    [street] NVARCHAR(1000) NOT NULL,
     [cep] DECIMAL(32,16) NOT NULL,
     [number] DECIMAL(32,16) NOT NULL,
     [complement] NVARCHAR(1000) NOT NULL,
@@ -18,6 +19,9 @@ CREATE TABLE [dbo].[addresses] (
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [addresses_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT [addresses_pkey] PRIMARY KEY CLUSTERED ([id])
 );
+
+-- AddForeignKey
+ALTER TABLE [dbo].[addresses] ADD CONSTRAINT [addresses_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[employees]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 COMMIT TRAN;
 
