@@ -24,5 +24,5 @@ export async function createEmployeeRelation(employeedata : EmployeeData, prisma
       //let employ : EmployeeCreate ={employee,address}
 
       
-      return employeedata;
+      return employee;
 }

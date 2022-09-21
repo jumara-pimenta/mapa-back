@@ -9,4 +9,6 @@ export class AddressesService {
   async create(createAddressDto: Prisma.AddressCreateInput): Promise<Address> {
     return await this.prismaService.address.create({ data: createAddressDto})
   }
+
+  
 }
