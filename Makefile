@@ -1,7 +1,7 @@
 build:
 	yarn
 	yarn build
-	npx prisma migrate dev
+	./scripts/automaticmigrate.sh
 	docker-compose up -d --build 
 
 .PHONY: build

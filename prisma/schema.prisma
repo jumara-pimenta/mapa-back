@@ -61,7 +61,7 @@ model Address {
   street       String
   cep          Decimal  
   number       Decimal
-  complement   String  
+  complement   String   
   neighborhood String  
   city         String
   state        String
