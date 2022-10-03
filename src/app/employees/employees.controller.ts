@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { Employee, Prisma } from '@prisma/client';
-import { EmployeeData } from './dto/type';
+import { EmployeeData } from '../dtos/employee/createEmployeeRelation.dto';
 import { EmployeesService } from './employees.service';
 
 @Controller('employees')

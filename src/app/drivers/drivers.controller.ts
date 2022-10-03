@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CreateDriver } from '../dtos/driver/createDriver.dto';
 import { DriversService } from './drivers.service';
 
 @Controller('drivers')
@@ -7,7 +8,7 @@ export class DriversController {
   constructor(private readonly driversService: DriversService) {}
 
   @Post()
-  async create(@Body() createDriver: Prisma.DriverCreateInput) {
+  async create(@Body() createDriver: CreateDriver) {
     return await this.driversService.create(createDriver);
   }
 

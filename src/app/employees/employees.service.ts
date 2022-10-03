@@ -5,7 +5,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { domainToASCII } from 'url';
 import { AddressesService } from '../addresses/addresses.service';
 import { createEmployeeRelation } from './createRelationService';
-import { EmployeeData } from './dto/type';
+import { EmployeeData } from '../dtos/employee/createEmployeeRelation.dto';
 
 @Injectable()
 export class EmployeesService {

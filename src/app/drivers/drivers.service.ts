@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Driver, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { endOfDay, parseISO, startOfDay } from 'date-fns';
 import {
   AppMessageError,
@@ -11,6 +11,9 @@ import {
   PrismaMessageError,
 } from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
+import { CreateDriver } from '../dtos/driver/createDriver.dto';
+import { Driver } from '../dtos/driver/driver.dto';
+import { UpdateDriver } from '../dtos/driver/updateDriver.dto';
 
 const dateColunsExistInDrivers = ['validation', 'createdAt'];
 
@@ -18,7 +21,7 @@ const dateColunsExistInDrivers = ['validation', 'createdAt'];
 export class DriversService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createDriver: Prisma.DriverCreateInput): Promise<Driver> {
+  async create(createDriver: CreateDriver): Promise<Driver> {
     try {
       const driver = await this.prismaService.driver.create({
         data: createDriver,
@@ -47,7 +50,7 @@ export class DriversService {
     return drivers;
   }
 
-  async update(id: string, data: Prisma.DriverUpdateInput): Promise<Driver> {
+  async update(id: string, data: UpdateDriver): Promise<Driver> {
     try {
       const checkExistDriver = await this.prismaService.driver.findFirst({
         where: { id },

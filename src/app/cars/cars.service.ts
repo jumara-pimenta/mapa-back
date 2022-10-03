@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Car, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import {
   AppMessageError,
   PrismaCodeError,
@@ -11,6 +11,8 @@ import {
 } from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
 import { endOfDay, parseISO, startOfDay } from 'date-fns';
+import { CreateCar } from '../dtos/car/createCar.dto';
+import { Car } from '../dtos/car/car.dto';
 
 const dateColunsExistInCars = [
   'lastSurvey',
@@ -23,7 +25,7 @@ const dateColunsExistInCars = [
 export class CarsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createCar: Prisma.CarCreateInput): Promise<Car> {
+  async create(createCar:CreateCar): Promise<CreateCar> {
     try {
       console.log(createCar)
       const car = await this.prismaService.car.create({

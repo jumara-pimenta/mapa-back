@@ -1,10 +1,11 @@
-import { Employee } from "@prisma/client";
 import { PrismaService } from "src/database/prisma.service";
-import { EmployeeData } from "./dto/type";
+import { Employee } from "../dtos/employee/employee.dto";
+import { EmployeeData } from "../dtos/employee/createEmployeeRelation.dto";
+import { EmployeeCreate } from "../dtos/employee/createEmployee.dto";
 
 
 export async function createEmployeeRelation(employeedata : EmployeeData, prismaService : PrismaService){
-    let employ : Employee = employeedata.employee
+    let employ : EmployeeCreate= employeedata.employee
       const employee = await prismaService.employee.create({
         data: employ
       });
@@ -21,8 +22,7 @@ export async function createEmployeeRelation(employeedata : EmployeeData, prisma
        data: endereco,
        
      });
-      //let employ : EmployeeCreate ={employee,address}
 
       
-      return employee;
+      return employee;  
 }

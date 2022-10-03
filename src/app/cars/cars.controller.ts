@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CreateCar } from '../dtos/car/createCar.dto';
 import { CarsService } from './cars.service';
 
 @Controller('cars')
@@ -7,7 +8,7 @@ export class CarsController {
   constructor(private readonly carsService: CarsService) {}
 
   @Post()
-  async create(@Body() createCar: Prisma.CarCreateInput) {
+  async create(@Body() createCar: CreateCar) {
     return await this.carsService.create(createCar);
   }
 
