@@ -1,6 +1,17 @@
+/*
+  Warnings:
+
+  - You are about to alter the column `cep` on the `addresses` table. The data in that column could be lost. The data in that column will be cast from `Decimal(32,16)` to `Int`.
+  - You are about to alter the column `number` on the `addresses` table. The data in that column could be lost. The data in that column will be cast from `Decimal(32,16)` to `Int`.
+
+*/
 BEGIN TRY
 
 BEGIN TRAN;
+
+-- AlterTable
+ALTER TABLE [dbo].[addresses] ALTER COLUMN [cep] INT NOT NULL;
+ALTER TABLE [dbo].[addresses] ALTER COLUMN [number] INT NOT NULL;
 
 -- CreateTable
 CREATE TABLE [dbo].[routesdetails] (

@@ -60,8 +60,8 @@ model Address {
   employee     Employee @relation(fields: [employeeId],references: [id])
   employeeId   String
   street       String
-  cep          Decimal  
-  number       Decimal
+  cep          Int 
+  number       Int
   complement   String   
   neighborhood String  
   city         String
