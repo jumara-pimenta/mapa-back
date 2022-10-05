@@ -10,7 +10,6 @@ import {
   ParseUUIDPipe,
   Patch,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { CreateDriver } from '../dtos/driver/createDriver.dto';
 import { DriversService } from './drivers.service';
 

@@ -1,5 +1,5 @@
-export type CreateCar = {
-  id?: string;
+export type UpdateCar = {
+  id: string;
   plate: string;
   company: string;
   type: string;

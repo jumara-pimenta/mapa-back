@@ -13,6 +13,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { endOfDay, parseISO, startOfDay } from 'date-fns';
 import { CreateCar } from '../dtos/car/createCar.dto';
 import { Car } from '../dtos/car/car.dto';
+import { UpdateCar } from '../dtos/car/updateCar.dto';
 
 const dateColunsExistInCars = [
   'lastSurvey',
@@ -25,9 +26,9 @@ const dateColunsExistInCars = [
 export class CarsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createCar:CreateCar): Promise<CreateCar> {
+  async create(createCar: CreateCar): Promise<CreateCar> {
     try {
-      console.log(createCar)
+      console.log(createCar);
       const car = await this.prismaService.car.create({
         data: createCar,
       });
@@ -84,5 +85,47 @@ export class CarsService {
     }
 
     return cars;
+  }
+
+  async update(id: string, data: UpdateCar): Promise<Car> {
+    try {
+      const checkExistCar = await this.prismaService.car.findFirst({
+        where: { id },
+      });
+
+      if (!checkExistCar) {
+        throw new NotFoundException('Automóvel não encontrado');
+      }
+
+      const car = await this.prismaService.car.update({
+        where: { id },
+        data: data,
+      });
+
+      return car;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaCodeError.UNIQUE_CONSTRAINT
+      ) {
+        throw new BadGatewayException(
+          PrismaMessageError.UNIQUE_CONSTRAINT_VIOLATION,
+        );
+      }
+      throw error;
+    }
+  }
+
+  async remove(id: string) {
+    const car = await this.prismaService.car.findUnique({
+      where: { id },
+    });
+    if (!car) {
+      throw new NotFoundException('Automóvel não encontrado');
+    }
+
+    await this.prismaService.car.delete({ where: { id } });
+
+    return;
   }
 }
