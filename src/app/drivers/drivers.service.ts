@@ -109,4 +109,17 @@ export class DriversService {
 
     return drivers;
   }
+
+  async remove(id: string) {
+    const driver = await this.prismaService.driver.findUnique({
+      where: { id },
+    });
+    if (!driver) {
+      throw new NotFoundException('Motorista não encontrado');
+    }
+
+    await this.prismaService.driver.delete({ where: { id } });
+
+    return;
+  }
 }

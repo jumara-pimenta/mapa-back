@@ -1,4 +1,15 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { UpdateDriver } from './../dtos/driver/updateDriver.dto';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  Delete,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateDriver } from '../dtos/driver/createDriver.dto';
 import { DriversService } from './drivers.service';
@@ -20,5 +31,18 @@ export class DriversController {
   @Get('search')
   async search(@Query('column') column: string, @Query('value') value: string) {
     return await this.driversService.search(column, value);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateDriverDto: UpdateDriver,
+  ) {
+    return await this.driversService.update(id, updateDriverDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return await this.driversService.remove(id);
   }
 }
