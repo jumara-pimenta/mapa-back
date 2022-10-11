@@ -51,7 +51,7 @@ model Employee {
   costCenter   String
   createdAt DateTime @default(now())
   address     Address[]
-  routesDetail  RoutesDetails[]
+  routes  Routes[]  @relation("_RoutesToEmployee")
   @@map("employees")
 }
 
@@ -82,7 +82,7 @@ model Routes {
   carId        String @unique
   driver       Driver @relation(fields: [driverId],references: [id])
   driverId     String @unique
-  routesDetail  RoutesDetails[]
+  employees  Employee[] @relation("_RoutesToEmployee")
   totalDist    String  
   typeOfRoutes String
   startTime    String
@@ -93,13 +93,12 @@ model Routes {
   
 }
 
-model RoutesDetails {
-  id    String @id@default(uuid())
-  routes      Routes @relation(fields: [routesId],references: [id])
-  routesId    String
-  employee    Employee @relation(fields: [employeeId],references: [id])
-  employeeId  String
-  createdAt DateTime @default(now())
+// model RoutesDetails {
+//   id    String @id@default(uuid())
+//   routes      Routes @relation(fields: [routesId],references: [id])
+//   routesId    String
+//   employee    Employee @relation(fields: [employeeId],references: [id])
+//   employeeId  String
 
-  @@map("routesdetails")
-}
+//   @@map("routesdetails")
+// }

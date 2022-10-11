@@ -3,7 +3,7 @@ import { Prisma, Routes } from '@prisma/client';
 import { AppMessageError, PrismaCodeError, PrismaMessageError } from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
 import { createRoutes } from '../dtos/routes/createRoutes.dto';
-import { getRoutesRelation } from './relationService';
+import { createRoutesRelation,getRoutesRelation } from './relationService';
 @Injectable()
 export class RoutesService {
   constructor(private readonly prismaService: PrismaService) { }
@@ -11,8 +11,7 @@ export class RoutesService {
 
   async create(createRoute: createRoutes): Promise<Routes> {
     try {
-      console.log(createRoute.routes)
-      const route = await this.prismaService.routes.create({data:createRoute.routes,})
+      const route = await createRoutesRelation(this.prismaService,createRoute)
       return route
     } catch (error) {
       if (
