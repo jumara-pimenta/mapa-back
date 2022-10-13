@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { CreateDriver } from '../dtos/driver/createDriver.dto';
 import { DriversService } from './drivers.service';
+import { Driver } from '@prisma/client';
+import { DriverSearch } from '../dtos/driver/searchDriver.dto';
 
 @Controller('drivers')
 export class DriversController {
@@ -22,16 +24,20 @@ export class DriversController {
     return await this.driversService.create(createDriver);
   }
 
+  // @Get()
+  // async findAll() {
+  //   return await this.driversService.findAll();
+  // }
+
+
   @Get()
-  async findAll() {
-    return await this.driversService.findAll();
-  }
+  async listarCompraSearch(
+    @Query() search: DriverSearch,
+  ): Promise<Driver[]> {
+    console.log(search)
+    return await this.driversService.search(search)
 
-  @Get('search')
-  async search(@Query('column') column: string, @Query('value') value: string) {
-    return await this.driversService.search(column, value);
   }
-
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,

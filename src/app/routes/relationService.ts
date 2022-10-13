@@ -62,7 +62,7 @@ export async function createRoutesRelation(prismaService : PrismaService,createR
               
 
         }})
-        return route;
+        return route
       } catch (error) {
         console.log(error)
 

@@ -11,11 +11,13 @@ import {
   PrismaMessageError,
 } from 'src/constants/exceptions';
 import { PrismaService } from 'src/database/prisma.service';
+import { generateQueryByFiltersForDrivers } from 'src/database/queries/Queries';
 import { CreateDriver } from '../dtos/driver/createDriver.dto';
 import { Driver } from '../dtos/driver/driver.dto';
+import { DriverSearch } from '../dtos/driver/searchDriver.dto';
 import { UpdateDriver } from '../dtos/driver/updateDriver.dto';
 
-const dateColunsExistInDrivers = ['validation', 'createdAt'];
+const dateColunsExistInDrivers = ['validation', 'createdAt', 'name','cnh'];
 
 @Injectable()
 export class DriversService {
@@ -79,29 +81,12 @@ export class DriversService {
     }
   }
 
-  async search(column: string, value: string): Promise<Driver[]> {
-    if (dateColunsExistInDrivers.includes(column)) {
-      const drivers = await this.prismaService.driver.findMany({
-        where: {
-          [column]: {
-            gte: startOfDay(parseISO(value)),
-            lte: endOfDay(parseISO(value)),
-          },
-        },
-      });
-
-      if (drivers.length === 0) {
-        throw new NotFoundException(AppMessageError.NO_RESULTS_QUERY);
-      }
-
-      return drivers;
-    }
-
-    const drivers = await this.prismaService.driver.findMany({
-      where: {
-        [column]: value,
-      },
-    });
+  async search(value: DriverSearch): Promise<Driver[]> {
+    const condition = generateQueryByFiltersForDrivers(value);
+    console.log(condition)
+    const drivers = condition ? await this.prismaService.driver.findMany({
+      where : condition
+    }) : await this.prismaService.driver.findMany()
 
     if (drivers.length === 0) {
       throw new NotFoundException(AppMessageError.NO_RESULTS_QUERY);

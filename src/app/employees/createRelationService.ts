@@ -5,7 +5,7 @@ import { EmployeeCreate } from "../dtos/employee/createEmployee.dto";
 
 
 export async function createEmployeeRelation(employeedata : EmployeeData, prismaService : PrismaService){
-    
+   
       const employee = await prismaService.employee.create({
         data:{
          registration : employeedata.employee.registration,
