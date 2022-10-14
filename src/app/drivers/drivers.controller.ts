@@ -31,26 +31,23 @@ export class DriversController {
   //   return await this.driversService.findAll();
   // }
 
-
   @Get()
-  async listarCompraSearch(
-    @Query() search: DriverSearch,
-  ): Promise<Driver[]> {
-    console.log(search)
-    return await this.driversService.search(search)
-
+  async listarCompraSearch(@Query() search: DriverSearch): Promise<Driver[]> {
+    console.log(search);
+    return await this.driversService.search(search);
   }
-  
+
   @Get('/download/exportDrivers')
-  async exportDrivers(@Response({passthrough : true}) res) : Promise<StreamableFile>{
-    const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx'
+  async exportDrivers(
+    @Response({ passthrough: true }) res,
+  ): Promise<StreamableFile> {
+    const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx';
     res.set({
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
-    return await this.driversService.export()
+    return await this.driversService.export();
   }
-
 
   @Patch(':id')
   async update(
