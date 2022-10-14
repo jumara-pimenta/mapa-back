@@ -9,6 +9,8 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  StreamableFile,
+  Response,
 } from '@nestjs/common';
 import { CreateDriver } from '../dtos/driver/createDriver.dto';
 import { DriversService } from './drivers.service';
@@ -38,6 +40,18 @@ export class DriversController {
     return await this.driversService.search(search)
 
   }
+  
+  @Get('/download/exportDrivers')
+  async exportDrivers(@Response({passthrough : true}) res) : Promise<StreamableFile>{
+    const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx'
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.driversService.export()
+  }
+
+
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
