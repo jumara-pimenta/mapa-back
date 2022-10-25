@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus, Param } from "@nestjs/common";
-import { RouteHistory } from "../entities/RouteHistory.entity";
-import { RouteHistoryService } from "../services/RouteHistory.service";
+import { RouteHistory } from "../entities/routeHistory.entity";
+import { RouteHistoryService } from "../services/routeHistory.service";
 
 @Controller("/api/routes/histories")
 export class RouteHistoryController {

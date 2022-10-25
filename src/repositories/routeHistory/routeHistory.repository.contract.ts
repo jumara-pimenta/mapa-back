@@ -1,4 +1,4 @@
-import { RouteHistory } from "../../entities/RouteHistory.entity";
+import { RouteHistory } from "../../entities/routeHistory.entity"
 
 export default interface IRouteHistoryRepository {
   create(data: RouteHistory): Promise<RouteHistory>
