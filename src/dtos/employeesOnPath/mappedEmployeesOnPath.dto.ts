@@ -18,6 +18,6 @@ export class MappedEmployeesOnPathDTO {
   confirmation: boolean
   disembarkAt?: Date
   position: number
-  locations: IEmployee
+  location: IEmployee
   createdAt: Date
 }

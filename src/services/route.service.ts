@@ -141,7 +141,7 @@ export class RouteService {
                 confirmation: item.confirmation,
                 disembarkAt: item.disembarkAt,
                 position: item.position,
-                locations: {
+                location: {
                   name: employee.name,
                   address: employee.address,
                   shift: employee.shift,
@@ -217,7 +217,7 @@ export class RouteService {
                 confirmation: item.confirmation,
                 disembarkAt: item.disembarkAt,
                 position: item.position,
-                locations: {
+                location: {
                   name: employee.name,
                   address: employee.address,
                   shift: employee.shift,

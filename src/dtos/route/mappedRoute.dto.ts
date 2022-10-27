@@ -22,7 +22,7 @@ class IEmployeesOnPathDTO  {
   confirmation: boolean
   disembarkAt?: Date
   position: number
-  locations: IEmployee
+  location: IEmployee
 }
 
 class IPath {

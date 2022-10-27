@@ -97,7 +97,7 @@ export class EmployeesOnPathService {
       disembarkAt: employeesOnPath.disembarkAt,
       position: employeesOnPath.position,
       createdAt: employeesOnPath.createdAt,
-      locations: {
+      location: {
         name: employee.name,
         address: employee.address,
         shift: employee.shift,
@@ -123,7 +123,7 @@ export class EmployeesOnPathService {
         disembarkAt: employeesOnPath.disembarkAt,
         position: employeesOnPath.position,
         createdAt: employeesOnPath.createdAt,
-        locations: {
+        location: {
           name: employee.name,
           address: employee.address,
           shift: employee.shift,

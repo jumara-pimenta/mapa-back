@@ -26,12 +26,17 @@ export class PathService {
     const route = await this.routeService.listById(props.routeId);
 
     if (type === ETypePath.ONE_WAY || type === ETypePath.RETURN) {
-      await this.pathRepository.create(new Path({
+      const path = await this.pathRepository.create(new Path({
         duration: duration,
         startsAt: startsAt,
         type: type,
         status: EStatusPath.PENDING
       }, route));
+
+      await this.employeesOnPathService.create({
+        employeeIds: props.employeeIds,
+        pathId: path.id
+      });
     } else if (type === ETypePath.ROUND_TRIP) {
       const pathOneWay = await this.pathRepository.create(new Path({
         duration: duration,
@@ -115,7 +120,7 @@ export class PathService {
           confirmation: item.confirmation,
           disembarkAt: item.disembarkAt,
           position: item.position,
-          locations: {
+          location: {
             name: employee.name,
             address: employee.address,
             shift: employee.shift,
@@ -155,7 +160,7 @@ export class PathService {
             confirmation: item.confirmation,
             disembarkAt: item.disembarkAt,
             position: item.position,
-            locations: {
+            location: {
               name: employee.name,
               address: employee.address,
               shift: employee.shift,
