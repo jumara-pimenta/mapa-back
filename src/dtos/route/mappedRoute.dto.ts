@@ -3,7 +3,6 @@ import { MappedDriverDTO } from "../driver/mappedDriver.dto"
 import { MappedVehicleDTO } from "../vehicle/mappedVehicle.dto"
 
 class IPin {
-  type: string
   lat: string
   long: string 
 }
@@ -13,7 +12,7 @@ class IEmployee {
   address: string
   shift: string
   registration: string
-  pin: IPin
+  location: IPin
 }
 
 class IEmployeesOnPathDTO  {
@@ -22,7 +21,7 @@ class IEmployeesOnPathDTO  {
   confirmation: boolean
   disembarkAt?: Date
   position: number
-  location: IEmployee
+  details: IEmployee
 }
 
 class IPath {

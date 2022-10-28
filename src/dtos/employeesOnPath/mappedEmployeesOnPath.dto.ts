@@ -1,5 +1,4 @@
 class IPin {
-  type: string
   lat: string
   long: string 
 }
@@ -9,7 +8,7 @@ class IEmployee {
   address: string
   shift: string
   registration: string
-  pin: IPin
+  location: IPin
 }
 
 export class MappedEmployeesOnPathDTO {
@@ -18,6 +17,6 @@ export class MappedEmployeesOnPathDTO {
   confirmation: boolean
   disembarkAt?: Date
   position: number
-  location: IEmployee
+  details: IEmployee
   createdAt: Date
 }

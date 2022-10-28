@@ -141,13 +141,12 @@ export class RouteService {
                 confirmation: item.confirmation,
                 disembarkAt: item.disembarkAt,
                 position: item.position,
-                location: {
+                details: {
                   name: employee.name,
                   address: employee.address,
                   shift: employee.shift,
                   registration: employee.registration,
-                  pin: {
-                    type: pins.at(0).type,
+                  location: {
                     lat: pins.at(0).pin.lat,
                     long: pins.at(0).pin.long
                   }
@@ -217,13 +216,12 @@ export class RouteService {
                 confirmation: item.confirmation,
                 disembarkAt: item.disembarkAt,
                 position: item.position,
-                location: {
+                details: {
                   name: employee.name,
                   address: employee.address,
                   shift: employee.shift,
                   registration: employee.registration,
-                  pin: {
-                    type: pins.at(0).type,
+                  location: {
                     lat: pins.at(0).pin.lat,
                     long: pins.at(0).pin.long
                   }
