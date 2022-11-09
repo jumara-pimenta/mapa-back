@@ -1,4 +1,4 @@
-import { IQueryDriver } from "src/dtos/driver/queryDriver.dto";
+import { IQueryDriver } from "../../dtos/driver/queryDriver.dto";
 import { FiltersDriverDTO } from "../../dtos/driver/filtersDriver.dto";
 
 export function generateQueryByFiltersForDrivers(filters: FiltersDriverDTO ){

@@ -1,4 +1,4 @@
-import { ETypePin } from 'src/utils/ETypes';
+import { ETypePin } from '../utils/ETypes';
 import { Employee } from './employee.entity';
 import { Pin } from './pin.entity';
 

@@ -1,5 +1,5 @@
 import { forwardRef, Module } from "@nestjs/common";
-import { PathController } from "src/controllers/path.controller";
+import { PathController } from "../controllers/path.controller";
 import { PathRepository } from "../repositories/path/path.repository";
 import { PathService } from "../services/path.service";
 import { EmployeesOnPathModule } from "./employeesOnPath.module";
