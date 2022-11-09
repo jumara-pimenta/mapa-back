@@ -1,4 +1,4 @@
-FROM node:lts-alpine as production
+FROM node:lts-alpine
 
 ARG NODE_ENV
 ARG PORT
@@ -10,15 +10,16 @@ WORKDIR /usr/app
 ENV TZ=America/Manaus
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
-RUN npm install --only=production --silent
+RUN yarn global add @nestjs/cli
 
-COPY . .
-COPY ./prisma prisma
+COPY . ./
 
-#RUN npx prisma generate
-RUN npx prisma migrate dev
+RUN yarn --prod --silent
+RUN npx prisma generate
+RUN yarn build
 
 EXPOSE ${PORT}
-CMD ["node", "dist/main"]
+
+CMD ["yarn", "start"]

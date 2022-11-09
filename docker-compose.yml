@@ -1,20 +1,13 @@
-version: '3'
+version: '3.7'
 
 services:
-  sonar-rotas-backend:
-    image: sonar-rotas-backend:latest
-    build:
+  app:
+    image: boilerplate-backend:latest
+    build: 
       dockerfile: Dockerfile
       context: .
-      args:
-        NODE_ENV: production
-        PORT: ${BACKEND_PORT}
-    container_name: sonar-rotas-backend
-    volumes:
-      - '/etc/localtime:/etc/localtime:ro'
-      - '/etc/timezone:/etc/timezone:ro'
-    restart: always
+    container_name: boilerplate-backend
     ports:
-      - ${BACKEND_PORT}:${BACKEND_PORT}
-    env_file:
-      - .env
+      - ${PORT_BACKEND}:${PORT_BACKEND}
+    restart: always
+    env_file: .env

@@ -1,7 +1,6 @@
 build:
 	yarn
 	yarn build
-#	./scripts/automaticmigrate.sh
 	docker-compose up -d --build 
 
 .PHONY: build
@@ -10,7 +9,6 @@ deploy:
 	git pull
 	yarn
 	yarn build
-	./scripts/automaticmigrate.sh
 	docker-compose up -d --build 
 
 .PHONY: deploy
@@ -26,6 +24,6 @@ down:
 .PHONY: down
 
 logs:
-	docker logs sonar-rotas-backend -f
+	docker logs boilerplate-backend -f
 
 .PHONY: logs

@@ -1,104 +1,133 @@
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_MSSQL_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
-}
-
-model Car {
-  id              String   @id @default(uuid())
-  plate           String   @unique
-  company         String
-  type            String
-  lastSurvey      DateTime
-  expiration      DateTime
-  capacity        Int
-  renavam         Int
-  lastMaintenance DateTime
-  note            String
-  isAccessibility Boolean  @default(false)
-  routes      Routes[]
-  createdAt DateTime @default(now())
-
-  @@map("cars")
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 model Driver {
-  id         String   @id @default(uuid())
-  name       String
-  cpf        String  @unique
-  cnh        String  @unique
-  validation DateTime
-  category   String
-  routes      Routes[]
-  createdAt DateTime @default(now())
+  id                 String               @id @unique
+  name               String               @db.VarChar(255)
+  cpf                String               @unique @db.VarChar(11)
+  cnh                String               @unique @db.VarChar(11)
+  validation         String
+  category           String
+  route              Route[]
+  createdAt          DateTime             @default(now()) @db.DateTimeOffset
+  updatedAt          DateTime?            @db.DateTimeOffset
+}
 
-  @@map("drivers")
+model Route {
+  id                  String              @id @unique
+  description         String
+  distance            String  
+  type                String
+  status              String
+  driver              Driver              @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId            String
+  path                Path[]
+  vehicle             Vehicle             @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicleId           String
+  routeHistory        RouteHistory[]
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
+}
+
+model Path {
+  id                  String              @id @unique
+  duration            String              @db.VarChar(10)
+  startsAt            String              @db.VarChar(10)
+  startedAt           DateTime?           @db.DateTimeOffset
+  finishedAt          DateTime?           @db.DateTimeOffset
+  type                String
+  status              String
+  employeesOnPath     EmployeesOnPath[]
+  route               Route               @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  routeId             String
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
+}
+
+model EmployeesOnPath {
+  id                    String              @id @unique
+  path                  Path                @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  pathId                String
+  employee              Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)              
+  employeeId            String
+  confirmation          Boolean             @default(false)
+  position              Int                 @db.Int
+  boardingAt            DateTime?           @db.DateTimeOffset
+  disembarkAt           DateTime?           @db.DateTimeOffset
+  createdAt             DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt             DateTime?           @db.DateTimeOffset
+}
+
+model RouteHistory {
+  id                  String              @id @unique
+  employeeIds         String   
+  route               Route               @relation(fields: [routeId], references: [id], onDelete: Cascade)           
+  routeId             String              
+  startedAt           DateTime            @db.DateTimeOffset
+  finishedAt          DateTime            @db.DateTimeOffset
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
+}
+
+model Vehicle {
+  id                  String              @id @unique
+  plate               String              @unique
+  company             String
+  type                String
+  lastSurvey          DateTime
+  expiration          DateTime
+  capacity            Int
+  renavam             String              @db.VarChar(11)
+  lastMaintenance     DateTime
+  note                String
+  isAccessibility     Boolean             @default(false)
+  routes              Route[]
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
 }
 
 model Employee {
-  id           String   @id @default(uuid())
-  registration String  @unique
-  name         String
-  cpf          String  @unique
-  rg           String  @unique
-  admission    DateTime
-  role         String
-  shift        String
-  costCenter   String
-  createdAt DateTime @default(now())
-  address     Address[]
-  routes  Routes[]  @relation("_RoutesToEmployee")
-  @@map("employees")
+  id                  String              @id @unique
+  registration        String              @unique
+  name                String
+  cpf                 String              @unique @db.VarChar(11)
+  rg                  String              @unique @db.VarChar(9)
+  admission           DateTime
+  role                String
+  shift               String
+  costCenter          String
+  address             String              @db.VarChar(255)
+  pins                EmployeesOnPin[]
+  employeeOnPath      EmployeesOnPath[]
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
 }
 
-model Address {
-  id           String   @id @default(uuid())
-  employee     Employee @relation(fields: [employeeId],references: [id])
-  employeeId   String
-  street       String
-  cep          Int 
-  number       Int
-  complement   String   
-  neighborhood String  
-  city         String
-  state        String
-  latitude     String
-  longitude    String
-  type         Boolean @default(false)
-  createdAt DateTime @default(now())
-
-  @@map("addresses")
-  
+model Pin {
+  id                  String              @id @unique
+  description         String              @db.VarChar(255)
+  lat                 String              @db.VarChar(255)
+  long                String              @db.VarChar(255)
+  employees           EmployeesOnPin[]
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
 }
 
-model Routes {
-  id           String   @id @default(uuid())
-  name         String
-  car          Car @relation(fields: [carId],references: [id])
-  carId        String @unique
-  driver       Driver @relation(fields: [driverId],references: [id])
-  driverId     String @unique
-  employees  Employee[] @relation("_RoutesToEmployee")
-  totalDist    String  
-  typeOfRoutes String
-  startTime    String
-  duration     String
-  createdAt DateTime @default(now())
+model EmployeesOnPin {
+  employee            Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId          String
+  pin                 Pin                 @relation(fields: [pinId], references: [id], onDelete: Cascade)
+  pinId               String
+  type                String              @db.VarChar(50)
+  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  updatedAt           DateTime?           @db.DateTimeOffset
 
-  @@map("routes")
-  
+  @@id([employeeId, pinId])
 }
-
-// model RoutesDetails {
-//   id    String @id@default(uuid())
-//   routes      Routes @relation(fields: [routesId],references: [id])
-//   routesId    String
-//   employee    Employee @relation(fields: [employeeId],references: [id])
-//   employeeId  String
-
-//   @@map("routesdetails")
-// }
