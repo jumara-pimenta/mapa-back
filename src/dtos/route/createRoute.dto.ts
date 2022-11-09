@@ -12,9 +12,9 @@ export class CreateRouteDTO {
   @IsNotEmpty()
   type: ETypeRoute
 
-  @IsString()
-  @IsNotEmpty()
-  status: string
+  // @IsString()
+  // @IsNotEmpty()
+  // status: string
 
   @IsString()
   @IsNotEmpty()
