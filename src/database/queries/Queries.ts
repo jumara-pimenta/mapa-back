@@ -1,8 +1,7 @@
-import { IQueryDriver } from "src/app/dtos/driver/queryDriver.dto";
-import { DriverSearch } from "src/app/dtos/driver/searchDriver.dto"
+import { IQueryDriver } from "src/dtos/driver/queryDriver.dto";
+import { FiltersDriverDTO } from "../../dtos/driver/filtersDriver.dto";
 
-
-export function generateQueryByFiltersForDrivers(filters: DriverSearch ){
+export function generateQueryByFiltersForDrivers(filters: FiltersDriverDTO ){
 
   const fields = {
     name: () => ({
@@ -19,10 +18,7 @@ export function generateQueryByFiltersForDrivers(filters: DriverSearch ){
     }),
     category: () => ({
       category: {contains:filters.category},
-    }),
-    createdAt: () => ({
-      createdAt: filters.createdAt,
-    }),
+    })
   }
   let query: IQueryDriver
   const keysFields = Object.keys(fields)

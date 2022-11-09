@@ -1,1 +1,0 @@
-yes | npx prisma migrate dev --name migrate
