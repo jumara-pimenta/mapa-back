@@ -147,6 +147,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
     return this.buildPageResponse(items, Array.isArray(total) ? total.length : total);
   }
 
+
   create(data: Route): Promise<Route> {
     return this.repository.route.create({
       data: {
@@ -159,5 +160,27 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         vehicleId: data.vehicle.id
       }
     });
+  }
+
+  findByDriverId(id: string): Promise<any> {
+    return this.repository.route.findMany({
+      where: {
+        driverId: id
+      },
+      select: {
+        id: true,
+        path: {
+          select: {
+            startedAt: true,
+            finishedAt: true,
+            status: true,
+            startsAt: true,
+            duration: true,
+          }
+        }
+      }
+
+
+    })
   }
 }
