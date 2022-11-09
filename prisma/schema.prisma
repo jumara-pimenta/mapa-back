@@ -84,11 +84,11 @@ model Vehicle {
   plate           String    @unique
   company         String
   type            String
-  lastSurvey      DateTime  @db.DateTimeOffset
-  expiration      DateTime  @db.DateTimeOffset
+  lastSurvey      DateTime
+  expiration      DateTime
   capacity        Int
   renavam         String    @db.VarChar(11)
-  lastMaintenance DateTime  @db.DateTimeOffset
+  lastMaintenance DateTime
   note            String
   isAccessibility Boolean   @default(false)
   routes          Route[]
@@ -102,7 +102,7 @@ model Employee {
   name           String
   cpf            String            @unique @db.VarChar(11)
   rg             String            @unique @db.VarChar(9)
-  admission      DateTime          @db.DateTimeOffset
+  admission      DateTime
   role           String
   shift          String
   costCenter     String
