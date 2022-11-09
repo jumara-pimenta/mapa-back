@@ -10,6 +10,7 @@ import { DriverService } from "./driver.service";
 import { VehicleService } from "./vehicle.service";
 import { PathService } from "./path.service";
 import { EStatusRoute } from "../utils/ETypes";
+import { format, addHours, addMinutes } from 'date-fns'
 
 @Injectable()
 export class RouteService {
@@ -24,9 +25,44 @@ export class RouteService {
 
   async create(payload: CreateRouteDTO): Promise<Route> {
 
+    const initRouteTime = payload.pathDetails.startsAt.split(':')
+    const initRouteDate = new Date(2000, 1, 1, Number(initRouteTime[0]), Number(initRouteTime[1]), 0)
+
+    const initRouteDuration = payload.pathDetails.duration.split(':')
+    const endRouteDate = new Date(2000, 1, 1, Number(initRouteDuration[0]), Number(initRouteDuration[1]), 0)
+
     const driver = await this.driverService.listById(payload.driverId);
 
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
+
+
+    const driverInRoute = await this.routeRepository.findByDriverId( driver.id);
+    // console.log(driverInRoute);
+    
+
+    driverInRoute.map(route => {
+      console.log(route);
+      
+      route.path.map(path => {
+        const startedAtTime = path.startsAt.split(':')
+        const startedAtDate = new Date(2000, 1, 1, Number(startedAtTime[0]), Number(startedAtTime[1]), 0);
+
+        const duration = path.duration.split(':')
+        const durationTime = new Date(2000, 1, 1, Number(duration[0]), Number(duration[1]), 0);
+
+        const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
+        console.log("finishedAtTime", finishedAtTime);
+        console.log("initRouteDate",initRouteDate);
+        console.log("endRouteDate", endRouteDate);
+
+          if(initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime ){
+           throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
+          }
+          if(endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime){
+            throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
+           }
+      })
+    });
 
     const props = new Route({
       description: payload.description,
@@ -80,7 +116,7 @@ export class RouteService {
 
     const route = await this.listById(id);
 
-    return await this.routeRepository.update(Object.assign(route, {...route, ...data}));
+    return await this.routeRepository.update(Object.assign(route, { ...route, ...data }));
   }
 
   private mapperMany(routes: Route[]): MappedRouteDTO[] {
@@ -121,7 +157,7 @@ export class RouteService {
         },
         paths: path.map(item => {
           const { employeesOnPath } = item;
-  
+
           return {
             id: item.id,
             duration: item.duration,
@@ -134,7 +170,7 @@ export class RouteService {
             employeesOnPath: employeesOnPath.map(item => {
               const { employee } = item;
               const { pins } = employee;
-  
+
               return {
                 id: item.id,
                 boardingAt: item.boardingAt,
@@ -161,75 +197,75 @@ export class RouteService {
 
   private mapperOne(route: Route): MappedRouteDTO {
     const { driver, vehicle, path } = route;
-      
-      return {
-        id: route.id,
-        description: route.description,
-        distance: route.distance,
-        status: route.status,
-        type: route.type,
-        createdAt: route.createdAt,
-        driver: {
-          id: driver.id,
-          name: driver.name,
-          cpf: driver.cpf,
-          cnh: driver.cnh,
-          validation: driver.validation,
-          category: driver.category,
-          createdAt: driver.createdAt,
-          updatedAt: driver.updatedAt
-        },
-        vehicle: {
-          id: vehicle.id,
-          plate: vehicle.plate,
-          company: vehicle.company,
-          type: vehicle.type,
-          lastSurvey: vehicle.lastSurvey,
-          expiration: vehicle.expiration,
-          capacity: vehicle.capacity,
-          renavam: vehicle.renavam,
-          lastMaintenance: vehicle.lastMaintenance,
-          note: vehicle.note,
-          isAccessibility: vehicle.isAccessibility,
-          createdAt: vehicle.createdAt,
-          updatedAt: vehicle.updatedAt
-        },
-        paths: path.map(item => {
-          const { employeesOnPath } = item;
-  
-          return {
-            id: item.id,
-            duration: item.duration,
-            finishedAt: item.finishedAt,
-            startedAt: item.startedAt,
-            startsAt: item.startsAt,
-            status: item.status,
-            type: item.type,
-            createdAt: item.createdAt,
-            employeesOnPath: employeesOnPath.map(item => {
-              const { employee } = item;
-              const { pins } = employee;
-  
-              return {
-                id: item.id,
-                boardingAt: item.boardingAt,
-                confirmation: item.confirmation,
-                disembarkAt: item.disembarkAt,
-                position: item.position,
-                details: {
-                  name: employee.name,
-                  address: employee.address,
-                  shift: employee.shift,
-                  registration: employee.registration,
-                  location: {
-                    lat: pins.at(0).pin.lat,
-                    long: pins.at(0).pin.long
-                  }
+
+    return {
+      id: route.id,
+      description: route.description,
+      distance: route.distance,
+      status: route.status,
+      type: route.type,
+      createdAt: route.createdAt,
+      driver: {
+        id: driver.id,
+        name: driver.name,
+        cpf: driver.cpf,
+        cnh: driver.cnh,
+        validation: driver.validation,
+        category: driver.category,
+        createdAt: driver.createdAt,
+        updatedAt: driver.updatedAt
+      },
+      vehicle: {
+        id: vehicle.id,
+        plate: vehicle.plate,
+        company: vehicle.company,
+        type: vehicle.type,
+        lastSurvey: vehicle.lastSurvey,
+        expiration: vehicle.expiration,
+        capacity: vehicle.capacity,
+        renavam: vehicle.renavam,
+        lastMaintenance: vehicle.lastMaintenance,
+        note: vehicle.note,
+        isAccessibility: vehicle.isAccessibility,
+        createdAt: vehicle.createdAt,
+        updatedAt: vehicle.updatedAt
+      },
+      paths: path.map(item => {
+        const { employeesOnPath } = item;
+
+        return {
+          id: item.id,
+          duration: item.duration,
+          finishedAt: item.finishedAt,
+          startedAt: item.startedAt,
+          startsAt: item.startsAt,
+          status: item.status,
+          type: item.type,
+          createdAt: item.createdAt,
+          employeesOnPath: employeesOnPath.map(item => {
+            const { employee } = item;
+            const { pins } = employee;
+
+            return {
+              id: item.id,
+              boardingAt: item.boardingAt,
+              confirmation: item.confirmation,
+              disembarkAt: item.disembarkAt,
+              position: item.position,
+              details: {
+                name: employee.name,
+                address: employee.address,
+                shift: employee.shift,
+                registration: employee.registration,
+                location: {
+                  lat: pins.at(0).pin.lat,
+                  long: pins.at(0).pin.long
                 }
               }
-            })
-          }
-        })
-      }
+            }
+          })
+        }
+      })
+    }
   }
 }
