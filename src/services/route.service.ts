@@ -115,34 +115,49 @@ export class RouteService {
       throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
     }
 
-
-    const driverInRoute = await this.routeRepository.findByDriverId( driver.id);
-    // console.log(driverInRoute);
-    
+    const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     driverInRoute.map(route => {
-      console.log(route);
-      
       route.path.map(path => {
-        const startedAtTime = path.startsAt.split(':')
-        const startedAtDate = new Date(2000, 1, 1, Number(startedAtTime[0]), Number(startedAtTime[1]), 0);
-
-        const duration = path.duration.split(':')
-        const durationTime = new Date(2000, 1, 1, Number(duration[0]), Number(duration[1]), 0);
-
+        const startedAtDate = convertTimeToDate(path.startsAt);
+        const durationTime = convertTimeToDate(path.duration);
+        
         const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
-        console.log("finishedAtTime", finishedAtTime);
-        console.log("initRouteDate",initRouteDate);
-        console.log("endRouteDate", endRouteDate);
-
-          if(initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime ){
-           throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
-          }
-          if(endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime){
-            throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
-           }
+        
+        if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
+          throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
+        }
+        if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
+          throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
+        }
       })
     });
+
+    const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
+    
+    if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {
+    }
+
+    await employeeInRoute.map(route => {
+      route.path.map(path => {
+        // const startedAtDate = convertTimeToDate(path.startsAt);
+        // const durationTime = convertTimeToDate(path.duration);
+        // const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
+
+        // const employeeInPath = path.employeesOnPath.filter(item => payload.employeeIds.includes(item.employee.id));
+
+        // if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime || endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
+        //   employeeArray.push(employeeInPath)
+        // }
+        
+      })
+    });
+
+
+    if (employeeArray.length > 0) {
+      throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota neste horário!`, HttpStatus.CONFLICT);
+
+    }
 
     const props = new Route({
       description: payload.description,
