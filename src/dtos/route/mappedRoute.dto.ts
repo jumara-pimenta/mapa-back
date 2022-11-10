@@ -74,3 +74,31 @@ export class MappedRouteDTO {
 	paths: IPath[]
 	vehicle: IVehicle
 }
+
+export class MappedRouteShortDTO {
+	id: string
+	description: string
+	distance: string
+	driver: IDriverShort
+	type: string
+	vehicle: IVehicleShort
+}
+
+
+class IDriverShort {
+  id: string
+  name: string
+}
+
+class IVehicleShort {
+  id: string
+  plate: string
+}
+
+
+class IPathShort {
+  id: string
+  startsAt: string
+  employeesOnPath: IEmployeesOnPathDTO[]
+
+}

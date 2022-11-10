@@ -3,7 +3,7 @@ import { Route } from "../entities/route.entity";
 import IRouteRepository from "../repositories/route/route.repository.contract";
 import { Page, PageResponse } from "../configs/database/page.model";
 import { FiltersRouteDTO } from "../dtos/route/filtersRoute.dto";
-import { MappedRouteDTO } from "../dtos/route/mappedRoute.dto";
+import { MappedRouteDTO, MappedRouteShortDTO } from "../dtos/route/mappedRoute.dto";
 import { CreateRouteDTO } from "../dtos/route/createRoute.dto";
 import { UpdateRouteDTO } from "../dtos/route/updateRoute.dto";
 import { DriverService } from "./driver.service";
@@ -60,7 +60,7 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
-  async listAll(page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<MappedRouteDTO>> {
+  async listAll(page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<MappedRouteShortDTO>> {
 
     const routes = await this.routeRepository.findAll(page, filters);
 
@@ -68,7 +68,7 @@ export class RouteService {
       throw new HttpException("Não existe routes para esta pesquisa!", HttpStatus.NOT_FOUND);
     }
 
-    const items = this.mapperMany(routes.items);
+    const items = this.mapperDataRoutes(routes.items);
 
     return {
       total: routes.total,
@@ -158,6 +158,31 @@ export class RouteService {
       }
     })
   }
+
+  private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
+    return routes.map(route => {
+      const { driver, vehicle, path } = route;
+
+    return {
+      id : route.id,
+      description : route.description,
+      distance : route.description,
+      type : route.type,
+      driver : {
+        id : driver.id,
+        name : driver.name
+      },
+      vehicle : {
+        id : vehicle.id,
+        plate : vehicle.plate
+      },
+      
+
+      }  
+    })}
+    
+  
+  
 
   private mapperOne(route: Route): MappedRouteDTO {
     const { driver, vehicle, path } = route;

@@ -11,7 +11,7 @@ import {
   Query
 } from "@nestjs/common";
 import { FiltersRouteDTO } from "../dtos/route/filtersRoute.dto";
-import { MappedRouteDTO } from "../dtos/route/mappedRoute.dto";
+import { MappedRouteDTO, MappedRouteShortDTO } from "../dtos/route/mappedRoute.dto";
 import { Page, PageResponse } from "../configs/database/page.model";
 import { Route } from "../entities/route.entity";
 import { RouteService } from "../services/route.service";
@@ -44,7 +44,7 @@ export class RouteController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAll(@Query() page: Page, @Query() filters: FiltersRouteDTO): Promise<PageResponse<MappedRouteDTO>> {
+  async getAll(@Query() page: Page, @Query() filters: FiltersRouteDTO): Promise<PageResponse<MappedRouteShortDTO>> {
     return await this.routeService.listAll(page, filters);
   }
 
