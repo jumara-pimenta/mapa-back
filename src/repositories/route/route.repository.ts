@@ -58,6 +58,9 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
             type: true,
             createdAt: true,
             employeesOnPath: {
+              orderBy: {
+                position: "asc"
+              },
               select: {
                 id: true,
                 boardingAt: true,
@@ -88,7 +91,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
           }
         },
         vehicle: true
-      }   
+      }
     })
   }
 
@@ -115,6 +118,9 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         path: {
           include: {
             employeesOnPath: {
+              orderBy: {
+                position: "asc"
+              },
               include: {
                 employee: {
                   select: {
@@ -181,6 +187,47 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
       }
 
 
+    })
+  }
+
+  findByEmployeeIds(id: string[]): Promise<any> {
+    return this.repository.route.findMany({
+      where: {
+        path: {
+          some: {
+            employeesOnPath: {
+              some: {
+                employeeId: {
+                  in: id
+                }
+              }
+            }
+          }
+        }
+      },
+      select: {
+        id: true,
+
+        path: {
+          select: {
+            employeesOnPath: {
+              select: {
+                employee: {
+                  select: {
+                    name: true,
+                    id: true,
+                  },
+                },
+              },
+            },
+            startedAt: true,
+            finishedAt: true,
+            status: true,
+            startsAt: true,
+            duration: true,
+          }
+        }
+      }
     })
   }
 }
