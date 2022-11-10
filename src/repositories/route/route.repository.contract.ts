@@ -8,5 +8,6 @@ export default interface IRouteRepository {
   findAll(page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<Route>>
   findById(id: string): Promise<Route>
   findByDriverId(id: string): Promise<Route[]>
+  findByEmployeeIds(id: string[]): Promise<Route[]>
   update(data: Route): Promise<Route>
 }
