@@ -58,7 +58,7 @@ model EmployeesOnPath {
   pathId       String
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   employeeId   String
-  confirmation Boolean   @default(false)
+  confirmation Boolean   @default(true)
   position     Int       @db.Int
   boardingAt   DateTime? @db.DateTimeOffset
   disembarkAt  DateTime? @db.DateTimeOffset
