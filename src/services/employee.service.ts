@@ -59,6 +59,7 @@ export class EmployeeService {
     return employees.map(employee => {
       return {
         id: employee.id,
+        name : employee.name,
         address: employee.address,
         admission: employee.admission,
         costCenter: employee.costCenter,

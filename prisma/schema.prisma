@@ -13,7 +13,7 @@ model Driver {
   name               String               @db.VarChar(255)
   cpf                String               @unique @db.VarChar(11)
   cnh                String               @unique @db.VarChar(11)
-  validation         String
+  validation         DateTime
   category           String
   route              Route[]
   createdAt          DateTime             @default(now()) @db.DateTimeOffset

@@ -6,7 +6,7 @@ export class Driver {
   name: string
   cpf: string
   cnh: string
-  validation: string
+  validation: Date
   category: string
   route?: Route
   createdAt: Date
