@@ -1,41 +1,51 @@
-import { IsDate, IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import {
+  IsDate,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateEmployeeDTO {
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  registration?: string
+  registration?: string;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  cpf?: string
+  @MinLength(11, { message: 'CPF nao pode conter menos que 11 digitos.' })
+  @MaxLength(11, { message: 'CPF nao pode conter mais que 11 digitos.' })
+  cpf?: string;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  rg?: string
+  @MinLength(9, { message: 'Rg nao pode conter menos que 9 digitos.' })
+  @MaxLength(11, { message: 'Rg nao pode conter mais que 9 digitos.' })
+  rg?: string;
 
-  @IsString()
-  @IsDate()
   @IsOptional()
-  admission?: Date
+  @IsDateString({ message: 'Registration não está definido como DateString.' })
+  admission?: Date;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  name?: string
+  name?: string;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  role?: string
+  role?: string;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  shift?: string
+  shift?: string;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  costCenter?: string
+  costCenter?: string;
 
-  @IsString()
+  @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  address?: string
-
+  address?: string;
 }
