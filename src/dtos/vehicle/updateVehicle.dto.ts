@@ -1,44 +1,59 @@
-import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import {
+  IsBoolean,
+  IsDate,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateVehicleDTO {
-  @IsString()
+  @IsString({ message: 'Plate não está definido para o tipo string.' })
   @IsOptional()
-  plate?: string
+  @MinLength(7, { message: 'Plate nao pode conter menos que 7 digitos.' })
+  @MaxLength(7, { message: 'Plate nao pode conter mais que 7 digitos.' })
+  plate?: string;
 
-  @IsString()
+  @IsString({ message: 'Company não está definido para o tipo string.' })
   @IsOptional()
-  company?: string
+  company?: string;
 
-  @IsString()
+  @IsString({ message: 'Type não está definido para o tipo string.' })
   @IsOptional()
-  type?: string
-
-  @IsDate()
-  @IsOptional()
-  lastSurvey?: Date
+  type?: string;
 
   @IsDate()
   @IsOptional()
-  expiration?: Date
+  lastSurvey?: Date;
+
+  @IsDate()
+  @IsOptional()
+  expiration?: Date;
 
   @IsNumber()
   @IsOptional()
-  capacity?: number
+  capacity?: number;
 
-  @IsString()
+  @IsString({ message: 'Renavam não está definido para o tipo string.' })
   @IsOptional()
-  renavam?: string
+  @MinLength(11, { message: 'Renavam nao pode conter menos que 11 digitos.' })
+  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 digitos.' })
+  renavam?: string;
 
   @IsDate()
   @IsOptional()
-  lastMaintenance?: Date
+  lastMaintenance?: Date;
 
-  @IsString()
+  @IsString({ message: 'note não está definido para o tipo string.' })
   @IsOptional()
-  note?: string
+  note?: string;
 
-  @IsString()
+  @IsString({
+    message: 'IsAccessibility não está definido para o tipo string.',
+  })
   @IsBoolean()
   @IsOptional()
-  isAccessibility?: boolean
+  isAccessibility?: boolean;
 }
