@@ -6,6 +6,8 @@ import {
   Matches,
   IsDateString,
 } from 'class-validator';
+import { Employee } from 'src/entities/employee.entity';
+// import { Unique } from './validator';
 
 export class CreateEmployeeDTO {
   @IsString({ message: 'Registration não está definido como string.' })
@@ -18,10 +20,11 @@ export class CreateEmployeeDTO {
   @MaxLength(11, { message: 'CPF nao pode conter mais que 11 digitos.' })
   cpf: string;
 
+  // @Length(10, 20)
   @IsString({ message: 'RG não está definido como string.' })
   @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
-  @MinLength(9, { message: 'Rg nao pode conter menos que 9 digitos.' })
-  @MaxLength(11, { message: 'Rg nao pode conter mais que 9 digitos.' })
+  @MinLength(7, { message: 'Rg nao pode conter menos que 9 digitos.' })
+  @MaxLength(10, { message: 'Rg nao pode conter mais que 9 digitos.' })
   rg: string;
 
   @IsString({ message: 'Admission não está definido como string.' })
@@ -35,7 +38,7 @@ export class CreateEmployeeDTO {
 
   @IsString({ message: 'Name não está definido como string.' })
   @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
-  @Matches(/^[a-zA-Z0-9\-_]\w{4,20}$/, { message: 'Nome de usuario Inválido' })
+  // @Matches(/^[a-zA-Z0-9\-_]\w{4,20}$/, { message: 'Nome de usuario Inválido' })
   name: string;
 
   @IsString({ message: 'Shift não está definido como string.' })

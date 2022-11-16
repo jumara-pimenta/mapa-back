@@ -21,8 +21,8 @@ export class UpdateEmployeeDTO {
 
   @IsString({ message: 'Registration não está definido como string.' })
   @IsOptional()
-  @MinLength(9, { message: 'Rg nao pode conter menos que 9 digitos.' })
-  @MaxLength(11, { message: 'Rg nao pode conter mais que 9 digitos.' })
+  @MinLength(7, { message: 'Rg nao pode conter menos que 9 digitos.' })
+  @MaxLength(10, { message: 'Rg nao pode conter mais que 9 digitos.' })
   rg?: string;
 
   @IsOptional()
