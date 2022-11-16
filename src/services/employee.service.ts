@@ -10,9 +10,9 @@ import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 @Injectable()
 export class EmployeeService {
   constructor(
-    @Inject('IEmployeeRepository')
-    private readonly employeeRepository: IEmployeeRepository,
-  ) {}
+    @Inject("IEmployeeRepository")
+    private readonly employeeRepository: IEmployeeRepository    
+  ) { }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
     const CpfExists = await this.employeeRepository.findByCpf(payload.cpf);
