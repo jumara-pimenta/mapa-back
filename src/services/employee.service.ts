@@ -11,7 +11,7 @@ import { UpdateEmployeeDTO } from "../dtos/employee/updateEmployee.dto";
 export class EmployeeService {
   constructor(
     @Inject("IEmployeeRepository")
-    private readonly employeeRepository: IEmployeeRepository
+    private readonly employeeRepository: IEmployeeRepository    
   ) { }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
@@ -53,6 +53,10 @@ export class EmployeeService {
     const employee = await this.listById(id);
 
     return await this.employeeRepository.update(Object.assign(employee, {...employee, ...data}));
+  }
+
+  async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
+    return await this.employeeRepository.findByIds(ids);
   }
 
   private toDTO(employees: Employee[]): MappedEmployeeDTO[] {

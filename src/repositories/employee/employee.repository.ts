@@ -84,4 +84,24 @@ export class EmployeeRepository extends Pageable<Employee> implements IEmployeeR
       }
     });
   }
+
+  findByIds(ids: string[]): Promise<any> {
+    return this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        pins: {
+          select: {
+            pin: true
+          }
+        }
+      }
+    });
+  }
+
 }
