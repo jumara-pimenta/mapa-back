@@ -31,7 +31,6 @@ export class RouteService {
 
   async create(payload: CreateRouteDTO): Promise<Route> {
     let employeeArray = [];
-
     let employeeArrayPins = [];
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
