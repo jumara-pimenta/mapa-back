@@ -98,22 +98,23 @@ export class EmployeeRepository
     });
   }
 
-  // create(data: Employee): Promise<Employee> {
-  //   return this.repository.employee.create({
-  //     data: {
-  //       id: data.id,
-  //       address: data.address,
-  //       // admission: data.admission,
-  //       admission: getDateInLocaleTime(new Date(data.admission)),
+  findByIds(ids: string[]): Promise<any> {
+    return this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        pins: {
+          select: {
+            pin: true
+          }
+        }
+      }
+    });
+  }
 
-  //       costCenter: data.costCenter,
-  //       cpf: data.cpf,
-  //       name: data.name,
-  //       registration: data.registration,
-  //       rg: data.rg,
-  //       role: data.role,
-  //       shift: data.shift,
-  //     },
-  //   });
-  // }
 }

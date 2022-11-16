@@ -8,4 +8,5 @@ export default interface IEmployeeRepository {
   findAll(page: Page, filters?: FiltersEmployeeDTO): Promise<PageResponse<Employee>>
   findById(id: string): Promise<Employee>
   update(data: Employee): Promise<Employee>
+  findByIds(ids: string[]): Promise<Employee[]>
 }

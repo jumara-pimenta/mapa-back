@@ -10,15 +10,9 @@ import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 @Injectable()
 export class EmployeeService {
   constructor(
-    @Inject('IEmployeeRepository')
-    private readonly employeeRepository: IEmployeeRepository,
-  ) {}
-
-  // async create(payload: CreateEmployeeDTO): Promise<Employee> {
-  //   return await this.employeeRepository.create(
-  //     new Employee({ ...payload, admission: new Date(payload.admission) }),
-  //   );
-  // }
+    @Inject("IEmployeeRepository")
+    private readonly employeeRepository: IEmployeeRepository    
+  ) { }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeRepository.create(new Employee(payload));
@@ -69,6 +63,10 @@ export class EmployeeService {
     return await this.employeeRepository.update(
       Object.assign(employee, { ...employee, ...data }),
     );
+  }
+
+  async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
+    return await this.employeeRepository.findByIds(ids);
   }
 
   private toDTO(employees: Employee[]): MappedEmployeeDTO[] {
