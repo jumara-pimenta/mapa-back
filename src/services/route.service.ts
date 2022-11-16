@@ -10,8 +10,10 @@ import { DriverService } from "./driver.service";
 import { VehicleService } from "./vehicle.service";
 import { PathService } from "./path.service";
 import { EStatusRoute } from "../utils/ETypes";
-import { format, addHours, addMinutes } from 'date-fns'
+import { addHours, addMinutes } from 'date-fns'
 import { convertTimeToDate } from "src/utils/date.service";
+import { EmployeeService } from "./employee.service";
+import { Employee } from "src/entities/employee.entity";
 
 @Injectable()
 export class RouteService {
@@ -20,28 +22,51 @@ export class RouteService {
     private readonly routeRepository: IRouteRepository,
     private readonly driverService: DriverService,
     private readonly vehicleService: VehicleService,
+    private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService
   ) { }
 
+
   async create(payload: CreateRouteDTO): Promise<Route> {
     let employeeArray = [];
+    let employeeArrayPins = [];
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
 
-    const driver = await this.driverService.listById(payload.driverId);
-    const vehicle = await this.vehicleService.listById(payload.vehicleId);
+    const driver = await this.driverService.listById(payload.driverId); // Busca o motorista pelo id
+    const vehicle = await this.vehicleService.listById(payload.vehicleId); // Busca o veículo pelo id
+
+    const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds); // Busca os pins dos funcionários
+    console.log(employeesPins);
+    employeesPins.map((employee: Employee) => {
+      if (!employee.pins) {
+        employeeArrayPins.push(employee.name)
+      } else {
+        employee.pins.filter((pin: any) => {
+          if (pin.type !== payload.type) {
+            return employeeArrayPins.push(employee.name);
+          }
+        })
+      }
+    })
+
+    if (employeeArrayPins.length > 0) {
+      throw new HttpException(`O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto em rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
+    }
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
+
+    const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
 
     driverInRoute.map(route => {
       route.path.map(path => {
         const startedAtDate = convertTimeToDate(path.startsAt);
         const durationTime = convertTimeToDate(path.duration);
-        
+
         const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
-        
+
         if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
           throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
         }
@@ -51,29 +76,27 @@ export class RouteService {
       })
     });
 
-    const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
-    
+
     if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {
     }
 
-    await employeeInRoute.map(route => {
+    employeeInRoute.map((route: Route) => {
       route.path.map(path => {
-        // const startedAtDate = convertTimeToDate(path.startsAt);
-        // const durationTime = convertTimeToDate(path.duration);
-        // const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
+        const employeeInPath = path.employeesOnPath.filter(item => {
 
-        // const employeeInPath = path.employeesOnPath.filter(item => payload.employeeIds.includes(item.employee.id));
+          if (payload.type === route.type) {
+            return payload.employeeIds.includes(item.employee.id);
+          }
+        });
 
-        // if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime || endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
-        //   employeeArray.push(employeeInPath)
-        // }
-        
+        employeeArray.push(employeeInPath);
       })
     });
 
 
+
     if (employeeArray.length > 0) {
-      throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota neste horário!`, HttpStatus.CONFLICT);
+      throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
 
     }
 
