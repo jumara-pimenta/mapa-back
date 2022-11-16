@@ -207,6 +207,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
       },
       select: {
         id: true,
+        type: true,
 
         path: {
           select: {

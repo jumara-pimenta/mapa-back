@@ -6,6 +6,7 @@ export default interface IEmployeesOnPathRepository {
   delete(id: string): Promise<EmployeesOnPath>
   findAll(page: Page, filters?: any): Promise<PageResponse<EmployeesOnPath>>
   findById(id: string): Promise<EmployeesOnPath>
+  findByIds(id: string): Promise<EmployeesOnPath[]>
   findByPath(pathId: string): Promise<EmployeesOnPath[]>
   findByRoute(routeId: string): Promise<EmployeesOnPath>
   findManyByRoute(routeId: string): Promise<EmployeesOnPath[]>
