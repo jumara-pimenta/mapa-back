@@ -117,13 +117,15 @@ export class RouteService {
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
+    const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
+
     driverInRoute.map(route => {
       route.path.map(path => {
         const startedAtDate = convertTimeToDate(path.startsAt);
         const durationTime = convertTimeToDate(path.duration);
-        
+
         const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
-        
+
         if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
           throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
         }
@@ -133,29 +135,27 @@ export class RouteService {
       })
     });
 
-    const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
-    
+
     if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {
     }
 
-    await employeeInRoute.map(route => {
+    employeeInRoute.map((route: Route) => {
       route.path.map(path => {
-        // const startedAtDate = convertTimeToDate(path.startsAt);
-        // const durationTime = convertTimeToDate(path.duration);
-        // const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
+        const employeeInPath = path.employeesOnPath.filter(item => {
 
-        // const employeeInPath = path.employeesOnPath.filter(item => payload.employeeIds.includes(item.employee.id));
+          if (payload.type === route.type) {
+            return payload.employeeIds.includes(item.employee.id);
+          }
+        });
 
-        // if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime || endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
-        //   employeeArray.push(employeeInPath)
-        // }
-        
+        employeeArray.push(employeeInPath);
       })
     });
 
 
+
     if (employeeArray.length > 0) {
-      throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota neste horário!`, HttpStatus.CONFLICT);
+      throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
 
     }
 
