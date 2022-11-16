@@ -114,4 +114,24 @@ export class EmployeeRepository
       },
     });
   }
+
+  findByIds(ids: string[]): Promise<any> {
+    return this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        pins: {
+          select: {
+            pin: true
+          }
+        }
+      }
+    });
+  }
+
 }
