@@ -35,7 +35,6 @@ export class CreateEmployeeDTO {
 
   @IsString({ message: 'Name não está definido como string.' })
   @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
-  @Matches(/^[a-zA-Z0-9\-_]\w{4,20}$/, { message: 'Nome de usuario Inválido' })
   name: string;
 
   @IsString({ message: 'Shift não está definido como string.' })
