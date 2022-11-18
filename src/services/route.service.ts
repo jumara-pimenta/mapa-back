@@ -42,14 +42,18 @@ export class RouteService {
     console.log(employeesPins);
     employeesPins.map((employee: Employee) => {
       if (!employee.pins) {
+        console.log("TESTE =>"+employee);
+        
         employeeArrayPins.push(employee.name)
-      } else {
+      } 
         employee.pins.filter((pin: any) => {
           if (pin.type !== payload.type) {
+            console.log("TESTE =>",[pin]);
+            
             return employeeArrayPins.push(employee.name);
           }
         })
-      }
+      
     })
 
     if (employeeArrayPins.length > 0) {
