@@ -1,5 +1,6 @@
 export class MappedEmployeeDTO {
   id: string
+  name : string
   registration: string
   cpf: string
   rg: string

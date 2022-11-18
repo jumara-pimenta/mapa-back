@@ -1,5 +1,5 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, Query } from "@nestjs/common";
-import { MappedPathDTO } from "src/dtos/path/mappedPath.dto";
+import { MappedPathDTO } from "../dtos/path/mappedPath.dto";
 import { Path } from "../entities/path.entity";
 import { PathService } from "../services/path.service";
 

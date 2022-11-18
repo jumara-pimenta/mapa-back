@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from "class-validator"
-import { ETypePin } from "src/utils/ETypes"
+import { ETypePin } from "../../utils/ETypes"
 
 export class AssociateEmployeeOnPinDTO {
   @IsString()

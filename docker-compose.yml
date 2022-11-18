@@ -2,11 +2,11 @@ version: '3.7'
 
 services:
   app:
-    image: boilerplate-backend:latest
+    image: sonar-rotas-backend:latest
     build: 
       dockerfile: Dockerfile
       context: .
-    container_name: boilerplate-backend
+    container_name: sonar-rotas-backend
     ports:
       - ${PORT_BACKEND}:${PORT_BACKEND}
     restart: always

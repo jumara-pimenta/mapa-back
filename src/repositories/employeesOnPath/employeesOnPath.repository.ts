@@ -4,8 +4,8 @@ import { PrismaService } from "../../configs/database/prisma.service";
 import IEmployeesOnPathRepository from "./employeesOnPath.repository.contract";
 import { getDateInLocaleTime } from "../../utils/date.service";
 import { EmployeesOnPath } from "../../entities/employeesOnPath.entity";
-import { Page, PageResponse } from "src/configs/database/page.model";
-import { generateQueryByFiltersForEmployeesOnPath } from "src/configs/database/Queries";
+import { Page, PageResponse } from "../../configs/database/page.model";
+import { generateQueryByFiltersForEmployeesOnPath } from "../../configs/database/Queries";
 
 @Injectable()
 export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> implements IEmployeesOnPathRepository {

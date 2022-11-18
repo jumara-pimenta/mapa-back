@@ -1,43 +1,59 @@
-import { IsString, IsNotEmpty, IsBoolean, IsNumber, IsDate } from "class-validator";
+import {
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsNumber,
+  IsDate,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateVehicleDTO {
-  @IsString()
-  @IsNotEmpty()
-  plate: string
+  @IsString({ message: 'Plate não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Plate não pode esta vazio.' })
+  @MinLength(7, { message: 'Plate nao pode conter menos que 7 digitos.' })
+  @MaxLength(7, { message: 'Plate nao pode conter mais que 7 digitos.' })
+  plate: string;
 
-  @IsString()
-  @IsNotEmpty()
-  company: string
+  @IsString({ message: 'Company não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Company não pode esta vazio.' })
+  company: string;
 
-  @IsString()
-  @IsNotEmpty()
-  type: string
+  @IsString({ message: 'Type não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Type não pode esta vazio.' })
+  type: string;
 
-  @IsString()
-  @IsNotEmpty()
-  lastSurvey: string
+  @IsString({ message: 'LastSurvey não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'LastSurvey não pode esta vazio.' })
+  lastSurvey: string;
 
-  @IsString()
-  @IsNotEmpty()
-  expiration: string
+  @IsString({ message: 'Expiration não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Expiration não pode esta vazio.' })
+  expiration: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  capacity: number
+  @IsNotEmpty({ message: 'capacity não pode esta vazio.' })
+  capacity: number;
 
-  @IsString()
-  @IsNotEmpty()
-  renavam: string
+  @IsString({ message: 'Renavam não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Renavam não pode esta vazio.' })
+  @MinLength(11, { message: 'Renavam nao pode conter menos que 11 digitos.' })
+  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 digitos.' })
+  renavam: string;
 
-  @IsString()
-  @IsNotEmpty()
-  lastMaintenance: string
+  @IsString({
+    message: 'LastMaintenance não está definido para o tipo string.',
+  })
+  @IsNotEmpty({ message: 'LastMaintenance não pode esta vazio.' })
+  lastMaintenance: string;
 
-  @IsString()
-  @IsNotEmpty()
-  note: string
+  @IsString({ message: 'Note não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Note não pode esta vazio.' })
+  note: string;
 
-  @IsBoolean()
-  @IsNotEmpty()
-  isAccessibility: boolean
+  @IsBoolean({
+    message: 'isAccessibility não está definido para o tipo tipo booleans.',
+  })
+  @IsNotEmpty({ message: 'isAccessibility não pode esta vazio.' })
+  isAccessibility: boolean;
 }

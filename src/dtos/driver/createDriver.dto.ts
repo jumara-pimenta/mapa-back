@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, IsDateString } from "class-validator";
 
 export class CreateDriverDTO {
   @IsString()
@@ -13,9 +13,9 @@ export class CreateDriverDTO {
   @IsNotEmpty()
   cnh: string
 
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
-  validation: string
+  validation: Date
 
   @IsString()
   @IsNotEmpty()

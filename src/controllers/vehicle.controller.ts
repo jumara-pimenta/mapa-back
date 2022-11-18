@@ -1,28 +1,26 @@
-import { 
-  Body, 
-  Controller, 
-  Delete, 
-  Get, 
-  HttpCode, 
-  HttpStatus, 
-  Param, 
-  Post, 
-  Put, 
-  Query
-} from "@nestjs/common";
-import { FiltersVehicleDTO } from "../dtos/vehicle/filtersVehicle.dto";
-import { MappedVehicleDTO } from "../dtos/vehicle/mappedVehicle.dto";
-import { Page, PageResponse } from "../configs/database/page.model";
-import { Vehicle } from "../entities/vehicle.entity";
-import { VehicleService } from "../services/vehicle.service";
-import { CreateVehicleDTO } from "../dtos/vehicle/createVehicle.dto";
-import { UpdateVehicleDTO } from "../dtos/vehicle/updateVehicle.dto";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { FiltersVehicleDTO } from '../dtos/vehicle/filtersVehicle.dto';
+import { MappedVehicleDTO } from '../dtos/vehicle/mappedVehicle.dto';
+import { Page, PageResponse } from '../configs/database/page.model';
+import { Vehicle } from '../entities/vehicle.entity';
+import { VehicleService } from '../services/vehicle.service';
+import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
+import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
 
-@Controller("/api/vehicles")
+@Controller('/api/vehicles')
 export class VehicleController {
-  constructor(
-    private readonly vehicleService: VehicleService
-  ) { }
+  constructor(private readonly vehicleService: VehicleService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -38,13 +36,19 @@ export class VehicleController {
 
   @Put('/:id')
   @HttpCode(HttpStatus.OK)
-  async update(@Param('id') id: string, @Body() data: UpdateVehicleDTO): Promise<Vehicle> {
+  async update(
+    @Param('id') id: string,
+    @Body() data: UpdateVehicleDTO,
+  ): Promise<Vehicle> {
     return await this.vehicleService.update(id, data);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAll(@Query() page: Page, @Query() filters: FiltersVehicleDTO): Promise<PageResponse<MappedVehicleDTO>> {
+  async getAll(
+    @Query() page: Page,
+    @Query() filters: FiltersVehicleDTO,
+  ): Promise<PageResponse<MappedVehicleDTO>> {
     return await this.vehicleService.listAll(page, filters);
   }
 
