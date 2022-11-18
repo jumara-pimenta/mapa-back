@@ -14,10 +14,6 @@ export class CreateRouteDTO {
 
   @IsString()
   @IsNotEmpty()
-  status: string
-
-  @IsString()
-  @IsNotEmpty()
   driverId: string
 
   @IsString()

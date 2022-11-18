@@ -67,6 +67,37 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
       }
     });
   }
+  findByIds(id: string): Promise<EmployeesOnPath[]> {
+    return this.repository.employeesOnPath.findMany({
+      where: { employeeId: id },
+      select: {
+        id: true,
+        confirmation: true,
+        position: true,
+        createdAt: true,
+        employee: {
+          select: {
+            name: true,
+            address: true,
+            shift: true,
+            registration: true,
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    lat: true,
+                    long: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
 
   findByPath(pathId: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
