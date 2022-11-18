@@ -110,6 +110,7 @@ export class EmployeeRepository
         name: true,
         pins: {
           select: {
+            type: true,
             pin: true
           }
         }
