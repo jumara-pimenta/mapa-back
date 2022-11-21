@@ -15,31 +15,31 @@ export class EmployeeService {
   ) { }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
-    const CpfExists = await this.employeeRepository.findByCpf(payload.cpf);
-    const RgExists = await this.employeeRepository.findByRg(payload.rg);
-    const RegistrationExists = await this.employeeRepository.findByRegistration(
-      payload.registration,
-    );
+    const cpfAlredyExist = await this.employeeRepository.findByCpf(payload.cpf);
+    const rgAlredyExist = await this.employeeRepository.findByRg(payload.rg);
+    const registrationAlredyExist =
+      await this.employeeRepository.findByRegistration(payload.registration);
 
-    if (CpfExists)
+    if (registrationAlredyExist) {
       throw new HttpException(
-        'CPF cadastrado para outro(a) colaborador(a)',
+        `Registration ja cadastrado: ${payload.cpf}`,
         HttpStatus.CONFLICT,
       );
-
-    if (RgExists)
+    }
+    if (cpfAlredyExist) {
       throw new HttpException(
-        'RG cadastrado para outro(a) colaborador(a)',
+        `CPF ja cadastrado: ${payload.cpf}`,
         HttpStatus.CONFLICT,
       );
-
-    if (RegistrationExists)
+    }
+    if (rgAlredyExist) {
       throw new HttpException(
-        'Matrícula cadastrada para outro(a) colaborador(a)',
+        `RG ja cadastrado: ${payload.rg}`,
         HttpStatus.CONFLICT,
       );
-
-    return this.employeeRepository.create(new Employee(payload));
+    } else {
+      return await this.employeeRepository.create(new Employee(payload));
+    }
   }
 
   async delete(id: string): Promise<Employee> {
