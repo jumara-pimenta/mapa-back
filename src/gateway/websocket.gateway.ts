@@ -29,6 +29,8 @@ export class WebsocketGateway {
         message: 'New message from server',
         content: payload
       });
+
+      
     } catch (error) {
       console.log(error);
       this.server.except(error);
