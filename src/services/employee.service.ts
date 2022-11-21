@@ -21,7 +21,31 @@ export class EmployeeService {
   // }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
-    return await this.employeeRepository.create(new Employee(payload));
+    const cpfAlredyExist = await this.employeeRepository.findByCpf(payload.cpf);
+    const rgAlredyExist = await this.employeeRepository.findByRg(payload.rg);
+    const registrationAlredyExist =
+      await this.employeeRepository.findByRegistration(payload.registration);
+
+    if (registrationAlredyExist) {
+      throw new HttpException(
+        `Registration ja cadastrado: ${payload.cpf}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (cpfAlredyExist) {
+      throw new HttpException(
+        `CPF ja cadastrado: ${payload.cpf}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (rgAlredyExist) {
+      throw new HttpException(
+        `RG ja cadastrado: ${payload.rg}`,
+        HttpStatus.CONFLICT,
+      );
+    } else {
+      return await this.employeeRepository.create(new Employee(payload));
+    }
   }
 
   async delete(id: string): Promise<Employee> {

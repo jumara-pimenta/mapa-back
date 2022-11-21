@@ -51,6 +51,24 @@ export class EmployeeRepository
     });
   }
 
+  findByCpf(cpf: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { cpf },
+    });
+  }
+
+  findByRegistration(registration: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { registration },
+    });
+  }
+
+  findByRg(rg: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { rg },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,
