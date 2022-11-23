@@ -114,42 +114,4 @@ export class EmployeeRepository
       },
     });
   }
-
-  findByIds(ids: string[]): Promise<any> {
-    return this.repository.employee.findMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        pins: {
-          select: {
-            type: true,
-            pin: true,
-          },
-        },
-      },
-    });
-  }
-
-  findByCpf(cpf: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { cpf },
-    });
-  }
-
-  findByRg(rg: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { rg },
-    });
-  }
-
-  findByRegistration(registration: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { registration },
-    });
-  }
 }
