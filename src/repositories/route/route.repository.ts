@@ -7,11 +7,14 @@ import { getDateInLocaleTime } from "../../utils/date.service";
 import { FiltersRouteDTO } from "../../dtos/route/filtersRoute.dto";
 import { generateQueryByFiltersForRoute } from "../../configs/database/Queries";
 import { Route } from "../../entities/route.entity";
+import { DriverService } from "../../services/driver.service";
+import { RouteWebsocket } from "src/entities/routeWebsocket.entity";
 
 @Injectable()
 export class RouteRepository extends Pageable<Route> implements IRouteRepository {
   constructor(
-    private readonly repository: PrismaService
+    private readonly repository: PrismaService,
+    private readonly driverService: DriverService,
   ) {
     super()
   }
@@ -33,6 +36,22 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         updatedAt: getDateInLocaleTime(new Date())
       },
       where: { id: data.id }
+    })
+  }
+
+  async updateWebsocket(data: Route): Promise<RouteWebsocket> {
+    return await this.repository.route.update({
+      data: {
+        id: data.id,
+        description: data.description,
+        distance: data.distance,
+        status: data.status,
+        type: data.type,
+        updatedAt: getDateInLocaleTime(new Date())
+      },
+      where: { id: data.id },
+
+
     })
   }
 
@@ -93,6 +112,72 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         vehicle: true
       }
     })
+
+
+
+  }
+
+  async findByIdWebsocket(id: string): Promise<any> {
+    const data = await this.repository.route.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        description: true,
+        distance: true,
+        driver: { select: { name: true } },
+        status: true,
+        type: true,
+        createdAt: true,
+        path: {
+          select: {
+            id: true,
+            duration: true,
+            finishedAt: true,
+            startedAt: true,
+            startsAt: true,
+            status: true,
+            type: true,
+            createdAt: true,
+            employeesOnPath: {
+              orderBy: {
+                position: "asc"
+              },
+              select: {
+                id: true,
+                boardingAt: true,
+                confirmation: true,
+                disembarkAt: true,
+                position: true,
+                employee: {
+                  select: {
+                    name: true,
+                    address: true,
+                    shift: true,
+                    registration: true,
+                    pins: {
+                      select: {
+                        type: true,
+                        pin: {
+                          select: {
+                            lat: true,
+                            long: true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        vehicle: { select: { plate: true } }
+      }
+    })
+
+
+
+    return data;
   }
 
   async findAll(page: Page, filters: FiltersRouteDTO): Promise<PageResponse<Route>> {

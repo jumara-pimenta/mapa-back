@@ -3,10 +3,14 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsRes
 import { Observable } from 'rxjs';
 import { Server } from 'socket.io';
 import { CurrentLocalDTO } from 'src/dtos/websocket/currentLocal.dto';
+import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
+import { RouteService } from 'src/services/route.service';
 
 @WebSocketGateway()
 export class WebsocketGateway {
-
+  constructor(
+    private readonly routeService: RouteService
+  ) { }
   @WebSocketServer() server: Server;
 
   onModuleInit() {
@@ -30,16 +34,31 @@ export class WebsocketGateway {
         content: payload
       });
 
-      
     } catch (error) {
       console.log(error);
-      this.server.except(error);
+      this.server.except(error).emit('onMessage', error);
       throw new WsException(error.message);
-
-
     }
-    // const 
 
+  }
+  @SubscribeMessage('StatusRouteDTO')
+  async handleRouteStatus(@MessageBody(new ValidationPipe({
+    exceptionFactory: (errors) => {
+      console.log(errors);
+      return new WsException(errors)
+    }
+  })) payload: StatusRouteDTO): Promise<void> {
+    try {
+      const data = await this.routeService.updateWebsocket(payload.id, payload.route, payload.path);
 
+      this.server.emit(data.id, {
+        message: data
+      });
+
+    } catch (error) {
+      console.log(error);
+      this.server.except(error).emit('onMessage', error);
+      throw new WsException(error.message);
+    }
   }
 }
