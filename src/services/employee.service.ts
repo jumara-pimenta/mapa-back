@@ -116,9 +116,32 @@ export class EmployeeService {
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
     const employee = await this.listById(id);
 
-    return await this.employeeRepository.update(
-      Object.assign(employee, { ...employee, ...data }),
-    );
+    function isValidCPF(cpf) {
+      if (typeof cpf !== 'string') return false;
+      cpf = cpf.replace(/[^\d]+/g, '');
+      if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
+      cpf = cpf.split('').map((el) => +el);
+      const rest = (count) =>
+        ((cpf
+          .slice(0, count - 12)
+          .reduce((soma, el, index) => soma + el * (count - index), 0) *
+          10) %
+          11) %
+        10;
+      return rest(10) === cpf[9] && rest(11) === cpf[10];
+    }
+
+    if (
+      data.cpf.length !== 11 ||
+      (!Array.from(data.cpf).filter((e) => e !== data.cpf[0]).length &&
+        isValidCPF)
+    ) {
+      throw new HttpException(`CPF INVALIDO: ${data.cpf}`, HttpStatus.CONFLICT);
+    } else {
+      return await this.employeeRepository.update(
+        Object.assign(employee, { ...employee, ...data }),
+      );
+    }
   }
 
   private toDTO(employees: Employee[]): MappedEmployeeDTO[] {
