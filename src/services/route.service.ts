@@ -37,20 +37,17 @@ export class RouteService {
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
 
-    const driver = await this.driverService.listById(payload.driverId); // Busca o motorista pelo id
-    const vehicle = await this.vehicleService.listById(payload.vehicleId); // Busca o veículo pelo id
+    const driver = await this.driverService.listById(payload.driverId);
+    const vehicle = await this.vehicleService.listById(payload.vehicleId); 
 
-    const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds); // Busca os pins dos funcionários
-    console.log(employeesPins);
+    const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds); 
     employeesPins.map((employee: Employee) => {
       if (!employee.pins) {
-        console.log("TESTE =>"+employee);
         
         employeeArrayPins.push(employee.name)
       } 
         employee.pins.filter((pin: any) => {
           if (pin.type !== payload.type) {
-            console.log("TESTE =>",[pin]);
             
             return employeeArrayPins.push(employee.name);
           }
@@ -179,7 +176,6 @@ export class RouteService {
     
 
     const pathData = await this.pathService.update(routeData.path[0].id, path );
-console.log("==>",pathData);
 
     const dataFilter = await this.listByIdWebsocket(id);
 
@@ -199,7 +195,6 @@ console.log("==>",pathData);
 
   }
 
-  // get by id with path
   async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
     const route = await this.routeRepository.findById(id);
     

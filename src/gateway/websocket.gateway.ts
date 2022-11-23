@@ -35,7 +35,6 @@ export class WebsocketGateway {
       });
 
     } catch (error) {
-      console.log(error);
       this.server.except(error).emit('onMessage', error);
       throw new WsException(error.message);
     }
@@ -56,7 +55,6 @@ export class WebsocketGateway {
       });
 
     } catch (error) {
-      console.log(error);
       this.server.except(error).emit('onMessage', error);
       throw new WsException(error.message);
     }
