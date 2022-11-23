@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Pin } from '../../entities/pin.entity';
 import IPinRepository from './pin.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryByFiltersForPin } from '../../configs/database/Queries';
+import { generateQueryForPins } from 'src/utils/QueriesPins';
 
 @Injectable()
 export class PinRepository extends Pageable<Pin> implements IPinRepository {
@@ -43,7 +43,7 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
     page: Page,
     filters: FiltersPinDTO,
   ): Promise<PageResponse<Pin>> {
-    const condition = generateQueryByFiltersForPin(filters);
+    const condition = generateQueryForPins(filters);
 
     const items = condition
       ? await this.repository.pin.findMany({
