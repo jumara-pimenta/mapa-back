@@ -84,6 +84,36 @@ export class EmployeeService {
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
     const employee = await this.listById(id);
 
+    const CpfExists = await this.employeeRepository.findByCpf(data.cpf);
+    const RgExists = await this.employeeRepository.findByRg(data.rg);
+    const RegistrationExists = await this.employeeRepository.findByRegistration(
+      data.registration,
+    );
+
+    if (CpfExists) {
+      if (CpfExists.id !== id) {
+        throw new HttpException(
+          'CPF já cadastrado para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    if (RgExists)
+      if (RgExists.id !== id) {
+        throw new HttpException(
+          'RG já cadastrado para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+    if (RegistrationExists)
+      if (RegistrationExists.id !== id) {
+        throw new HttpException(
+          'Matrícula já cadastrada para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
     return await this.employeeRepository.update(
       Object.assign(employee, { ...employee, ...data }),
     );
