@@ -1,4 +1,5 @@
 import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { EStatusPath, ETypePath } from "src/utils/ETypes";
 
 export class UpdatePathDTO {
   @IsString()
@@ -14,8 +15,11 @@ export class UpdatePathDTO {
   @IsOptional()
   sequenceQr?: number
 
-  @MinLength(2)
-  @MaxLength(3)
+  @IsEnum(ETypePath)
   @IsOptional()
-  type?: string
+  type?: ETypePath
+
+  @IsEnum(EStatusPath)
+  @IsOptional()
+  status?: EStatusPath
 }
