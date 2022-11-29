@@ -21,7 +21,57 @@ export class EmployeeService {
   // }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
-    return await this.employeeRepository.create(new Employee(payload));
+    const cpfAlredyExist = await this.employeeRepository.findByCpf(payload.cpf);
+    const rgAlredyExist = await this.employeeRepository.findByRg(payload.rg);
+    const registrationAlredyExist =
+      await this.employeeRepository.findByRegistration(payload.registration);
+
+    function isValidCPF(cpf) {
+      if (typeof cpf !== 'string') return false;
+      cpf = cpf.replace(/[^\d]+/g, '');
+      if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
+      cpf = cpf.split('').map((el) => +el);
+      const rest = (count) =>
+        ((cpf
+          .slice(0, count - 12)
+          .reduce((soma, el, index) => soma + el * (count - index), 0) *
+          10) %
+          11) %
+        10;
+      return rest(10) === cpf[9] && rest(11) === cpf[10];
+    }
+
+    if (
+      payload.cpf.length !== 11 ||
+      (!Array.from(payload.cpf).filter((e) => e !== payload.cpf[0]).length &&
+        isValidCPF)
+    ) {
+      throw new HttpException(
+        `CPF INVALIDO: ${payload.cpf}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (registrationAlredyExist) {
+      throw new HttpException(
+        `Registration ja cadastrado: ${payload.registration}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (cpfAlredyExist) {
+      throw new HttpException(
+        `CPF ja cadastrado: ${payload.cpf}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (rgAlredyExist) {
+      throw new HttpException(
+        `RG ja cadastrado: ${payload.rg}`,
+        HttpStatus.CONFLICT,
+      );
+    } else {
+      return await this.employeeRepository.create(new Employee(payload));
+    }
   }
 
   async delete(id: string): Promise<Employee> {
@@ -66,9 +116,32 @@ export class EmployeeService {
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
     const employee = await this.listById(id);
 
-    return await this.employeeRepository.update(
-      Object.assign(employee, { ...employee, ...data }),
-    );
+    function isValidCPF(cpf) {
+      if (typeof cpf !== 'string') return false;
+      cpf = cpf.replace(/[^\d]+/g, '');
+      if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
+      cpf = cpf.split('').map((el) => +el);
+      const rest = (count) =>
+        ((cpf
+          .slice(0, count - 12)
+          .reduce((soma, el, index) => soma + el * (count - index), 0) *
+          10) %
+          11) %
+        10;
+      return rest(10) === cpf[9] && rest(11) === cpf[10];
+    }
+
+    if (
+      data.cpf.length !== 11 ||
+      (!Array.from(data.cpf).filter((e) => e !== data.cpf[0]).length &&
+        isValidCPF)
+    ) {
+      throw new HttpException(`CPF INVALIDO: ${data.cpf}`, HttpStatus.CONFLICT);
+    } else {
+      return await this.employeeRepository.update(
+        Object.assign(employee, { ...employee, ...data }),
+      );
+    }
   }
 
   private toDTO(employees: Employee[]): MappedEmployeeDTO[] {
