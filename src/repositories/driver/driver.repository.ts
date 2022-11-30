@@ -30,7 +30,6 @@ export class DriverRepository
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
-        // validation: data.validation,
         validation: getDateInLocaleTime(new Date(data.validation)),
       },
       where: {
@@ -42,6 +41,18 @@ export class DriverRepository
   findById(id: string): Promise<Driver> {
     return this.repository.driver.findUnique({
       where: { id },
+    });
+  }
+
+  findByCpf(cpf: string): Promise<Driver> {
+    return this.repository.driver.findUnique({
+      where: { cpf },
+    });
+  }
+
+  findByCnh(cnh: string): Promise<Driver> {
+    return this.repository.driver.findUnique({
+      where: { cnh },
     });
   }
 
@@ -82,7 +93,6 @@ export class DriverRepository
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
-        // validation: data.validation,
         validation: getDateInLocaleTime(new Date(data.validation)),
       },
     });
