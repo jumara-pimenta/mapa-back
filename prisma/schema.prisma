@@ -85,7 +85,7 @@ model Vehicle {
   lastSurvey      DateTime  @db.DateTimeOffset
   expiration      DateTime  @db.DateTimeOffset
   capacity        Int
-  renavam         String    @db.VarChar(11)
+  renavam         String    @unique @db.VarChar(11)
   lastMaintenance DateTime  @db.DateTimeOffset
   note            String
   isAccessibility Boolean   @default(false)

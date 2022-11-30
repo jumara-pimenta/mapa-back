@@ -96,4 +96,16 @@ export class VehicleRepository
       },
     });
   }
+
+  findByPlate(plate: string): Promise<Vehicle> {
+    return this.repository.vehicle.findUnique({
+      where: { plate },
+    });
+  }
+
+  findByRenavam(renavam: string): Promise<Vehicle> {
+    return this.repository.vehicle.findUnique({
+      where: { renavam },
+    });
+  }
 }
