@@ -10,15 +10,15 @@ generator client {
 }
 
 model Driver {
-  id                 String               @id @unique
-  name               String               @db.VarChar(255)
-  cpf                String               @unique @db.VarChar(11)
-  cnh                String               @unique @db.VarChar(11)
-  validation         DateTime
-  category           String
-  route              Route[]
-  createdAt          DateTime             @default(now()) @db.DateTimeOffset
-  updatedAt          DateTime?            @db.DateTimeOffset
+  id         String    @id @unique
+  name       String    @db.VarChar(255)
+  cpf        String    @unique @db.VarChar(11)
+  cnh        String    @unique @db.VarChar(11)
+  validation DateTime
+  category   String
+  route      Route[]
+  createdAt  DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt  DateTime? @db.DateTimeOffset
 }
 
 model Route {
@@ -82,11 +82,11 @@ model Vehicle {
   plate           String    @unique
   company         String
   type            String
-  lastSurvey      DateTime
-  expiration      DateTime
+  lastSurvey      DateTime  @db.DateTimeOffset
+  expiration      DateTime  @db.DateTimeOffset
   capacity        Int
   renavam         String    @db.VarChar(11)
-  lastMaintenance DateTime
+  lastMaintenance DateTime  @db.DateTimeOffset
   note            String
   isAccessibility Boolean   @default(false)
   routes          Route[]
