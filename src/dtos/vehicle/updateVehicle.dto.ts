@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsDate,
+  IsDateString,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -24,11 +25,11 @@ export class UpdateVehicleDTO {
   @IsOptional()
   type?: string;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   lastSurvey?: Date;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   expiration?: Date;
 
@@ -42,7 +43,7 @@ export class UpdateVehicleDTO {
   @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
   renavam?: string;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   lastMaintenance?: Date;
 
@@ -50,9 +51,6 @@ export class UpdateVehicleDTO {
   @IsOptional()
   note?: string;
 
-  @IsString({
-    message: 'Acessibilidade não está definido para o tipo string.',
-  })
   @IsBoolean()
   @IsOptional()
   isAccessibility?: boolean;

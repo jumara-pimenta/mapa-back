@@ -6,6 +6,7 @@ import {
   IsDate,
   MinLength,
   MaxLength,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
@@ -23,13 +24,13 @@ export class CreateVehicleDTO {
   @IsNotEmpty({ message: 'Tipo não pode está vazio.' })
   type: string;
 
-  @IsString({
-    message: 'Última vistoria não está definido para o tipo string.',
+  @IsDateString({
+    message: 'Última manutenção não está no formato certo de data.',
   })
   @IsNotEmpty({ message: 'Última vistoria não pode está vazio.' })
   lastSurvey: string;
 
-  @IsString({ message: 'Expiração não está definido para o tipo string.' })
+  @IsDateString({ message: 'Expiração não está no formato certo de data.' })
   @IsNotEmpty({ message: 'Expiração não pode está vazio.' })
   expiration: string;
 
@@ -43,8 +44,8 @@ export class CreateVehicleDTO {
   @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
   renavam: string;
 
-  @IsString({
-    message: 'Última manutenção não está definido para o tipo string.',
+  @IsDateString({
+    message: 'Última manutenção não está no formato certo de data.',
   })
   @IsNotEmpty({ message: 'Última manutenção não pode está vazio.' })
   lastMaintenance: string;
