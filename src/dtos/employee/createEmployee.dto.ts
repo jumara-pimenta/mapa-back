@@ -20,8 +20,8 @@ export class CreateEmployeeDTO {
 
   @IsString({ message: 'RG não está definido como string.' })
   @IsNotEmpty({ message: 'RG não pode receber valor vazio.' })
-  @MinLength(9, { message: 'RG nao pode conter menos que 9 dígitos.' })
-  @MaxLength(11, { message: 'RG nao pode conter mais que 9 dígitos.' })
+  @MinLength(8, { message: 'RG nao pode conter menos que 8 dígitos.' })
+  @MaxLength(11, { message: 'RG nao pode conter mais que 11 dígitos.' })
   rg: string;
 
   @IsString({ message: 'Admissão não está definido como string.' })
