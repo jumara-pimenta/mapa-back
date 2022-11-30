@@ -57,9 +57,6 @@ export class UpdateVehicleDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   note?: string;
 
-  @IsString({
-    message: 'Acessibilidade não está definido para o tipo string.',
-  })
   @IsBoolean()
   @IsOptional()
   isAccessibility?: boolean;
