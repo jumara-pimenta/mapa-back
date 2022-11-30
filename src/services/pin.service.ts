@@ -70,6 +70,7 @@ export class PinService {
       return {
         id: pin.id,
         description: pin.description,
+        street : pin.street,
         lat: pin.lat,
         long: pin.long,
         createdAt: pin.createdAt,

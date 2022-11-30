@@ -7,6 +7,9 @@ export function generateQueryForPins(filters: FiltersPinDTO): MappedPinDTO {
     description: () => ({
       description: filters.description,
     }),
+    street : ()=>({
+      street : filters.street
+    })
   };
 
   const keysFields = Object.keys(fields);

@@ -113,10 +113,11 @@ model Employee {
 model Pin {
   id                  String              @id @unique
   description         String              @db.VarChar(255)
+  street              String              @db.VarChar(255)
   lat                 String              @db.VarChar(255)
   long                String              @db.VarChar(255)
   employees           EmployeesOnPin[]
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
+  createdAt           DateTime            @db.DateTimeOffset
   updatedAt           DateTime?           @db.DateTimeOffset
 }
 

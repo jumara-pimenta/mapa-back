@@ -14,17 +14,18 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
     super();
   }
 
-  delete(id: string): Promise<Pin> {
+  delete(id: string): Promise<any> {
     return this.repository.pin.delete({
       where: { id },
     });
   }
 
-  update(data: Pin): Promise<Pin> {
+  update(data: Pin): Promise<any> {
     return this.repository.pin.update({
       data: {
         id: data.id,
         description: data.description,
+        street : data.street,
         lat: data.lat,
         long: data.long,
         updatedAt: getDateInLocaleTime(new Date()),
@@ -73,7 +74,9 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
       data: {
         id: data.id,
         description: data.description,
+        street : data.street,
         lat: data.lat,
+        createdAt : data.createdAt,
         long: data.long,
       },
     });
