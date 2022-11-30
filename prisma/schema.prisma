@@ -88,7 +88,7 @@ model Vehicle {
   expiration      DateTime
   capacity        Int
   renavam         String    @db.VarChar(11)
-  lastMaintenance DateTime
+  lastMaintenance DateTime  @db.DateTimeOffset
   note            String
   isAccessibility Boolean   @default(false)
   routes          Route[]
