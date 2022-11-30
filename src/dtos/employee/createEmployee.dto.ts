@@ -8,44 +8,44 @@ import {
 } from 'class-validator';
 
 export class CreateEmployeeDTO {
-  @IsString({ message: 'Registration não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
+  @IsString({ message: 'Matrícula não está definida como string.' })
+  @IsNotEmpty({ message: 'Matrícula não pode receber valor vazio.' })
   registration: string;
 
-  @IsString({ message: 'Cpf não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
-  @MinLength(11, { message: 'CPF nao pode conter menos que 11 digitos.' })
-  @MaxLength(11, { message: 'CPF nao pode conter mais que 11 digitos.' })
+  @IsString({ message: 'CPF não está definido como string.' })
+  @IsNotEmpty({ message: 'CPF não pode receber valor vazio.' })
+  @MinLength(11, { message: 'CPF não pode conter menos que 11 dígitos.' })
+  @MaxLength(11, { message: 'CPF não pode conter mais que 11 dígitos.' })
   cpf: string;
 
   @IsString({ message: 'RG não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
-  @MinLength(9, { message: 'Rg nao pode conter menos que 9 digitos.' })
-  @MaxLength(11, { message: 'Rg nao pode conter mais que 9 digitos.' })
+  @IsNotEmpty({ message: 'RG não pode receber valor vazio.' })
+  @MinLength(8, { message: 'RG nao pode conter menos que 8 dígitos.' })
+  @MaxLength(11, { message: 'RG nao pode conter mais que 11 dígitos.' })
   rg: string;
 
-  @IsString({ message: 'Admission não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
-  @IsDateString({ message: 'Registration não está definido como DateString.' })
+  @IsString({ message: 'Admissão não está definido como string.' })
+  @IsNotEmpty({ message: 'Admissão não pode receber valor vazio.' })
+  @IsDateString({ message: 'Admissão não está definido como DateString.' })
   admission: Date;
 
-  @IsString({ message: 'Role não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
+  @IsString({ message: 'Cargo não está definido como string.' })
+  @IsNotEmpty({ message: 'Cargo não pode receber valor vazio.' })
   role: string;
 
-  @IsString({ message: 'Name não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
+  @IsString({ message: 'Nome não está definido como string.' })
+  @IsNotEmpty({ message: 'Nome não pode receber valor vazio.' })
   name: string;
 
-  @IsString({ message: 'Shift não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
+  @IsString({ message: 'Turno não está definido como string.' })
+  @IsNotEmpty({ message: 'Turno não pode receber valor vazio.' })
   shift: string;
 
-  @IsString({ message: 'CostCenter não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
+  @IsString({ message: 'Centro de custo não está definido como string.' })
+  @IsNotEmpty({ message: 'Centro de custo não pode receber valor vazio.' })
   costCenter: string;
 
-  @IsString({ message: 'Address não está definido como string.' })
-  @IsNotEmpty({ message: 'Registration não pode receber valor ser vazio.' })
+  @IsString({ message: 'Endereço não está definido como string.' })
+  @IsNotEmpty({ message: 'Endereço não pode receber valor vazio.' })
   address: string;
 }
