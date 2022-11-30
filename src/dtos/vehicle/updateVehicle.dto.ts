@@ -11,17 +11,17 @@ import {
 } from 'class-validator';
 
 export class UpdateVehicleDTO {
-  @IsString({ message: 'Plate não está definido para o tipo string.' })
+  @IsString({ message: 'Placa não está definido para o tipo string.' })
   @IsOptional()
-  @MinLength(7, { message: 'Plate nao pode conter menos que 7 digitos.' })
-  @MaxLength(7, { message: 'Plate nao pode conter mais que 7 digitos.' })
+  @MinLength(7, { message: 'Placa não pode conter menos que 7 dígitos.' })
+  @MaxLength(7, { message: 'Placa não pode conter mais que 7 dígitos.' })
   plate?: string;
 
-  @IsString({ message: 'Company não está definido para o tipo string.' })
+  @IsString({ message: 'Empresa não está definido para o tipo string.' })
   @IsOptional()
   company?: string;
 
-  @IsString({ message: 'Type não está definido para o tipo string.' })
+  @IsString({ message: 'Tipo não está definido para o tipo string.' })
   @IsOptional()
   type?: string;
 
@@ -39,15 +39,15 @@ export class UpdateVehicleDTO {
 
   @IsString({ message: 'Renavam não está definido para o tipo string.' })
   @IsOptional()
-  @MinLength(11, { message: 'Renavam nao pode conter menos que 11 digitos.' })
-  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 digitos.' })
+  @MinLength(11, { message: 'Renavam não pode conter menos que 11 dígitos.' })
+  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
   renavam?: string;
 
   @IsDateString()
   @IsOptional()
   lastMaintenance?: Date;
 
-  @IsString({ message: 'note não está definido para o tipo string.' })
+  @IsString({ message: 'Observação não está definido para o tipo string.' })
   @IsOptional()
   note?: string;
 

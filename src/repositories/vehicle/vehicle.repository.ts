@@ -29,9 +29,9 @@ export class VehicleRepository
         id: data.id,
         capacity: data.capacity,
         company: data.company,
-        expiration: data.expiration,
-        lastMaintenance: data.lastMaintenance,
-        lastSurvey: data.lastSurvey,
+        expiration: getDateInLocaleTime(new Date(data.expiration)),
+        lastMaintenance: getDateInLocaleTime(new Date(data.lastMaintenance)),
+        lastSurvey: getDateInLocaleTime(new Date(data.lastSurvey)),
         note: data.note,
         plate: data.plate,
         renavam: data.renavam,
@@ -92,7 +92,20 @@ export class VehicleRepository
         renavam: data.renavam,
         type: data.type,
         isAccessibility: data.isAccessibility,
+        createdAt: data.createdAt,
       },
+    });
+  }
+
+  findByPlate(plate: string): Promise<Vehicle> {
+    return this.repository.vehicle.findUnique({
+      where: { plate },
+    });
+  }
+
+  findByRenavam(renavam: string): Promise<Vehicle> {
+    return this.repository.vehicle.findUnique({
+      where: { renavam },
     });
   }
 }
