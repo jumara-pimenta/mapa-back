@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryByFiltersForEmployee } from '../../configs/database/Queries';
+import { generateQueryForEmployee } from 'src/utils/QueriesEmployeer';
 
 @Injectable()
 export class EmployeeRepository
@@ -30,7 +30,6 @@ export class EmployeeRepository
         address: data.address,
         // admission: data.admission,
         admission: getDateInLocaleTime(new Date(data.admission)),
-
         costCenter: data.costCenter,
         cpf: data.cpf,
         name: data.name,
@@ -51,11 +50,29 @@ export class EmployeeRepository
     });
   }
 
+  findByCpf(cpf: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { cpf },
+    });
+  }
+
+  findByRegistration(registration: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { registration },
+    });
+  }
+
+  findByRg(rg: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { rg },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>> {
-    const condition = generateQueryByFiltersForEmployee(filters);
+    const condition = generateQueryForEmployee(filters);
 
     const items = condition
       ? await this.repository.employee.findMany({
