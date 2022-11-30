@@ -14,6 +14,8 @@ import { addHours, addMinutes } from 'date-fns'
 import { convertTimeToDate } from "src/utils/date.service";
 import { EmployeeService } from "./employee.service";
 import { Employee } from "src/entities/employee.entity";
+import { RouteWebsocket } from "src/entities/routeWebsocket.entity";
+import { UpdatePathDTO } from "src/dtos/path/updatePath.dto";
 
 @Injectable()
 export class RouteService {
@@ -35,20 +37,17 @@ export class RouteService {
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
 
-    const driver = await this.driverService.listById(payload.driverId); // Busca o motorista pelo id
-    const vehicle = await this.vehicleService.listById(payload.vehicleId); // Busca o veículo pelo id
+    const driver = await this.driverService.listById(payload.driverId);
+    const vehicle = await this.vehicleService.listById(payload.vehicleId); 
 
-    const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds); // Busca os pins dos funcionários
-    console.log(employeesPins);
+    const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds); 
     employeesPins.map((employee: Employee) => {
       if (!employee.pins) {
-        console.log("TESTE =>"+employee);
         
         employeeArrayPins.push(employee.name)
       } 
         employee.pins.filter((pin: any) => {
           if (pin.type !== payload.type) {
-            console.log("TESTE =>",[pin]);
             
             return employeeArrayPins.push(employee.name);
           }
@@ -136,6 +135,15 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
+  async listByIdWebsocket(id: string): Promise<any> {
+    const route = await this.routeRepository.findByIdWebsocket(id);
+
+    if (!route) throw new HttpException(`Não foi encontrada uma rota com o id: ${id}!`, HttpStatus.NOT_FOUND);
+
+    // return this.mapperOne(route);
+    return route;
+  }
+
   async listAll(page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<MappedRouteDTO>> {
 
     const routes = await this.routeRepository.findAll(page, filters);
@@ -157,6 +165,43 @@ export class RouteService {
     const route = await this.listById(id);
 
     return await this.routeRepository.update(Object.assign(route, { ...route, ...data }));
+  }
+
+  async updateWebsocket(id: string, route: UpdateRouteDTO, path?: UpdatePathDTO): Promise<any> {
+
+    const routeData = await this.listByIdWebsocket(id);
+
+    await this.routeRepository.updateWebsocket(Object.assign(routeData, { ...routeData, ...route }));
+
+    
+
+    const pathData = await this.pathService.update(routeData.path[0].id, path );
+
+    const dataFilter = await this.listByIdWebsocket(id);
+
+    const dataFilterWebsocket = {
+      id: dataFilter.id,
+      description: dataFilter.description,
+      distance: dataFilter.distance,
+      status: dataFilter.status,
+      type: dataFilter.type,
+      driver: dataFilter.driver.name,
+      vehicle: dataFilter.vehicle.plate,
+      path: dataFilter.path
+    }
+    
+
+    return dataFilterWebsocket;
+
+  }
+
+  async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
+    const route = await this.routeRepository.findById(id);
+    
+    const path = await this.pathService.listById(route.path[0].id);
+
+    return this.mapperOne(route);
+  
   }
 
   private mapperMany(routes: Route[]): MappedRouteDTO[] {

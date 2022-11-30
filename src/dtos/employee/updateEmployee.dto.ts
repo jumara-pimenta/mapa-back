@@ -19,33 +19,33 @@ export class UpdateEmployeeDTO {
   @MaxLength(11, { message: 'CPF não pode conter mais que 11 digitos.' })
   cpf?: string;
 
-  @IsString({ message: 'RG não está definido como string.' })
+  @IsString({ message: 'Rg não está definido como string.' })
   @IsOptional()
-  @MinLength(8, { message: 'Rg não pode conter menos que 8 digitos.' })
-  @MaxLength(11, { message: 'Rg não pode conter mais que 11 digitos.' })
+  @MinLength(8, { message: 'Rg nao pode conter menos que 9 digitos.' })
+  @MaxLength(10, { message: 'Rg nao pode conter mais que 9 digitos.' })
   rg?: string;
 
   @IsOptional()
-  @IsDateString({ message: 'Admissão não está definido como DateString.' })
+  @IsDateString({ message: 'Admission não está definido como DateString.' })
   admission?: Date;
 
-  @IsString({ message: 'Nome não está definido como string.' })
+  @IsString({ message: 'Name não está definido como string.' })
   @IsOptional()
   name?: string;
 
-  @IsString({ message: 'Cargo não está definido como string.' })
+  @IsString({ message: 'Role não está definido como string.' })
   @IsOptional()
   role?: string;
 
-  @IsString({ message: 'Turno não está definido como string.' })
+  @IsString({ message: 'Shift não está definido como string.' })
   @IsOptional()
   shift?: string;
 
-  @IsString({ message: 'Centro de custo não está definido como string.' })
+  @IsString({ message: 'CostCenter não está definido como string.' })
   @IsOptional()
   costCenter?: string;
 
-  @IsString({ message: 'Endereço não está definido como string.' })
+  @IsString({ message: 'Address não está definido como string.' })
   @IsOptional()
   address?: string;
 }

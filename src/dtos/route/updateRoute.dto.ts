@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
-import { EStatusPath, ETypeRoute } from "src/utils/ETypes";
+import { EStatusRoute, ETypeRoute } from "src/utils/ETypes";
 
 export class UpdateRouteDTO {
   @IsString()
@@ -14,9 +14,9 @@ export class UpdateRouteDTO {
   @IsOptional()
   type?: ETypeRoute
 
-  @IsEnum(EStatusPath)
+  @IsEnum(EStatusRoute)
   @IsOptional()
-  status?: EStatusPath
+  status?: EStatusRoute
 
   @IsString()
   @IsOptional()

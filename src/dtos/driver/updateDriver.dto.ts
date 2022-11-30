@@ -1,23 +1,23 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength, IsDateString } from "class-validator";
+import { IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class UpdateDriverDTO {
   @IsString()
   @IsOptional()
-  name?: string
+  name?: string;
 
   @IsString()
   @IsOptional()
-  cpf?: string
+  cpf?: string;
 
   @IsString()
   @IsOptional()
-  cnh?: string
+  cnh?: string;
 
   @IsDateString()
   @IsOptional()
-  validation?: Date
+  validation?: Date;
 
   @IsString()
   @IsOptional()
-  category?: string
+  category?: string;
 }
