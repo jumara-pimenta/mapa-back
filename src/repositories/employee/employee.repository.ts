@@ -28,7 +28,6 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
         admission: getDateInLocaleTime(new Date(data.admission)),
 
         costCenter: data.costCenter,
@@ -38,8 +37,6 @@ export class EmployeeRepository
         rg: data.rg,
         role: data.role,
         shift: data.shift,
-        createdAt: getDateInLocaleTime(new Date()),
-        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
     });
@@ -85,8 +82,7 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
-        admission: getDateInLocaleTime(new Date(data.admission)),
+        admission: data.admission,
         costCenter: data.costCenter,
         cpf: data.cpf,
         name: data.name,
@@ -94,6 +90,7 @@ export class EmployeeRepository
         rg: data.rg,
         role: data.role,
         shift: data.shift,
+        createdAt: data.createdAt,
       },
     });
   }
