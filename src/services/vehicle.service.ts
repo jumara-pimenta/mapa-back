@@ -83,13 +83,11 @@ export class VehicleService {
 
   async update(id: string, data: UpdateVehicleDTO): Promise<Vehicle> {
     const vehicle = await this.listById(id);
-    const plateExists = await this.vehicleRepository.findByPlate(data.plate);
-    const renavamExists = await this.vehicleRepository.findByRenavam(
-      data.renavam,
-    );
 
-    if (plateExists) {
-      if (plateExists.id !== id) {
+    if (data.plate) {
+      const plateExists = await this.vehicleRepository.findByPlate(data.plate);
+
+      if (plateExists && plateExists.plate !== vehicle.plate) {
         throw new HttpException(
           'Placa cadastrada para outro veículo',
           HttpStatus.CONFLICT,
@@ -97,12 +95,18 @@ export class VehicleService {
       }
     }
 
-    if (renavamExists) {
-      if (renavamExists.id !== id) {
-        throw new HttpException(
-          'Renavam cadastrado para outro veículo',
-          HttpStatus.CONFLICT,
-        );
+    if (data.renavam) {
+      const renavamExists = await this.vehicleRepository.findByRenavam(
+        data.renavam,
+      );
+
+      if (renavamExists && renavamExists.renavam !== vehicle.renavam) {
+        if (renavamExists.id !== id) {
+          throw new HttpException(
+            'Renavam cadastrado para outro veículo',
+            HttpStatus.CONFLICT,
+          );
+        }
       }
     }
 
