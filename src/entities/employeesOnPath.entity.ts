@@ -8,6 +8,7 @@ export class EmployeesOnPath {
   position: number
   boardingAt?: Date
   disembarkAt?: Date
+  description?: string
   employee?: Partial<Employee>
   path?: Path
   createdAt: Date
