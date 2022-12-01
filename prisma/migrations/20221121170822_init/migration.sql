@@ -54,7 +54,7 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [id] NVARCHAR(1000) NOT NULL,
     [pathId] NVARCHAR(1000) NOT NULL,
     [employeeId] NVARCHAR(1000) NOT NULL,
-    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 0,
+    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 1,
     [position] INT NOT NULL,
     [boardingAt] DATETIMEOFFSET,
     [disembarkAt] DATETIMEOFFSET,

@@ -209,6 +209,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
               include: {
                 employee: {
                   select: {
+                    name: true,
                     pins: {
                       include: {
                         pin: {
