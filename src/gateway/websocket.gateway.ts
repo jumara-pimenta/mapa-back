@@ -5,6 +5,8 @@ import { Server } from 'socket.io';
 import { CurrentLocalDTO } from 'src/dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
 import { RouteService } from 'src/services/route.service';
+import { getDateInLocaleTime } from 'src/utils/date.service';
+import { EStatusRoute } from 'src/utils/ETypes';
 
 @WebSocketGateway()
 export class WebsocketGateway {
@@ -21,7 +23,7 @@ export class WebsocketGateway {
     );
   }
 
-  @SubscribeMessage('message')
+  @SubscribeMessage('local')
   handleMessage(@MessageBody(new ValidationPipe({
     exceptionFactory: (errors) => {
       console.log(errors);
@@ -29,33 +31,81 @@ export class WebsocketGateway {
     }
   })) payload: CurrentLocalDTO): void {
     try {
-      this.server.emit('onMessage', {
-        message: 'New message from server',
-        content: payload
+      this.server.emit(payload.id, {
+        ...payload
       });
 
     } catch (error) {
-      this.server.except(error).emit('onMessage', error);
+      this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
 
   }
-  @SubscribeMessage('StatusRouteDTO')
-  async handleRouteStatus(@MessageBody(new ValidationPipe({
+
+  @SubscribeMessage('startRoute')
+  async handleRouteStart(@MessageBody(new ValidationPipe({
     exceptionFactory: (errors) => {
       console.log(errors);
       return new WsException(errors)
     }
   })) payload: StatusRouteDTO): Promise<void> {
     try {
-      const data = await this.routeService.updateWebsocket(payload.id, payload.route, payload.path);
+      const startAt = {
+        ...payload,
+        route: {
+          ...payload.route,
+          status: 'EM ANDAMENTO' as EStatusRoute
+        },
+        path: {
+          ...payload.path,
+          startedAt: getDateInLocaleTime(new Date()),
+          finishedAt: null,
+        }
+      }
 
-      this.server.emit(data.id, {
-        message: data
+      const data = await this.routeService.updateWebsocket(startAt);
+
+      this.server.emit(payload.routeId, {
+        ...data
       });
 
     } catch (error) {
-      this.server.except(error).emit('onMessage', error);
+      console.log(error);
+      this.server.except(error).emit('error', error);
+      throw new WsException(error.message);
+    }
+  }
+
+  @SubscribeMessage('FinishRoute')
+  async handleRouteFinish(@MessageBody(new ValidationPipe({
+    exceptionFactory: (errors) => {
+      console.log(errors);
+      return new WsException(errors)
+    }
+  })) payload: StatusRouteDTO): Promise<void> {
+    try {
+
+      const finishedAt = {
+        ...payload,
+        route: {
+          ...payload.route,
+          status: 'PENDENTE' as EStatusRoute
+        },
+        path: {
+          ...payload.path,
+          finishedAt: new Date()
+        }
+      }
+
+      const data = await this.routeService.updateWebsocket(finishedAt);
+
+      this.server.emit(payload.routeId, {
+        ...data
+      });
+
+
+    } catch (error) {
+      this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
   }

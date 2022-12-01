@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from "class-validator";
 export class CurrentLocalDTO {
   @IsString()
   @IsNotEmpty()
-  route: string;
+  id: string;
 
   @IsString()
   @IsNotEmpty()
@@ -11,7 +11,7 @@ export class CurrentLocalDTO {
 
   @IsString()
   @IsNotEmpty()
-  driverName: string;
+  driverId: string;
 
   @IsString()
   @IsNotEmpty()

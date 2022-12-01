@@ -22,4 +22,10 @@ export class UpdatePathDTO {
   @IsEnum(EStatusPath)
   @IsOptional()
   status?: EStatusPath
+
+  @IsOptional()
+  startedAt?: Date
+
+  @IsOptional()
+  finishedAt?: Date
 }
