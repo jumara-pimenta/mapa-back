@@ -42,15 +42,14 @@ export class RouteService {
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
 
     const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds);
-    employeesPins.map((employee: Employee) => {
+    employeesPins.forEach((employee: Employee) => {
       if (!employee.pins) {
 
         employeeArrayPins.push(employee.name)
       }
-      employee.pins.filter((pin: any) => {
+      employee.pins.forEach((pin: any) => {
         if (pin.type !== payload.type) {
-
-          return employeeArrayPins.push(employee.name);
+          employeeArrayPins.push(employee.name);
         }
       })
 
@@ -64,8 +63,10 @@ export class RouteService {
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
 
-    driverInRoute.map(route => {
-      route.path.map(path => {
+    const vehicleInRoute = await this.routeRepository.findByVehicleId(vehicle.id);
+
+    driverInRoute.forEach(route => {
+      route.path.forEach(path => {
         const startedAtDate = convertTimeToDate(path.startsAt);
         const durationTime = convertTimeToDate(path.duration);
 
@@ -80,12 +81,27 @@ export class RouteService {
       })
     });
 
+    vehicleInRoute.forEach(route => {
+      route.path.forEach(path => {
+        const startedAtDate = convertTimeToDate(path.startsAt);
+        const durationTime = convertTimeToDate(path.duration);
 
-    if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {
-    }
+        const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
 
-    employeeInRoute.map((route: Route) => {
-      route.path.map(path => {
+        if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
+          throw new HttpException(`O veículo já está em uma rota neste horário!`, HttpStatus.CONFLICT);
+        }
+        if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
+          throw new HttpException(`O veículo já está em uma rota neste horário!`, HttpStatus.CONFLICT);
+        }
+      })
+    });
+
+
+    if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {};
+
+    employeeInRoute.forEach((route: Route) => {
+      route.path.forEach(path => {
         const employeeInPath = path.employeesOnPath.filter(item => {
 
           if (payload.type === route.type) {
