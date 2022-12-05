@@ -1,3 +1,4 @@
+import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -7,6 +8,7 @@ import {
   MinLength,
   MaxLength,
   IsDateString,
+  Length,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
@@ -14,14 +16,17 @@ export class CreateVehicleDTO {
   @IsNotEmpty({ message: 'Placa não pode está vazio.' })
   @MinLength(7, { message: 'Placa não pode conter menos que 7 dígitos.' })
   @MaxLength(7, { message: 'Placa não pode conter mais que 7 dígitos.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   plate: string;
 
   @IsString({ message: 'Empresa não está definido para o tipo string.' })
   @IsNotEmpty({ message: 'Empresa não pode está vazio.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   company: string;
 
   @IsString({ message: 'Tipo não está definido para o tipo string.' })
   @IsNotEmpty({ message: 'Tipo não pode está vazio.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   type: string;
 
   @IsDateString({
@@ -42,6 +47,7 @@ export class CreateVehicleDTO {
   @IsNotEmpty({ message: 'Renavam não pode está vazio.' })
   @MinLength(11, { message: 'Renavam não pode conter menos que 11 dígitos.' })
   @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   renavam: string;
 
   @IsDateString({
@@ -52,6 +58,7 @@ export class CreateVehicleDTO {
 
   @IsString({ message: 'Observação não está definido para o tipo string.' })
   @IsNotEmpty({ message: 'Observação não pode está vazio.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   note: string;
 
   @IsBoolean({

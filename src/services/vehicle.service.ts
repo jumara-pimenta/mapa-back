@@ -53,7 +53,7 @@ export class VehicleService {
 
     if (!vehicle)
       throw new HttpException(
-        `Não foi encontrado um vehicle com o id: ${id}`,
+        `Não foi encontrado um veículo com o id: ${id}`,
         HttpStatus.NOT_FOUND,
       );
 
@@ -68,7 +68,7 @@ export class VehicleService {
 
     if (vehicles.total === 0) {
       throw new HttpException(
-        'Não existe vehicles para esta pesquisa!',
+        'Não existe veículo para esta pesquisa!',
         HttpStatus.NOT_FOUND,
       );
     }
