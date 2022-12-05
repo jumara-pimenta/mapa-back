@@ -2,8 +2,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsResponse, WsException } from '@nestjs/websockets';
 import { Observable } from 'rxjs';
 import { Server } from 'socket.io';
+import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
 import { CurrentLocalDTO } from 'src/dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
+import { EmployeesOnPathService } from 'src/services/employeesOnPath.service';
 import { RouteService } from 'src/services/route.service';
 import { getDateInLocaleTime } from 'src/utils/date.service';
 import { EStatusRoute } from 'src/utils/ETypes';
@@ -11,7 +13,8 @@ import { EStatusRoute } from 'src/utils/ETypes';
 @WebSocketGateway()
 export class WebsocketGateway {
   constructor(
-    private readonly routeService: RouteService
+    private readonly routeService: RouteService,
+    private readonly employeesOnPathService: EmployeesOnPathService,
   ) { }
   @WebSocketServer() server: Server;
 
@@ -105,6 +108,32 @@ export class WebsocketGateway {
 
 
     } catch (error) {
+      this.server.except(error).emit('error', error);
+      throw new WsException(error.message);
+    }
+  }
+
+  @SubscribeMessage('updateEmployee')
+  async handleUpdateEmployee(@MessageBody(new ValidationPipe({
+    exceptionFactory: (errors) => {
+      console.log(errors);
+      return new WsException(errors)
+    }
+  })) routeId: string,employeeOnPathId: string, payload: UpdateEmployeesOnPathDTO): Promise<void> {
+    try {
+
+
+    await this.employeesOnPathService.update(employeeOnPathId,payload);
+    const data = await this.routeService.listById(routeId);
+
+      this.server.emit(routeId, {
+        ...data
+      });
+
+}
+    catch (error) {
+      console.log(error);
+      
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
