@@ -209,6 +209,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
               include: {
                 employee: {
                   select: {
+                    name: true,
                     pins: {
                       include: {
                         pin: {
@@ -274,6 +275,29 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
 
     })
   }
+
+  findByVehicleId(id: string): Promise<any> {
+    return this.repository.route.findMany({
+      where: {
+        vehicleId: id
+      },
+      select: {
+        id: true,
+        path: {
+          select: {
+            startedAt: true,
+            finishedAt: true,
+            status: true,
+            startsAt: true,
+            duration: true,
+          }
+        }
+      }
+
+
+    })
+  }
+
 
   findByEmployeeIds(id: string[]): Promise<any> {
     return this.repository.route.findMany({
