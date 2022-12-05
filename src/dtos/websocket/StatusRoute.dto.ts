@@ -13,10 +13,10 @@ export class StatusRouteDTO {
   pathId: string 
   
   @IsNotEmpty()
-  route: UpdateRouteDTO
+  route?: UpdateRouteDTO
 
   @IsNotEmpty()
-  path: UpdatePathDTO
+  path?: UpdatePathDTO
 
 
 
