@@ -76,7 +76,7 @@ export class WebsocketGateway {
     }
   }
 
-  @SubscribeMessage('FinishRoute')
+  @SubscribeMessage('finishRoute')
   async handleRouteFinish(@MessageBody(new ValidationPipe({
     exceptionFactory: (errors) => {
       console.log(errors);
