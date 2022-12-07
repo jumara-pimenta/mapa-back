@@ -48,6 +48,9 @@ export class EmployeeRepository
   findById(id: string): Promise<Employee> {
     return this.repository.employee.findUnique({
       where: { id },
+      include: {
+        pins: true,
+      }
     });
   }
 
