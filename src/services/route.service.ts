@@ -14,8 +14,6 @@ import { addHours, addMinutes } from 'date-fns'
 import { convertTimeToDate } from "src/utils/date.service";
 import { EmployeeService } from "./employee.service";
 import { Employee } from "src/entities/employee.entity";
-import { RouteWebsocket } from "src/entities/routeWebsocket.entity";
-import { UpdatePathDTO } from "src/dtos/path/updatePath.dto";
 import { StatusRouteDTO } from "src/dtos/websocket/StatusRoute.dto";
 
 @Injectable()
@@ -43,7 +41,8 @@ export class RouteService {
 
     const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds);
     employeesPins.forEach((employee: Employee) => {
-      if (!employee.pins) {
+
+      if (employee.pins.length === 0) {
 
         employeeArrayPins.push(employee.name)
       }
@@ -98,7 +97,7 @@ export class RouteService {
     });
 
 
-    if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {};
+    if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') { };
 
     employeeInRoute.forEach((route: Route) => {
       route.path.forEach(path => {
@@ -183,11 +182,11 @@ export class RouteService {
     return await this.routeRepository.update(Object.assign(route, { ...route, ...data }));
   }
 
-  async updateWebsocket(payload: StatusRouteDTO, ): Promise<any> {
+  async updateWebsocket(payload: StatusRouteDTO,): Promise<any> {
     await this.update(payload.routeId, payload.route);
 
     await this.pathService.update(payload.pathId, payload.path);
-    
+
     const dataFilter = await this.listByIdWebsocket(payload.routeId);
 
     const dataFilterWebsocket = {
@@ -207,6 +206,7 @@ export class RouteService {
     return dataFilterWebsocket;
 
   }
+
 
 
   async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
@@ -289,7 +289,10 @@ export class RouteService {
               }
             })
           }
-        })
+        }),
+        quantityEmployees: +path.map(item => {
+          return item.employeesOnPath.length
+        }),
       }
     })
   }
@@ -364,6 +367,9 @@ export class RouteService {
             }
           })
         }
+      }),
+      quantityEmployees: +path.map(item => {
+        return item.employeesOnPath.length
       })
     }
   }
