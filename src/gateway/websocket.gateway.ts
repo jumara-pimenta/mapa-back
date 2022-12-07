@@ -3,6 +3,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsRes
 import { Observable } from 'rxjs';
 import { Server } from 'socket.io';
 import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
+import { WebsocketUpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
 import { CurrentLocalDTO } from 'src/dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
 import { EmployeesOnPathService } from 'src/services/employeesOnPath.service';
@@ -119,17 +120,20 @@ export class WebsocketGateway {
       console.log(errors);
       return new WsException(errors)
     }
-  })) routeId: string,employeeOnPathId: string, payload: UpdateEmployeesOnPathDTO): Promise<void> {
+  })) payload: WebsocketUpdateEmployeesStatusOnPathDTO): Promise<void> {
     try {
+      console.log("==>==>=>",payload);
 
+      
+      
+      await this.employeesOnPathService.updateWebsocket(payload.employeeOnPathId,payload.payload);
+      const data = await this.routeService.listById(payload.routeId);
 
-    await this.employeesOnPathService.update(employeeOnPathId,payload);
-    const data = await this.routeService.listById(routeId);
-
-      this.server.emit(routeId, {
+      this.server.emit(payload.routeId, {
         ...data
       });
-
+      
+   
 }
     catch (error) {
       console.log(error);

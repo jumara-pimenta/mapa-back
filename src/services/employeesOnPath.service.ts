@@ -97,7 +97,8 @@ export class EmployeesOnPathService {
   }
 
   async update(id: string, data: UpdateEmployeesOnPathDTO): Promise<MappedEmployeesOnPathDTO> {
-
+    
+    console.log("=====>", id, data);
     const employeesOnPath = await this.listById(id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
@@ -109,7 +110,22 @@ export class EmployeesOnPathService {
     return this.mappedOne(updatedEmployeeOnPath);
   }
 
+  async updateWebsocket(id: string, data: UpdateEmployeesOnPathDTO): Promise<void> {
+    
+    console.log("=====>", id, data);
+    const employeesOnPath = await this.listById(id);
+
+    await this.employeesOnPathRepository.update(
+      Object.assign(
+        employeesOnPath,
+        { ...employeesOnPath, ...data }
+      ));
+
+   
+  }
+
   async updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
+    
     const employeesOnPath = await this.findById(payload.id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
@@ -138,8 +154,8 @@ export class EmployeesOnPathService {
         shift: employee.shift,
         registration: employee.registration,
         location: {
-          lat: pins.at(0).pin.lat,
-          long: pins.at(0).pin.long
+          lat: pins?.at(0).pin.lat,
+          long: pins?.at(0).pin.long
         }
       }
     };
