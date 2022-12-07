@@ -290,9 +290,7 @@ export class RouteService {
             })
           }
         }),
-        quantityEmployees: +path.map(item => {
-          return item.employeesOnPath.length
-        }),
+        quantityEmployees: path[0].employeesOnPath.length,
       }
     })
   }
@@ -368,9 +366,7 @@ export class RouteService {
           })
         }
       }),
-      quantityEmployees: +path.map(item => {
-        return item.employeesOnPath.length
-      })
+      quantityEmployees: path[0].employeesOnPath.length
     }
   }
 }
