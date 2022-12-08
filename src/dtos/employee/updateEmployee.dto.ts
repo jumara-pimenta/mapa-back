@@ -1,8 +1,6 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import {
-  IsDate,
   IsDateString,
-  IsEnum,
   IsOptional,
   IsString,
   MaxLength,
@@ -22,7 +20,7 @@ export class UpdateEmployeeDTO {
   @MaxLength(11, { message: 'CPF não pode conter mais que 11 digitos.' })
   cpf?: string;
 
-  @IsString({ message: 'Rg não está definido como string.' })
+  @IsString({ message: 'RG não está definido como string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @MinLength(8, { message: 'Rg não pode conter menos que 8 digitos.' })
@@ -33,27 +31,27 @@ export class UpdateEmployeeDTO {
   @IsDateString({ message: 'Admission não está definido como DateString.' })
   admission?: Date;
 
-  @IsString({ message: 'Name não está definido como string.' })
+  @IsString({ message: 'Nome não está definido como string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   name?: string;
 
-  @IsString({ message: 'Role não está definido como string.' })
+  @IsString({ message: 'Cargo não está definido como string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role?: string;
 
-  @IsString({ message: 'Shift não está definido como string.' })
+  @IsString({ message: 'Turno não está definido como string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift?: string;
 
-  @IsString({ message: 'CostCenter não está definido como string.' })
+  @IsString({ message: 'Centro de custo não está definido como string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter?: string;
 
-  @IsString({ message: 'Address não está definido como string.' })
+  @IsString({ message: 'Endereço não está definido como string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;

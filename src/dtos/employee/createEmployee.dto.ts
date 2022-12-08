@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  Matches,
   IsDateString,
 } from 'class-validator';
 
@@ -39,9 +38,8 @@ export class CreateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
-  @IsString({ message: 'Nome não está definido como string.' })
-  @IsNotEmpty({ message: 'Nome não pode receber valor vazio.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsString({ message: 'Name não está definido como string.' })
+  @IsNotEmpty({ message: 'Name não pode receber valor ser vazio.' })
   name: string;
 
   @IsString({ message: 'Turno não está definido como string.' })
