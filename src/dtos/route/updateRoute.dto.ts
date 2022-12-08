@@ -2,27 +2,27 @@ import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-valida
 import { EStatusRoute, ETypeRoute } from "src/utils/ETypes";
 
 export class UpdateRouteDTO {
-  @IsString()
+  @IsString({ message: '[Description] não está definida como string.' })
   @IsOptional()
   description?: string
 
-  @IsString()
+  @IsString({ message: '[Distance] não está definida como string.'})
   @IsOptional()
   distance?: string
 
-  @IsEnum(ETypeRoute)
+  @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.'})
   @IsOptional()
   type?: ETypeRoute
 
-  @IsEnum(EStatusRoute)
+  @IsEnum(EStatusRoute, { message: '[Status] não está definida como enum.'})
   @IsOptional()
   status?: EStatusRoute
 
-  @IsString()
+  @IsString({ message: '[DriverId] não está definida como string.'})
   @IsOptional()
   driverId?: string
 
-  @IsString()
+  @IsString({ message: '[VehicleId] não está definida como string.'})
   @IsOptional()
   vehicleId?: string
 }

@@ -97,7 +97,7 @@ export class WebsocketGateway {
         },
         path: {
           ...payload.path,
-          finishedAt: new Date()
+          finishedAt: getDateInLocaleTime(new Date())
         }
       }
 
