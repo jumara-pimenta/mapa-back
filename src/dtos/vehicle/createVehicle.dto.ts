@@ -1,3 +1,4 @@
+import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -7,54 +8,62 @@ import {
   MinLength,
   MaxLength,
   IsDateString,
+  Length,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
-  @IsString({ message: 'Plate não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Plate não pode esta vazio.' })
-  @MinLength(7, { message: 'Plate nao pode conter menos que 7 digitos.' })
-  @MaxLength(7, { message: 'Plate nao pode conter mais que 7 digitos.' })
+  @IsString({ message: 'Placa não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Placa não pode está vazio.' })
+  @MinLength(7, { message: 'Placa não pode conter menos que 7 dígitos.' })
+  @MaxLength(7, { message: 'Placa não pode conter mais que 7 dígitos.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   plate: string;
 
-  @IsString({ message: 'Company não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Company não pode esta vazio.' })
+  @IsString({ message: 'Empresa não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Empresa não pode está vazio.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   company: string;
 
-  @IsString({ message: 'Type não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Type não pode esta vazio.' })
+  @IsString({ message: 'Tipo não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Tipo não pode está vazio.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   type: string;
 
-  @IsDateString({ message: 'LastSurvey não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'LastSurvey não pode esta vazio.' })
+  @IsDateString({
+    message: 'Última manutenção não está no formato certo de data.',
+  })
+  @IsNotEmpty({ message: 'Última vistoria não pode está vazio.' })
   lastSurvey: string;
 
-  @IsDateString({ message: 'Expiration não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Expiration não pode esta vazio.' })
+  @IsDateString({ message: 'Expiração não está no formato certo de data.' })
+  @IsNotEmpty({ message: 'Expiração não pode está vazio.' })
   expiration: string;
 
   @IsNumber()
-  @IsNotEmpty({ message: 'capacity não pode esta vazio.' })
+  @IsNotEmpty({ message: 'Capacidade não pode está vazio.' })
   capacity: number;
 
   @IsString({ message: 'Renavam não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Renavam não pode esta vazio.' })
-  @MinLength(11, { message: 'Renavam nao pode conter menos que 11 digitos.' })
-  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 digitos.' })
+  @IsNotEmpty({ message: 'Renavam não pode está vazio.' })
+  @MinLength(11, { message: 'Renavam não pode conter menos que 11 dígitos.' })
+  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   renavam: string;
 
   @IsDateString({
     message: 'LastMaintenance não está definido para o tipo string.',
   })
-  @IsNotEmpty({ message: 'LastMaintenance não pode esta vazio.' })
+  @IsNotEmpty({ message: 'Última manutenção não pode está vazio.' })
   lastMaintenance: string;
 
-  @IsString({ message: 'Note não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Note não pode esta vazio.' })
+  @IsString({ message: 'Observação não está definido para o tipo string.' })
+  @IsNotEmpty({ message: 'Observação não pode está vazio.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   note: string;
 
   @IsBoolean({
-    message: 'isAccessibility não está definido para o tipo tipo booleans.',
+    message: 'Acessibilidade não está definido para o tipo tipo booleans.',
   })
-  @IsNotEmpty({ message: 'isAccessibility não pode esta vazio.' })
+  @IsNotEmpty({ message: 'Acessibilidade não pode está vazio.' })
   isAccessibility: boolean;
 }
