@@ -7,6 +7,8 @@ import {
   Matches,
   IsDateString,
 } from 'class-validator';
+import { Employee } from 'src/entities/employee.entity';
+// import { Unique } from './validator';
 
 export class CreateEmployeeDTO {
   @IsString({ message: 'Matrícula não está definida como string.' })
@@ -21,6 +23,7 @@ export class CreateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   cpf: string;
 
+  // @Length(10, 20)
   @IsString({ message: 'RG não está definido como string.' })
   @IsNotEmpty({ message: 'RG não pode receber valor vazio.' })
   @MinLength(8, { message: 'RG nao pode conter menos que 8 dígitos.' })
