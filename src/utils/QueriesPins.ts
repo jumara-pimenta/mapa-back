@@ -5,11 +5,11 @@ import { FiltersPinDTO } from 'src/dtos/pin/filtersPin.dto';
 export function generateQueryForPins(filters: FiltersPinDTO): MappedPinDTO {
   const fields = {
     description: () => ({
-      description: filters.description,
+      description: { contains: filters.description },
     }),
-    street : ()=>({
-      street : filters.street
-    })
+    street: () => ({
+      street: { contains: filters.street },
+    }),
   };
 
   const keysFields = Object.keys(fields);
