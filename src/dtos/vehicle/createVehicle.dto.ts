@@ -51,7 +51,7 @@ export class CreateVehicleDTO {
   renavam: string;
 
   @IsDateString({
-    message: 'Última manutenção não está no formato certo de data.',
+    message: 'LastMaintenance não está definido para o tipo string.',
   })
   @IsNotEmpty({ message: 'Última manutenção não pode está vazio.' })
   lastMaintenance: string;
