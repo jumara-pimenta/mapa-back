@@ -11,7 +11,8 @@ export default interface IEmployeeRepository {
   ): Promise<PageResponse<Employee>>;
   findById(id: string): Promise<Employee>;
   findByCpf(cpf: string): Promise<Employee>;
-  findByRegistration(registration: string): Promise<Employee>;
   findByRg(rg: string): Promise<Employee>;
+  findByRegistration(registration: string): Promise<Employee>;
   update(data: Employee): Promise<Employee>;
+  findByIds(ids: string[]): Promise<Employee[]>;
 }

@@ -83,3 +83,8 @@ export function verifyAndFormatDate(date: string): Date {
     );
   }
 }
+
+export function convertTimeToDate(hour: string): Date {
+  const timeSplited = hour.split(':')
+  return new Date(2000, 1, 1, Number(timeSplited[0]), Number(timeSplited[1]), 0)
+}
