@@ -1,6 +1,7 @@
 datasource db {
-  provider = "sqlserver"
-  url      = env("DATABASE_URL")
+  provider          = "sqlserver"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -13,7 +14,7 @@ model Driver {
   name               String               @db.VarChar(255)
   cpf                String               @unique @db.VarChar(11)
   cnh                String               @unique @db.VarChar(11)
-  validation         DateTime
+  validation         DateTime             @db.DateTimeOffset
   category           String
   route              Route[]
   createdAt          DateTime             @default(now()) @db.DateTimeOffset
@@ -21,93 +22,93 @@ model Driver {
 }
 
 model Route {
-  id                  String              @id @unique
-  description         String
-  distance            String  
-  type                String
-  status              String
-  driver              Driver              @relation(fields: [driverId], references: [id], onDelete: Cascade)
-  driverId            String
-  path                Path[]
-  vehicle             Vehicle             @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  vehicleId           String
-  routeHistory        RouteHistory[]
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  id           String         @id @unique
+  description  String
+  distance     String
+  type         String
+  status       String
+  driver       Driver         @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId     String
+  path         Path[]
+  vehicle      Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicleId    String
+  routeHistory RouteHistory[]
+  createdAt    DateTime       @default(now()) @db.DateTimeOffset
+  updatedAt    DateTime?      @db.DateTimeOffset
 }
 
 model Path {
-  id                  String              @id @unique
-  duration            String              @db.VarChar(10)
-  startsAt            String              @db.VarChar(10)
-  startedAt           DateTime?           @db.DateTimeOffset
-  finishedAt          DateTime?           @db.DateTimeOffset
-  type                String
-  status              String
-  employeesOnPath     EmployeesOnPath[]
-  route               Route               @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  routeId             String
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  id              String            @id @unique
+  duration        String            @db.VarChar(10)
+  startsAt        String            @db.VarChar(10)
+  startedAt       DateTime?         @db.DateTimeOffset
+  finishedAt      DateTime?         @db.DateTimeOffset
+  type            String
+  status          String
+  employeesOnPath EmployeesOnPath[]
+  route           Route             @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  routeId         String
+  createdAt       DateTime          @default(now()) @db.DateTimeOffset
+  updatedAt       DateTime?         @db.DateTimeOffset
 }
 
 model EmployeesOnPath {
-  id                    String              @id @unique
-  path                  Path                @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  pathId                String
-  employee              Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)              
-  employeeId            String
-  confirmation          Boolean             @default(false)
-  position              Int                 @db.Int
-  boardingAt            DateTime?           @db.DateTimeOffset
-  disembarkAt           DateTime?           @db.DateTimeOffset
-  createdAt             DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt             DateTime?           @db.DateTimeOffset
+  id           String    @id @unique
+  path         Path      @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  pathId       String
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId   String
+  confirmation Boolean   @default(true)
+  position     Int       @db.Int
+  boardingAt   DateTime? @db.DateTimeOffset
+  disembarkAt  DateTime? @db.DateTimeOffset
+  createdAt    DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt    DateTime? @db.DateTimeOffset
 }
 
 model RouteHistory {
-  id                  String              @id @unique
-  employeeIds         String   
-  route               Route               @relation(fields: [routeId], references: [id], onDelete: Cascade)           
-  routeId             String              
-  startedAt           DateTime            @db.DateTimeOffset
-  finishedAt          DateTime            @db.DateTimeOffset
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  id          String    @id @unique
+  employeeIds String
+  route       Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  routeId     String
+  startedAt   DateTime  @db.DateTimeOffset
+  finishedAt  DateTime  @db.DateTimeOffset
+  createdAt   DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt   DateTime? @db.DateTimeOffset
 }
 
 model Vehicle {
-  id                  String              @id @unique
-  plate               String              @unique
-  company             String
-  type                String
-  lastSurvey          DateTime
-  expiration          DateTime
-  capacity            Int
-  renavam             String              @db.VarChar(11)
-  lastMaintenance     DateTime
-  note                String
-  isAccessibility     Boolean             @default(false)
-  routes              Route[]
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  id              String    @id @unique
+  plate           String    @unique
+  company         String
+  type            String
+  lastSurvey      DateTime  @db.DateTimeOffset
+  expiration      DateTime  @db.DateTimeOffset
+  capacity        Int
+  renavam         String    @unique @db.VarChar(11)
+  lastMaintenance DateTime  @db.DateTimeOffset
+  note            String
+  isAccessibility Boolean   @default(false)
+  routes          Route[]
+  createdAt       DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt       DateTime? @db.DateTimeOffset
 }
 
 model Employee {
-  id                  String              @id @unique
-  registration        String              @unique
-  name                String
-  cpf                 String              @unique @db.VarChar(11)
-  rg                  String              @unique @db.VarChar(9)
-  admission           DateTime
-  role                String
-  shift               String
-  costCenter          String
-  address             String              @db.VarChar(255)
-  pins                EmployeesOnPin[]
-  employeeOnPath      EmployeesOnPath[]
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  id             String            @id @unique
+  registration   String            @unique
+  name           String
+  cpf            String            @unique @db.VarChar(11)
+  rg             String            @unique @db.VarChar(9)
+  admission      DateTime          @db.DateTimeOffset
+  role           String
+  shift          String
+  costCenter     String
+  address        String            @db.VarChar(255)
+  pins           EmployeesOnPin[]
+  employeeOnPath EmployeesOnPath[]
+  createdAt      DateTime          @default(now()) @db.DateTimeOffset
+  updatedAt      DateTime?         @db.DateTimeOffset
 }
 
 model Pin {
@@ -122,13 +123,13 @@ model Pin {
 }
 
 model EmployeesOnPin {
-  employee            Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  employeeId          String
-  pin                 Pin                 @relation(fields: [pinId], references: [id], onDelete: Cascade)
-  pinId               String
-  type                String              @db.VarChar(50)
-  createdAt           DateTime            @default(now()) @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId String
+  pin        Pin       @relation(fields: [pinId], references: [id], onDelete: Cascade)
+  pinId      String
+  type       String    @db.VarChar(50)
+  createdAt  DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt  DateTime? @db.DateTimeOffset
 
   @@id([employeeId, pinId])
 }

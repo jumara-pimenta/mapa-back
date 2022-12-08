@@ -14,64 +14,32 @@ export class EmployeeService {
     private readonly employeeRepository: IEmployeeRepository,
   ) {}
 
-  // async create(payload: CreateEmployeeDTO): Promise<Employee> {
-  //   return await this.employeeRepository.create(
-  //     new Employee({ ...payload, admission: new Date(payload.admission) }),
-  //   );
-  // }
-
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
-    const cpfAlredyExist = await this.employeeRepository.findByCpf(payload.cpf);
-    const rgAlredyExist = await this.employeeRepository.findByRg(payload.rg);
-    const registrationAlredyExist =
-      await this.employeeRepository.findByRegistration(payload.registration);
+    const CpfExists = await this.employeeRepository.findByCpf(payload.cpf);
+    const RgExists = await this.employeeRepository.findByRg(payload.rg);
+    const RegistrationExists = await this.employeeRepository.findByRegistration(
+      payload.registration,
+    );
 
-    function isValidCPF(cpf) {
-      if (typeof cpf !== 'string') return false;
-      cpf = cpf.replace(/[^\d]+/g, '');
-      if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
-      cpf = cpf.split('').map((el) => +el);
-      const rest = (count) =>
-        ((cpf
-          .slice(0, count - 12)
-          .reduce((soma, el, index) => soma + el * (count - index), 0) *
-          10) %
-          11) %
-        10;
-      return rest(10) === cpf[9] && rest(11) === cpf[10];
-    }
+    if (CpfExists)
+      throw new HttpException(
+        'CPF cadastrado para outro(a) colaborador(a)',
+        HttpStatus.CONFLICT,
+      );
 
-    if (
-      payload.cpf.length !== 11 ||
-      (!Array.from(payload.cpf).filter((e) => e !== payload.cpf[0]).length &&
-        isValidCPF)
-    ) {
+    if (RgExists)
       throw new HttpException(
-        `CPF INVALIDO: ${payload.cpf}`,
+        'RG cadastrado para outro(a) colaborador(a)',
         HttpStatus.CONFLICT,
       );
-    }
 
-    if (registrationAlredyExist) {
+    if (RegistrationExists)
       throw new HttpException(
-        `Registration ja cadastrado: ${payload.registration}`,
+        'Matrícula cadastrada para outro(a) colaborador(a)',
         HttpStatus.CONFLICT,
       );
-    }
-    if (cpfAlredyExist) {
-      throw new HttpException(
-        `CPF ja cadastrado: ${payload.cpf}`,
-        HttpStatus.CONFLICT,
-      );
-    }
-    if (rgAlredyExist) {
-      throw new HttpException(
-        `RG ja cadastrado: ${payload.rg}`,
-        HttpStatus.CONFLICT,
-      );
-    } else {
-      return await this.employeeRepository.create(new Employee(payload));
-    }
+
+    return this.employeeRepository.create(new Employee(payload));
   }
 
   async delete(id: string): Promise<Employee> {
@@ -85,7 +53,7 @@ export class EmployeeService {
 
     if (!employee)
       throw new HttpException(
-        `Não foi encontrado um employee com o id: ${id}`,
+        `Não foi encontrado um(a) colaborador(a) com o id: ${id}`,
         HttpStatus.NOT_FOUND,
       );
 
@@ -100,7 +68,7 @@ export class EmployeeService {
 
     if (employees.total === 0) {
       throw new HttpException(
-        'Não existe employees para esta pesquisa!',
+        'Não existe colaborador(a) para esta pesquisa!',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -116,9 +84,49 @@ export class EmployeeService {
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
     const employee = await this.listById(id);
 
+    if (data.cpf) {
+      const CpfExists = await this.employeeRepository.findByCpf(data.cpf);
+      if (CpfExists && CpfExists.cpf !== employee.cpf) {
+        throw new HttpException(
+          'CPF cadastrado para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    if (data.rg) {
+      const RgExists = await this.employeeRepository.findByRg(data.rg);
+
+      if (RgExists && RgExists.rg !== employee.rg) {
+        throw new HttpException(
+          'RG cadastrado para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    if (data.registration) {
+      const RegistrationExists =
+        await this.employeeRepository.findByRegistration(data.registration);
+
+      if (
+        RegistrationExists &&
+        RegistrationExists.registration !== employee.registration
+      ) {
+        throw new HttpException(
+          'Matrícula cadastrada para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
     return await this.employeeRepository.update(
       Object.assign(employee, { ...employee, ...data }),
     );
+  }
+
+  async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
+    return await this.employeeRepository.findByIds(ids);
   }
 
   private toDTO(employees: Employee[]): MappedEmployeeDTO[] {

@@ -15,7 +15,48 @@ export class DriverService {
   ) {}
 
   async create(payload: CreateDriverDTO): Promise<Driver> {
-    return await this.driverRepository.create(new Driver(payload));
+    const cpfAlredyExist = await this.driverRepository.findByCpf(payload.cpf);
+    const cnhAlredyExist = await this.driverRepository.findByCnh(payload.cnh);
+
+    function isValidCPF(cpf) {
+      if (typeof cpf !== 'string') return false;
+      cpf = cpf.replace(/[^\d]+/g, '');
+      if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
+      cpf = cpf.split('').map((el) => +el);
+      const rest = (count) =>
+        ((cpf
+          .slice(0, count - 12)
+          .reduce((soma, el, index) => soma + el * (count - index), 0) *
+          10) %
+          11) %
+        10;
+      return rest(10) === cpf[9] && rest(11) === cpf[10];
+    }
+
+    if (
+      payload.cpf.length !== 11 ||
+      (!Array.from(payload.cpf).filter((e) => e !== payload.cpf[0]).length &&
+        isValidCPF)
+    ) {
+      throw new HttpException(
+        `CPF INVALIDO: ${payload.cpf}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (cpfAlredyExist) {
+      throw new HttpException(
+        `CPF ja cadastrado: ${payload.cpf}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (cnhAlredyExist) {
+      throw new HttpException(
+        `CNH ja cadastrado: ${payload.cnh}`,
+        HttpStatus.CONFLICT,
+      );
+    } else {
+      return await this.driverRepository.create(new Driver(payload));
+    }
   }
 
   async delete(id: string): Promise<Driver> {
@@ -59,6 +100,28 @@ export class DriverService {
 
   async update(id: string, data: UpdateDriverDTO): Promise<Driver> {
     const driver = await this.listById(id);
+
+    if (data.cpf) {
+      const cpfAlredyExist = await this.driverRepository.findByCpf(data.cpf);
+
+      if (cpfAlredyExist && cpfAlredyExist.cpf !== driver.cpf) {
+        throw new HttpException(
+          `CPF ja cadastrado: ${data.cpf}`,
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    if (data.cnh) {
+      const cnhAlredyExist = await this.driverRepository.findByCnh(data.cnh);
+
+      if (cnhAlredyExist && cnhAlredyExist.cnh !== driver.cnh) {
+        throw new HttpException(
+          `CNH ja cadastrado: ${data.cnh}`,
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
 
     return await this.driverRepository.update(
       Object.assign(driver, { ...driver, ...data }),

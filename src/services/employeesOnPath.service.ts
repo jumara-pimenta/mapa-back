@@ -1,4 +1,5 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { UpdateEmployeesStatusOnPathDTO } from "src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto";
 import { CreateEmployeesOnPathDTO } from "../dtos/employeesOnPath/createEmployeesOnPath.dto";
 import { MappedEmployeesOnPathDTO } from "../dtos/employeesOnPath/mappedEmployeesOnPath.dto";
 import { UpdateEmployeesOnPathDTO } from "../dtos/employeesOnPath/updateEmployeesOnPath.dto";
@@ -28,7 +29,7 @@ export class EmployeesOnPathService {
 
       await this.employeesOnPathRepository.create(new EmployeesOnPath({ position }, employee, path));
 
-      position++; 
+      position++;
     }
 
     return;
@@ -44,18 +45,40 @@ export class EmployeesOnPathService {
     const employeesOnPath = await this.employeesOnPathRepository.findById(id);
 
     if (!employeesOnPath) throw new HttpException(
-      `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`, 
+      `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`,
       HttpStatus.NOT_FOUND
     );
 
     return this.mappedOne(employeesOnPath);
   }
 
+  async findById(id: string): Promise<EmployeesOnPath> {
+    const employeesOnPath = await this.employeesOnPathRepository.findById(id);
+
+    if (!employeesOnPath) throw new HttpException(
+      `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`,
+      HttpStatus.NOT_FOUND
+    );
+
+    return employeesOnPath;
+  }
+
+  async listByIds(id: string): Promise<EmployeesOnPath[]> {
+    const employeesOnPath = await this.employeesOnPathRepository.findByIds(id);
+
+    if (!employeesOnPath) throw new HttpException(
+      `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`,
+      HttpStatus.NOT_FOUND
+    );
+
+    return employeesOnPath;
+  }
+
   async listByRoute(routeId: string): Promise<EmployeesOnPath> {
     const employeesOnPath = await this.employeesOnPathRepository.findByRoute(routeId);
 
     if (!employeesOnPath) throw new HttpException(
-      `Não foi encontrado um trajeto para a rota: ${routeId}`, 
+      `Não foi encontrado um trajeto para a rota: ${routeId}`,
       HttpStatus.NOT_FOUND
     );
 
@@ -66,12 +89,12 @@ export class EmployeesOnPathService {
     const employeesOnPath = await this.employeesOnPathRepository.findManyByRoute(routeId);
 
     if (!employeesOnPath.length) throw new HttpException(
-      `Não foi encontrado um trajeto para a rota: ${routeId}`, 
+      `Não foi encontrado um trajeto para a rota: ${routeId}`,
       HttpStatus.NOT_FOUND
     );
 
     return this.mappedMany(employeesOnPath);
-  }   
+  }
 
   async update(id: string, data: UpdateEmployeesOnPathDTO): Promise<MappedEmployeesOnPathDTO> {
 
@@ -79,11 +102,23 @@ export class EmployeesOnPathService {
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
       Object.assign(
-        employeesOnPath, 
-        {...employeesOnPath, ...data}
-    ));
+        employeesOnPath,
+        { ...employeesOnPath, ...data }
+      ));
 
     return this.mappedOne(updatedEmployeeOnPath);
+  }
+
+  async updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
+    const employeesOnPath = await this.findById(payload.id);
+
+    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
+      Object.assign(
+        employeesOnPath,
+        { ...employeesOnPath, confirmation: payload.status }
+      ));
+    return updatedEmployeeOnPath;
+
   }
 
   private mappedOne(employeesOnPath: EmployeesOnPath): MappedEmployeesOnPathDTO {

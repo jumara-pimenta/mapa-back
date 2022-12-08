@@ -1,4 +1,5 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Put, Query } from "@nestjs/common";
+import { UpdateEmployeesStatusOnPathDTO } from "src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto";
 import { MappedEmployeesOnPathDTO } from "../dtos/employeesOnPath/mappedEmployeesOnPath.dto";
 import { EmployeesOnPathService } from "../services/employeesOnPath.service";
 
@@ -19,4 +20,11 @@ export class EmployeesOnPathController {
   async getManyByRoute(@Query("route") route: string): Promise<MappedEmployeesOnPathDTO[]> {
     return await this.employeeOnPathService.listManyByRoute(route);
   }
+
+  @Put()
+  @HttpCode(HttpStatus.OK)
+  async updateEmployeeConfirmation(@Body() payload:UpdateEmployeesStatusOnPathDTO): Promise<MappedEmployeesOnPathDTO[]> {
+    return await this.employeeOnPathService.updateStatus(payload);
+  }
+ 
 }

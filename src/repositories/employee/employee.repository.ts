@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryByFiltersForEmployee } from '../../configs/database/Queries';
+import { generateQueryForEmployee } from 'src/utils/QueriesEmployeer';
 
 @Injectable()
 export class EmployeeRepository
@@ -28,9 +28,7 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
         admission: getDateInLocaleTime(new Date(data.admission)),
-
         costCenter: data.costCenter,
         cpf: data.cpf,
         name: data.name,
@@ -38,8 +36,6 @@ export class EmployeeRepository
         rg: data.rg,
         role: data.role,
         shift: data.shift,
-        createdAt: getDateInLocaleTime(new Date()),
-        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
     });
@@ -73,7 +69,7 @@ export class EmployeeRepository
     page: Page,
     filters: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>> {
-    const condition = generateQueryByFiltersForEmployee(filters);
+    const condition = generateQueryForEmployee(filters);
 
     const items = condition
       ? await this.repository.employee.findMany({
@@ -103,8 +99,7 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
-        admission: getDateInLocaleTime(new Date(data.admission)),
+        admission: data.admission,
         costCenter: data.costCenter,
         cpf: data.cpf,
         name: data.name,
@@ -112,26 +107,46 @@ export class EmployeeRepository
         rg: data.rg,
         role: data.role,
         shift: data.shift,
+        createdAt: data.createdAt,
       },
     });
   }
 
-  // create(data: Employee): Promise<Employee> {
-  //   return this.repository.employee.create({
-  //     data: {
-  //       id: data.id,
-  //       address: data.address,
-  //       // admission: data.admission,
-  //       admission: getDateInLocaleTime(new Date(data.admission)),
+  findByIds(ids: string[]): Promise<any> {
+    return this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        pins: {
+          select: {
+            type: true,
+            pin: true,
+          },
+        },
+      },
+    });
+  }
 
-  //       costCenter: data.costCenter,
-  //       cpf: data.cpf,
-  //       name: data.name,
-  //       registration: data.registration,
-  //       rg: data.rg,
-  //       role: data.role,
-  //       shift: data.shift,
-  //     },
-  //   });
-  // }
+  findByCpf(cpf: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { cpf },
+    });
+  }
+
+  findByRg(rg: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { rg },
+    });
+  }
+
+  findByRegistration(registration: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { registration },
+    });
+  }
 }

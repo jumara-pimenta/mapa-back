@@ -1,24 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { Page, PageResponse } from "../../configs/database/page.model";
-import { Pageable } from "../../configs/database/pageable.service";
-import { PrismaService } from "../../configs/database/prisma.service";
-import IVehicleRepository from "./vehicle.repository.contract";
-import { getDateInLocaleTime } from "../../utils/date.service";
-import { generateQueryByFiltersForVehicle } from "../../configs/database/Queries";
-import { FiltersVehicleDTO } from "../../dtos/vehicle/filtersVehicle.dto";
-import { Vehicle } from "../../entities/vehicle.entity";
+import { Injectable } from '@nestjs/common';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { Pageable } from '../../configs/database/pageable.service';
+import { PrismaService } from '../../configs/database/prisma.service';
+import IVehicleRepository from './vehicle.repository.contract';
+import { getDateInLocaleTime } from '../../utils/date.service';
+import { generateQueryByFiltersForVehicle } from '../../configs/database/Queries';
+import { FiltersVehicleDTO } from '../../dtos/vehicle/filtersVehicle.dto';
+import { Vehicle } from '../../entities/vehicle.entity';
 
 @Injectable()
-export class VehicleRepository extends Pageable<Vehicle> implements IVehicleRepository {
-  constructor(
-    private readonly repository: PrismaService
-  ) {
-    super()
+export class VehicleRepository
+  extends Pageable<Vehicle>
+  implements IVehicleRepository
+{
+  constructor(private readonly repository: PrismaService) {
+    super();
   }
 
   delete(id: string): Promise<Vehicle> {
     return this.repository.vehicle.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -28,44 +29,53 @@ export class VehicleRepository extends Pageable<Vehicle> implements IVehicleRepo
         id: data.id,
         capacity: data.capacity,
         company: data.company,
-        expiration: data.expiration,
-        lastMaintenance: data.lastMaintenance,
-        lastSurvey: data.lastSurvey,
+        expiration: getDateInLocaleTime(new Date(data.expiration)),
+        lastMaintenance: getDateInLocaleTime(new Date(data.lastMaintenance)),
+        lastSurvey: getDateInLocaleTime(new Date(data.lastSurvey)),
         note: data.note,
         plate: data.plate,
         renavam: data.renavam,
         type: data.type,
         isAccessibility: data.isAccessibility,
-        updatedAt: getDateInLocaleTime(new Date())
+        updatedAt: getDateInLocaleTime(new Date()),
       },
-      where: { id: data.id }
-    })
+      where: { id: data.id },
+    });
   }
 
   findById(id: string): Promise<Vehicle> {
     return this.repository.vehicle.findUnique({
-      where: { id }
-    })
+      where: { id },
+    });
   }
 
-  async findAll(page: Page, filters: FiltersVehicleDTO): Promise<PageResponse<Vehicle>> {
-
+  async findAll(
+    page: Page,
+    filters: FiltersVehicleDTO,
+  ): Promise<PageResponse<Vehicle>> {
     const condition = generateQueryByFiltersForVehicle(filters);
 
-    const items = condition ? await this.repository.vehicle.findMany({
-      ...this.buildPage(page),
-      where: condition
-    }) : await this.repository.vehicle.findMany({
-      ...this.buildPage(page)
-    });
+    const items = condition
+      ? await this.repository.vehicle.findMany({
+          ...this.buildPage(page),
+          where: condition,
+        })
+      : await this.repository.vehicle.findMany({
+          ...this.buildPage(page),
+        });
 
-    const total = condition ? await this.repository.vehicle.findMany({
-      where: {
-        ...condition
-      }
-    }) : await this.repository.vehicle.count();
+    const total = condition
+      ? await this.repository.vehicle.findMany({
+          where: {
+            ...condition,
+          },
+        })
+      : await this.repository.vehicle.count();
 
-    return this.buildPageResponse(items, Array.isArray(total) ? total.length : total);
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
   }
 
   create(data: Vehicle): Promise<Vehicle> {
@@ -81,8 +91,21 @@ export class VehicleRepository extends Pageable<Vehicle> implements IVehicleRepo
         plate: data.plate,
         renavam: data.renavam,
         type: data.type,
-        isAccessibility: data.isAccessibility
-      }
+        isAccessibility: data.isAccessibility,
+        createdAt: data.createdAt,
+      },
+    });
+  }
+
+  findByPlate(plate: string): Promise<Vehicle> {
+    return this.repository.vehicle.findUnique({
+      where: { plate },
+    });
+  }
+
+  findByRenavam(renavam: string): Promise<Vehicle> {
+    return this.repository.vehicle.findUnique({
+      where: { renavam },
     });
   }
 }
