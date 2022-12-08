@@ -28,7 +28,6 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
         admission: getDateInLocaleTime(new Date(data.admission)),
 
         costCenter: data.costCenter,
@@ -38,8 +37,6 @@ export class EmployeeRepository
         rg: data.rg,
         role: data.role,
         shift: data.shift,
-        createdAt: getDateInLocaleTime(new Date()),
-        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
     });
@@ -85,8 +82,7 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
-        admission: getDateInLocaleTime(new Date(data.admission)),
+        admission: data.admission,
         costCenter: data.costCenter,
         cpf: data.cpf,
         name: data.name,
@@ -94,6 +90,7 @@ export class EmployeeRepository
         rg: data.rg,
         role: data.role,
         shift: data.shift,
+        createdAt: data.createdAt,
       },
     });
   }
@@ -102,8 +99,8 @@ export class EmployeeRepository
     return this.repository.employee.findMany({
       where: {
         id: {
-          in: ids
-        }
+          in: ids,
+        },
       },
       select: {
         id: true,
@@ -111,11 +108,28 @@ export class EmployeeRepository
         pins: {
           select: {
             type: true,
-            pin: true
-          }
-        }
-      }
+            pin: true,
+          },
+        },
+      },
     });
   }
 
+  findByCpf(cpf: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { cpf },
+    });
+  }
+
+  findByRg(rg: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { rg },
+    });
+  }
+
+  findByRegistration(registration: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { registration },
+    });
+  }
 }

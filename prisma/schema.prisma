@@ -10,15 +10,15 @@ generator client {
 }
 
 model Driver {
-  id                 String               @id @unique
-  name               String               @db.VarChar(255)
-  cpf                String               @unique @db.VarChar(11)
-  cnh                String               @unique @db.VarChar(11)
-  validation         DateTime
-  category           String
-  route              Route[]
-  createdAt          DateTime             @default(now()) @db.DateTimeOffset
-  updatedAt          DateTime?            @db.DateTimeOffset
+  id         String    @id @unique
+  name       String    @db.VarChar(255)
+  cpf        String    @unique @db.VarChar(11)
+  cnh        String    @unique @db.VarChar(11)
+  validation DateTime
+  category   String
+  route      Route[]
+  createdAt  DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt  DateTime? @db.DateTimeOffset
 }
 
 model Route {
@@ -100,7 +100,7 @@ model Employee {
   name           String
   cpf            String            @unique @db.VarChar(11)
   rg             String            @unique @db.VarChar(9)
-  admission      DateTime
+  admission      DateTime          @db.DateTimeOffset
   role           String
   shift          String
   costCenter     String
