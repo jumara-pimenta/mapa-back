@@ -41,7 +41,6 @@ export class RouteService {
 
     const employeesPins = await this.employeeService.listAllEmployeesPins(payload.employeeIds);
     employeesPins.forEach((employee: Employee) => {
-
       if (employee.pins.length === 0) {
 
         employeeArrayPins.push(employee.name)
@@ -112,11 +111,8 @@ export class RouteService {
       })
     });
 
-
-
     if (employeeArray.length > 0) {
       throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
-
     }
 
     const props = new Route({
@@ -207,6 +203,13 @@ export class RouteService {
 
   }
 
+  async softDelete(id: string): Promise<Route> {
+    const route = await this.listById(id);
+    if(!route) throw new HttpException(`Não foi encontrada uma rota com o id: ${id}!`, HttpStatus.NOT_FOUND);
+
+    return await this.routeRepository.softDelete(route.id);
+  }
+
 
 
   async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
@@ -290,7 +293,7 @@ export class RouteService {
             })
           }
         }),
-        quantityEmployees: path[0].employeesOnPath.length,
+        quantityEmployees: path[0]?.employeesOnPath?.length,
       }
     })
   }
@@ -366,7 +369,7 @@ export class RouteService {
           })
         }
       }),
-      quantityEmployees: path[0].employeesOnPath.length
+      quantityEmployees: path[0]?.employeesOnPath?.length
     }
   }
 }

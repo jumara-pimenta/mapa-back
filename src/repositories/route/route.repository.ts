@@ -186,7 +186,10 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
 
     const items = condition ? await this.repository.route.findMany({
       ...this.buildPage(page),
-      where: condition,
+      where: {
+        ...condition,
+        deletedAt: null
+      },
       include: {
         driver: true,
         path: {
@@ -198,6 +201,9 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
       }
     }) : await this.repository.route.findMany({
       ...this.buildPage(page),
+      where: {
+        deletedAt: null
+      },
       include: {
         driver: true,
         path: {
@@ -232,9 +238,14 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
 
     const total = condition ? await this.repository.route.findMany({
       where: {
-        ...condition
+        ...condition,
+        deletedAt: null
       }
-    }) : await this.repository.route.count();
+    }) : await this.repository.route.count({
+      where: {
+        deletedAt: null
+      }
+    });
 
     return this.buildPageResponse(items, Array.isArray(total) ? total.length : total);
   }
@@ -257,10 +268,12 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
   findByDriverId(id: string): Promise<any> {
     return this.repository.route.findMany({
       where: {
-        driverId: id
+        driverId: id,
+        deletedAt: null
       },
       select: {
         id: true,
+        status: true,
         path: {
           select: {
             startedAt: true,
@@ -279,7 +292,8 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
   findByVehicleId(id: string): Promise<any> {
     return this.repository.route.findMany({
       where: {
-        vehicleId: id
+        vehicleId: id,
+        deletedAt: null
       },
       select: {
         id: true,
@@ -302,6 +316,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
   findByEmployeeIds(id: string[]): Promise<any> {
     return this.repository.route.findMany({
       where: {
+        deletedAt: null,
         path: {
           some: {
             employeesOnPath: {
@@ -339,5 +354,15 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         }
       }
     })
+  }
+
+  async softDelete(id: string): Promise<Route> {
+    return this.repository.route.update({
+      where: { id },
+      data: {
+        status: "deleted",
+        deletedAt: getDateInLocaleTime(new Date())
+      }
+    });
   }
 }

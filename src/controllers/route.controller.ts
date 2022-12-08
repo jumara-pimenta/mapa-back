@@ -33,7 +33,7 @@ export class RouteController {
   @Delete('/:id')
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Route> {
-    return await this.routeService.delete(id);
+    return await this.routeService.softDelete(id);
   }
 
   @Put('/:id')

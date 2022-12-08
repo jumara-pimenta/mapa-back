@@ -14,4 +14,5 @@ export default interface IRouteRepository {
   findByEmployeeIds(id: string[]): Promise<Route[]>
   update(data: Route): Promise<Route>
   updateWebsocket(data: Route): Promise<RouteWebsocket>
+  softDelete(id: string): Promise<Route>
 }

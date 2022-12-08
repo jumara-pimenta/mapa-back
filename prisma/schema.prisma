@@ -35,6 +35,7 @@ model Route {
   routeHistory RouteHistory[]
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
   updatedAt    DateTime?      @db.DateTimeOffset
+  deletedAt    DateTime?      @db.DateTimeOffset
 }
 
 model Path {
