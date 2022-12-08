@@ -115,50 +115,6 @@ export class RouteService {
       throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
     }
 
-    const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
-
-    const employeeInRoute = await this.routeRepository.findByEmployeeIds(payload.employeeIds);
-
-    driverInRoute.map(route => {
-      route.path.map(path => {
-        const startedAtDate = convertTimeToDate(path.startsAt);
-        const durationTime = convertTimeToDate(path.duration);
-
-        const finishedAtTime = addHours(addMinutes(startedAtDate, durationTime.getMinutes()), durationTime.getHours());
-
-        if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
-          throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
-        }
-        if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
-          throw new HttpException(`O motorista já está em uma rota neste horário!`, HttpStatus.CONFLICT);
-        }
-      })
-    });
-
-
-    if (payload.type === 'CONVENCIONAL' || payload.type === 'ESPECIAL') {
-    }
-
-    employeeInRoute.map((route: Route) => {
-      route.path.map(path => {
-        const employeeInPath = path.employeesOnPath.filter(item => {
-
-          if (payload.type === route.type) {
-            return payload.employeeIds.includes(item.employee.id);
-          }
-        });
-
-        employeeArray.push(employeeInPath);
-      })
-    });
-
-
-
-    if (employeeArray.length > 0) {
-      throw new HttpException(`O(s) colaborador(es)${employeeArray.map(item => item.map(employee => " " + employee.employee.name))} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`, HttpStatus.CONFLICT);
-
-    }
-
     const props = new Route({
       description: payload.description,
       distance: 'EM PROCESSAMENTO',
