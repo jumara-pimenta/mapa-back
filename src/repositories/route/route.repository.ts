@@ -1,27 +1,30 @@
-import { Injectable } from "@nestjs/common";
-import { Page, PageResponse } from "../../configs/database/page.model";
-import { Pageable } from "../../configs/database/pageable.service";
-import { PrismaService } from "../../configs/database/prisma.service";
-import IRouteRepository from "./route.repository.contract";
-import { getDateInLocaleTime } from "../../utils/date.service";
-import { FiltersRouteDTO } from "../../dtos/route/filtersRoute.dto";
-import { generateQueryByFiltersForRoute } from "../../configs/database/Queries";
-import { Route } from "../../entities/route.entity";
-import { DriverService } from "../../services/driver.service";
-import { RouteWebsocket } from "src/entities/routeWebsocket.entity";
+import { Injectable } from '@nestjs/common';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { Pageable } from '../../configs/database/pageable.service';
+import { PrismaService } from '../../configs/database/prisma.service';
+import IRouteRepository from './route.repository.contract';
+import { getDateInLocaleTime } from '../../utils/date.service';
+import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
+import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
+import { Route } from '../../entities/route.entity';
+import { DriverService } from '../../services/driver.service';
+import { RouteWebsocket } from 'src/entities/routeWebsocket.entity';
 
 @Injectable()
-export class RouteRepository extends Pageable<Route> implements IRouteRepository {
+export class RouteRepository
+  extends Pageable<Route>
+  implements IRouteRepository
+{
   constructor(
     private readonly repository: PrismaService,
     private readonly driverService: DriverService,
   ) {
-    super()
+    super();
   }
 
   delete(id: string): Promise<Route> {
     return this.repository.route.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -33,10 +36,10 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         distance: data.distance,
         status: data.status,
         type: data.type,
-        updatedAt: getDateInLocaleTime(new Date())
+        updatedAt: getDateInLocaleTime(new Date()),
       },
-      where: { id: data.id }
-    })
+      where: { id: data.id },
+    });
   }
 
   async updateWebsocket(data: Route): Promise<RouteWebsocket> {
@@ -47,12 +50,10 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         distance: data.distance,
         status: data.status,
         type: data.type,
-        updatedAt: getDateInLocaleTime(new Date())
+        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
-
-
-    })
+    });
   }
 
   findById(id: string): Promise<Route> {
@@ -78,7 +79,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
             createdAt: true,
             employeesOnPath: {
               orderBy: {
-                position: "asc"
+                position: 'asc',
               },
               select: {
                 id: true,
@@ -98,23 +99,20 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                            long: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
-        vehicle: true
-      }
-    })
-
-
-
+        vehicle: true,
+      },
+    });
   }
 
   async findByIdWebsocket(id: string): Promise<any> {
@@ -140,7 +138,7 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
             createdAt: true,
             employeesOnPath: {
               orderBy: {
-                position: "asc"
+                position: 'asc',
               },
               select: {
                 id: true,
@@ -160,96 +158,102 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                            long: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
-        vehicle: { select: { plate: true } }
-      }
-    })
-
-
+        vehicle: { select: { plate: true } },
+      },
+    });
 
     return data;
   }
 
-  async findAll(page: Page, filters: FiltersRouteDTO): Promise<PageResponse<Route>> {
-
+  async findAll(
+    page: Page,
+    filters: FiltersRouteDTO,
+  ): Promise<PageResponse<Route>> {
     const condition = generateQueryByFiltersForRoute(filters);
 
-    const items = condition ? await this.repository.route.findMany({
-      ...this.buildPage(page),
-      where: {
-        ...condition,
-        deletedAt: null
-      },
-      include: {
-        driver: true,
-        path: {
+    const items = condition
+      ? await this.repository.route.findMany({
+          ...this.buildPage(page),
+          where: {
+            ...condition,
+            deletedAt: null,
+          },
           include: {
-            employeesOnPath: true
-          }
-        },
-        vehicle: true,
-      }
-    }) : await this.repository.route.findMany({
-      ...this.buildPage(page),
-      where: {
-        deletedAt: null
-      },
-      include: {
-        driver: true,
-        path: {
-          include: {
-            employeesOnPath: {
-              orderBy: {
-                position: "asc"
-              },
+            driver: true,
+            path: {
               include: {
-                employee: {
-                  select: {
-                    name: true,
-                    pins: {
-                      include: {
-                        pin: {
-                          select: {
-                            lat: true,
-                            long: true
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        vehicle: true,
-      }
-    });
+                employeesOnPath: true,
+              },
+            },
+            vehicle: true,
+          },
+        })
+      : await this.repository.route.findMany({
+          ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                long: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            vehicle: true,
+          },
+        });
 
-    const total = condition ? await this.repository.route.findMany({
-      where: {
-        ...condition,
-        deletedAt: null
-      }
-    }) : await this.repository.route.count({
-      where: {
-        deletedAt: null
-      }
-    });
+    const total = condition
+      ? await this.repository.route.findMany({
+          where: {
+            ...condition,
+            deletedAt: null,
+          },
+        })
+      : await this.repository.route.count({
+          where: {
+            deletedAt: null,
+          },
+        });
 
-    return this.buildPageResponse(items, Array.isArray(total) ? total.length : total);
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
   }
-
 
   create(data: Route): Promise<Route> {
     return this.repository.route.create({
@@ -260,8 +264,8 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
         status: data.status,
         type: data.type,
         driverId: data.driver.id,
-        vehicleId: data.vehicle.id
-      }
+        vehicleId: data.vehicle.id,
+      },
     });
   }
 
@@ -269,7 +273,12 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
     return this.repository.route.findMany({
       where: {
         driverId: id,
-        deletedAt: null
+        deletedAt: null,
+        path: {
+          every: {
+            finishedAt: null,
+          },
+        },
       },
       select: {
         id: true,
@@ -281,19 +290,22 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
             status: true,
             startsAt: true,
             duration: true,
-          }
-        }
-      }
-
-
-    })
+          },
+        },
+      },
+    });
   }
 
   findByVehicleId(id: string): Promise<any> {
     return this.repository.route.findMany({
       where: {
         vehicleId: id,
-        deletedAt: null
+        deletedAt: null,
+        path: {
+          every: {
+            finishedAt: null,
+          },
+        },
       },
       select: {
         id: true,
@@ -304,35 +316,34 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
             status: true,
             startsAt: true,
             duration: true,
-          }
-        }
-      }
-
-
-    })
+          },
+        },
+      },
+    });
   }
-
 
   findByEmployeeIds(id: string[]): Promise<any> {
     return this.repository.route.findMany({
       where: {
         deletedAt: null,
         path: {
+          every: {
+            finishedAt: null,
+          },
           some: {
             employeesOnPath: {
               some: {
                 employeeId: {
-                  in: id
-                }
-              }
-            }
-          }
-        }
+                  in: id,
+                },
+              },
+            },
+          },
+        },
       },
       select: {
         id: true,
         type: true,
-
         path: {
           select: {
             employeesOnPath: {
@@ -350,19 +361,19 @@ export class RouteRepository extends Pageable<Route> implements IRouteRepository
             status: true,
             startsAt: true,
             duration: true,
-          }
-        }
-      }
-    })
+          },
+        },
+      },
+    });
   }
 
   async softDelete(id: string): Promise<Route> {
     return this.repository.route.update({
       where: { id },
       data: {
-        status: "deleted",
-        deletedAt: getDateInLocaleTime(new Date())
-      }
+        status: 'deleted',
+        deletedAt: getDateInLocaleTime(new Date()),
+      },
     });
   }
 }

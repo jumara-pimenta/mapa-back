@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 import { EStatusRoute, ETypeRoute } from "src/utils/ETypes";
 
 export class UpdateRouteDTO {
@@ -25,4 +25,10 @@ export class UpdateRouteDTO {
   @IsString({ message: '[VehicleId] não está definida como string.'})
   @IsOptional()
   vehicleId?: string
+
+  @IsString({ each: true , message: '[EmployeeIds] não está definida como string.'})
+  @IsOptional()
+  employeeIds?: string[]
+
+
 }
