@@ -1,21 +1,30 @@
-import { IsString, IsEnum, MinLength, MaxLength, IsNotEmpty } from "class-validator";
+import { Transform, TransformFnParams } from 'class-transformer';
+import {
+  IsString,
+  IsEnum,
+  MinLength,
+  MaxLength,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreatePinDTO {
-  @IsString({message : "Descrição tem que ser do tipo string"})
-  @IsNotEmpty({message : "Descrição não pode ser vazia"})
-  description: string
+  @IsString({ message: 'Descrição tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Descrição não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  description: string;
 
-  @IsString({message : "Rua tem que ser do tipo string"})
-  @IsNotEmpty({message : "Rua não pode ser vazia"})
-  street : string
-  
-  
-  @IsString({message : "Latitude tem que ser do tipo string"})
-  @IsNotEmpty({message : "Latitude não pode ser vazia"})
-  lat: string 
+  @IsString({ message: 'Rua tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Rua não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  street: string;
 
- 
-  @IsString({message : "Longitude tem que ser do tipo string"})
-  @IsNotEmpty({message : "Longitude não pode ser vazia"})
-  long: string
+  @IsString({ message: 'Latitude tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Latitude não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  lat: string;
+
+  @IsString({ message: 'Longitude tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Longitude não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  long: string;
 }
