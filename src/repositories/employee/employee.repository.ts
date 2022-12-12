@@ -132,7 +132,7 @@ export class EmployeeRepository
     });
   }
 
-  findByCpf(cpf: string): Promise<Employee> {
+  /*   findByCpf(cpf: string): Promise<Employee> {
     return this.repository.employee.findUnique({
       where: { cpf },
     });
@@ -148,5 +148,5 @@ export class EmployeeRepository
     return this.repository.employee.findUnique({
       where: { registration },
     });
-  }
+  } */
 }
