@@ -10,6 +10,7 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { AssociateEmployeeOnPinDTO } from 'src/dtos/employeesOnPin/associateEmployeeOnPin.dto';
 import { ModuleRef } from '@nestjs/core/injector/module-ref';
+import { ECreatePin } from 'src/utils/ETypes';
 
 @Injectable()
 export class EmployeeService {
@@ -20,48 +21,59 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-    // private readonly moduleRef: ModuleRef,
   ) { }
 
-  async create(payload: CreateEmployeeDTO): Promise<Employee> {
-    const cpfAlredyExist = await this.employeeRepository.findByCpf(payload.cpf);
-    const rgAlredyExist = await this.employeeRepository.findByRg(payload.rg);
+  async create(props: CreateEmployeeDTO): Promise<Employee> {
+    const cpfAlredyExist = await this.employeeRepository.findByCpf(props.cpf);
+    const rgAlredyExist = await this.employeeRepository.findByRg(props.rg);
     const registrationAlredyExist =
-      await this.employeeRepository.findByRegistration(payload.registration);
+      await this.employeeRepository.findByRegistration(props.registration);
 
     if (registrationAlredyExist) {
       throw new HttpException(
-        `Registration ja cadastrado: ${payload.cpf}`,
+        `Matrícula já cadastrada: ${props.registration}!`,
         HttpStatus.CONFLICT,
       );
     }
+
     if (cpfAlredyExist) {
       throw new HttpException(
-        `CPF ja cadastrado: ${payload.cpf}`,
+        `CPF jé cadastrado: ${props.cpf}!`,
         HttpStatus.CONFLICT,
       );
     }
+
     if (rgAlredyExist) {
       throw new HttpException(
-        `RG ja cadastrado: ${payload.rg}`,
+        `RG ja cadastrado: ${props.rg}`,
         HttpStatus.CONFLICT,
       );
+    }
 
-    const user = await this.employeeRepository.create(new Employee(payload));
-    if (payload.pin.typeCreation === 'EXISTENTE') {
-      if (!payload.pin.id)
+    const employee = await this.employeeRepository.create(new Employee(props));
+
+    if (props.pin.typeCreation === ECreatePin.IS_EXISTENT) {
+      if (!props.pin.id)
         throw new HttpException(
-          'Não foi encontrado um id para o pin',
+          'Id do ponto de embarque precisa ser enviado para associar ao ponto existente!',
           HttpStatus.BAD_REQUEST,
         );
-      await this.employeeOnPinService.associateEmployee({ employeeId: user.id, pinId: payload.pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
-    }
-    if (payload.pin.typeCreation === 'NOVO') {
-      const pin = await this.pinService.create({ description: payload.pin.description, lat: payload.pin.lat, long: payload.pin.long })
-      await this.employeeOnPinService.associateEmployee({ employeeId: user.id, pinId: pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
+
+      await this.employeeOnPinService.associateEmployee({ employeeId: employee.id, pinId: props.pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
+    } else if (props.pin.typeCreation === ECreatePin.IS_NEW) {
+      const { description, lat, long, street } = props.pin;
+
+      const pin = await this.pinService.create({
+        description,
+        lat,
+        long,
+        street
+      });
+
+      await this.employeeOnPinService.associateEmployee({ employeeId: employee.id, pinId: pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
     }
 
-    return user;
+    return employee;
   }
 
   async delete(id: string): Promise<Employee> {
@@ -104,7 +116,7 @@ export class EmployeeService {
   }
 
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
-    const employee = await this.listById(id);
+    const employee = await this.employeeRepository.findById(id);
 
     function isValidCPF(cpf) {
       if (typeof cpf !== 'string') return false;
@@ -156,3 +168,4 @@ export class EmployeeService {
     });
   }
 }
+
