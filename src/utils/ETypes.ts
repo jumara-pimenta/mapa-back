@@ -26,3 +26,8 @@ export enum EStatusPath {
   IN_PROGRESS = 'EM ANDAMENTO',
   FINISHED = 'FINALIZADO'
 }
+
+export enum ECreatePin {
+  IS_EXISTENT = 'EXISTENTE',
+  IS_NEW = 'NOVO'
+}

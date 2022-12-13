@@ -132,21 +132,5 @@ export class EmployeeRepository
     });
   }
 
-  findByCpf(cpf: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { cpf },
-    });
-  }
 
-  findByRg(rg: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { rg },
-    });
-  }
-
-  findByRegistration(registration: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { registration },
-    });
-  }
 }
