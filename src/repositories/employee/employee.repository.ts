@@ -50,7 +50,24 @@ export class EmployeeRepository
     });
   }
 
-  
+  findByCpf(cpf: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { cpf },
+    });
+  }
+
+  findByRegistration(registration: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { registration },
+    });
+  }
+
+  findByRg(rg: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { rg },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,
@@ -102,8 +119,8 @@ export class EmployeeRepository
     return this.repository.employee.findMany({
       where: {
         id: {
-          in: ids,
-        },
+          in: ids
+        }
       },
       select: {
         id: true,
@@ -111,28 +128,11 @@ export class EmployeeRepository
         pins: {
           select: {
             type: true,
-            pin: true,
-          },
-        },
-      },
+            pin: true
+          }
+        }
+      }
     });
   }
 
-  findByCpf(cpf: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { cpf },
-    });
-  }
-
-  findByRg(rg: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { rg },
-    });
-  }
-
-  findByRegistration(registration: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { registration },
-    });
-  }
 }

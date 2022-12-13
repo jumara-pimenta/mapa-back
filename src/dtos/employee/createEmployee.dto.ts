@@ -6,6 +6,8 @@ import {
   MaxLength,
   IsDateString,
 } from 'class-validator';
+import { Employee } from 'src/entities/employee.entity';
+// import { Unique } from './validator';
 
 export class CreateEmployeeDTO {
   @IsString({ message: 'Matrícula não está definida como string.' })

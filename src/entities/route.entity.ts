@@ -14,6 +14,7 @@ export class Route {
   vehicle?: Vehicle
   createdAt: Date
   updatedAt?: Date
+  deletedAt?: Date
 
   constructor(
     props: Omit<Route, "id" | "createdAt" | "vehicle" | "paths" | "driver">,
