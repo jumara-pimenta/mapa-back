@@ -8,9 +8,8 @@ import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
-import { AssociateEmployeeOnPinDTO } from 'src/dtos/employeesOnPin/associateEmployeeOnPin.dto';
-import { ModuleRef } from '@nestjs/core/injector/module-ref';
-import { ECreatePin } from 'src/utils/ETypes';
+import { AssociateEmployeeOnPinDTO } from '../dtos/employeesOnPin/associateEmployeeOnPin.dto';
+import { ECreatePin } from '../utils/ETypes';
 
 @Injectable()
 export class EmployeeService {
