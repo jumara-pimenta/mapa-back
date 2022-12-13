@@ -10,6 +10,7 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { AssociateEmployeeOnPinDTO } from 'src/dtos/employeesOnPin/associateEmployeeOnPin.dto';
 import { ModuleRef } from '@nestjs/core/injector/module-ref';
+import { CreatePinDTO } from 'src/dtos/pin/createPin.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -46,6 +47,7 @@ export class EmployeeService {
         `RG ja cadastrado: ${payload.rg}`,
         HttpStatus.CONFLICT,
       );
+    }
 
     const user = await this.employeeRepository.create(new Employee(payload));
     if (payload.pin.typeCreation === 'EXISTENTE') {
