@@ -1,8 +1,6 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import {
-  IsDate,
   IsDateString,
-  IsEnum,
   IsOptional,
   IsString,
   MaxLength,
@@ -30,7 +28,7 @@ export class UpdateEmployeeDTO {
   rg?: string;
 
   @IsOptional()
-  @IsDateString({ message: 'Admissão não está definido como DateString.' })
+  @IsDateString({ message: 'Admission não está definido como DateString.' })
   admission?: Date;
 
   @IsString({ message: 'Nome não está definido como string.' })

@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[Driver] (
     [name] VARCHAR(255) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [cnh] VARCHAR(11) NOT NULL,
-    [validation] DATETIME2 NOT NULL,
+    [validation] DATETIMEOFFSET NOT NULL,
     [category] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Driver_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
@@ -29,6 +29,7 @@ CREATE TABLE [dbo].[Route] (
     [vehicleId] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Route_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
+    [deletedAt] DATETIMEOFFSET,
     CONSTRAINT [Route_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Route_id_key] UNIQUE NONCLUSTERED ([id])
 );
@@ -54,8 +55,9 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [id] NVARCHAR(1000) NOT NULL,
     [pathId] NVARCHAR(1000) NOT NULL,
     [employeeId] NVARCHAR(1000) NOT NULL,
-    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 0,
+    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 1,
     [position] INT NOT NULL,
+    [description] VARCHAR(50),
     [boardingAt] DATETIMEOFFSET,
     [disembarkAt] DATETIMEOFFSET,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [EmployeesOnPath_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -87,14 +89,15 @@ CREATE TABLE [dbo].[Vehicle] (
     [expiration] DATETIME2 NOT NULL,
     [capacity] INT NOT NULL,
     [renavam] VARCHAR(11) NOT NULL,
-    [lastMaintenance] DATETIME2 NOT NULL,
+    [lastMaintenance] DATETIMEOFFSET NOT NULL,
     [note] NVARCHAR(1000) NOT NULL,
     [isAccessibility] BIT NOT NULL CONSTRAINT [Vehicle_isAccessibility_df] DEFAULT 0,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Vehicle_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Vehicle_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Vehicle_id_key] UNIQUE NONCLUSTERED ([id]),
-    CONSTRAINT [Vehicle_plate_key] UNIQUE NONCLUSTERED ([plate])
+    CONSTRAINT [Vehicle_plate_key] UNIQUE NONCLUSTERED ([plate]),
+    CONSTRAINT [Vehicle_renavam_key] UNIQUE NONCLUSTERED ([renavam])
 );
 
 -- CreateTable
@@ -122,9 +125,10 @@ CREATE TABLE [dbo].[Employee] (
 CREATE TABLE [dbo].[Pin] (
     [id] NVARCHAR(1000) NOT NULL,
     [description] VARCHAR(255) NOT NULL,
+    [street] VARCHAR(255) NOT NULL,
     [lat] VARCHAR(255) NOT NULL,
     [long] VARCHAR(255) NOT NULL,
-    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Pin_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [createdAt] DATETIMEOFFSET NOT NULL,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Pin_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Pin_id_key] UNIQUE NONCLUSTERED ([id])

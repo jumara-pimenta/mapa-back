@@ -40,6 +40,7 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
       where: { id },
       select: {
         id: true,
+        description: true,
         boardingAt: true,
         confirmation: true,
         disembarkAt: true,
@@ -261,7 +262,9 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
         id: data.id,
         position: data.position,
         confirmation: data.confirmation,
-        disembarkAt: data.disembarkAt,
+        description: data.description,
+        disembarkAt: getDateInLocaleTime(data.disembarkAt),
+        boardingAt: getDateInLocaleTime(data.boardingAt),
         updatedAt: getDateInLocaleTime(new Date())
       },
       where: { id: data.id }

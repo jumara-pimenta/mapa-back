@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  Matches,
   IsDateString,
   IsEnum,
   ValidateNested,
@@ -35,9 +34,9 @@ export class CreateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   rg: string;
 
-  @IsString({ message: 'Admissão não está definido como string.' })
-  @IsNotEmpty({ message: 'Admissão não pode receber valor vazio.' })
-  @IsDateString({ message: 'Admissão não está definido como DateString.' })
+  @IsString({ message: 'Admission não está definido como string.' })
+  @IsNotEmpty({ message: 'Admission não pode receber valor ser vazio.' })
+  @IsDateString({ message: 'Admission não está definido como DateString.' })
   admission: Date;
 
   @IsString({ message: 'Cargo não está definido como string.' })
@@ -45,9 +44,8 @@ export class CreateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
-  @IsString({ message: 'Nome não está definido como string.' })
-  @IsNotEmpty({ message: 'Nome não pode receber valor vazio.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsString({ message: 'Name não está definido como string.' })
+  @IsNotEmpty({ message: 'Name não pode receber valor ser vazio.' })
   name: string;
 
   @IsString({ message: 'Turno não está definido como string.' })
