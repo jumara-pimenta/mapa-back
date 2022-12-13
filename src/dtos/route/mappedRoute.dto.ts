@@ -73,4 +73,5 @@ export class MappedRouteDTO {
 	createdAt: Date
 	paths: IPath[]
 	vehicle: IVehicle
+  quantityEmployees: number
 }

@@ -29,6 +29,7 @@ CREATE TABLE [dbo].[Route] (
     [vehicleId] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Route_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
+    [deletedAt] DATETIMEOFFSET,
     CONSTRAINT [Route_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Route_id_key] UNIQUE NONCLUSTERED ([id])
 );
@@ -56,6 +57,7 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [employeeId] NVARCHAR(1000) NOT NULL,
     [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 1,
     [position] INT NOT NULL,
+    [description] VARCHAR(50),
     [boardingAt] DATETIMEOFFSET,
     [disembarkAt] DATETIMEOFFSET,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [EmployeesOnPath_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -83,8 +85,8 @@ CREATE TABLE [dbo].[Vehicle] (
     [plate] NVARCHAR(1000) NOT NULL,
     [company] NVARCHAR(1000) NOT NULL,
     [type] NVARCHAR(1000) NOT NULL,
-    [lastSurvey] DATETIMEOFFSET NOT NULL,
-    [expiration] DATETIMEOFFSET NOT NULL,
+    [lastSurvey] DATETIME2 NOT NULL,
+    [expiration] DATETIME2 NOT NULL,
     [capacity] INT NOT NULL,
     [renavam] VARCHAR(11) NOT NULL,
     [lastMaintenance] DATETIMEOFFSET NOT NULL,
@@ -119,9 +121,10 @@ CREATE TABLE [dbo].[Employee] (
 CREATE TABLE [dbo].[Pin] (
     [id] NVARCHAR(1000) NOT NULL,
     [description] VARCHAR(255) NOT NULL,
+    [street] VARCHAR(255) NOT NULL,
     [lat] VARCHAR(255) NOT NULL,
     [long] VARCHAR(255) NOT NULL,
-    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Pin_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [createdAt] DATETIMEOFFSET NOT NULL,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Pin_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Pin_id_key] UNIQUE NONCLUSTERED ([id])

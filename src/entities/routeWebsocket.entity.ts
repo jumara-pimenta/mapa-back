@@ -3,28 +3,27 @@ import { Driver } from './driver.entity';
 import { Path } from './path.entity';
 import { Vehicle } from './vehicle.entity';
 
-export class Route {
+export class RouteWebsocket {
   id: string
   description: string
   distance: string  
   type: string
   status: string
-  driver?: Driver
+  driver?: string
   path?: Partial<Path>[]
-  vehicle?: Vehicle
+  vehicle?: string
   createdAt: Date
   updatedAt?: Date
-  deletedAt?: Date
 
   constructor(
-    props: Omit<Route, "id" | "createdAt" | "vehicle" | "paths" | "driver">,
+    props: Omit<RouteWebsocket, "id" | "createdAt" | "vehicle" | "paths" | "driver">,
     driver: Driver,
     vehicle: Vehicle,
     id?: string
   ) {
     Object.assign(this, props);
     this.id = id ?? uuid();
-    this.driver = driver;
-    this.vehicle = vehicle;
+    this.driver = driver.name;
+    this.vehicle = vehicle.plate;
   }
 }

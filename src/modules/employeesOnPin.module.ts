@@ -1,4 +1,5 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
+import { ModuleRef } from "@nestjs/core";
 import { EmployeesOnPinController } from "../controllers/employeesOnPin.controller";
 import { EmployeesOnPinRepository } from "../repositories/employeesOnPin/employeesOnPin.repository";
 import { EmployeesOnPinService } from "../services/employeesOnPin.service";
@@ -7,8 +8,8 @@ import { PinModule } from "./pin.module";
 
 @Module({
   imports: [
-    EmployeeModule,
-    PinModule
+    PinModule,
+    forwardRef(() => EmployeeModule)
   ],
   controllers: [EmployeesOnPinController],
   providers: [

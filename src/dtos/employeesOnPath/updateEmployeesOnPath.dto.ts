@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsDate, IsDateString, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class UpdateEmployeesOnPathDTO {
   @IsString()
@@ -18,4 +18,20 @@ export class UpdateEmployeesOnPathDTO {
   @MaxLength(3)
   @IsOptional()
   type?: string
+
+  @IsBoolean()
+  @IsOptional()
+  confirmation?: boolean
+
+  @IsDateString()
+  @IsOptional()
+  boardingAt?: Date
+
+  @IsDateString()
+  @IsOptional()
+  disembarkAt?: Date
+  
+  @IsString()
+  @IsOptional()
+  description?: string
 }

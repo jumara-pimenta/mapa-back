@@ -94,6 +94,7 @@ export class PathService {
   async update(id: string, data: UpdatePathDTO): Promise<Path> {
 
     const path = await this.listById(id);
+    
 
     return await this.pathRepository.update(Object.assign(path, {...path, ...data}));
   }

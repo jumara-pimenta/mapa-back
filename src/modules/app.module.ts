@@ -11,6 +11,7 @@ import { RouteModule } from "./route.module";
 import { RouteHistoryModule } from "./routeHistory.module";
 import { VehicleModule } from "./vehicle.module";
 import { EmployeesOnPinModule } from "./employeesOnPin.module";
+import { WebsocketModule } from "./websocket.module";
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { EmployeesOnPinModule } from "./employeesOnPin.module";
     PinModule,
     RouteModule,
     RouteHistoryModule,
-    VehicleModule
+    VehicleModule,
+    WebsocketModule
   ],
 })
 

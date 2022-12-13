@@ -42,6 +42,9 @@ export class EmployeeRepository
   findById(id: string): Promise<Employee> {
     return this.repository.employee.findUnique({
       where: { id },
+      include: {
+        pins: true,
+      }
     });
   }
 
@@ -100,8 +103,8 @@ export class EmployeeRepository
     return this.repository.employee.findMany({
       where: {
         id: {
-          in: ids,
-        },
+          in: ids
+        }
       },
       select: {
         id: true,

@@ -1,13 +1,16 @@
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
   MinLength,
   MaxLength,
-  Matches,
   IsDateString,
+  IsEnum,
+  ValidateNested,
 } from 'class-validator';
 import { Employee } from 'src/entities/employee.entity';
+import { ETypePin } from 'src/utils/ETypes';
+import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 // import { Unique } from './validator';
 
 export class CreateEmployeeDTO {
@@ -26,9 +29,8 @@ export class CreateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
-  @IsString({ message: 'Nome não está definido como string.' })
-  @IsNotEmpty({ message: 'Nome não pode receber valor vazio.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsString({ message: 'Name não está definido como string.' })
+  @IsNotEmpty({ message: 'Name não pode receber valor ser vazio.' })
   name: string;
 
   @IsString({ message: 'Turno não está definido como string.' })
@@ -45,4 +47,9 @@ export class CreateEmployeeDTO {
   @IsNotEmpty({ message: 'Endereço não pode receber valor vazio.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => CreateEmployeePinDTO)
+  @IsNotEmpty()
+  pin: CreateEmployeePinDTO
 }

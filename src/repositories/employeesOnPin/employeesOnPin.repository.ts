@@ -14,12 +14,35 @@ export class EmployeesOnPinRepository extends Pageable<EmployeesOnPin> implement
   }
 
   create(data: EmployeesOnPin): Promise<EmployeesOnPin> {
-    return this.repository.employeesOnPin.create({
-      data: {
-        employeeId: data.employee.id,
-        pinId: data.pin.id,
-        type: data.type
+    return this.repository.employeesOnPin.create(
+      {
+        data: {
+          employeeId: data.employee.id,
+          pinId: data.pin.id,
+          type: data.type
+        },
       }
-    });
+    )
+
+
+  }
+  update(pinId: string, data: EmployeesOnPin ): Promise<EmployeesOnPin> {
+    return this.repository.employeesOnPin.update(
+      {
+        where: {
+          employeeId_pinId:{
+            employeeId: data.employee.id,
+            pinId: pinId
+          }
+        },
+        data: {
+          employeeId: data.employee.id,
+          pinId: data.pin.id,
+          type: data.type
+        },
+      }
+    )
+
+
   }
 }

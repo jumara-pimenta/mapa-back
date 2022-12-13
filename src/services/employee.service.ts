@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -6,13 +6,22 @@ import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
+import { PinService } from './pin.service';
+import { EmployeesOnPinService } from './employeesOnPin.service';
+import { AssociateEmployeeOnPinDTO } from 'src/dtos/employeesOnPin/associateEmployeeOnPin.dto';
+import { ModuleRef } from '@nestjs/core/injector/module-ref';
 
 @Injectable()
 export class EmployeeService {
   constructor(
     @Inject('IEmployeeRepository')
     private readonly employeeRepository: IEmployeeRepository,
-  ) {}
+    @Inject(forwardRef(() => EmployeesOnPinService))
+    private readonly employeeOnPinService: EmployeesOnPinService,
+    @Inject(forwardRef(() => PinService))
+    private readonly pinService: PinService,
+    // private readonly moduleRef: ModuleRef,
+  ) { }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
     const RegistrationExists = await this.employeeRepository.findByRegistration(
