@@ -7,8 +7,6 @@ export class Employee {
   id: string;
   name: string;
   registration: string;
-  cpf: string;
-  rg: string;
   admission: Date;
   role: string;
   shift: string;
