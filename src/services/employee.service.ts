@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -6,12 +6,21 @@ import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
+import { PinService } from './pin.service';
+import { EmployeesOnPinService } from './employeesOnPin.service';
+import { AssociateEmployeeOnPinDTO } from 'src/dtos/employeesOnPin/associateEmployeeOnPin.dto';
+import { ModuleRef } from '@nestjs/core/injector/module-ref';
 
 @Injectable()
 export class EmployeeService {
   constructor(
-    @Inject("IEmployeeRepository")
-    private readonly employeeRepository: IEmployeeRepository    
+    @Inject('IEmployeeRepository')
+    private readonly employeeRepository: IEmployeeRepository,
+    @Inject(forwardRef(() => EmployeesOnPinService))
+    private readonly employeeOnPinService: EmployeesOnPinService,
+    @Inject(forwardRef(() => PinService))
+    private readonly pinService: PinService,
+    // private readonly moduleRef: ModuleRef,
   ) { }
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
@@ -37,9 +46,22 @@ export class EmployeeService {
         `RG ja cadastrado: ${payload.rg}`,
         HttpStatus.CONFLICT,
       );
-    } else {
-      return await this.employeeRepository.create(new Employee(payload));
+
+    const user = await this.employeeRepository.create(new Employee(payload));
+    if (payload.pin.typeCreation === 'EXISTENTE') {
+      if (!payload.pin.id)
+        throw new HttpException(
+          'Não foi encontrado um id para o pin',
+          HttpStatus.BAD_REQUEST,
+        );
+      await this.employeeOnPinService.associateEmployee({ employeeId: user.id, pinId: payload.pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
     }
+    if (payload.pin.typeCreation === 'NOVO') {
+      const pin = await this.pinService.create({ description: payload.pin.description, lat: payload.pin.lat, long: payload.pin.long })
+      await this.employeeOnPinService.associateEmployee({ employeeId: user.id, pinId: pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
+    }
+
+    return user;
   }
 
   async delete(id: string): Promise<Employee> {

@@ -128,11 +128,12 @@ export class EmployeeRepository
         pins: {
           select: {
             type: true,
-            pin: true
-          }
-        }
-      }
+            pin: true,
+          },
+        },
+      },
     });
   }
+
 
 }
