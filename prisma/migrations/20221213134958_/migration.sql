@@ -29,6 +29,7 @@ CREATE TABLE [dbo].[Route] (
     [vehicleId] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Route_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
+    [deletedAt] DATETIMEOFFSET,
     CONSTRAINT [Route_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Route_id_key] UNIQUE NONCLUSTERED ([id])
 );
@@ -84,8 +85,8 @@ CREATE TABLE [dbo].[Vehicle] (
     [plate] NVARCHAR(1000) NOT NULL,
     [company] NVARCHAR(1000) NOT NULL,
     [type] NVARCHAR(1000) NOT NULL,
-    [lastSurvey] DATETIMEOFFSET NOT NULL,
-    [expiration] DATETIMEOFFSET NOT NULL,
+    [lastSurvey] DATETIME2 NOT NULL,
+    [expiration] DATETIME2 NOT NULL,
     [capacity] INT NOT NULL,
     [renavam] VARCHAR(11) NOT NULL,
     [lastMaintenance] DATETIMEOFFSET NOT NULL,
@@ -106,7 +107,7 @@ CREATE TABLE [dbo].[Employee] (
     [name] NVARCHAR(1000) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [rg] VARCHAR(9) NOT NULL,
-    [admission] DATETIMEOFFSET NOT NULL,
+    [admission] DATETIME2 NOT NULL,
     [role] NVARCHAR(1000) NOT NULL,
     [shift] NVARCHAR(1000) NOT NULL,
     [costCenter] NVARCHAR(1000) NOT NULL,
