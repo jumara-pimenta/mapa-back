@@ -185,6 +185,7 @@ export class PathService {
 
     return {
       id: path.id,
+      routeDescription: path?.route.description,
       duration: path.duration,
       finishedAt: path.finishedAt,
       startedAt: path.startedAt,
@@ -223,6 +224,7 @@ export class PathService {
 
       return {
         id: path.id,
+        routeDescription: path?.route.description,
         duration: path.duration,
         finishedAt: path.finishedAt,
         startedAt: path.startedAt,

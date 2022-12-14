@@ -30,4 +30,5 @@ export class MappedPathDTO {
   type: string;
   createdAt: Date;
   employeesOnPath: IEmployeesOnPathDTO[];
+  routeDescription: string;
 }
