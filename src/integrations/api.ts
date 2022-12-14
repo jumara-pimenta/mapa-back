@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-export const coreApi = () => axios.create({
-    baseURL: process.env.CORE_API_URL
-})
+export const coreApi = () =>
+  axios.create({
+    baseURL: process.env.CORE_API_URL,
+  });

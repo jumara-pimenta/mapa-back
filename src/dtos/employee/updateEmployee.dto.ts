@@ -1,12 +1,8 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import {
-  IsDate,
   IsDateString,
-  IsEnum,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class UpdateEmployeeDTO {
@@ -15,22 +11,8 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration?: string;
 
-  @IsString({ message: 'CPF não está definido como string.' })
   @IsOptional()
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  @MinLength(11, { message: 'CPF não pode conter menos que 11 digitos.' })
-  @MaxLength(11, { message: 'CPF não pode conter mais que 11 digitos.' })
-  cpf?: string;
-
-  @IsString({ message: 'RG não está definido como string.' })
-  @IsOptional()
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  @MinLength(8, { message: 'Rg não pode conter menos que 8 digitos.' })
-  @MaxLength(11, { message: 'Rg não pode conter mais que 11 digitos.' })
-  rg?: string;
-
-  @IsOptional()
-  @IsDateString({ message: 'Admissão não está definido como DateString.' })
+  @IsDateString()
   admission?: Date;
 
   @IsString({ message: 'Nome não está definido como string.' })

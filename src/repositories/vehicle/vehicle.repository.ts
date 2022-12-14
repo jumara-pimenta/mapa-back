@@ -105,7 +105,9 @@ export class VehicleRepository
 
   findByRenavam(renavam: string): Promise<Vehicle> {
     return this.repository.vehicle.findUnique({
-      where: { renavam },
+      where: {
+        renavam: renavam,
+      },
     });
   }
 }

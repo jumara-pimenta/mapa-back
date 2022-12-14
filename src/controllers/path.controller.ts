@@ -1,13 +1,12 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Put, Query } from "@nestjs/common";
+import { UpdatePathDTO } from "src/dtos/path/updatePath.dto";
 import { MappedPathDTO } from "../dtos/path/mappedPath.dto";
 import { Path } from "../entities/path.entity";
 import { PathService } from "../services/path.service";
 
-@Controller("/api/routes/paths")
+@Controller('/api/routes/paths')
 export class PathController {
-  constructor(
-    private readonly pathService: PathService
-  ) { }
+  constructor(private readonly pathService: PathService) {}
 
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
@@ -17,7 +16,9 @@ export class PathController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getManyByRoute(@Query('route') route: string): Promise<MappedPathDTO[]> {
+  async getManyByRoute(
+    @Query('route') route: string,
+  ): Promise<MappedPathDTO[]> {
     return await this.pathService.listManyByRoute(route);
   }
 
@@ -25,5 +26,11 @@ export class PathController {
   @HttpCode(HttpStatus.OK)
   async getManyByDriver(@Query('driver') driver: string): Promise<MappedPathDTO[]> {
     return await this.pathService.listManyByDriver(driver);
+  }
+
+  @Put('/:id')
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() payload: UpdatePathDTO): Promise<Path> {
+    return await this.pathService.update(id, payload);
   }
 }

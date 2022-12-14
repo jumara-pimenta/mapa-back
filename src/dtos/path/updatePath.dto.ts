@@ -1,21 +1,23 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsDateString, IsEnum, IsOptional, IsString, Matches } from "class-validator";
+import { EStatusPath } from "../../utils/ETypes";
+
+const DurationRgx = new RegExp(/^[0-9]{2}:[0-9]{2}/gm);
+const StartsAtRgx = new RegExp(/^[0-9]{2}:[0-9]{2}/gm);
 
 export class UpdatePathDTO {
-  @IsString()
+  @Matches(DurationRgx)
   @IsOptional()
-  process?: string
+  duration?: string
 
-  @IsString()
-  @MaxLength(15)
+  @Matches(StartsAtRgx)
   @IsOptional()
-  product?: string
+  startsAt?: string
 
-  @IsString()
+  @IsDateString()
   @IsOptional()
-  sequenceQr?: number
+  startedAt?: Date
 
-  @MinLength(2)
-  @MaxLength(3)
+  @IsEnum(EStatusPath)
   @IsOptional()
-  type?: string
+  status?: EStatusPath;
 }

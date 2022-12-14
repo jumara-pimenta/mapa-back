@@ -1,7 +1,8 @@
 export class MappedPinDTO {
-  id: string
-  description: string
-  lat: string 
-  long: string
-  createdAt: Date
+  id: string;
+  description: string;
+  street: string;
+  lat: string;
+  long: string;
+  createdAt: Date;
 }

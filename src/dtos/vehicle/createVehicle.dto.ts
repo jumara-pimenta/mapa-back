@@ -4,11 +4,9 @@ import {
   IsNotEmpty,
   IsBoolean,
   IsNumber,
-  IsDate,
   MinLength,
   MaxLength,
   IsDateString,
-  Length,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
@@ -26,16 +24,15 @@ export class CreateVehicleDTO {
 
   @IsString({ message: 'Tipo não está definido para o tipo string.' })
   @IsNotEmpty({ message: 'Tipo não pode está vazio.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   type: string;
 
-  @IsDateString({
-    message: 'Última manutenção não está no formato certo de data.',
+  @IsString({
+    message: 'Última vistoria não está definido para o tipo string.',
   })
   @IsNotEmpty({ message: 'Última vistoria não pode está vazio.' })
   lastSurvey: string;
 
-  @IsDateString({ message: 'Expiração não está no formato certo de data.' })
+  @IsString({ message: 'Expiração não está definido para o tipo string.' })
   @IsNotEmpty({ message: 'Expiração não pode está vazio.' })
   expiration: string;
 
@@ -47,18 +44,14 @@ export class CreateVehicleDTO {
   @IsNotEmpty({ message: 'Renavam não pode está vazio.' })
   @MinLength(11, { message: 'Renavam não pode conter menos que 11 dígitos.' })
   @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   renavam: string;
 
-  @IsDateString({
-    message: 'LastMaintenance não está definido para o tipo string.',
-  })
+  @IsDateString()
   @IsNotEmpty({ message: 'Última manutenção não pode está vazio.' })
   lastMaintenance: string;
 
   @IsString({ message: 'Observação não está definido para o tipo string.' })
   @IsNotEmpty({ message: 'Observação não pode está vazio.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   note: string;
 
   @IsBoolean({

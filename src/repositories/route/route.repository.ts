@@ -7,6 +7,7 @@ import { getDateInLocaleTime } from '../../utils/date.service';
 import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
+import { RouteWebsocket } from 'src/entities/routeWebsocket.entity';
 
 @Injectable()
 export class RouteRepository
@@ -15,6 +16,18 @@ export class RouteRepository
 {
   constructor(private readonly repository: PrismaService) {
     super();
+  }
+  findByIdWebsocket(id: string): Promise<any> {
+    throw new Error('Method not implemented.');
+  }
+  findByVehicleId(id: string): Promise<Route[]> {
+    throw new Error('Method not implemented.');
+  }
+  updateWebsocket(data: Route): Promise<RouteWebsocket> {
+    throw new Error('Method not implemented.');
+  }
+  softDelete(id: string): Promise<Route> {
+    throw new Error('Method not implemented.');
   }
 
   delete(id: string): Promise<Route> {
@@ -200,7 +213,11 @@ export class RouteRepository
   findByEmployeeIds(id: string[]): Promise<any> {
     return this.repository.route.findMany({
       where: {
+        deletedAt: null,
         path: {
+          every: {
+            finishedAt: null,
+          },
           some: {
             employeesOnPath: {
               some: {
@@ -215,7 +232,6 @@ export class RouteRepository
       select: {
         id: true,
         type: true,
-
         path: {
           select: {
             employeesOnPath: {

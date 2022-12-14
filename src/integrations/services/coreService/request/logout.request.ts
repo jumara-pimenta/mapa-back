@@ -1,3 +1,3 @@
 export class LogoutRequest {
-    user: string;
+  user: string;
 }

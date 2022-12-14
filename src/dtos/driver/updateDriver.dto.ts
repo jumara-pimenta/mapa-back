@@ -1,15 +1,15 @@
 import { IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class UpdateDriverDTO {
-  @IsString()
+  @IsString({ message: '[Name] não está definida como string.' })
   @IsOptional()
   name?: string;
 
-  @IsString()
+  @IsString({ message: '[CPF] não está definida como string.' })
   @IsOptional()
   cpf?: string;
 
-  @IsString()
+  @IsString({ message: '[CNH] não está definida como string.' })
   @IsOptional()
   cnh?: string;
 
@@ -17,7 +17,7 @@ export class UpdateDriverDTO {
   @IsOptional()
   validation?: Date;
 
-  @IsString()
+  @IsString({ message: '[Category] não está definida como string.' })
   @IsOptional()
   category?: string;
 }
