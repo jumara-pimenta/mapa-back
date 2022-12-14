@@ -77,6 +77,54 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     });
   }
 
+  findByDriver(driverId: string): Promise<Path[]> {
+    return this.repository.path.findMany({
+      where: { 
+        route: {
+          driverId
+        }
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        employeesOnPath: {
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   findByRoute(routeId: string): Promise<Path[]> {
     return this.repository.path.findMany({
       where: { routeId },

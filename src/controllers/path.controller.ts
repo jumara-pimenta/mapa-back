@@ -28,4 +28,10 @@ export class PathController {
   async updateById(@Param('id') id: string, @Body() payload: UpdatePathDTO): Promise<Path> {
     return await this.pathService.update(id, payload);
   }
+  
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async getManyByDriver(@Query('driver') driver: string): Promise<MappedPathDTO[]> {
+    return await this.pathService.listManyByDriver(driver);
+  }
 }
