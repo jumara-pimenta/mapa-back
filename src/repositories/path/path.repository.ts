@@ -175,6 +175,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             },
           },
         },
+        route: {
+          select: {
+            description: true,
+          }
+        }
       },
     });
   }
