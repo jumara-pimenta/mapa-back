@@ -1,4 +1,10 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -20,7 +26,7 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-  ) { }
+  ) {}
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     const RegistrationExists = await this.employeeRepository.findByRegistration(
@@ -43,18 +49,27 @@ export class EmployeeService {
           HttpStatus.BAD_REQUEST,
         );
 
-      await this.employeeOnPinService.associateEmployee({ employeeId: employee.id, pinId: props.pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
+      await this.employeeOnPinService.associateEmployee({
+        employeeId: employee.id,
+        pinId: props.pin.id,
+        type: 'CONVENCIONAL',
+      } as AssociateEmployeeOnPinDTO);
     } else if (props.pin.typeCreation === ECreatePin.IS_NEW) {
-      const { description, lat, long, street } = props.pin;
+      const { title, local, details, lat, lng } = props.pin;
 
       const pin = await this.pinService.create({
-        description,
+        title,
+        local,
+        details,
         lat,
-        long,
-        street
+        lng,
       });
 
-      await this.employeeOnPinService.associateEmployee({ employeeId: employee.id, pinId: pin.id, type: "CONVENCIONAL" } as AssociateEmployeeOnPinDTO)
+      await this.employeeOnPinService.associateEmployee({
+        employeeId: employee.id,
+        pinId: pin.id,
+        type: 'CONVENCIONAL',
+      } as AssociateEmployeeOnPinDTO);
     }
 
     return employee;
@@ -142,4 +157,3 @@ export class EmployeeService {
     });
   }
 }
-

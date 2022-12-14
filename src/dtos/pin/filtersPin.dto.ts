@@ -1,4 +1,5 @@
 export class FiltersPinDTO {
-  description?: string
-  street?: string
+  title?: string;
+  local?: string;
+  details?: string;
 }
