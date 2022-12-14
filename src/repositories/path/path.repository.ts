@@ -31,6 +31,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startedAt: true,
         finishedAt: true,
         createdAt: true,
+        route: {
+          select: {
+            description: true,
+          }
+        },
         employeesOnPath: {
           select: {
             id: true,
@@ -97,6 +102,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startedAt: true,
         finishedAt: true,
         createdAt: true,
+        route: {
+          select: {
+            description: true,
+          }
+        },
         employeesOnPath: {
           select: {
             id: true,
@@ -200,6 +210,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startedAt: true,
         finishedAt: true,
         createdAt: true,
+        route: {
+          select: {
+            description: true,
+          }
+        },
         employeesOnPath: {
           select: {
             id: true,
