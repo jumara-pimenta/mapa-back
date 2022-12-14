@@ -30,10 +30,8 @@ export class EmployeeRepository
         address: data.address,
         admission: getDateInLocaleTime(new Date(data.admission)),
         costCenter: data.costCenter,
-        cpf: data.cpf,
         name: data.name,
         registration: data.registration,
-        rg: data.rg,
         role: data.role,
         shift: data.shift,
       },
@@ -50,21 +48,9 @@ export class EmployeeRepository
     });
   }
 
-  findByCpf(cpf: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { cpf },
-    });
-  }
-
   findByRegistration(registration: string): Promise<Employee> {
     return this.repository.employee.findUnique({
       where: { registration },
-    });
-  }
-
-  findByRg(rg: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { rg },
     });
   }
 
@@ -104,10 +90,8 @@ export class EmployeeRepository
         address: data.address,
         admission: data.admission,
         costCenter: data.costCenter,
-        cpf: data.cpf,
         name: data.name,
         registration: data.registration,
-        rg: data.rg,
         role: data.role,
         shift: data.shift,
         createdAt: data.createdAt,
@@ -134,6 +118,4 @@ export class EmployeeRepository
       },
     });
   }
-
-
 }

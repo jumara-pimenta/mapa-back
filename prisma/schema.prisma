@@ -1,7 +1,7 @@
 datasource db {
   provider          = "sqlserver"
   url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -100,9 +100,7 @@ model Employee {
   id             String            @id @unique
   registration   String            @unique
   name           String
-  cpf            String            @unique @db.VarChar(11)
-  rg             String            @unique @db.VarChar(9)
-  admission      DateTime
+  admission      DateTime          @db.DateTimeOffset
   role           String
   shift          String
   costCenter     String

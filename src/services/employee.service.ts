@@ -23,28 +23,13 @@ export class EmployeeService {
   ) { }
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
-    const cpfAlredyExist = await this.employeeRepository.findByCpf(props.cpf);
-    const rgAlredyExist = await this.employeeRepository.findByRg(props.rg);
-    const registrationAlredyExist =
-      await this.employeeRepository.findByRegistration(props.registration);
+    const RegistrationExists = await this.employeeRepository.findByRegistration(
+      props.registration,
+    );
 
-    if (registrationAlredyExist) {
+    if (RegistrationExists) {
       throw new HttpException(
-        `Matrícula já cadastrada: ${props.registration}!`,
-        HttpStatus.CONFLICT,
-      );
-    }
-
-    if (cpfAlredyExist) {
-      throw new HttpException(
-        `CPF jé cadastrado: ${props.cpf}!`,
-        HttpStatus.CONFLICT,
-      );
-    }
-
-    if (rgAlredyExist) {
-      throw new HttpException(
-        `RG ja cadastrado: ${props.rg}`,
+        'Matrícula cadastrada para outro(a) colaborador(a)!',
         HttpStatus.CONFLICT,
       );
     }
@@ -117,32 +102,24 @@ export class EmployeeService {
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
     const employee = await this.employeeRepository.findById(id);
 
-    function isValidCPF(cpf) {
-      if (typeof cpf !== 'string') return false;
-      cpf = cpf.replace(/[^\d]+/g, '');
-      if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
-      cpf = cpf.split('').map((el) => +el);
-      const rest = (count) =>
-        ((cpf
-          .slice(0, count - 12)
-          .reduce((soma, el, index) => soma + el * (count - index), 0) *
-          10) %
-          11) %
-        10;
-      return rest(10) === cpf[9] && rest(11) === cpf[10];
+    if (data.registration) {
+      const RegistrationExists =
+        await this.employeeRepository.findByRegistration(data.registration);
+
+      if (
+        RegistrationExists &&
+        RegistrationExists.registration !== employee.registration
+      ) {
+        throw new HttpException(
+          'Matrícula cadastrada para outro(a) colaborador(a)',
+          HttpStatus.CONFLICT,
+        );
+      }
     }
 
-    if (
-      data.cpf.length !== 11 ||
-      (!Array.from(data.cpf).filter((e) => e !== data.cpf[0]).length &&
-        isValidCPF)
-    ) {
-      throw new HttpException(`CPF INVALIDO: ${data.cpf}`, HttpStatus.CONFLICT);
-    } else {
-      return await this.employeeRepository.update(
-        Object.assign(employee, { ...employee, ...data }),
-      );
-    }
+    return await this.employeeRepository.update(
+      Object.assign(employee, { ...employee, ...data }),
+    );
   }
 
   async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
@@ -157,9 +134,7 @@ export class EmployeeService {
         address: employee.address,
         admission: employee.admission,
         costCenter: employee.costCenter,
-        cpf: employee.cpf,
         registration: employee.registration,
-        rg: employee.rg,
         role: employee.role,
         shift: employee.shift,
         createdAt: employee.createdAt,

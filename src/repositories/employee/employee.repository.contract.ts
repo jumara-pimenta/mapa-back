@@ -10,9 +10,6 @@ export default interface IEmployeeRepository {
     filters?: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>>;
   findById(id: string): Promise<Employee>;
-  findByIds(ids: string[]): Promise<any>;
-  findByCpf(cpf: string): Promise<Employee>;
-  findByRg(rg: string): Promise<Employee>;
   findByRegistration(registration: string): Promise<Employee>;
   update(data: Employee): Promise<Employee>;
   findByIds(ids: string[]): Promise<Employee[]>;
