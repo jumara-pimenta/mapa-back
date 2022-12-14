@@ -24,10 +24,11 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
     return this.repository.pin.update({
       data: {
         id: data.id,
-        description: data.description,
-        street : data.street,
+        title: data.title,
+        local: data.local,
+        details: data.details,
         lat: data.lat,
-        long: data.long,
+        lng: data.lng,
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
@@ -73,11 +74,12 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
     return this.repository.pin.create({
       data: {
         id: data.id,
-        description: data.description,
-        street : data.street,
+        title: data.title,
+        local: data.local,
+        details: data.details,
         lat: data.lat,
-        createdAt : data.createdAt,
-        long: data.long,
+        createdAt: data.createdAt,
+        lng: data.lng,
       },
     });
   }

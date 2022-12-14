@@ -10,15 +10,15 @@ generator client {
 }
 
 model Driver {
-  id                 String               @id @unique
-  name               String               @db.VarChar(255)
-  cpf                String               @unique @db.VarChar(11)
-  cnh                String               @unique @db.VarChar(11)
-  validation         DateTime             @db.DateTimeOffset
-  category           String
-  route              Route[]
-  createdAt          DateTime             @default(now()) @db.DateTimeOffset
-  updatedAt          DateTime?            @db.DateTimeOffset
+  id         String    @id @unique
+  name       String    @db.VarChar(255)
+  cpf        String    @unique @db.VarChar(11)
+  cnh        String    @unique @db.VarChar(11)
+  validation DateTime  @db.DateTimeOffset
+  category   String
+  route      Route[]
+  createdAt  DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt  DateTime? @db.DateTimeOffset
 }
 
 model Route {
@@ -114,14 +114,15 @@ model Employee {
 }
 
 model Pin {
-  id                  String              @id @unique
-  description         String              @db.VarChar(255)
-  street              String              @db.VarChar(255)
-  lat                 String              @db.VarChar(255)
-  long                String              @db.VarChar(255)
-  employees           EmployeesOnPin[]
-  createdAt           DateTime            @db.DateTimeOffset
-  updatedAt           DateTime?           @db.DateTimeOffset
+  id        String           @id @unique
+  title     String           @db.VarChar(255)
+  local     String           @db.VarChar(255)
+  details   String           @db.VarChar(255)
+  lat       String           @db.VarChar(255)
+  lng       String           @db.VarChar(255)
+  employees EmployeesOnPin[]
+  createdAt DateTime         @db.DateTimeOffset
+  updatedAt DateTime?        @db.DateTimeOffset
 }
 
 model EmployeesOnPin {

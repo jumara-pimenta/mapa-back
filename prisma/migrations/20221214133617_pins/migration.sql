@@ -124,10 +124,11 @@ CREATE TABLE [dbo].[Employee] (
 -- CreateTable
 CREATE TABLE [dbo].[Pin] (
     [id] NVARCHAR(1000) NOT NULL,
-    [description] VARCHAR(255) NOT NULL,
-    [street] VARCHAR(255) NOT NULL,
+    [title] VARCHAR(255) NOT NULL,
+    [local] VARCHAR(255) NOT NULL,
+    [details] VARCHAR(255) NOT NULL,
     [lat] VARCHAR(255) NOT NULL,
-    [long] VARCHAR(255) NOT NULL,
+    [lng] VARCHAR(255) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Pin_pkey] PRIMARY KEY CLUSTERED ([id]),
