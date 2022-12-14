@@ -17,17 +17,150 @@ export class RouteRepository
   constructor(private readonly repository: PrismaService) {
     super();
   }
-  findByIdWebsocket(id: string): Promise<any> {
-    throw new Error('Method not implemented.');
+
+  async findByIdWebsocket(id: string): Promise<any> {
+    const data = await this.repository.route.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        description: true,
+        distance: true,
+        driver: { select: { name: true } },
+        status: true,
+        type: true,
+        createdAt: true,
+        path: {
+          select: {
+            id: true,
+            duration: true,
+            finishedAt: true,
+            startedAt: true,
+            startsAt: true,
+            status: true,
+            type: true,
+            createdAt: true,
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              select: {
+                id: true,
+                boardingAt: true,
+                confirmation: true,
+                disembarkAt: true,
+                position: true,
+                employee: {
+                  select: {
+                    name: true,
+                    address: true,
+                    shift: true,
+                    registration: true,
+                    pins: {
+                      select: {
+                        type: true,
+                        pin: {
+                          select: {
+                            lat: true,
+                            long: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: { select: { plate: true } },
+      },
+    });
+
+    return data;
   }
-  findByVehicleId(id: string): Promise<Route[]> {
-    throw new Error('Method not implemented.');
+
+  findByVehicleId(vehicleId: string): Promise<Route[]> {
+    return this.repository.route.findMany({
+      where: { 
+        vehicleId
+       },
+      select: {
+        id: true,
+        description: true,
+        distance: true,
+        driver: true,
+        status: true,
+        type: true,
+        createdAt: true,
+        path: {
+          select: {
+            id: true,
+            duration: true,
+            finishedAt: true,
+            startedAt: true,
+            startsAt: true,
+            status: true,
+            type: true,
+            createdAt: true,
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              select: {
+                id: true,
+                boardingAt: true,
+                confirmation: true,
+                disembarkAt: true,
+                position: true,
+                employee: {
+                  select: {
+                    name: true,
+                    address: true,
+                    shift: true,
+                    registration: true,
+                    pins: {
+                      select: {
+                        type: true,
+                        pin: {
+                          select: {
+                            lat: true,
+                            long: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: true,
+      },
+    });
   }
-  updateWebsocket(data: Route): Promise<RouteWebsocket> {
-    throw new Error('Method not implemented.');
+
+  async updateWebsocket(data: Route): Promise<RouteWebsocket> {
+    return await this.repository.route.update({
+      data: {
+        id: data.id,
+        description: data.description,
+        distance: data.distance,
+        status: data.status,
+        type: data.type,
+        updatedAt: getDateInLocaleTime(new Date()),
+      },
+      where: { id: data.id },
+    });
   }
   softDelete(id: string): Promise<Route> {
-    throw new Error('Method not implemented.');
+    return this.repository.route.update({
+      where: { id },
+      data: {
+        status: 'deleted',
+        deletedAt: getDateInLocaleTime(new Date()),
+      },
+    });
   }
 
   delete(id: string): Promise<Route> {

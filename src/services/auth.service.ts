@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 // import { JwtService } from "@nestjs/jwt";
 import ICoreServiceIntegration from '../integrations/services/coreService/core.service.integration.contract';
-import { differenceInSeconds, fromUnixTime, isAfter } from 'date-fns';
-import { TokenDTO } from '../dtos/auth/token.dto';
+import { differenceInSeconds, fromUnixTime } from 'date-fns';
 
 @Injectable()
 export class AuthService {
