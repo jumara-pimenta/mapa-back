@@ -85,8 +85,8 @@ CREATE TABLE [dbo].[Vehicle] (
     [plate] NVARCHAR(1000) NOT NULL,
     [company] NVARCHAR(1000) NOT NULL,
     [type] NVARCHAR(1000) NOT NULL,
-    [lastSurvey] DATETIMEOFFSET NOT NULL,
-    [expiration] DATETIMEOFFSET NOT NULL,
+    [lastSurvey] DATETIME2 NOT NULL,
+    [expiration] DATETIME2 NOT NULL,
     [capacity] INT NOT NULL,
     [renavam] VARCHAR(11) NOT NULL,
     [lastMaintenance] DATETIMEOFFSET NOT NULL,
@@ -105,11 +105,6 @@ CREATE TABLE [dbo].[Employee] (
     [id] NVARCHAR(1000) NOT NULL,
     [registration] NVARCHAR(1000) NOT NULL,
     [name] NVARCHAR(1000) NOT NULL,
-<<<<<<< Updated upstream:prisma/migrations/20221213201742_/migration.sql
-=======
-    [cpf] VARCHAR(11) NOT NULL,
-    [rg] VARCHAR(9) NOT NULL,
->>>>>>> Stashed changes:prisma/migrations/20221214190351_/migration.sql
     [admission] DATETIMEOFFSET NOT NULL,
     [role] NVARCHAR(1000) NOT NULL,
     [shift] NVARCHAR(1000) NOT NULL,

@@ -1,23 +1,30 @@
-import { IsDateString, IsEnum, IsOptional, IsString, Matches } from "class-validator";
-import { EStatusPath } from "../../utils/ETypes";
-
-const DurationRgx = new RegExp(/^[0-9]{2}:[0-9]{2}/gm);
-const StartsAtRgx = new RegExp(/^[0-9]{2}:[0-9]{2}/gm);
+import { IsDateString, IsEnum, IsOptional, Matches } from 'class-validator';
+import { DurationRgx, StartsAtRgx } from '../../utils/Regex';
+import { EStatusPath } from '../../utils/ETypes';
 
 export class UpdatePathDTO {
-  @Matches(DurationRgx)
+  @Matches(DurationRgx, {
+    message:
+      '[duration] O tempo de duração do trajeto deve ser do formato esperado: 00h00',
+  })
   @IsOptional()
-  duration?: string
+  duration?: string;
 
-  @Matches(StartsAtRgx)
+  @Matches(StartsAtRgx, {
+    message:
+      '[startsAt] A hora de início do trajeto deve ser do formato esperado: 00h00',
+  })
   @IsOptional()
-  startsAt?: string
+  startsAt?: string;
 
   @IsDateString()
   @IsOptional()
-  startedAt?: Date
+  startedAt?: Date;
 
-  @IsEnum(EStatusPath)
+  @IsEnum(EStatusPath, {
+    message:
+      '[status] O status do trajeto deve ser do formato esperado: PENDENTE | EM ANDAMENTO | FINALIZADO',
+  })
   @IsOptional()
   status?: EStatusPath;
 }

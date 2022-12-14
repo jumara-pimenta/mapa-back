@@ -11,3 +11,6 @@ export const dateInFormatThreeRgx = new RegExp(
 );
 
 export const durationPathRgx = new RegExp(/^([0-9]{2})[:]([0-9]{2})$/);
+
+export const DurationRgx = new RegExp(/^[0-9]{2}h[0-9]{2}/gm);
+export const StartsAtRgx = new RegExp(/^[0-9]{2}h[0-9]{2}/gm);

@@ -1,6 +1,10 @@
+import { EStatusPath, ETypePath } from '../../utils/ETypes';
+
 export interface IQueryPath {
-  sequenceQr?: number;
-  process?: string;
-  type?: string;
-  product?: string;
+  status?: EStatusPath;
+  duration?: string;
+  finishedAt?: Date;
+  startedAt?: string;
+  startsAt?: string;
+  type?: ETypePath;
 }
