@@ -91,6 +91,17 @@ export class PathService {
     return this.mapperMany(path);
   }
 
+  async listManyByDriver(driverId: string): Promise<MappedPathDTO[]> {
+    const path = await this.pathRepository.findByDriver(driverId);
+
+    if (!path.length) throw new HttpException(
+      `Não foram encontrados trajetos para este motorista!`, 
+      HttpStatus.NOT_FOUND
+    );
+
+    return this.mapperMany(path);
+  }
+
   async update(id: string, data: UpdatePathDTO): Promise<Path> {
 
     const path = await this.listById(id);

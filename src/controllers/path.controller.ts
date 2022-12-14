@@ -20,4 +20,10 @@ export class PathController {
   async getManyByRoute(@Query('route') route: string): Promise<MappedPathDTO[]> {
     return await this.pathService.listManyByRoute(route);
   }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async getManyByDriver(@Query('driver') driver: string): Promise<MappedPathDTO[]> {
+    return await this.pathService.listManyByDriver(driver);
+  }
 }
