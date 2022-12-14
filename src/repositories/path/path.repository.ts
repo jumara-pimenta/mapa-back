@@ -50,7 +50,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     pin: {
                       select: {
                         lat: true,
-                        long: true,
+                        lng: true,
                       },
                     },
                   },

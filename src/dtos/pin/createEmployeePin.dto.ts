@@ -15,10 +15,6 @@ export class CreateEmployeePinDTO {
   @IsOptional()
   id?: string;
 
-  @IsString({ message: '[title] não está definido como string.' })
-  @IsOptional()
-  description?: string;
-
   @IsString({ message: '[lat] não está definido como string.' })
   @IsOptional()
   lat?: string;
@@ -27,7 +23,15 @@ export class CreateEmployeePinDTO {
   @IsOptional()
   lng?: string;
 
-  @IsString({ message: '[street] não está definido como string.' })
+  @IsString({ message: '[local] não está definido como string.' })
   @IsOptional()
-  street?: string;
+  local?: string;
+
+  @IsString({ message: '[details] não está definido como string.' })
+  @IsOptional()
+  details?: string;
+
+  @IsString({ message: '[title] não está definido como string.' })
+  @IsOptional()
+  title?: string;
 }

@@ -65,7 +65,7 @@ export class RouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true,
+                            lng: true,
                           },
                         },
                       },
@@ -128,7 +128,7 @@ export class RouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true,
+                            lng: true,
                           },
                         },
                       },
