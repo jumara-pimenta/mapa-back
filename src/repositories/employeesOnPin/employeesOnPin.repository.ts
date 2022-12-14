@@ -1,48 +1,41 @@
-import { Injectable } from "@nestjs/common";
-import { Page, PageResponse } from "../../configs/database/page.model";
-import { Pageable } from "../../configs/database/pageable.service";
-import { PrismaService } from "../../configs/database/prisma.service";
-import { EmployeesOnPin } from "../../entities/employeesOnPin.entity";
-import IEmployeesOnPinRepository from "./employeesOnPin.repository.contract";
+import { Injectable } from '@nestjs/common';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { Pageable } from '../../configs/database/pageable.service';
+import { PrismaService } from '../../configs/database/prisma.service';
+import { EmployeesOnPin } from '../../entities/employeesOnPin.entity';
+import IEmployeesOnPinRepository from './employeesOnPin.repository.contract';
 
 @Injectable()
-export class EmployeesOnPinRepository extends Pageable<EmployeesOnPin> implements IEmployeesOnPinRepository {
-  constructor(
-    private readonly repository: PrismaService
-  ) {
-    super()
+export class EmployeesOnPinRepository
+  extends Pageable<EmployeesOnPin>
+  implements IEmployeesOnPinRepository
+{
+  constructor(private readonly repository: PrismaService) {
+    super();
   }
 
   create(data: EmployeesOnPin): Promise<EmployeesOnPin> {
-    return this.repository.employeesOnPin.create(
-      {
-        data: {
-          employeeId: data.employee.id,
-          pinId: data.pin.id,
-          type: data.type
-        },
-      }
-    )
-
-
+    return this.repository.employeesOnPin.create({
+      data: {
+        employeeId: data.employee.id,
+        pinId: data.pin.id,
+        type: data.type,
+      },
+    });
   }
-  update(pinId: string, data: EmployeesOnPin ): Promise<EmployeesOnPin> {
-    return this.repository.employeesOnPin.update(
-      {
-        where: {
-          employeeId_pinId:{
-            employeeId: data.employee.id,
-            pinId: pinId
-          }
-        },
-        data: {
+  update(pinId: string, data: EmployeesOnPin): Promise<EmployeesOnPin> {
+    return this.repository.employeesOnPin.update({
+      where: {
+        employeeId_pinId: {
           employeeId: data.employee.id,
-          pinId: data.pin.id,
-          type: data.type
+          pinId: pinId,
         },
-      }
-    )
-
-
+      },
+      data: {
+        employeeId: data.employee.id,
+        pinId: data.pin.id,
+        type: data.type,
+      },
+    });
   }
 }

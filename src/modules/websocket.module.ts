@@ -4,7 +4,7 @@ import { EmployeesOnPathModule } from './employeesOnPath.module';
 import { RouteModule } from './route.module';
 
 @Module({
-  imports: [RouteModule, EmployeesOnPathModule,],
-  providers: [WebsocketGateway,]
+  imports: [RouteModule, EmployeesOnPathModule],
+  providers: [WebsocketGateway],
 })
 export class WebsocketModule {}

@@ -1,4 +1,10 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -20,8 +26,8 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-    // private readonly moduleRef: ModuleRef,
-  ) { }
+  ) // private readonly moduleRef: ModuleRef,
+  {}
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
     const RegistrationExists = await this.employeeRepository.findByRegistration(

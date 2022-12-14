@@ -1,7 +1,7 @@
-import { PathDetailsDTO } from "./pathDetails.dto";
+import { PathDetailsDTO } from './pathDetails.dto';
 
 export class CreatePathDTO {
-  details: PathDetailsDTO
-  employeeIds: string[]
-  routeId: string
+  details: PathDetailsDTO;
+  employeeIds: string[];
+  routeId: string;
 }

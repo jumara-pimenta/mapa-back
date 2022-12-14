@@ -4,23 +4,23 @@ import { Path } from './path.entity';
 import { Vehicle } from './vehicle.entity';
 
 export class Route {
-  id: string
-  description: string
-  distance: string  
-  type: string
-  status: string
-  driver?: Driver
-  path?: Partial<Path>[]
-  vehicle?: Vehicle
-  createdAt: Date
-  updatedAt?: Date
-  deletedAt?: Date
+  id: string;
+  description: string;
+  distance: string;
+  type: string;
+  status: string;
+  driver?: Driver;
+  path?: Partial<Path>[];
+  vehicle?: Vehicle;
+  createdAt: Date;
+  updatedAt?: Date;
+  deletedAt?: Date;
 
   constructor(
-    props: Omit<Route, "id" | "createdAt" | "vehicle" | "paths" | "driver">,
+    props: Omit<Route, 'id' | 'createdAt' | 'vehicle' | 'paths' | 'driver'>,
     driver: Driver,
     vehicle: Vehicle,
-    id?: string
+    id?: string,
   ) {
     Object.assign(this, props);
     this.id = id ?? uuid();

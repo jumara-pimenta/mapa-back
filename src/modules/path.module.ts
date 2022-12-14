@@ -1,24 +1,23 @@
-import { forwardRef, Module } from "@nestjs/common";
-import { PathController } from "../controllers/path.controller";
-import { PathRepository } from "../repositories/path/path.repository";
-import { PathService } from "../services/path.service";
-import { EmployeesOnPathModule } from "./employeesOnPath.module";
-import { RouteModule } from "./route.module";
+import { forwardRef, Module } from '@nestjs/common';
+import { PathController } from '../controllers/path.controller';
+import { PathRepository } from '../repositories/path/path.repository';
+import { PathService } from '../services/path.service';
+import { EmployeesOnPathModule } from './employeesOnPath.module';
+import { RouteModule } from './route.module';
 
 @Module({
   imports: [
     forwardRef(() => RouteModule),
-    forwardRef(() => EmployeesOnPathModule)
+    forwardRef(() => EmployeesOnPathModule),
   ],
   controllers: [PathController],
   providers: [
     PathService,
     {
-      provide: "IPathRepository",
-      useClass: PathRepository
-    }
+      provide: 'IPathRepository',
+      useClass: PathRepository,
+    },
   ],
-  exports: [PathService]
+  exports: [PathService],
 })
-
 export class PathModule {}

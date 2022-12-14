@@ -247,7 +247,7 @@ export class RouteService {
         employee.pins.forEach((pin: any) => {
           if (pin.type !== route.type) {
             console.log(pin.type, route.type);
-            
+
             employeeArrayPins.push(employee.name);
           }
         });

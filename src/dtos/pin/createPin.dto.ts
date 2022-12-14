@@ -1,11 +1,5 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import {
-  IsString,
-  IsEnum,
-  MinLength,
-  MaxLength,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreatePinDTO {
   @IsString({ message: 'Descrição tem que ser do tipo string' })

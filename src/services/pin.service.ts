@@ -15,8 +15,10 @@ export class PinService {
   ) {}
 
   async create(payload: CreatePinDTO): Promise<Pin> {
-    if (Number(payload.lat) < -90 || Number(payload.lat) > 90) throw new HttpException("Latitude inválida", HttpStatus.BAD_REQUEST);
-    if (Number(payload.long) < -180 || Number(payload.long) > 180) throw new HttpException("Longitude inválida", HttpStatus.BAD_REQUEST);
+    if (Number(payload.lat) < -90 || Number(payload.lat) > 90)
+      throw new HttpException('Latitude inválida', HttpStatus.BAD_REQUEST);
+    if (Number(payload.long) < -180 || Number(payload.long) > 180)
+      throw new HttpException('Longitude inválida', HttpStatus.BAD_REQUEST);
 
     return await this.pinRepository.create(new Pin(payload));
   }
@@ -73,7 +75,7 @@ export class PinService {
       return {
         id: pin.id,
         description: pin.description,
-        street : pin.street,
+        street: pin.street,
         lat: pin.lat,
         long: pin.long,
         createdAt: pin.createdAt,

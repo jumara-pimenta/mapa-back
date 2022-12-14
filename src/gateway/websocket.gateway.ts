@@ -1,5 +1,12 @@
 import { ValidationPipe } from '@nestjs/common';
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsResponse, WsException } from '@nestjs/websockets';
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  MessageBody,
+  WsResponse,
+  WsException,
+} from '@nestjs/websockets';
 import { Observable } from 'rxjs';
 import { Server } from 'socket.io';
 import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
@@ -16,63 +23,69 @@ export class WebsocketGateway {
   constructor(
     private readonly routeService: RouteService,
     private readonly employeesOnPathService: EmployeesOnPathService,
-  ) { }
+  ) {}
   @WebSocketServer() server: Server;
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
       console.log(socket.id);
       console.log('Client connected');
-    }
-    );
+    });
   }
 
   @SubscribeMessage('local')
-  handleMessage(@MessageBody(new ValidationPipe({
-    exceptionFactory: (errors) => {
-      console.log(errors);
-      return new WsException(errors)
-    }
-  })) payload: CurrentLocalDTO): void {
+  handleMessage(
+    @MessageBody(
+      new ValidationPipe({
+        exceptionFactory: (errors) => {
+          console.log(errors);
+          return new WsException(errors);
+        },
+      }),
+    )
+    payload: CurrentLocalDTO,
+  ): void {
     try {
       this.server.emit(payload.id, {
-        ...payload
+        ...payload,
       });
-
     } catch (error) {
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
-
   }
 
   @SubscribeMessage('startRoute')
-  async handleRouteStart(@MessageBody(new ValidationPipe({
-    exceptionFactory: (errors) => {
-      console.log(errors);
-      return new WsException(errors)
-    }
-  })) payload: StatusRouteDTO): Promise<void> {
+  async handleRouteStart(
+    @MessageBody(
+      new ValidationPipe({
+        exceptionFactory: (errors) => {
+          console.log(errors);
+          return new WsException(errors);
+        },
+      }),
+    )
+    payload: StatusRouteDTO,
+  ): Promise<void> {
     try {
       const startAt = {
         ...payload,
         route: {
           ...payload.route,
-          status: 'EM ANDAMENTO' as EStatusRoute
+          status: 'EM ANDAMENTO' as EStatusRoute,
         },
         path: {
           ...payload.path,
           startedAt: getDateInLocaleTime(new Date()),
           finishedAt: null,
-        }
-      }
+        },
+      };
 
       const data = await this.routeService.updateWebsocket(startAt);
 
       this.server.emit(payload.routeId, {
-        ...data
+        ...data,
       });
-
     } catch (error) {
       console.log(error);
       this.server.except(error).emit('error', error);
@@ -81,33 +94,35 @@ export class WebsocketGateway {
   }
 
   @SubscribeMessage('finishRoute')
-  async handleRouteFinish(@MessageBody(new ValidationPipe({
-    exceptionFactory: (errors) => {
-      console.log(errors);
-      return new WsException(errors)
-    }
-  })) payload: StatusRouteDTO): Promise<void> {
+  async handleRouteFinish(
+    @MessageBody(
+      new ValidationPipe({
+        exceptionFactory: (errors) => {
+          console.log(errors);
+          return new WsException(errors);
+        },
+      }),
+    )
+    payload: StatusRouteDTO,
+  ): Promise<void> {
     try {
-
       const finishedAt = {
         ...payload,
         route: {
           ...payload.route,
-          status: 'PENDENTE' as EStatusRoute
+          status: 'PENDENTE' as EStatusRoute,
         },
         path: {
           ...payload.path,
-          finishedAt: getDateInLocaleTime(new Date())
-        }
-      }
+          finishedAt: getDateInLocaleTime(new Date()),
+        },
+      };
 
       const data = await this.routeService.updateWebsocket(finishedAt);
 
       this.server.emit(payload.routeId, {
-        ...data
+        ...data,
       });
-
-
     } catch (error) {
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
@@ -115,29 +130,32 @@ export class WebsocketGateway {
   }
 
   @SubscribeMessage('updateEmployee')
-  async handleUpdateEmployee(@MessageBody(new ValidationPipe({
-    exceptionFactory: (errors) => {
-      console.log(errors);
-      return new WsException(errors)
-    }
-  })) payload: WebsocketUpdateEmployeesStatusOnPathDTO): Promise<void> {
+  async handleUpdateEmployee(
+    @MessageBody(
+      new ValidationPipe({
+        exceptionFactory: (errors) => {
+          console.log(errors);
+          return new WsException(errors);
+        },
+      }),
+    )
+    payload: WebsocketUpdateEmployeesStatusOnPathDTO,
+  ): Promise<void> {
     try {
-      console.log("==>==>=>",payload);
+      console.log('==>==>=>', payload);
 
-      
-      
-      await this.employeesOnPathService.updateWebsocket(payload.employeeOnPathId,payload.payload);
+      await this.employeesOnPathService.updateWebsocket(
+        payload.employeeOnPathId,
+        payload.payload,
+      );
       const data = await this.routeService.listById(payload.routeId);
 
       this.server.emit(payload.routeId, {
-        ...data
+        ...data,
       });
-      
-   
-}
-    catch (error) {
+    } catch (error) {
       console.log(error);
-      
+
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }

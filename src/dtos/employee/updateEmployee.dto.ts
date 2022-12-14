@@ -3,8 +3,6 @@ import {
   IsDateString,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class UpdateEmployeeDTO {
@@ -14,7 +12,7 @@ export class UpdateEmployeeDTO {
   registration?: string;
 
   @IsOptional()
-  @IsDateString({ message: 'Admission não está definido como DateString.' })
+  @IsDateString()
   admission?: Date;
 
   @IsString({ message: 'Nome não está definido como string.' })

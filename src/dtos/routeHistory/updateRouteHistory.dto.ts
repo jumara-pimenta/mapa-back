@@ -1,21 +1,27 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateRouteHistoryDTO {
   @IsString()
   @IsOptional()
-  process?: string
+  process?: string;
 
   @IsString()
   @MaxLength(15)
   @IsOptional()
-  product?: string
+  product?: string;
 
   @IsString()
   @IsOptional()
-  sequenceQr?: number
+  sequenceQr?: number;
 
   @MinLength(2)
   @MaxLength(3)
   @IsOptional()
-  type?: string
+  type?: string;
 }

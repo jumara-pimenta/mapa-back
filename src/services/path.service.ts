@@ -1,65 +1,85 @@
-import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { Path } from "../entities/path.entity";
-import IPathRepository from "../repositories/path/path.repository.contract";
-import { MappedPathDTO } from "../dtos/path/mappedPath.dto";
-import { CreatePathDTO } from "../dtos/path/createPath.dto";
-import { UpdatePathDTO } from "../dtos/path/updatePath.dto";
-import { RouteService } from "./route.service";
-import { EStatusPath, ETypePath } from "../utils/ETypes";
-import { EmployeesOnPathService } from "./employeesOnPath.service";
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { Path } from '../entities/path.entity';
+import IPathRepository from '../repositories/path/path.repository.contract';
+import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
+import { CreatePathDTO } from '../dtos/path/createPath.dto';
+import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
+import { RouteService } from './route.service';
+import { EStatusPath, ETypePath } from '../utils/ETypes';
+import { EmployeesOnPathService } from './employeesOnPath.service';
 
 @Injectable()
 export class PathService {
   constructor(
-    @Inject("IPathRepository")
+    @Inject('IPathRepository')
     private readonly pathRepository: IPathRepository,
     @Inject(forwardRef(() => RouteService))
     private readonly routeService: RouteService,
     @Inject(forwardRef(() => EmployeesOnPathService))
-    private readonly employeesOnPathService: EmployeesOnPathService
-  ) { }
+    private readonly employeesOnPathService: EmployeesOnPathService,
+  ) {}
 
   async generate(props: CreatePathDTO): Promise<void> {
-
     const { type, duration, isAutoRoute, startsAt } = props.details;
 
     const route = await this.routeService.listById(props.routeId);
 
     if (type === ETypePath.ONE_WAY || type === ETypePath.RETURN) {
-      const path = await this.pathRepository.create(new Path({
-        duration: duration,
-        startsAt: startsAt,
-        type: type,
-        status: EStatusPath.PENDING
-      }, route));
+      const path = await this.pathRepository.create(
+        new Path(
+          {
+            duration: duration,
+            startsAt: startsAt,
+            type: type,
+            status: EStatusPath.PENDING,
+          },
+          route,
+        ),
+      );
 
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
-        pathId: path.id
+        pathId: path.id,
       });
     } else if (type === ETypePath.ROUND_TRIP) {
-      const pathOneWay = await this.pathRepository.create(new Path({
-        duration: duration,
-        startsAt: startsAt,
-        type: ETypePath.ONE_WAY,
-        status: EStatusPath.PENDING
-      }, route));
+      const pathOneWay = await this.pathRepository.create(
+        new Path(
+          {
+            duration: duration,
+            startsAt: startsAt,
+            type: ETypePath.ONE_WAY,
+            status: EStatusPath.PENDING,
+          },
+          route,
+        ),
+      );
 
-      const pathReturn = await this.pathRepository.create(new Path({
-        duration: duration,
-        startsAt: startsAt,
-        type: ETypePath.RETURN,
-        status: EStatusPath.PENDING
-      }, route));
+      const pathReturn = await this.pathRepository.create(
+        new Path(
+          {
+            duration: duration,
+            startsAt: startsAt,
+            type: ETypePath.RETURN,
+            status: EStatusPath.PENDING,
+          },
+          route,
+        ),
+      );
 
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
-        pathId: pathOneWay.id
+        pathId: pathOneWay.id,
       });
 
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
-        pathId: pathReturn.id
+        pathId: pathReturn.id,
       });
     }
 
@@ -75,7 +95,11 @@ export class PathService {
   async listById(id: string): Promise<MappedPathDTO> {
     const path = await this.pathRepository.findById(id);
 
-    if (!path) throw new HttpException(`Não foi encontrado um path com o id: ${id}`, HttpStatus.NOT_FOUND);
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado um path com o id: ${id}`,
+        HttpStatus.NOT_FOUND,
+      );
 
     return this.mapperOne(path);
   }
@@ -83,25 +107,26 @@ export class PathService {
   async listManyByRoute(routeId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByRoute(routeId);
 
-    if (!path.length) throw new HttpException(
-      `Não foram encontrados trajetos para a rota com o id: ${routeId}!`, 
-      HttpStatus.NOT_FOUND
-    );
+    if (!path.length)
+      throw new HttpException(
+        `Não foram encontrados trajetos para a rota com o id: ${routeId}!`,
+        HttpStatus.NOT_FOUND,
+      );
 
     return this.mapperMany(path);
   }
 
   async update(id: string, data: UpdatePathDTO): Promise<Path> {
-
     const path = await this.listById(id);
-    
 
-    return await this.pathRepository.update(Object.assign(path, {...path, ...data}));
+    return await this.pathRepository.update(
+      Object.assign(path, { ...path, ...data }),
+    );
   }
 
   private mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
-  
+
     return {
       id: path.id,
       duration: path.duration,
@@ -111,7 +136,7 @@ export class PathService {
       status: path.status,
       type: path.type,
       createdAt: path.createdAt,
-      employeesOnPath: employeesOnPath.map(item => {
+      employeesOnPath: employeesOnPath.map((item) => {
         const { employee } = item;
         const { pins } = employee;
 
@@ -128,17 +153,16 @@ export class PathService {
             registration: employee.registration,
             location: {
               lat: pins.at(0).pin.lat,
-              long: pins.at(0).pin.long
-            }
-          }
-        }
-      })
-    }
+              long: pins.at(0).pin.long,
+            },
+          },
+        };
+      }),
+    };
   }
 
   private mapperMany(paths: Path[]): MappedPathDTO[] {
-  
-    return paths.map(path => {
+    return paths.map((path) => {
       const { employeesOnPath } = path;
 
       return {
@@ -150,10 +174,10 @@ export class PathService {
         status: path.status,
         type: path.type,
         createdAt: path.createdAt,
-        employeesOnPath: employeesOnPath.map(item => {
+        employeesOnPath: employeesOnPath.map((item) => {
           const { employee } = item;
           const { pins } = employee;
-  
+
           return {
             id: item.id,
             boardingAt: item.boardingAt,
@@ -167,12 +191,12 @@ export class PathService {
               registration: employee.registration,
               location: {
                 lat: pins.at(0).pin.lat,
-                long: pins.at(0).pin.long
-              }
-            }
-          }
-        })
-      }
-    })
+                long: pins.at(0).pin.long,
+              },
+            },
+          };
+        }),
+      };
+    });
   }
 }
