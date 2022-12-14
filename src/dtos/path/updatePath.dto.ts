@@ -1,33 +1,30 @@
-import { IsDateString, IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
-import { EStatusPath, ETypePath } from "src/utils/ETypes";
+import { IsDateString, IsEnum, IsOptional, Matches } from 'class-validator';
+import { DurationRgx, StartsAtRgx } from '../../utils/Regex';
+import { EStatusPath } from '../../utils/ETypes';
 
 export class UpdatePathDTO {
-  @IsString( { message: 'Description não está definida como string.' } )
+  @Matches(DurationRgx, {
+    message:
+      '[duration] O tempo de duração do trajeto deve ser do formato esperado: 00h00',
+  })
   @IsOptional()
-  process?: string
+  duration?: string;
 
-  @IsString( { message: 'Product não está definida como string.' } )
-  @MaxLength(15, { message: 'Product não pode ter mais de 15 caracteres.' })
+  @Matches(StartsAtRgx, {
+    message:
+      '[startsAt] A hora de início do trajeto deve ser do formato esperado: 00h00',
+  })
   @IsOptional()
-  product?: string
+  startsAt?: string;
 
-  @IsString( { message: 'Sequence não está definida como string.' } )
-  @IsOptional( { message: 'Sequence não pode receber um valor vazio.' } )
-  sequenceQr?: number
-
-  @IsEnum(ETypePath, { message: 'Type não está definida como enum.' })
+  @IsDateString()
   @IsOptional()
-  type?: ETypePath
+  startedAt?: Date;
 
-  @IsEnum(EStatusPath, { message: 'Status não está definida como enum.' })
+  @IsEnum(EStatusPath, {
+    message:
+      '[status] O status do trajeto deve ser do formato esperado: PENDENTE | EM ANDAMENTO | FINALIZADO',
+  })
   @IsOptional()
-  status?: EStatusPath
-
-  @IsOptional()
-  @IsDateString( { message: 'StartedAt não está definida como date.' })
-  startedAt?: Date
-
-  @IsOptional()
-  @IsDateString( { message: 'FinishedAt não está definida como date.' })
-  finishedAt?: Date
+  status?: EStatusPath;
 }

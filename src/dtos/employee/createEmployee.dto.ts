@@ -2,16 +2,10 @@ import { Transform, TransformFnParams, Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
-  MinLength,
-  MaxLength,
   IsDateString,
-  IsEnum,
   ValidateNested,
 } from 'class-validator';
-import { Employee } from 'src/entities/employee.entity';
-import { ETypePin } from 'src/utils/ETypes';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
-// import { Unique } from './validator';
 
 export class CreateEmployeeDTO {
   @IsString({ message: 'Matrícula não está definida como string.' })
@@ -21,7 +15,7 @@ export class CreateEmployeeDTO {
 
   @IsString({ message: 'Admissão não está definido como string.' })
   @IsNotEmpty({ message: 'Admissão não pode receber valor vazio.' })
-  @IsDateString({ message: 'Admissão não está definido como DateString.' })
+  @IsDateString()
   admission: Date;
 
   @IsString({ message: 'Cargo não está definido como string.' })
@@ -51,5 +45,5 @@ export class CreateEmployeeDTO {
   @ValidateNested({ each: true })
   @Type(() => CreateEmployeePinDTO)
   @IsNotEmpty()
-  pin: CreateEmployeePinDTO
+  pin: CreateEmployeePinDTO;
 }

@@ -8,7 +8,7 @@ import { EmployeeService } from "./employee.service";
 @Injectable()
 export class EmployeesOnPinService {
   constructor(
-    @Inject("IEmployeesOnPinRepository")
+    @Inject('IEmployeesOnPinRepository')
     private readonly employeesOnPinRepository: IEmployeesOnPinRepository,
     @Inject(forwardRef(() => EmployeeService))
     private readonly employeeService: EmployeeService,

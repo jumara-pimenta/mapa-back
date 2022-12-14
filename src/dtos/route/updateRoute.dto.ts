@@ -1,34 +1,42 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
-import { EStatusRoute, ETypeRoute } from "src/utils/ETypes";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import { EStatusRoute, ETypeRoute } from 'src/utils/ETypes';
 
 export class UpdateRouteDTO {
   @IsString({ message: '[Description] não está definida como string.' })
   @IsOptional()
-  description?: string
+  description?: string;
 
-  @IsString({ message: '[Distance] não está definida como string.'})
+  @IsString({ message: '[Distance] não está definida como string.' })
   @IsOptional()
-  distance?: string
+  distance?: string;
 
-  @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.'})
+  @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.' })
   @IsOptional()
-  type?: ETypeRoute
+  type?: ETypeRoute;
 
-  @IsEnum(EStatusRoute, { message: '[Status] não está definida como enum.'})
+  @IsEnum(EStatusRoute, { message: '[Status] não está definida como enum.' })
   @IsOptional()
-  status?: EStatusRoute
+  status?: EStatusRoute;
 
-  @IsString({ message: '[DriverId] não está definida como string.'})
+  @IsString({ message: '[DriverId] não está definida como string.' })
   @IsOptional()
-  driverId?: string
+  driverId?: string;
 
-  @IsString({ message: '[VehicleId] não está definida como string.'})
+  @IsString({ message: '[VehicleId] não está definida como string.' })
   @IsOptional()
-  vehicleId?: string
+  vehicleId?: string;
 
-  @IsString({ each: true , message: '[EmployeeIds] não está definida como string.'})
+  @IsString({
+    each: true,
+    message: '[EmployeeIds] não está definida como string.',
+  })
   @IsOptional()
-  employeeIds?: string[]
-
-
+  employeeIds?: string[];
 }

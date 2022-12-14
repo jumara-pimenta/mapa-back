@@ -11,7 +11,8 @@ import { Vehicle } from '../../entities/vehicle.entity';
 @Injectable()
 export class VehicleRepository
   extends Pageable<Vehicle>
-  implements IVehicleRepository {
+  implements IVehicleRepository
+{
   constructor(private readonly repository: PrismaService) {
     super();
   }
@@ -56,19 +57,19 @@ export class VehicleRepository
 
     const items = condition
       ? await this.repository.vehicle.findMany({
-        ...this.buildPage(page),
-        where: condition,
-      })
+          ...this.buildPage(page),
+          where: condition,
+        })
       : await this.repository.vehicle.findMany({
-        ...this.buildPage(page),
-      });
+          ...this.buildPage(page),
+        });
 
     const total = condition
       ? await this.repository.vehicle.findMany({
-        where: {
-          ...condition,
-        },
-      })
+          where: {
+            ...condition,
+          },
+        })
       : await this.repository.vehicle.count();
 
     return this.buildPageResponse(
@@ -105,7 +106,7 @@ export class VehicleRepository
   findByRenavam(renavam: string): Promise<Vehicle> {
     return this.repository.vehicle.findUnique({
       where: {
-        renavam: renavam
+        renavam: renavam,
       },
     });
   }

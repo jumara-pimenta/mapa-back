@@ -46,9 +46,7 @@ export class CreateVehicleDTO {
   @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
   renavam: string;
 
-  @IsDateString({
-    message: 'LastMaintenance não está definido para o tipo string.',
-  })
+  @IsDateString()
   @IsNotEmpty({ message: 'Última manutenção não pode está vazio.' })
   lastMaintenance: string;
 

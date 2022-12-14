@@ -1,25 +1,21 @@
-import { forwardRef, Module } from "@nestjs/common";
-import { ModuleRef } from "@nestjs/core";
-import { EmployeesOnPinController } from "../controllers/employeesOnPin.controller";
-import { EmployeesOnPinRepository } from "../repositories/employeesOnPin/employeesOnPin.repository";
-import { EmployeesOnPinService } from "../services/employeesOnPin.service";
-import { EmployeeModule } from "./employee.module";
-import { PinModule } from "./pin.module";
+import { forwardRef, Module } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
+import { EmployeesOnPinController } from '../controllers/employeesOnPin.controller';
+import { EmployeesOnPinRepository } from '../repositories/employeesOnPin/employeesOnPin.repository';
+import { EmployeesOnPinService } from '../services/employeesOnPin.service';
+import { EmployeeModule } from './employee.module';
+import { PinModule } from './pin.module';
 
 @Module({
-  imports: [
-    PinModule,
-    forwardRef(() => EmployeeModule)
-  ],
+  imports: [PinModule, forwardRef(() => EmployeeModule)],
   controllers: [EmployeesOnPinController],
   providers: [
     EmployeesOnPinService,
     {
-      provide: "IEmployeesOnPinRepository",
-      useClass: EmployeesOnPinRepository
-    }
+      provide: 'IEmployeesOnPinRepository',
+      useClass: EmployeesOnPinRepository,
+    },
   ],
-  exports: [EmployeesOnPinService]
+  exports: [EmployeesOnPinService],
 })
-
 export class EmployeesOnPinModule {}

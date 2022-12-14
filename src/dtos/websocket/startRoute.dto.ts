@@ -1,7 +1,13 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString , isIdentityCard} from "class-validator";
-import { EStatusPath, EStatusRoute } from "src/utils/ETypes";
-import { UpdatePathDTO } from "../path/updatePath.dto";
-import { UpdateRouteDTO } from "../route/updateRoute.dto";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  isIdentityCard,
+} from 'class-validator';
+import { EStatusPath, EStatusRoute } from 'src/utils/ETypes';
+import { UpdatePathDTO } from '../path/updatePath.dto';
+import { UpdateRouteDTO } from '../route/updateRoute.dto';
 
 export class StatusRouteDTO {
   @IsString()
@@ -10,15 +16,11 @@ export class StatusRouteDTO {
 
   @IsString()
   @IsNotEmpty()
-  pathId: string 
-  
-  @IsNotEmpty()
-  route: UpdateRouteDTO
+  pathId: string;
 
   @IsNotEmpty()
-  path: UpdatePathDTO
+  route: UpdateRouteDTO;
 
-
-
-
+  @IsNotEmpty()
+  path: UpdatePathDTO;
 }

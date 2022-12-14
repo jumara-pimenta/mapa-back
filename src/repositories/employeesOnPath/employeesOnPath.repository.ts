@@ -274,7 +274,7 @@ export class EmployeesOnPathRepository
         description: data.description,
         disembarkAt: getDateInLocaleTime(data.disembarkAt),
         boardingAt: getDateInLocaleTime(data.boardingAt),
-        updatedAt: getDateInLocaleTime(new Date())
+        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
     });

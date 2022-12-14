@@ -8,7 +8,7 @@ import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
-import { RouteWebsocket } from 'src/entities/routeWebsocket.entity';
+import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
 @Injectable()
 export class RouteRepository
@@ -22,14 +22,130 @@ export class RouteRepository
     super();
   }
 
-  delete(id: string): Promise<Route> {
-    return this.repository.route.delete({
+  async findByIdWebsocket(id: string): Promise<any> {
+    const data = await this.repository.route.findUnique({
       where: { id },
+      select: {
+        id: true,
+        description: true,
+        distance: true,
+        driver: { select: { name: true } },
+        status: true,
+        type: true,
+        createdAt: true,
+        path: {
+          select: {
+            id: true,
+            duration: true,
+            finishedAt: true,
+            startedAt: true,
+            startsAt: true,
+            status: true,
+            type: true,
+            createdAt: true,
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              select: {
+                id: true,
+                boardingAt: true,
+                confirmation: true,
+                disembarkAt: true,
+                position: true,
+                employee: {
+                  select: {
+                    name: true,
+                    address: true,
+                    shift: true,
+                    registration: true,
+                    pins: {
+                      select: {
+                        type: true,
+                        pin: {
+                          select: {
+                            lat: true,
+                            long: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: { select: { plate: true } },
+      },
+    });
+
+    return data;
+  }
+
+  findByVehicleId(vehicleId: string): Promise<Route[]> {
+    return this.repository.route.findMany({
+      where: { 
+        vehicleId
+       },
+      select: {
+        id: true,
+        description: true,
+        distance: true,
+        driver: true,
+        status: true,
+        type: true,
+        createdAt: true,
+        path: {
+          select: {
+            id: true,
+            duration: true,
+            finishedAt: true,
+            startedAt: true,
+            startsAt: true,
+            status: true,
+            type: true,
+            createdAt: true,
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              select: {
+                id: true,
+                boardingAt: true,
+                confirmation: true,
+                disembarkAt: true,
+                position: true,
+                employee: {
+                  select: {
+                    name: true,
+                    address: true,
+                    shift: true,
+                    registration: true,
+                    pins: {
+                      select: {
+                        type: true,
+                        pin: {
+                          select: {
+                            lat: true,
+                            long: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: true,
+      },
     });
   }
 
-  update(data: Route): Promise<Route> {
-    return this.repository.route.update({
+  async updateWebsocket(data: Route): Promise<RouteWebsocket> {
+    return await this.repository.route.update({
       data: {
         id: data.id,
         description: data.description,
@@ -42,8 +158,14 @@ export class RouteRepository
     });
   }
 
-  async updateWebsocket(data: Route): Promise<RouteWebsocket> {
-    return await this.repository.route.update({
+  delete(id: string): Promise<Route> {
+    return this.repository.route.delete({
+      where: { id },
+    });
+  }
+
+  update(data: Route): Promise<Route> {
+    return this.repository.route.update({
       data: {
         id: data.id,
         description: data.description,
@@ -113,67 +235,6 @@ export class RouteRepository
         vehicle: true,
       },
     });
-  }
-
-  async findByIdWebsocket(id: string): Promise<any> {
-    const data = await this.repository.route.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        description: true,
-        distance: true,
-        driver: { select: { name: true } },
-        status: true,
-        type: true,
-        createdAt: true,
-        path: {
-          select: {
-            id: true,
-            duration: true,
-            finishedAt: true,
-            startedAt: true,
-            startsAt: true,
-            status: true,
-            type: true,
-            createdAt: true,
-            employeesOnPath: {
-              orderBy: {
-                position: 'asc',
-              },
-              select: {
-                id: true,
-                boardingAt: true,
-                confirmation: true,
-                disembarkAt: true,
-                position: true,
-                employee: {
-                  select: {
-                    name: true,
-                    address: true,
-                    shift: true,
-                    registration: true,
-                    pins: {
-                      select: {
-                        type: true,
-                        pin: {
-                          select: {
-                            lat: true,
-                            lng: true,
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        vehicle: { select: { plate: true } },
-      },
-    });
-
-    return data;
   }
 
   async findAll(
@@ -283,32 +344,6 @@ export class RouteRepository
       select: {
         id: true,
         status: true,
-        path: {
-          select: {
-            startedAt: true,
-            finishedAt: true,
-            status: true,
-            startsAt: true,
-            duration: true,
-          },
-        },
-      },
-    });
-  }
-
-  findByVehicleId(id: string): Promise<any> {
-    return this.repository.route.findMany({
-      where: {
-        vehicleId: id,
-        deletedAt: null,
-        path: {
-          every: {
-            finishedAt: null,
-          },
-        },
-      },
-      select: {
-        id: true,
         path: {
           select: {
             startedAt: true,

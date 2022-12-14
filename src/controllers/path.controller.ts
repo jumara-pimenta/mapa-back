@@ -1,37 +1,61 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Put, Query } from "@nestjs/common";
-import path from "path";
-import { UpdatePathDTO } from "src/dtos/path/updatePath.dto";
-import { MappedPathDTO } from "../dtos/path/mappedPath.dto";
-import { Path } from "../entities/path.entity";
-import { PathService } from "../services/path.service";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+} from '@nestjs/common';
+import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
+import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
+import { Path } from '../entities/path.entity';
+import { PathService } from '../services/path.service';
+import { EStatusPath } from 'src/utils/ETypes';
 
-@Controller("/api/routes/paths")
+@Controller('/api/routes')
 export class PathController {
-  constructor(
-    private readonly pathService: PathService
-  ) { }
+  constructor(private readonly pathService: PathService) {}
 
-  @Get('/:id')
+  @Get('/paths/:id')
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Path> {
     return await this.pathService.listById(id);
   }
 
-  @Get()
+  @Get('/:routeId/paths')
   @HttpCode(HttpStatus.OK)
-  async getManyByRoute(@Query('route') route: string): Promise<MappedPathDTO[]> {
-    return await this.pathService.listManyByRoute(route);
+  async getManyByRoute(
+    @Param('routeId') routeId: string,
+  ): Promise<MappedPathDTO[]> {
+    return await this.pathService.listManyByRoute(routeId);
   }
 
-  @Put('/:id')
+  @Get('/paths/drivers/:driverId')
   @HttpCode(HttpStatus.OK)
-  async updateById(@Param('id') id: string, @Body() payload: UpdatePathDTO): Promise<Path> {
-    return await this.pathService.update(id, payload);
+  async getManyByDriver(
+    @Param('driverId') driverId: string,
+  ): Promise<MappedPathDTO[]> {
+    return await this.pathService.listManyByDriver(driverId);
   }
-  
-  @Get()
+
+  @Get('/paths/drivers/:driverId/status/:status')
   @HttpCode(HttpStatus.OK)
-  async getManyByDriver(@Query('driver') driver: string): Promise<MappedPathDTO[]> {
-    return await this.pathService.listManyByDriver(driver);
+  async getOneByStatus(
+    @Param('driverId') driverId: string,
+    @Param('status') status: EStatusPath,
+  ): Promise<Path> {
+    console.log('');
+    
+    return await this.pathService.listOneByDriverAndStatus(driverId, status);
+  }
+
+  @Put('/paths/:id')
+  @HttpCode(HttpStatus.OK)
+  async update(
+    @Param('id') id: string,
+    @Body() payload: UpdatePathDTO,
+  ): Promise<Path> {
+    return await this.pathService.update(id, payload);
   }
 }

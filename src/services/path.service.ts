@@ -26,7 +26,7 @@ export class PathService {
   ) {}
 
   async generate(props: CreatePathDTO): Promise<void> {
-    const { type, duration, isAutoRoute, startsAt } = props.details;
+    const { type, duration, startsAt } = props.details;
 
     const route = await this.routeService.listById(props.routeId);
 
@@ -119,17 +119,61 @@ export class PathService {
   async listManyByDriver(driverId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByDriver(driverId);
 
-    if (!path.length) throw new HttpException(
-      `Não foram encontrados trajetos para este motorista!`, 
-      HttpStatus.NOT_FOUND
-    );
+    if (!path.length)
+      throw new HttpException(
+        'Não foram encontrados trajetos para este motorista!',
+        HttpStatus.NOT_FOUND,
+      );
 
     return this.mapperMany(path);
   }
 
+  async listOneByDriverAndStatus(driverId: string, status: EStatusPath): Promise<Path> {
+    const path = await this.pathRepository.findByDriverIdAndStatus(driverId, status);
+
+    if (!path)
+      throw new HttpException(
+        `Não existe trajeto com status ${status} para este motorista!`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(path);
+  }
+
   async update(id: string, data: UpdatePathDTO): Promise<Path> {
     const path = await this.listById(id);
-    
+
+    if (data.status) {
+      if (
+        data.status === EStatusPath.PENDING &&
+        path.status === EStatusPath.PENDING
+      ) {
+        throw new HttpException(
+          'O status do trajeto já está pendente!',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (
+        data.status === EStatusPath.IN_PROGRESS &&
+        path.status === EStatusPath.IN_PROGRESS
+      ) {
+        throw new HttpException(
+          'O trajeto já se encontra em andamento!',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (
+        data.status === EStatusPath.FINISHED &&
+        path.status === EStatusPath.FINISHED
+      ) {
+        throw new HttpException(
+          'Não é possível atualizar o status de um trajeto que já foi finalizado!',
+          HttpStatus.METHOD_NOT_ALLOWED,
+        );
+      }
+    }
 
     return await this.pathRepository.update(
       Object.assign(path, { ...path, ...data }),

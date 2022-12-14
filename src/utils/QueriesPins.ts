@@ -1,17 +1,13 @@
 import { MappedPinDTO } from './../dtos/pin/mappedPin.dto';
-// import { addHour } from './Utils';
-import { FiltersPinDTO } from 'src/dtos/pin/filtersPin.dto';
+import { FiltersPinDTO } from '../dtos/pin/filtersPin.dto';
 
 export function generateQueryForPins(filters: FiltersPinDTO): MappedPinDTO {
   const fields = {
-    title: () => ({
-      title: { contains: filters.title },
+    description: () => ({
+      description: { contains: filters.description },
     }),
-    local: () => ({
-      local: { contains: filters.local },
-    }),
-    details: () => ({
-      details: { contains: filters.details },
+    street: () => ({
+      street: { contains: filters.street },
     }),
   };
 
