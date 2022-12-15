@@ -10,7 +10,9 @@ async function bootstrap() {
     origin: '*',
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    forbidUnknownValues: false
+  }));
 
   await app.listen(process.env.PORT_BACKEND, () =>
     console.log(`🤖 server running on port ${process.env.PORT_BACKEND}...`),
