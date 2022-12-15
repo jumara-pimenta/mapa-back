@@ -3,6 +3,6 @@ export class MappedPinDTO {
   description: string;
   street: string;
   lat: string;
-  long: string;
+  lng: string;
   createdAt: Date;
 }

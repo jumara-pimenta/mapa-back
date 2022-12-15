@@ -20,5 +20,5 @@ export class CreatePinDTO {
   @IsString({ message: 'Longitude tem que ser do tipo string' })
   @IsNotEmpty({ message: 'O campo Longitude não pode ser vazio' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  long: string;
+  lng: string;
 }

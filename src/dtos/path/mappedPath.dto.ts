@@ -1,6 +1,6 @@
 class IPin {
   lat: string;
-  long: string;
+  lng: string;
 }
 
 class IEmployee {
@@ -22,6 +22,7 @@ class IEmployeesOnPathDTO {
 
 export class MappedPathDTO {
   id: string;
+  routeDescription: string;
   duration: string;
   finishedAt?: Date;
   startedAt?: Date;

@@ -59,7 +59,7 @@ export class EmployeesOnPathRepository
                 pin: {
                   select: {
                     lat: true,
-                    long: true,
+                    lng: true,
                   },
                 },
               },
@@ -89,7 +89,7 @@ export class EmployeesOnPathRepository
                 pin: {
                   select: {
                     lat: true,
-                    long: true,
+                    lng: true,
                   },
                 },
               },
@@ -124,7 +124,7 @@ export class EmployeesOnPathRepository
                 pin: {
                   select: {
                     lat: true,
-                    long: true,
+                    lng: true,
                   },
                 },
               },
@@ -171,7 +171,7 @@ export class EmployeesOnPathRepository
                 pin: {
                   select: {
                     lat: true,
-                    long: true,
+                    lng: true,
                   },
                 },
               },
@@ -211,7 +211,7 @@ export class EmployeesOnPathRepository
                     pin: {
                       select: {
                         lat: true,
-                        long: true,
+                        lng: true,
                       },
                     },
                   },
@@ -241,7 +241,7 @@ export class EmployeesOnPathRepository
                     pin: {
                       select: {
                         lat: true,
-                        long: true,
+                        lng: true,
                       },
                     },
                   },

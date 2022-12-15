@@ -408,7 +408,7 @@ export class RouteService {
                   registration: employee.registration,
                   location: {
                     lat: pins.at(0).pin.lat,
-                    long: pins.at(0).pin.long,
+                    lng: pins.at(0).pin.lng,
                   },
                 },
               };
@@ -484,7 +484,7 @@ export class RouteService {
                 registration: employee.registration,
                 location: {
                   lat: pins.at(0).pin.lat,
-                  long: pins.at(0).pin.long,
+                  lng: pins.at(0).pin.lng,
                 },
               },
             };

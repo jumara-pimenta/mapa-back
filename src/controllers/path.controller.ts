@@ -11,7 +11,7 @@ import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
 import { Path } from '../entities/path.entity';
 import { PathService } from '../services/path.service';
-import { EStatusPath } from 'src/utils/ETypes';
+import { EStatusPath } from '../utils/ETypes';
 
 @Controller('/api/routes')
 export class PathController {
@@ -45,8 +45,6 @@ export class PathController {
     @Param('driverId') driverId: string,
     @Param('status') status: EStatusPath,
   ): Promise<Path> {
-    console.log('');
-    
     return await this.pathService.listOneByDriverAndStatus(driverId, status);
   }
 

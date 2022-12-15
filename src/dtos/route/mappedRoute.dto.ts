@@ -4,7 +4,7 @@ import { MappedVehicleDTO } from '../vehicle/mappedVehicle.dto';
 
 class IPin {
   lat: string;
-  long: string;
+  lng: string;
 }
 
 class IEmployee {

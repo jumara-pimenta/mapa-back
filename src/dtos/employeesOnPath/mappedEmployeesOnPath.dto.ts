@@ -1,6 +1,6 @@
 class IPin {
   lat: string;
-  long: string;
+  lng: string;
 }
 
 class IEmployee {

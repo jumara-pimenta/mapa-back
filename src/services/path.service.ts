@@ -128,8 +128,14 @@ export class PathService {
     return this.mapperMany(path);
   }
 
-  async listOneByDriverAndStatus(driverId: string, status: EStatusPath): Promise<Path> {
-    const path = await this.pathRepository.findByDriverIdAndStatus(driverId, status);
+  async listOneByDriverAndStatus(
+    driverId: string,
+    status: EStatusPath,
+  ): Promise<Path> {
+    const path = await this.pathRepository.findByDriverIdAndStatus(
+      driverId,
+      status,
+    );
 
     if (!path)
       throw new HttpException(
@@ -185,6 +191,7 @@ export class PathService {
 
     return {
       id: path.id,
+      routeDescription: path?.route.description,
       duration: path.duration,
       finishedAt: path.finishedAt,
       startedAt: path.startedAt,
@@ -209,7 +216,7 @@ export class PathService {
             registration: employee.registration,
             location: {
               lat: pins.at(0).pin.lat,
-              long: pins.at(0).pin.long,
+              lng: pins.at(0).pin.lng,
             },
           },
         };
@@ -223,6 +230,7 @@ export class PathService {
 
       return {
         id: path.id,
+        routeDescription: path?.route.description,
         duration: path.duration,
         finishedAt: path.finishedAt,
         startedAt: path.startedAt,
@@ -247,7 +255,7 @@ export class PathService {
               registration: employee.registration,
               location: {
                 lat: pins.at(0).pin.lat,
-                long: pins.at(0).pin.long,
+                lng: pins.at(0).pin.lng,
               },
             },
           };

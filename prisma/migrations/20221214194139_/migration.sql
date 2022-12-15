@@ -123,7 +123,7 @@ CREATE TABLE [dbo].[Pin] (
     [description] VARCHAR(255) NOT NULL,
     [street] VARCHAR(255) NOT NULL,
     [lat] VARCHAR(255) NOT NULL,
-    [long] VARCHAR(255) NOT NULL,
+    [lng] VARCHAR(255) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Pin_pkey] PRIMARY KEY CLUSTERED ([id]),

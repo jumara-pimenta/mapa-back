@@ -61,7 +61,7 @@ export class RouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true,
+                            lng: true,
                           },
                         },
                       },
@@ -81,9 +81,9 @@ export class RouteRepository
 
   findByVehicleId(vehicleId: string): Promise<Route[]> {
     return this.repository.route.findMany({
-      where: { 
-        vehicleId
-       },
+      where: {
+        vehicleId,
+      },
       select: {
         id: true,
         description: true,
@@ -124,7 +124,7 @@ export class RouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true,
+                            lng: true,
                           },
                         },
                       },
@@ -153,6 +153,7 @@ export class RouteRepository
       where: { id: data.id },
     });
   }
+
   softDelete(id: string): Promise<Route> {
     return this.repository.route.update({
       where: { id },
@@ -226,7 +227,7 @@ export class RouteRepository
                         pin: {
                           select: {
                             lat: true,
-                            long: true,
+                            lng: true,
                           },
                         },
                       },
@@ -280,7 +281,7 @@ export class RouteRepository
                             pin: {
                               select: {
                                 lat: true,
-                                long: true,
+                                lng: true,
                               },
                             },
                           },

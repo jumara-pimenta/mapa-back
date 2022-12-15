@@ -26,9 +26,9 @@ export class CreateEmployeePinDTO {
   @IsOptional()
   lat?: string;
 
-  @IsString({ message: '[long] não está definido como string.' })
+  @IsString({ message: '[lng] não está definido como string.' })
   @IsOptional()
-  long?: string;
+  lng?: string;
 
   @IsString({ message: '[street] não está definido como string.' })
   @IsOptional()
