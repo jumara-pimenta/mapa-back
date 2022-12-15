@@ -85,9 +85,9 @@ export class RouteRepository
 
   findByVehicleId(vehicleId: string): Promise<Route[]> {
     return this.repository.route.findMany({
-      where: { 
-        vehicleId
-       },
+      where: {
+        vehicleId,
+      },
       select: {
         id: true,
         description: true,

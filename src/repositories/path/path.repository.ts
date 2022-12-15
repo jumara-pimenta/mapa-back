@@ -12,15 +12,18 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     super();
   }
 
-  findByDriverIdAndStatus(driverId: string, status: EStatusPath): Promise<Path> {
+  findByDriverIdAndStatus(
+    driverId: string,
+    status: EStatusPath,
+  ): Promise<Path> {
     return this.repository.path.findFirst({
       where: {
         status,
         route: {
           driver: {
             id: driverId,
-          }
-        }
+          },
+        },
       },
       select: {
         id: true,
@@ -34,7 +37,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         route: {
           select: {
             description: true,
-          }
+          },
         },
         employeesOnPath: {
           select: {
@@ -105,7 +108,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         route: {
           select: {
             description: true,
-          }
+          },
         },
         employeesOnPath: {
           select: {
@@ -141,12 +144,12 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
 
   findByDriver(driverId: string): Promise<Path[]> {
     return this.repository.path.findMany({
-      where: { 
+      where: {
         route: {
           driver: {
-            id: driverId
-          }
-        }
+            id: driverId,
+          },
+        },
       },
       select: {
         id: true,
@@ -157,6 +160,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startedAt: true,
         finishedAt: true,
         createdAt: true,
+        route: {
+          select: {
+            description: true,
+          },
+        },
         employeesOnPath: {
           select: {
             id: true,
@@ -185,22 +193,17 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             },
           },
         },
-        route: {
-          select: {
-            description: true,
-          }
-        }
       },
     });
   }
 
   findByRoute(routeId: string): Promise<Path[]> {
     return this.repository.path.findMany({
-      where: { 
+      where: {
         route: {
-          id: routeId
+          id: routeId,
         },
-       },
+      },
       select: {
         id: true,
         type: true,
@@ -213,7 +216,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         route: {
           select: {
             description: true,
-          }
+          },
         },
         employeesOnPath: {
           select: {

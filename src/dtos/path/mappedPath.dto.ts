@@ -22,6 +22,7 @@ class IEmployeesOnPathDTO {
 
 export class MappedPathDTO {
   id: string;
+  routeDescription: string;
   duration: string;
   finishedAt?: Date;
   startedAt?: Date;

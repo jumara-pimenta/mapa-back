@@ -168,8 +168,8 @@ export class EmployeesOnPathService {
         shift: employee.shift,
         registration: employee.registration,
         location: {
-          lat: pins.at(0).pin.lat,
-          lng: pins.at(0).pin.lng,
+          lat: pins?.at(0).pin.lat,
+          lng: pins?.at(0).pin.lng,
         },
       },
     };

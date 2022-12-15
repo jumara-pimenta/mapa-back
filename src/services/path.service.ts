@@ -128,8 +128,14 @@ export class PathService {
     return this.mapperMany(path);
   }
 
-  async listOneByDriverAndStatus(driverId: string, status: EStatusPath): Promise<Path> {
-    const path = await this.pathRepository.findByDriverIdAndStatus(driverId, status);
+  async listOneByDriverAndStatus(
+    driverId: string,
+    status: EStatusPath,
+  ): Promise<Path> {
+    const path = await this.pathRepository.findByDriverIdAndStatus(
+      driverId,
+      status,
+    );
 
     if (!path)
       throw new HttpException(
