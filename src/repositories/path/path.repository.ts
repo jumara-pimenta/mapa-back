@@ -64,11 +64,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     pin: {
                       select: {
                         lat: true,
-<<<<<<< HEAD
                         lng: true,
-=======
-                        long: true,
->>>>>>> 538e29d14df65d70073bd3975795a807dff9c008
                       },
                     },
                   },
@@ -112,11 +108,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     pin: {
                       select: {
                         lat: true,
-<<<<<<< HEAD
                         lng: true,
-=======
-                        long: true,
->>>>>>> 538e29d14df65d70073bd3975795a807dff9c008
                       },
                     },
                   },
