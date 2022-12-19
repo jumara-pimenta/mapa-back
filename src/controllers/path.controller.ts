@@ -57,7 +57,7 @@ export class PathController {
     return await this.pathService.update(id, payload);
   }
 
-  @Get('/employees/:employeeId/status/:status')
+  @Get('/paths/employees/:employeeId/status/:status')
   @HttpCode(HttpStatus.OK)
   async getByEmployeeAndStatus(
     @Param('employeeId') employeeId: string,
