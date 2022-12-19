@@ -13,6 +13,7 @@ export class EmployeesOnPath {
   path?: Path;
   createdAt: Date;
   updatedAt?: Date;
+  routeName?: string;
 
   constructor(
     props: Omit<EmployeesOnPath, 'id' | 'createdAt' | 'path' | 'employee'>,

@@ -4,6 +4,7 @@ class IPin {
 }
 
 class IEmployee {
+  id?: string;
   name: string;
   address: string;
   shift: string;

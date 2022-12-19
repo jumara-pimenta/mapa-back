@@ -1,3 +1,4 @@
+
 import { Injectable } from '@nestjs/common';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
@@ -87,6 +88,7 @@ export class RouteRepository
     return this.repository.route.findMany({
       where: {
         vehicleId,
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -211,6 +213,7 @@ export class RouteRepository
                 position: true,
                 employee: {
                   select: {
+                    id: true,
                     name: true,
                     address: true,
                     shift: true,
@@ -379,6 +382,7 @@ export class RouteRepository
       select: {
         id: true,
         type: true,
+        description: true,
         path: {
           select: {
             employeesOnPath: {
@@ -412,3 +416,4 @@ export class RouteRepository
     });
   }
 }
+
