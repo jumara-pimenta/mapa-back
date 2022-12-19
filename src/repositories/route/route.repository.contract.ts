@@ -1,7 +1,7 @@
 import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { Route } from '../../entities/route.entity';
-import { RouteWebsocket } from 'src/entities/routeWebsocket.entity';
+import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
 export default interface IRouteRepository {
   create(data: Route): Promise<Route>;
@@ -12,7 +12,6 @@ export default interface IRouteRepository {
   findByDriverId(id: string): Promise<Route[]>;
   findByVehicleId(id: string): Promise<Route[]>;
   findByEmployeeIds(id: string[]): Promise<Route[]>;
-  findByEmployeeOnPath(id: string): Promise<Route[]>;
   update(data: Route): Promise<Route>;
   updateWebsocket(data: Route): Promise<RouteWebsocket>;
   softDelete(id: string): Promise<Route>;

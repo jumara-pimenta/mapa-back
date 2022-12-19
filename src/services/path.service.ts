@@ -26,7 +26,7 @@ export class PathService {
   ) {}
 
   async generate(props: CreatePathDTO): Promise<void> {
-    const { type, duration, isAutoRoute, startsAt } = props.details;
+    const { type, duration, startsAt } = props.details;
 
     const route = await this.routeService.listById(props.routeId);
 
@@ -122,6 +122,24 @@ export class PathService {
     return await this.pathRepository.update(
       Object.assign(path, { ...path, ...data }),
     );
+  }
+
+  async listByEmployeeAndStatus(
+    employeeId: string,
+    status: EStatusPath,
+  ): Promise<MappedPathDTO> {
+    const path = await this.pathRepository.findByEmployeeAndStatus(
+      employeeId,
+      status,
+    );
+
+    if (!path)
+      throw new HttpException(
+        'O colaborador não possui trajetos em andamento!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(path);
   }
 
   private mapperOne(path: Path): MappedPathDTO {

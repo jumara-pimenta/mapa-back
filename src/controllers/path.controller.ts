@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
+import { EStatusPath } from 'src/utils/ETypes';
 import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
 import { Path } from '../entities/path.entity';
 import { PathService } from '../services/path.service';
@@ -38,5 +39,14 @@ export class PathController {
     @Body() payload: UpdatePathDTO,
   ): Promise<Path> {
     return await this.pathService.update(id, payload);
+  }
+
+  @Get('/employees/:employeeId/status/:status')
+  @HttpCode(HttpStatus.OK)
+  async getByEmployeeAndStatus(
+    @Param('employeeId') employeeId: string,
+    @Param('status') status: EStatusPath,
+  ): Promise<MappedPathDTO> {
+    return await this.pathService.listByEmployeeAndStatus(employeeId, status);
   }
 }
