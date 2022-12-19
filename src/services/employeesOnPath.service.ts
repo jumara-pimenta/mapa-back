@@ -5,7 +5,7 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
+import { UpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import { CreateEmployeesOnPathDTO } from '../dtos/employeesOnPath/createEmployeesOnPath.dto';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
@@ -25,7 +25,7 @@ export class EmployeesOnPathService {
   ) {}
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
-    let position: number = 1;
+    let position = 1;
 
     const path = await this.pathService.listById(props.pathId);
 
@@ -115,7 +115,6 @@ export class EmployeesOnPathService {
     id: string,
     data: UpdateEmployeesOnPathDTO,
   ): Promise<MappedEmployeesOnPathDTO> {
-    console.log('=====>', id, data);
     const employeesOnPath = await this.listById(id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(

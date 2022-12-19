@@ -24,6 +24,19 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             id: driverId,
           },
         },
+      }
+    })
+}
+      
+  findByEmployeeAndStatus(employeeId: string, status: EStatusPath): Promise<Path> {
+    return this.repository.path.findFirst({
+      where: {
+        status,
+        employeesOnPath: {
+          some: {
+            employeeId
+          }
+        }
       },
       select: {
         id: true,

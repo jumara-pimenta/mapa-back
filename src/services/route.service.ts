@@ -36,8 +36,8 @@ export class RouteService {
   ) {}
 
   async create(payload: CreateRouteDTO): Promise<Route> {
-    let employeeArray = [];
-    let employeeArrayPins = [];
+    const employeeArray = [];
+    const employeeArrayPins = [];
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
@@ -82,13 +82,13 @@ export class RouteService {
 
         if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -107,13 +107,13 @@ export class RouteService {
 
         if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -182,7 +182,7 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
-  async listByIdWebsocket(id: string): Promise<any> {
+  async listByIdWebsocket(id: string): Promise<Route> {
     const route = await this.routeRepository.findByIdWebsocket(id);
 
     if (!route)
@@ -191,7 +191,6 @@ export class RouteService {
         HttpStatus.NOT_FOUND,
       );
 
-    // return this.mapperOne(route);
     return route;
   }
 
@@ -208,7 +207,7 @@ export class RouteService {
       );
     }
 
-    const items = this.mapperMany(routes.items);
+    const items = await this.mapperMany(routes.items);
 
     return {
       total: routes.total,
@@ -217,14 +216,14 @@ export class RouteService {
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
-    let employeeArray = [];
-    let employeeArrayPins = [];
+    const employeeArray = [];
+    const employeeArrayPins = [];
 
     const route = await this.listById(id);
 
     if (route.paths[0].finishedAt !== null)
       throw new HttpException(
-        `Não é possível alterar uma rota que já foi finalizada!`,
+        'Não é possível alterar uma rota que já foi finalizada!',
         HttpStatus.CONFLICT,
       );
 
@@ -240,7 +239,7 @@ export class RouteService {
         if (employee.pins.length === 0) {
           employeeArrayPins.push(employee.name);
         }
-        employee.pins.forEach((pin: any) => {
+        employee.pins.forEach((pin) => {
           if (pin.type !== route.type) {
             console.log(pin.type, route.type);
 
@@ -322,7 +321,6 @@ export class RouteService {
       vehicle: dataFilter.vehicle.plate,
       path: dataFilter.path,
     };
-    console.log('dataFilterWebsocket', dataFilterWebsocket);
 
     return dataFilterWebsocket;
   }
@@ -341,12 +339,10 @@ export class RouteService {
   async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
     const route = await this.routeRepository.findById(id);
 
-    const path = await this.pathService.listById(route.path[0].id);
-
     return this.mapperOne(route);
   }
 
-  private mapperMany(routes: Route[]): MappedRouteDTO[] {
+  private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {
     return routes.map((route) => {
       const { driver, vehicle, path } = route;
 

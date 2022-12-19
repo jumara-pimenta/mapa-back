@@ -1,7 +1,7 @@
 import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { Route } from '../../entities/route.entity';
-import { RouteWebsocket } from 'src/entities/routeWebsocket.entity';
+import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
 export default interface IRouteRepository {
   create(data: Route): Promise<Route>;
