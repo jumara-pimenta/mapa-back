@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[Driver] (
     [name] VARCHAR(255) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [cnh] VARCHAR(11) NOT NULL,
-    [validation] DATETIME2 NOT NULL,
+    [validation] DATETIMEOFFSET NOT NULL,
     [category] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Driver_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
@@ -54,7 +54,7 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [id] NVARCHAR(1000) NOT NULL,
     [pathId] NVARCHAR(1000) NOT NULL,
     [employeeId] NVARCHAR(1000) NOT NULL,
-    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 0,
+    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 1,
     [position] INT NOT NULL,
     [boardingAt] DATETIMEOFFSET,
     [disembarkAt] DATETIMEOFFSET,
@@ -83,18 +83,19 @@ CREATE TABLE [dbo].[Vehicle] (
     [plate] NVARCHAR(1000) NOT NULL,
     [company] NVARCHAR(1000) NOT NULL,
     [type] NVARCHAR(1000) NOT NULL,
-    [lastSurvey] DATETIME2 NOT NULL,
-    [expiration] DATETIME2 NOT NULL,
+    [lastSurvey] DATETIMEOFFSET NOT NULL,
+    [expiration] DATETIMEOFFSET NOT NULL,
     [capacity] INT NOT NULL,
     [renavam] VARCHAR(11) NOT NULL,
-    [lastMaintenance] DATETIME2 NOT NULL,
+    [lastMaintenance] DATETIMEOFFSET NOT NULL,
     [note] NVARCHAR(1000) NOT NULL,
     [isAccessibility] BIT NOT NULL CONSTRAINT [Vehicle_isAccessibility_df] DEFAULT 0,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Vehicle_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Vehicle_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Vehicle_id_key] UNIQUE NONCLUSTERED ([id]),
-    CONSTRAINT [Vehicle_plate_key] UNIQUE NONCLUSTERED ([plate])
+    CONSTRAINT [Vehicle_plate_key] UNIQUE NONCLUSTERED ([plate]),
+    CONSTRAINT [Vehicle_renavam_key] UNIQUE NONCLUSTERED ([renavam])
 );
 
 -- CreateTable
@@ -104,7 +105,7 @@ CREATE TABLE [dbo].[Employee] (
     [name] NVARCHAR(1000) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [rg] VARCHAR(9) NOT NULL,
-    [admission] DATETIME2 NOT NULL,
+    [admission] DATETIMEOFFSET NOT NULL,
     [role] NVARCHAR(1000) NOT NULL,
     [shift] NVARCHAR(1000) NOT NULL,
     [costCenter] NVARCHAR(1000) NOT NULL,
@@ -121,10 +122,12 @@ CREATE TABLE [dbo].[Employee] (
 -- CreateTable
 CREATE TABLE [dbo].[Pin] (
     [id] NVARCHAR(1000) NOT NULL,
-    [description] VARCHAR(255) NOT NULL,
+    [title] VARCHAR(255) NOT NULL,
+    [local] VARCHAR(255) NOT NULL,
+    [details] VARCHAR(255) NOT NULL,
     [lat] VARCHAR(255) NOT NULL,
-    [long] VARCHAR(255) NOT NULL,
-    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Pin_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [lng] VARCHAR(255) NOT NULL,
+    [createdAt] DATETIMEOFFSET NOT NULL,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Pin_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Pin_id_key] UNIQUE NONCLUSTERED ([id])
