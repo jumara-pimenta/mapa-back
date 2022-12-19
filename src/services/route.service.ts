@@ -306,6 +306,19 @@ export class RouteService {
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<any> {
+
+    if(payload.path.startedAt){
+      const data = await this.listByIdWebsocket(payload.routeId)
+      console.log(data);
+      
+      if(data.path[0].employeesOnPath.length === 0){
+        throw new HttpException(
+          `Não é possível iniciar uma rota sem colaboradores!`,
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
     await this.update(payload.routeId, payload.route);
 
     await this.pathService.update(payload.pathId, payload.path);
@@ -396,7 +409,9 @@ export class RouteService {
             createdAt: item.createdAt,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
-              const { pins } = employee;
+              // const { pins } = employee;
+
+              
 
               return {
                 id: item.id,
@@ -405,13 +420,13 @@ export class RouteService {
                 disembarkAt: item.disembarkAt,
                 position: item.position,
                 details: {
-                  name: employee.name,
-                  address: employee.address,
-                  shift: employee.shift,
-                  registration: employee.registration,
+                  name: employee?.name,
+                  address: employee?.address,
+                  shift: employee?.shift,
+                  registration: employee?.registration,
                   location: {
-                    lat: pins.at(0).pin.lat,
-                    lng: pins.at(0).pin.lng,
+                    lat: item?.employee?.pins?.at(0)?.pin?.lat ? item?.employee?.pins?.at(0)?.pin?.lat : "",
+                    lng: item?.employee?.pins?.at(0)?.pin?.lng ? item?.employee?.pins?.at(0)?.pin?.lng : "",
                   },
                 },
               };
