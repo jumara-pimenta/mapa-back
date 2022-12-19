@@ -1,7 +1,7 @@
 datasource db {
   provider          = "sqlserver"
   url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -35,6 +35,7 @@ model Route {
   routeHistory RouteHistory[]
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
   updatedAt    DateTime?      @db.DateTimeOffset
+  deletedAt    DateTime?      @db.DateTimeOffset
 }
 
 model Path {
@@ -60,6 +61,7 @@ model EmployeesOnPath {
   employeeId   String
   confirmation Boolean   @default(true)
   position     Int       @db.Int
+  description  String?   @db.VarChar(50)
   boardingAt   DateTime? @db.DateTimeOffset
   disembarkAt  DateTime? @db.DateTimeOffset
   createdAt    DateTime  @default(now()) @db.DateTimeOffset
@@ -82,8 +84,8 @@ model Vehicle {
   plate           String    @unique
   company         String
   type            String
-  lastSurvey      DateTime  @db.DateTimeOffset
-  expiration      DateTime  @db.DateTimeOffset
+  lastSurvey      DateTime
+  expiration      DateTime
   capacity        Int
   renavam         String    @unique @db.VarChar(11)
   lastMaintenance DateTime  @db.DateTimeOffset
@@ -98,8 +100,6 @@ model Employee {
   id             String            @id @unique
   registration   String            @unique
   name           String
-  cpf            String            @unique @db.VarChar(11)
-  rg             String            @unique @db.VarChar(9)
   admission      DateTime          @db.DateTimeOffset
   role           String
   shift          String

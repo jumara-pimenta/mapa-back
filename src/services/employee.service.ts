@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -6,32 +12,27 @@ import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
+import { PinService } from './pin.service';
+import { EmployeesOnPinService } from './employeesOnPin.service';
+import { AssociateEmployeeOnPinDTO } from 'src/dtos/employeesOnPin/associateEmployeeOnPin.dto';
+import { ModuleRef } from '@nestjs/core/injector/module-ref';
 
 @Injectable()
 export class EmployeeService {
   constructor(
     @Inject('IEmployeeRepository')
     private readonly employeeRepository: IEmployeeRepository,
-  ) {}
+    @Inject(forwardRef(() => EmployeesOnPinService))
+    private readonly employeeOnPinService: EmployeesOnPinService,
+    @Inject(forwardRef(() => PinService))
+    private readonly pinService: PinService,
+  ) // private readonly moduleRef: ModuleRef,
+  {}
 
   async create(payload: CreateEmployeeDTO): Promise<Employee> {
-    const CpfExists = await this.employeeRepository.findByCpf(payload.cpf);
-    const RgExists = await this.employeeRepository.findByRg(payload.rg);
     const RegistrationExists = await this.employeeRepository.findByRegistration(
       payload.registration,
     );
-
-    if (CpfExists)
-      throw new HttpException(
-        'CPF cadastrado para outro(a) colaborador(a)',
-        HttpStatus.CONFLICT,
-      );
-
-    if (RgExists)
-      throw new HttpException(
-        'RG cadastrado para outro(a) colaborador(a)',
-        HttpStatus.CONFLICT,
-      );
 
     if (RegistrationExists)
       throw new HttpException(
@@ -84,27 +85,6 @@ export class EmployeeService {
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
     const employee = await this.listById(id);
 
-    if (data.cpf) {
-      const CpfExists = await this.employeeRepository.findByCpf(data.cpf);
-      if (CpfExists && CpfExists.cpf !== employee.cpf) {
-        throw new HttpException(
-          'CPF cadastrado para outro(a) colaborador(a)',
-          HttpStatus.CONFLICT,
-        );
-      }
-    }
-
-    if (data.rg) {
-      const RgExists = await this.employeeRepository.findByRg(data.rg);
-
-      if (RgExists && RgExists.rg !== employee.rg) {
-        throw new HttpException(
-          'RG cadastrado para outro(a) colaborador(a)',
-          HttpStatus.CONFLICT,
-        );
-      }
-    }
-
     if (data.registration) {
       const RegistrationExists =
         await this.employeeRepository.findByRegistration(data.registration);
@@ -137,9 +117,7 @@ export class EmployeeService {
         address: employee.address,
         admission: employee.admission,
         costCenter: employee.costCenter,
-        cpf: employee.cpf,
         registration: employee.registration,
-        rg: employee.rg,
         role: employee.role,
         shift: employee.shift,
         createdAt: employee.createdAt,

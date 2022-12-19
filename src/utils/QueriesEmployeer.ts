@@ -10,12 +10,6 @@ export function generateQueryForEmployee(
     registration: () => ({
       registration: filters.registration,
     }),
-    cpf: () => ({
-      cpf: filters.cpf,
-    }),
-    rg: () => ({
-      rg: filters.rg,
-    }),
     admission: () => ({
       admission: filters.admission,
     }),

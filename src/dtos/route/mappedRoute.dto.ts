@@ -1,7 +1,3 @@
-import { Path } from '../../entities/path.entity';
-import { MappedDriverDTO } from '../driver/mappedDriver.dto';
-import { MappedVehicleDTO } from '../vehicle/mappedVehicle.dto';
-
 class IPin {
   lat: string;
   lng: string;
@@ -73,4 +69,5 @@ export class MappedRouteDTO {
   createdAt: Date;
   paths: IPath[];
   vehicle: IVehicle;
+  quantityEmployees: number;
 }

@@ -1,12 +1,10 @@
-import { Controller, Get, HttpCode, HttpStatus, Param } from "@nestjs/common";
-import { RouteHistory } from "../entities/routeHistory.entity";
-import { RouteHistoryService } from "../services/routeHistory.service";
+import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import { RouteHistory } from '../entities/routeHistory.entity';
+import { RouteHistoryService } from '../services/routeHistory.service';
 
-@Controller("/api/routes/histories")
+@Controller('/api/routes/histories')
 export class RouteHistoryController {
-  constructor(
-    private readonly RouteHistoryService: RouteHistoryService
-  ) { }
+  constructor(private readonly RouteHistoryService: RouteHistoryService) {}
 
   @Get('/:id')
   @HttpCode(HttpStatus.OK)

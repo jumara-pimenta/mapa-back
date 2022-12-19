@@ -3,4 +3,3 @@ export class IntegrationException extends Error {
     super(error);
   }
 }
-  

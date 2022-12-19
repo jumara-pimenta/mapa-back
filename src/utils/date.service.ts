@@ -1,10 +1,14 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
-import { differenceInDays, differenceInSeconds, isDate } from "date-fns";
-import { zonedTimeToUtc } from "date-fns-tz";
-import { dateInFormatOneRgx, dateInFormatThreeRgx, dateInFormatTwoRgx } from "./Regex";
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
+import { zonedTimeToUtc } from 'date-fns-tz';
+import {
+  dateInFormatOneRgx,
+  dateInFormatThreeRgx,
+  dateInFormatTwoRgx,
+} from './Regex';
 
 export function getDateInLocaleTime(date: Date): Date {
-  const newDate = zonedTimeToUtc(date, "UTC");
+  const newDate = zonedTimeToUtc(date, 'UTC');
 
   return newDate;
 }
@@ -22,11 +26,13 @@ export function getDifferenceInDays(currentDay: Date, lastDay: Date): number {
 }
 
 export function resetHour(date: Date) {
-  const frozenTime = "T00:00:00.000Z"
+  const frozenTime = 'T00:00:00.000Z';
 
   const dayMonthAndYearExtracted = date.toJSON();
 
-  const dateWithZeroHour = new Date(dayMonthAndYearExtracted.substring(0,10) + frozenTime);
+  const dateWithZeroHour = new Date(
+    dayMonthAndYearExtracted.substring(0, 10) + frozenTime,
+  );
 
   return dateWithZeroHour;
 }
@@ -48,8 +54,8 @@ export function verifyAndFormatDate(date: string): Date {
 
     dateInString = `${year}-${month}-${day}`;
 
-    return dateInFormatExpected = resetHour(new Date(dateInString));
-  } 
+    return (dateInFormatExpected = resetHour(new Date(dateInString)));
+  }
 
   if (date.match(dateInFormatTwoRgx)) {
     regExpMatchDate = date.match(dateInFormatTwoRgx);
@@ -60,8 +66,8 @@ export function verifyAndFormatDate(date: string): Date {
 
     dateInString = `${year}-${month}-${day}`;
 
-    return dateInFormatExpected = resetHour(new Date(dateInString));
-  } 
+    return (dateInFormatExpected = resetHour(new Date(dateInString)));
+  }
 
   if (date.match(dateInFormatThreeRgx)) {
     regExpMatchDate = date.match(dateInFormatThreeRgx);
@@ -72,19 +78,27 @@ export function verifyAndFormatDate(date: string): Date {
 
     dateInString = `${year}-${month}-${day}`;
 
-    return dateInFormatExpected = resetHour(new Date(dateInString));
+    return (dateInFormatExpected = resetHour(new Date(dateInString)));
   }
 
-  const dateInFormatValue = new Date(date)
+  const dateInFormatValue = new Date(date);
 
   if (!isDate(dateInFormatValue)) {
-    throw new HttpException(`Formato de data inválido. Foi enviado "${date}", mas esperava ['dd-mm-aaaa', 'aaaa-mm-dd' or 'dd/mm/aaaa']`, 
-    HttpStatus.BAD_REQUEST
+    throw new HttpException(
+      `Formato de data inválido. Foi enviado "${date}", mas esperava ['dd-mm-aaaa', 'aaaa-mm-dd' or 'dd/mm/aaaa']`,
+      HttpStatus.BAD_REQUEST,
     );
   }
 }
 
 export function convertTimeToDate(hour: string): Date {
-  const timeSplited = hour.split(':')
-  return new Date(2000, 1, 1, Number(timeSplited[0]), Number(timeSplited[1]), 0)
+  const timeSplited = hour.split(':');
+  return new Date(
+    2000,
+    1,
+    1,
+    Number(timeSplited[0]),
+    Number(timeSplited[1]),
+    0,
+  );
 }

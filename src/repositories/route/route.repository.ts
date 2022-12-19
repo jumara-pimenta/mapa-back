@@ -7,13 +7,18 @@ import { getDateInLocaleTime } from '../../utils/date.service';
 import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
+import { DriverService } from '../../services/driver.service';
+import { RouteWebsocket } from 'src/entities/routeWebsocket.entity';
 
 @Injectable()
 export class RouteRepository
   extends Pageable<Route>
   implements IRouteRepository
 {
-  constructor(private readonly repository: PrismaService) {
+  constructor(
+    private readonly repository: PrismaService,
+    private readonly driverService: DriverService,
+  ) {
     super();
   }
 
@@ -25,6 +30,20 @@ export class RouteRepository
 
   update(data: Route): Promise<Route> {
     return this.repository.route.update({
+      data: {
+        id: data.id,
+        description: data.description,
+        distance: data.distance,
+        status: data.status,
+        type: data.type,
+        updatedAt: getDateInLocaleTime(new Date()),
+      },
+      where: { id: data.id },
+    });
+  }
+
+  async updateWebsocket(data: Route): Promise<RouteWebsocket> {
+    return await this.repository.route.update({
       data: {
         id: data.id,
         description: data.description,
@@ -96,6 +115,67 @@ export class RouteRepository
     });
   }
 
+  async findByIdWebsocket(id: string): Promise<any> {
+    const data = await this.repository.route.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        description: true,
+        distance: true,
+        driver: { select: { name: true } },
+        status: true,
+        type: true,
+        createdAt: true,
+        path: {
+          select: {
+            id: true,
+            duration: true,
+            finishedAt: true,
+            startedAt: true,
+            startsAt: true,
+            status: true,
+            type: true,
+            createdAt: true,
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              select: {
+                id: true,
+                boardingAt: true,
+                confirmation: true,
+                disembarkAt: true,
+                position: true,
+                employee: {
+                  select: {
+                    name: true,
+                    address: true,
+                    shift: true,
+                    registration: true,
+                    pins: {
+                      select: {
+                        type: true,
+                        pin: {
+                          select: {
+                            lat: true,
+                            lng: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: { select: { plate: true } },
+      },
+    });
+
+    return data;
+  }
+
   async findAll(
     page: Page,
     filters: FiltersRouteDTO,
@@ -105,7 +185,10 @@ export class RouteRepository
     const items = condition
       ? await this.repository.route.findMany({
           ...this.buildPage(page),
-          where: condition,
+          where: {
+            ...condition,
+            deletedAt: null,
+          },
           include: {
             driver: true,
             path: {
@@ -118,6 +201,9 @@ export class RouteRepository
         })
       : await this.repository.route.findMany({
           ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+          },
           include: {
             driver: true,
             path: {
@@ -129,6 +215,7 @@ export class RouteRepository
                   include: {
                     employee: {
                       select: {
+                        name: true,
                         pins: {
                           include: {
                             pin: {
@@ -153,9 +240,14 @@ export class RouteRepository
       ? await this.repository.route.findMany({
           where: {
             ...condition,
+            deletedAt: null,
           },
         })
-      : await this.repository.route.count();
+      : await this.repository.route.count({
+          where: {
+            deletedAt: null,
+          },
+        });
 
     return this.buildPageResponse(
       items,
@@ -181,6 +273,39 @@ export class RouteRepository
     return this.repository.route.findMany({
       where: {
         driverId: id,
+        deletedAt: null,
+        path: {
+          every: {
+            finishedAt: null,
+          },
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+        path: {
+          select: {
+            startedAt: true,
+            finishedAt: true,
+            status: true,
+            startsAt: true,
+            duration: true,
+          },
+        },
+      },
+    });
+  }
+
+  findByVehicleId(id: string): Promise<any> {
+    return this.repository.route.findMany({
+      where: {
+        vehicleId: id,
+        deletedAt: null,
+        path: {
+          every: {
+            finishedAt: null,
+          },
+        },
       },
       select: {
         id: true,
@@ -200,7 +325,11 @@ export class RouteRepository
   findByEmployeeIds(id: string[]): Promise<any> {
     return this.repository.route.findMany({
       where: {
+        deletedAt: null,
         path: {
+          every: {
+            finishedAt: null,
+          },
           some: {
             employeesOnPath: {
               some: {
@@ -215,7 +344,6 @@ export class RouteRepository
       select: {
         id: true,
         type: true,
-
         path: {
           select: {
             employeesOnPath: {
@@ -235,6 +363,16 @@ export class RouteRepository
             duration: true,
           },
         },
+      },
+    });
+  }
+
+  async softDelete(id: string): Promise<Route> {
+    return this.repository.route.update({
+      where: { id },
+      data: {
+        status: 'deleted',
+        deletedAt: getDateInLocaleTime(new Date()),
       },
     });
   }

@@ -1,21 +1,39 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import {
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
+import { EStatusPath, ETypePath } from 'src/utils/ETypes';
 
 export class UpdatePathDTO {
-  @IsString()
+  @IsString({ message: 'Description não está definida como string.' })
   @IsOptional()
-  process?: string
+  process?: string;
 
-  @IsString()
-  @MaxLength(15)
+  @IsString({ message: 'Product não está definida como string.' })
+  @MaxLength(15, { message: 'Product não pode ter mais de 15 caracteres.' })
   @IsOptional()
-  product?: string
+  product?: string;
 
-  @IsString()
-  @IsOptional()
-  sequenceQr?: number
+  @IsString({ message: 'Sequence não está definida como string.' })
+  @IsOptional({ message: 'Sequence não pode receber um valor vazio.' })
+  sequenceQr?: number;
 
-  @MinLength(2)
-  @MaxLength(3)
+  @IsEnum(ETypePath, { message: 'Type não está definida como enum.' })
   @IsOptional()
-  type?: string
+  type?: ETypePath;
+
+  @IsEnum(EStatusPath, { message: 'Status não está definida como enum.' })
+  @IsOptional()
+  status?: EStatusPath;
+
+  @IsOptional()
+  @IsDateString()
+  startedAt?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  finishedAt?: Date;
 }

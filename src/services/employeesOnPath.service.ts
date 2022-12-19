@@ -5,7 +5,7 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
+import { UpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import { CreateEmployeesOnPathDTO } from '../dtos/employeesOnPath/createEmployeesOnPath.dto';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
@@ -124,6 +124,18 @@ export class EmployeesOnPathService {
     return this.mappedOne(updatedEmployeeOnPath);
   }
 
+  async updateWebsocket(
+    id: string,
+    data: UpdateEmployeesOnPathDTO,
+  ): Promise<void> {
+    console.log('=====>', id, data);
+    const employeesOnPath = await this.listById(id);
+
+    await this.employeesOnPathRepository.update(
+      Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
+    );
+  }
+
   async updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
     const employeesOnPath = await this.findById(payload.id);
 
@@ -155,8 +167,8 @@ export class EmployeesOnPathService {
         shift: employee.shift,
         registration: employee.registration,
         location: {
-          lat: pins.at(0).pin.lat,
-          long: pins.at(0).pin.lng,
+          lat: pins?.at(0).pin.lat,
+          lng: pins?.at(0).pin.lng,
         },
       },
     };
@@ -183,7 +195,7 @@ export class EmployeesOnPathService {
           registration: employee.registration,
           location: {
             lat: pins.at(0).pin.lat,
-            long: pins.at(0).pin.lng,
+            lng: pins.at(0).pin.lng,
           },
         },
       };
