@@ -211,7 +211,7 @@ export class RouteService {
       );
     }
 
-    const items = this.mapperMany(routes.items);
+    const items = await this.mapperMany(routes.items);
 
     return {
       total: routes.total,
@@ -343,7 +343,13 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
-  private mapperMany(routes: Route[]): MappedRouteDTO[] {
+  async employeeOnPaths(id: string): Promise<MappedRouteDTO[]> {
+    const paths = await this.routeRepository.findByEmployeeOnPath(id);
+
+    return this.mapperMany(paths);
+  }
+
+  private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {
     return routes.map((route) => {
       const { driver, vehicle, path } = route;
 

@@ -1,3 +1,4 @@
+import { Employee } from '@prisma/client';
 import {
   Body,
   Controller,
@@ -56,5 +57,11 @@ export class RouteController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<MappedRouteDTO> {
     return await this.routeService.listById(id);
+  }
+
+  @Get('/employee/:id')
+  @HttpCode(HttpStatus.OK)
+  async employee(@Param('id') id: string): Promise<MappedRouteDTO[]> {
+    return await this.routeService.employeeOnPaths(id);
   }
 }

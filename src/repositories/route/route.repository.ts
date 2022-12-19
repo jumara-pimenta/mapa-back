@@ -367,6 +367,63 @@ export class RouteRepository
     });
   }
 
+  findByEmployeeOnPath(id: string): Promise<Route[]> {
+    return this.repository.route.findMany({
+      where: {
+        deletedAt: null,
+        path: {
+          some: {
+            employeesOnPath: {
+              some: {
+                employeeId: {
+                  in: id,
+                },
+              },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        type: true,
+        distance: true,
+        driver: true,
+        driverId: true,
+        vehicle: true,
+        status: true,
+        description: true,
+        vehicleId: true,
+        updatedAt: true,
+        routeHistory: true,
+        createdAt: true,
+        path: {
+          select: {
+            employeesOnPath: {
+              select: {
+                boardingAt: true,
+                confirmation: true,
+                description: true,
+                position: true,
+                disembarkAt: true,
+                employee: {
+                  select: {
+                    name: true,
+                    id: true,
+                  },
+                },
+              },
+            },
+            startedAt: true,
+            finishedAt: true,
+            status: true,
+            startsAt: true,
+            duration: true,
+          },
+        },
+      },
+    });
+  }
+
   async softDelete(id: string): Promise<Route> {
     return this.repository.route.update({
       where: { id },
