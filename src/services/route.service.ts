@@ -51,11 +51,6 @@ export class RouteService {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
       }
-      // employee.pins.forEach((pin: any) => {
-      //   if (pin.type !== payload.type) {
-      //     employeeArrayPins.push(employee.name);
-      //   }
-      // });
     });
 
     if (employeeArrayPins.length > 0) {
@@ -182,8 +177,9 @@ export class RouteService {
         HttpStatus.NOT_FOUND,
       );
 
-    const dto = this.mapperOne(route);
-    return dto;
+      
+
+    return this.mapperOne(route);
   }
 
   async listByIdWebsocket(id: string): Promise<any> {
@@ -204,7 +200,6 @@ export class RouteService {
     filters?: FiltersRouteDTO,
   ): Promise<PageResponse<MappedRouteDTO>> {
     const routes = await this.routeRepository.findAll(page, filters);
-    console.log(routes);
 
     if (routes.total === 0) {
       throw new HttpException(
@@ -255,7 +250,7 @@ export class RouteService {
       });
 
       employeeInRoute
-        .filter((r) => r.id != id && route.type === r.type)
+        .filter((_r) => _r.id != id && route.type === _r.type)
         .forEach((routeItem: Route) => {
           routeItem.path.forEach((path) => {
             const employeeInPath = path.employeesOnPath.filter((item) =>
@@ -270,11 +265,8 @@ export class RouteService {
           });
         });
       if (employeeArray.length > 0) {
-        /* const msg = `O(s) colaborador(es)${employeeArray.map((item) =>
-          item.map((employee) => ' ' + employee.employee.name),
-        )} já está(ão) em uma rota do tipo ${route.type.toLocaleLowerCase()}!`;
- */
-        const msg = `Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
+        
+        throw new HttpException(`Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
           (item) =>
             item.map(
               (employee) =>
@@ -283,9 +275,7 @@ export class RouteService {
                 ' Rota: ' +
                 employee.routeName,
             ),
-        )}`;
-
-        throw new HttpException(msg, HttpStatus.CONFLICT);
+        )}`, HttpStatus.CONFLICT);
       }
       if (employeeArrayPins.length > 0) {
         throw new HttpException(
@@ -294,7 +284,6 @@ export class RouteService {
         );
       }
 
-      // for await delete old paths
       for await (const path of route.paths) {
         await this.pathService.delete(path.id);
       }
