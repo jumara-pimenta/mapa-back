@@ -1,3 +1,4 @@
+
 import {
   forwardRef,
   HttpException,
@@ -50,11 +51,11 @@ export class RouteService {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
       }
-      employee.pins.forEach((pin: any) => {
-        if (pin.type !== payload.type) {
-          employeeArrayPins.push(employee.name);
-        }
-      });
+      // employee.pins.forEach((pin: any) => {
+      //   if (pin.type !== payload.type) {
+      //     employeeArrayPins.push(employee.name);
+      //   }
+      // });
     });
 
     if (employeeArrayPins.length > 0) {
@@ -175,14 +176,14 @@ export class RouteService {
 
   async listById(id: string): Promise<MappedRouteDTO> {
     const route = await this.routeRepository.findById(id);
-
     if (!route)
       throw new HttpException(
         `Não foi encontrada uma rota com o id: ${id}!`,
         HttpStatus.NOT_FOUND,
       );
 
-    return this.mapperOne(route);
+    const dto = this.mapperOne(route);
+    return dto;
   }
 
   async listByIdWebsocket(id: string): Promise<any> {
@@ -203,6 +204,7 @@ export class RouteService {
     filters?: FiltersRouteDTO,
   ): Promise<PageResponse<MappedRouteDTO>> {
     const routes = await this.routeRepository.findAll(page, filters);
+    console.log(routes);
 
     if (routes.total === 0) {
       throw new HttpException(
@@ -232,9 +234,8 @@ export class RouteService {
       );
 
     if (data.employeeIds) {
-      const employeeInRoute = await this.routeRepository.findByEmployeeIds(
-        data.employeeIds,
-      );
+      const employeeInRoute: Route[] =
+        await this.routeRepository.findByEmployeeIds(data.employeeIds);
 
       const employeesPins = await this.employeeService.listAllEmployeesPins(
         data.employeeIds,
@@ -253,25 +254,38 @@ export class RouteService {
         });
       });
 
-      employeeInRoute.forEach((routeItem: Route) => {
-        routeItem.path.forEach((path) => {
-          const employeeInPath = path.employeesOnPath.filter((item) => {
-            if (route.type === routeItem.type) {
-              data.employeeIds.includes(item.employee.id);
+      employeeInRoute
+        .filter((r) => r.id != id && route.type === r.type)
+        .forEach((routeItem: Route) => {
+          routeItem.path.forEach((path) => {
+            const employeeInPath = path.employeesOnPath.filter((item) =>
+              data.employeeIds.includes(item.employee.id),
+            );
+            employeeInPath.forEach((r) => {
+              r.routeName = routeItem.description;
+            });
+            if (employeeInPath) {
+              employeeArray.push(employeeInPath);
             }
           });
-
-          employeeArray.push(employeeInPath);
         });
-      });
-
       if (employeeArray.length > 0) {
-        throw new HttpException(
-          `O(s) colaborador(es)${employeeArray.map((item) =>
-            item.map((employee) => ' ' + employee.employee.name),
-          )} já está(ão) em uma rota do tipo ${route.type.toLocaleLowerCase()}!`,
-          HttpStatus.CONFLICT,
-        );
+        /* const msg = `O(s) colaborador(es)${employeeArray.map((item) =>
+          item.map((employee) => ' ' + employee.employee.name),
+        )} já está(ão) em uma rota do tipo ${route.type.toLocaleLowerCase()}!`;
+ */
+        const msg = `Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
+          (item) =>
+            item.map(
+              (employee) =>
+                ' Nome: ' +
+                employee.employee.name +
+                ' Rota: ' +
+                employee.routeName,
+            ),
+        )}`;
+
+        throw new HttpException(msg, HttpStatus.CONFLICT);
       }
       if (employeeArrayPins.length > 0) {
         throw new HttpException(
@@ -478,6 +492,7 @@ export class RouteService {
               disembarkAt: item.disembarkAt,
               position: item.position,
               details: {
+                id: employee.id,
                 name: employee.name,
                 address: employee.address,
                 shift: employee.shift,
