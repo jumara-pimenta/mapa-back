@@ -115,7 +115,6 @@ export class EmployeesOnPathService {
     id: string,
     data: UpdateEmployeesOnPathDTO,
   ): Promise<MappedEmployeesOnPathDTO> {
-    console.log('=====>', id, data);
     const employeesOnPath = await this.listById(id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
@@ -129,7 +128,6 @@ export class EmployeesOnPathService {
     id: string,
     data: UpdateEmployeesOnPathDTO,
   ): Promise<void> {
-    console.log('=====>', id, data);
     const employeesOnPath = await this.listById(id);
 
     await this.employeesOnPathRepository.update(

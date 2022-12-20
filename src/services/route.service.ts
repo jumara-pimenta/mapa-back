@@ -252,16 +252,13 @@ export class RouteService {
       employeesPins.forEach((employee: Employee) => {
         employee.pins.forEach((pin: any) => {
           if (pin.type === route.type) {
-            console.log(pin.type, route.type);
             
             _employee.push(employee.name);
           }
-          console.log(_employee.length);
           
         });
         if (_employee.length < 1) employeeArrayPins.push(employee.name);
       });
-      console.log(employeeArrayPins);
 
       employeeInRoute
         .filter((_r) => _r.id != id && route.type === _r.type)
@@ -442,8 +439,8 @@ export class RouteService {
                   shift: employee?.shift,
                   registration: employee?.registration,
                   location: {
-                    lat: item?.employee?.pins?.at(0)?.pin?.lat ? item?.employee?.pins?.at(0)?.pin?.lat : "",
-                    lng: item?.employee?.pins?.at(0)?.pin?.lng ? item?.employee?.pins?.at(0)?.pin?.lng : "",
+                    lat: item?.employee?.pins?.at(0)?.pin?.lat,
+                    lng: item?.employee?.pins?.at(0)?.pin?.lng,
                   },
                 },
               };
