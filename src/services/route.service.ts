@@ -51,7 +51,6 @@ export class RouteService {
         employeeArrayPins.push(employee.name);
       }
       const _employee = [];
-      console.log(employee.pins);
 
       employee.pins.forEach((item: any) => {
         if (item.type === payload.type) {
@@ -314,7 +313,6 @@ export class RouteService {
   async updateWebsocket(payload: StatusRouteDTO): Promise<any> {
     if (payload.path.startedAt) {
       const data = await this.listByIdWebsocket(payload.routeId);
-      console.log(data);
 
       if (data.path[0].employeesOnPath.length === 0) {
         throw new HttpException(

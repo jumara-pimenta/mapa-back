@@ -25,8 +25,7 @@ export class WebsocketGateway {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Client connected');
+      console.log('🔗client connected:', socket.id);
     });
   }
 
@@ -35,7 +34,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -57,7 +55,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -84,7 +81,6 @@ export class WebsocketGateway {
         ...data,
       });
     } catch (error) {
-      console.log(error);
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
@@ -95,7 +91,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -131,7 +126,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -139,7 +133,6 @@ export class WebsocketGateway {
     payload: WebsocketUpdateEmployeesStatusOnPathDTO,
   ): Promise<void> {
     try {
-      console.log('==>==>=>', payload);
 
       await this.employeesOnPathService.updateWebsocket(
         payload.employeeOnPathId,
@@ -151,7 +144,6 @@ export class WebsocketGateway {
         ...data,
       });
     } catch (error) {
-      console.log(error);
 
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
