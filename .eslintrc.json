@@ -30,6 +30,6 @@
             "error",
             "omitLastInOneLineBlock"
         ],
-        "@typescript-eslint/ban-types": "off"
+        "@typescript-eslint/ban-types": "never"
     }
 }

@@ -1,4 +1,3 @@
-
 import {
   forwardRef,
   HttpException,
@@ -53,7 +52,7 @@ export class RouteService {
       }
       const _employee = [];
       console.log(employee.pins);
-      
+
       employee.pins.forEach((item: any) => {
         if (item.type === payload.type) {
           _employee.push(employee.name);
@@ -135,7 +134,6 @@ export class RouteService {
           if (payload.type === route.type) {
             return payload.employeeIds.includes(item.employee.id);
           }
-          
         });
 
         employeeArray.push(employeeInPath);
@@ -187,8 +185,6 @@ export class RouteService {
         HttpStatus.NOT_FOUND,
       );
 
-      
-
     return this.mapperOne(route);
   }
 
@@ -238,23 +234,19 @@ export class RouteService {
       );
 
     if (data.employeeIds) {
-
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
 
       const employeesPins = await this.employeeService.listAllEmployeesPins(
         data.employeeIds,
       );
-      
 
       const _employee = [];
       employeesPins.forEach((employee: Employee) => {
         employee.pins.forEach((pin: any) => {
           if (pin.type === route.type) {
-            
             _employee.push(employee.name);
           }
-          
         });
         if (_employee.length < 1) employeeArrayPins.push(employee.name);
       });
@@ -266,10 +258,9 @@ export class RouteService {
             const employeeInPath = path.employeesOnPath.filter((item) =>
               data.employeeIds.includes(item.employee.id),
             );
-            
+
             employeeInPath.forEach((__r) => {
               __r.routeName = routeItem.description;
-              
             });
             if (employeeInPath) {
               employeeArray.push(employeeInPath);
@@ -277,19 +268,21 @@ export class RouteService {
           });
         });
       if (employeeArray.length > 0) {
-        
-        throw new HttpException(`Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
-          (item) =>
-            item.map(
-              (employee) =>
-                ' Nome: ' +
-                employee.employee.name +
-                ' Rota: ' +
-                employee.routeName,
-            ),
-        )}`, HttpStatus.CONFLICT);
+        throw new HttpException(
+          `Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
+            (item) =>
+              item.map(
+                (employee) =>
+                  ' Nome: ' +
+                  employee.employee.name +
+                  ' Rota: ' +
+                  employee.routeName,
+              ),
+          )}`,
+          HttpStatus.CONFLICT,
+        );
       }
-      
+
       if (employeeArrayPins.length > 0) {
         throw new HttpException(
           `O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto em rota do tipo ${route.type.toLocaleLowerCase()}!`,
@@ -319,14 +312,13 @@ export class RouteService {
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<any> {
-
-    if(payload.path.startedAt){
-      const data = await this.listByIdWebsocket(payload.routeId)
+    if (payload.path.startedAt) {
+      const data = await this.listByIdWebsocket(payload.routeId);
       console.log(data);
-      
-      if(data.path[0].employeesOnPath.length === 0){
+
+      if (data.path[0].employeesOnPath.length === 0) {
         throw new HttpException(
-          `Não é possível iniciar uma rota sem colaboradores!`,
+          'Não é possível iniciar uma rota sem colaboradores!',
           HttpStatus.CONFLICT,
         );
       }
@@ -420,8 +412,6 @@ export class RouteService {
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
               // const { pins } = employee;
-
-              
 
               return {
                 id: item.id,
