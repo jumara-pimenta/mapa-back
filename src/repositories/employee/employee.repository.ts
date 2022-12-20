@@ -43,7 +43,20 @@ export class EmployeeRepository
     return this.repository.employee.findUnique({
       where: { id },
       include: {
-        pins: true,
+        pins: {
+          select: {
+            pin: {
+              select: {
+                id: true,
+                details: true,
+                lat: true,
+                lng: true,
+                local: true,
+                title: true
+              }
+            }
+          }
+        },
       },
     });
   }
