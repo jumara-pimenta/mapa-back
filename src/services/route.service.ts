@@ -411,7 +411,6 @@ export class RouteService {
             createdAt: item.createdAt,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
-              // const { pins } = employee;
 
               return {
                 id: item.id,
