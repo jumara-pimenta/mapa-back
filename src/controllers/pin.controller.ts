@@ -14,7 +14,7 @@ import { Pin } from '../entities/pin.entity';
 import { PinService } from '../services/pin.service';
 import { CreatePinDTO } from '../dtos/pin/createPin.dto';
 import { UpdatePinDTO } from '../dtos/pin/updatePin.dto';
-import { FiltersPinDTO } from 'src/dtos/pin/filtersPin.dto';
+import { FiltersPinDTO } from '../dtos/pin/filtersPin.dto';
 import { Page, PageResponse } from '../configs/database/page.model';
 
 @Controller('/api/pins')

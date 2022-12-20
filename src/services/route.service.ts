@@ -17,10 +17,10 @@ import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import { EStatusRoute, ETypePath } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate } from 'src/utils/date.service';
+import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
-import { Employee } from 'src/entities/employee.entity';
-import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
+import { Employee } from '../entities/employee.entity';
+import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 
 @Injectable()
 export class RouteService {

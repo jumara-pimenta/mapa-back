@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryForEmployee } from 'src/utils/QueriesEmployeer';
+import { generateQueryForEmployee } from '../../utils/QueriesEmployeer';
 
 @Injectable()
 export class EmployeeRepository

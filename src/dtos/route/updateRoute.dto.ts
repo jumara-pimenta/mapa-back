@@ -3,10 +3,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
-import { EStatusRoute, ETypeRoute } from 'src/utils/ETypes';
+import { EStatusRoute, ETypeRoute } from '../../utils/ETypes';
 
 export class UpdateRouteDTO {
   @IsString({ message: '[Description] não está definida como string.' })

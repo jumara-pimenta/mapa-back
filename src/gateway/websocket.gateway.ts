@@ -4,19 +4,16 @@ import {
   WebSocketGateway,
   WebSocketServer,
   MessageBody,
-  WsResponse,
   WsException,
 } from '@nestjs/websockets';
-import { Observable } from 'rxjs';
 import { Server } from 'socket.io';
-import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { WebsocketUpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
-import { CurrentLocalDTO } from 'src/dtos/websocket/currentLocal.dto';
-import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
-import { EmployeesOnPathService } from 'src/services/employeesOnPath.service';
-import { RouteService } from 'src/services/route.service';
-import { getDateInLocaleTime } from 'src/utils/date.service';
-import { EStatusRoute } from 'src/utils/ETypes';
+import { WebsocketUpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
+import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
+import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
+import { EmployeesOnPathService } from '../services/employeesOnPath.service';
+import { RouteService } from '../services/route.service';
+import { getDateInLocaleTime } from '../utils/date.service';
+import { EStatusRoute } from '../utils/ETypes';
 
 @WebSocketGateway()
 export class WebsocketGateway {

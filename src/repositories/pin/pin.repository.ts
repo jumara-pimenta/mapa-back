@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Pin } from '../../entities/pin.entity';
 import IPinRepository from './pin.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryForPins } from 'src/utils/QueriesPins';
+import { generateQueryForPins } from '../../utils/QueriesPins';
 
 @Injectable()
 export class PinRepository extends Pageable<Pin> implements IPinRepository {
