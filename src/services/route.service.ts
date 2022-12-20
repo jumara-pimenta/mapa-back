@@ -51,6 +51,15 @@ export class RouteService {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
       }
+      const _employee = [];
+      console.log(employee.pins);
+      
+      employee.pins.forEach((item: any) => {
+        if (item.type === payload.type) {
+          _employee.push(employee.name);
+        }
+        if (_employee.length === 0) employeeArrayPins.push(employee.name);
+      });
     });
 
     if (employeeArrayPins.length > 0) {
@@ -126,6 +135,7 @@ export class RouteService {
           if (payload.type === route.type) {
             return payload.employeeIds.includes(item.employee.id);
           }
+          
         });
 
         employeeArray.push(employeeInPath);
@@ -229,25 +239,29 @@ export class RouteService {
       );
 
     if (data.employeeIds) {
+
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
 
       const employeesPins = await this.employeeService.listAllEmployeesPins(
         data.employeeIds,
       );
+      
 
+      const _employee = [];
       employeesPins.forEach((employee: Employee) => {
-        if (employee.pins.length === 0) {
-          employeeArrayPins.push(employee.name);
-        }
-        const _employee = [];
         employee.pins.forEach((pin: any) => {
           if (pin.type === route.type) {
+            console.log(pin.type, route.type);
+            
             _employee.push(employee.name);
           }
-          if (_employee.length === 0) employeeArrayPins.push(employee.name);
+          console.log(_employee.length);
+          
         });
+        if (_employee.length < 1) employeeArrayPins.push(employee.name);
       });
+      console.log(employeeArrayPins);
 
       employeeInRoute
         .filter((_r) => _r.id != id && route.type === _r.type)
@@ -256,8 +270,10 @@ export class RouteService {
             const employeeInPath = path.employeesOnPath.filter((item) =>
               data.employeeIds.includes(item.employee.id),
             );
-            employeeInPath.forEach((r) => {
-              r.routeName = routeItem.description;
+            
+            employeeInPath.forEach((__r) => {
+              __r.routeName = routeItem.description;
+              
             });
             if (employeeInPath) {
               employeeArray.push(employeeInPath);
@@ -277,6 +293,7 @@ export class RouteService {
             ),
         )}`, HttpStatus.CONFLICT);
       }
+      
       if (employeeArrayPins.length > 0) {
         throw new HttpException(
           `O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto em rota do tipo ${route.type.toLocaleLowerCase()}!`,
