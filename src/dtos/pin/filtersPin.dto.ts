@@ -1,5 +1,5 @@
 export class FiltersPinDTO {
-  description?: string
-  lat?: string 
-  long?: string
+  title?: string;
+  local?: string;
+  details?: string;
 }

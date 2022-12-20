@@ -1,18 +1,19 @@
-import { Injectable } from "@nestjs/common";
-import { Pageable } from "../../configs/database/pageable.service";
-import { PrismaService } from "../../configs/database/prisma.service";
-import IEmployeesOnPathRepository from "./employeesOnPath.repository.contract";
-import { getDateInLocaleTime } from "../../utils/date.service";
-import { EmployeesOnPath } from "../../entities/employeesOnPath.entity";
-import { Page, PageResponse } from "../../configs/database/page.model";
-import { generateQueryByFiltersForEmployeesOnPath } from "../../configs/database/Queries";
+import { Injectable } from '@nestjs/common';
+import { Pageable } from '../../configs/database/pageable.service';
+import { PrismaService } from '../../configs/database/prisma.service';
+import IEmployeesOnPathRepository from './employeesOnPath.repository.contract';
+import { getDateInLocaleTime } from '../../utils/date.service';
+import { EmployeesOnPath } from '../../entities/employeesOnPath.entity';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { generateQueryByFiltersForEmployeesOnPath } from '../../configs/database/Queries';
 
 @Injectable()
-export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> implements IEmployeesOnPathRepository {
-  constructor(
-    private readonly repository: PrismaService
-  ) {
-    super()
+export class EmployeesOnPathRepository
+  extends Pageable<EmployeesOnPath>
+  implements IEmployeesOnPathRepository
+{
+  constructor(private readonly repository: PrismaService) {
+    super();
   }
 
   create(data: EmployeesOnPath): Promise<EmployeesOnPath> {
@@ -24,14 +25,14 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
         confirmation: data.confirmation,
         disembarkAt: data.disembarkAt,
         employeeId: data.employee.id,
-        pathId: data.path.id
-      }
+        pathId: data.path.id,
+      },
     });
   }
 
   delete(id: string): Promise<EmployeesOnPath> {
     return this.repository.employeesOnPath.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -40,6 +41,7 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
       where: { id },
       select: {
         id: true,
+        description: true,
         boardingAt: true,
         confirmation: true,
         disembarkAt: true,
@@ -57,21 +59,51 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
                 pin: {
                   select: {
                     lat: true,
-                    long: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    lng: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+  findByIds(id: string): Promise<EmployeesOnPath[]> {
+    return this.repository.employeesOnPath.findMany({
+      where: { employeeId: id },
+      select: {
+        id: true,
+        confirmation: true,
+        position: true,
+        createdAt: true,
+        employee: {
+          select: {
+            name: true,
+            address: true,
+            shift: true,
+            registration: true,
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    lat: true,
+                    lng: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   findByPath(pathId: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: {
-        pathId
+        pathId,
       },
       select: {
         id: true,
@@ -92,33 +124,33 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
                 pin: {
                   select: {
                     lat: true,
-                    long: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                    lng: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   findByRoute(routeId: string): Promise<EmployeesOnPath> {
     return this.repository.employeesOnPath.findFirst({
       where: {
         path: {
-          routeId
-        }
-      }
-    })
+          routeId,
+        },
+      },
+    });
   }
 
   findManyByRoute(routeId: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: {
         path: {
-          routeId
-        }
+          routeId,
+        },
       },
       select: {
         id: true,
@@ -139,89 +171,98 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
                 pin: {
                   select: {
                     lat: true,
-                    long: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                    lng: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
-  async findAll(page: Page, filters?: any): Promise<PageResponse<EmployeesOnPath>> {
-
+  async findAll(
+    page: Page,
+    filters?: any,
+  ): Promise<PageResponse<EmployeesOnPath>> {
     const condition = generateQueryByFiltersForEmployeesOnPath(filters);
 
-    const items = condition ? await this.repository.employeesOnPath.findMany({
-      ...this.buildPage(page),
-      where: condition,
-      select: {
-        id: true,
-        boardingAt: true,
-        confirmation: true,
-        disembarkAt: true,
-        position: true,
-        createdAt: true,
-        employee: {
+    const items = condition
+      ? await this.repository.employeesOnPath.findMany({
+          ...this.buildPage(page),
+          where: condition,
           select: {
-            name: true,
-            address: true,
-            shift: true,
-            registration: true,
-            pins: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            createdAt: true,
+            employee: {
               select: {
-                type: true,
-                pin: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
                   select: {
-                    lat: true,
-                    long: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }) : await this.repository.employeesOnPath.findMany({
-      ...this.buildPage(page),
-      select: {
-        id: true,
-        boardingAt: true,
-        confirmation: true,
-        disembarkAt: true,
-        position: true,
-        createdAt: true,
-        employee: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        })
+      : await this.repository.employeesOnPath.findMany({
+          ...this.buildPage(page),
           select: {
-            name: true,
-            address: true,
-            shift: true,
-            registration: true,
-            pins: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            createdAt: true,
+            employee: {
               select: {
-                type: true,
-                pin: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
                   select: {
-                    lat: true,
-                    long: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
 
-    const total = condition ? await this.repository.employeesOnPath.findMany({
-      where: {
-        ...condition
-      }
-    }) : await this.repository.employeesOnPath.count();
+    const total = condition
+      ? await this.repository.employeesOnPath.findMany({
+          where: {
+            ...condition,
+          },
+        })
+      : await this.repository.employeesOnPath.count();
 
-    return this.buildPageResponse(items, Array.isArray(total) ? total.length : total);
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
   }
 
   update(data: EmployeesOnPath): Promise<EmployeesOnPath> {
@@ -230,10 +271,12 @@ export class EmployeesOnPathRepository extends Pageable<EmployeesOnPath> impleme
         id: data.id,
         position: data.position,
         confirmation: data.confirmation,
-        disembarkAt: data.disembarkAt,
-        updatedAt: getDateInLocaleTime(new Date())
+        description: data.description,
+        disembarkAt: getDateInLocaleTime(data.disembarkAt),
+        boardingAt: getDateInLocaleTime(data.boardingAt),
+        updatedAt: getDateInLocaleTime(new Date()),
       },
-      where: { id: data.id }
-    })
+      where: { id: data.id },
+    });
   }
 }

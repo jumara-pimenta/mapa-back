@@ -1,35 +1,36 @@
-import { FiltersDriverDTO } from "../../dtos/driver/filtersDriver.dto";
-import { IQueryDriver } from "../../dtos/driver/queryDriver.dto";
-import { FiltersEmployeeDTO } from "../../dtos/employee/filtersEmployee.dto";
-import { IQueryEmployee } from "../../dtos/employee/queryEmployee.dto";
-import { FiltersEmployeesOnPathDTO } from "../../dtos/employeesOnPath/filtersEmployeesOnPath.dto";
-import { IQueryEmployeesOnPath } from "../../dtos/employeesOnPath/queryEmployeesOnPath.dto";
-import { FiltersPathDTO } from "../../dtos/path/filtersPath.dto";
-import { IQueryPath } from "../../dtos/path/queryPath.dto";
-import { FiltersPinDTO } from "../../dtos/pin/filtersPin.dto";
-import { FiltersRouteHistoryDTO } from "../../dtos/routeHistory/filtersRouteHistory.dto";
-import { IQueryRouteHistory } from "../../dtos/routeHistory/queryRouteHistory.dto";
-import { FiltersVehicleDTO } from "../../dtos/vehicle/filtersVehicle.dto";
-import { IQueryVehicle } from "../../dtos/vehicle/queryVehicle.dto";
-import { convertAndVerifyNumber } from "../../utils/Utils";
-import { IQueryPin } from "../../dtos/pin/queryPin.dto";
+import { FiltersDriverDTO } from '../../dtos/driver/filtersDriver.dto';
+import { IQueryDriver } from '../../dtos/driver/queryDriver.dto';
+import { FiltersEmployeeDTO } from '../../dtos/employee/filtersEmployee.dto';
+import { IQueryEmployee } from '../../dtos/employee/queryEmployee.dto';
+import { FiltersEmployeesOnPathDTO } from '../../dtos/employeesOnPath/filtersEmployeesOnPath.dto';
+import { IQueryEmployeesOnPath } from '../../dtos/employeesOnPath/queryEmployeesOnPath.dto';
+import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
+import { IQueryPath } from '../../dtos/path/queryPath.dto';
+import { FiltersPinDTO } from '../../dtos/pin/filtersPin.dto';
+import { FiltersRouteHistoryDTO } from '../../dtos/routeHistory/filtersRouteHistory.dto';
+import { IQueryRouteHistory } from '../../dtos/routeHistory/queryRouteHistory.dto';
+import { FiltersVehicleDTO } from '../../dtos/vehicle/filtersVehicle.dto';
+import { IQueryVehicle } from '../../dtos/vehicle/queryVehicle.dto';
+import { convertAndVerifyNumber } from '../../utils/Utils';
+import { IQueryPin } from '../../dtos/pin/queryPin.dto';
 
-export function generateQueryByFiltersForEmployee(filters: any): IQueryEmployee {
-
+export function generateQueryByFiltersForEmployee(
+  filters: any,
+): IQueryEmployee {
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -38,15 +39,13 @@ export function generateQueryByFiltersForEmployee(filters: any): IQueryEmployee 
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -56,32 +55,33 @@ export function generateQueryByFiltersForEmployee(filters: any): IQueryEmployee 
   return query;
 }
 
-export function generateQueryByFiltersForEmployeesOnPath(filters: FiltersEmployeesOnPathDTO): IQueryEmployeesOnPath {
-
+export function generateQueryByFiltersForEmployeesOnPath(
+  filters: FiltersEmployeesOnPathDTO,
+): IQueryEmployeesOnPath {
   const fields = {
     boardingAt: () => ({
-      boardingAt: filters.boardingAt
+      boardingAt: filters.boardingAt,
     }),
     confirmation: () => ({
-      confirmation: filters.confirmation 
+      confirmation: filters.confirmation,
     }),
     disembarkAt: () => ({
-      disembarkAt: filters.disembarkAt
+      disembarkAt: filters.disembarkAt,
     }),
     position: () => ({
-      position: filters.position
+      position: filters.position,
     }),
     employeeId: () => ({
       employee: {
-        id: filters.employeeId
-      }
+        id: filters.employeeId,
+      },
     }),
     pathId: () => ({
       path: {
-        id: filters.pathId
-      }
+        id: filters.pathId,
+      },
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -90,15 +90,13 @@ export function generateQueryByFiltersForEmployeesOnPath(filters: FiltersEmploye
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -109,21 +107,20 @@ export function generateQueryByFiltersForEmployeesOnPath(filters: FiltersEmploye
 }
 
 export function generateQueryByFiltersForDriver(filters: any): IQueryDriver {
-
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -132,15 +129,13 @@ export function generateQueryByFiltersForDriver(filters: any): IQueryDriver {
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -151,21 +146,20 @@ export function generateQueryByFiltersForDriver(filters: any): IQueryDriver {
 }
 
 export function generateQueryByFiltersForVehicle(filters: any): IQueryVehicle {
-
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -174,15 +168,13 @@ export function generateQueryByFiltersForVehicle(filters: any): IQueryVehicle {
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -193,21 +185,20 @@ export function generateQueryByFiltersForVehicle(filters: any): IQueryVehicle {
 }
 
 export function generateQueryByFiltersForRoute(filters: any): IQueryVehicle {
-
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -216,15 +207,13 @@ export function generateQueryByFiltersForRoute(filters: any): IQueryVehicle {
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -234,22 +223,23 @@ export function generateQueryByFiltersForRoute(filters: any): IQueryVehicle {
   return query;
 }
 
-export function generateQueryByFiltersForRouteHistory(filters: any): IQueryRouteHistory {
-
+export function generateQueryByFiltersForRouteHistory(
+  filters: any,
+): IQueryRouteHistory {
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -258,15 +248,13 @@ export function generateQueryByFiltersForRouteHistory(filters: any): IQueryRoute
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -277,21 +265,20 @@ export function generateQueryByFiltersForRouteHistory(filters: any): IQueryRoute
 }
 
 export function generateQueryByFiltersForPath(filters: any): IQueryPath {
-
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -300,15 +287,13 @@ export function generateQueryByFiltersForPath(filters: any): IQueryPath {
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }
@@ -319,21 +304,20 @@ export function generateQueryByFiltersForPath(filters: any): IQueryPath {
 }
 
 export function generateQueryByFiltersForPin(filters: any): IQueryPin {
-
   const fields = {
     sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr)
+      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
     }),
     process: () => ({
-      process: filters.process 
+      process: filters.process,
     }),
     type: () => ({
-      type: filters.type
+      type: filters.type,
     }),
     product: () => ({
-      product: filters.product
+      product: filters.product,
     }),
-  }
+  };
 
   const keysFields = Object.keys(fields);
 
@@ -342,15 +326,13 @@ export function generateQueryByFiltersForPin(filters: any): IQueryPin {
   let queryBuilder: Function;
 
   for (const filter in filters) {
-    
     if (keysFields.includes(filter)) {
-
       queryBuilder = fields[filter];
 
-      if (query) { 
+      if (query) {
         const newCondition = queryBuilder();
 
-        Object.assign(query, {...newCondition});
+        Object.assign(query, { ...newCondition });
       } else {
         query = queryBuilder();
       }

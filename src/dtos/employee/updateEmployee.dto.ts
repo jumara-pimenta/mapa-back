@@ -1,41 +1,42 @@
-import { IsDate, IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { Transform, TransformFnParams } from 'class-transformer';
+import {
+  IsDateString,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateEmployeeDTO {
-  @IsString()
+  @IsString({ message: 'Matrícula não está definida como string.' })
   @IsOptional()
-  registration?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  registration?: string;
 
-  @IsString()
   @IsOptional()
-  cpf?: string
+  @IsDateString()
+  admission?: Date;
 
-  @IsString()
+  @IsString({ message: 'Nome não está definido como string.' })
   @IsOptional()
-  rg?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  name?: string;
 
-  @IsString()
-  @IsDate()
+  @IsString({ message: 'Cargo não está definido como string.' })
   @IsOptional()
-  admission?: Date
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  role?: string;
 
-  @IsString()
+  @IsString({ message: 'Turno não está definido como string.' })
   @IsOptional()
-  name?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  shift?: string;
 
-  @IsString()
+  @IsString({ message: 'Centro de custo não está definido como string.' })
   @IsOptional()
-  role?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  costCenter?: string;
 
-  @IsString()
+  @IsString({ message: 'Endereço não está definido como string.' })
   @IsOptional()
-  shift?: string
-
-  @IsString()
-  @IsOptional()
-  costCenter?: string
-
-  @IsString()
-  @IsOptional()
-  address?: string
-
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  address?: string;
 }

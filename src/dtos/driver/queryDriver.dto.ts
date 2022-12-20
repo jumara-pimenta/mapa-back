@@ -1,7 +1,7 @@
 export interface IQueryDriver {
-  name?: string
-  cpf?: string
-  cnh?: string
-  validation?: string
-  category?: string
+  name?: string;
+  cpf?: string;
+  cnh?: string;
+  validation?: Date;
+  category?: string;
 }

@@ -3,7 +3,7 @@ version: '3.7'
 services:
   app:
     image: sonar-rotas-backend:latest
-    build: 
+    build:
       dockerfile: Dockerfile
       context: .
     container_name: sonar-rotas-backend

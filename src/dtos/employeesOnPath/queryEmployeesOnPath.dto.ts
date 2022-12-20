@@ -1,12 +1,12 @@
 export interface IQueryEmployeesOnPath {
-  boardingAt?: Date
-  confirmation?: boolean
-  disembarkAt?: Date
+  boardingAt?: Date;
+  confirmation?: boolean;
+  disembarkAt?: Date;
   employee?: {
-    id?: string
-  },
+    id?: string;
+  };
   path?: {
-    id?: string
-  },
-  position?: number
+    id?: string;
+  };
+  position?: number;
 }

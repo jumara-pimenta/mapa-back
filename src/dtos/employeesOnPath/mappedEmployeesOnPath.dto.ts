@@ -1,22 +1,22 @@
 class IPin {
-  lat: string
-  long: string 
+  lat: string;
+  lng: string;
 }
 
 class IEmployee {
-  name: string
-  address: string
-  shift: string
-  registration: string
-  location: IPin
+  name: string;
+  address: string;
+  shift: string;
+  registration: string;
+  location: IPin;
 }
 
 export class MappedEmployeesOnPathDTO {
-  id: string
-  boardingAt?: Date
-  confirmation: boolean
-  disembarkAt?: Date
-  position: number
-  details: IEmployee
-  createdAt: Date
+  id: string;
+  boardingAt?: Date;
+  confirmation: boolean;
+  disembarkAt?: Date;
+  position: number;
+  details: IEmployee;
+  createdAt: Date;
 }

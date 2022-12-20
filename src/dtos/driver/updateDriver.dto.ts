@@ -1,23 +1,23 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class UpdateDriverDTO {
-  @IsString()
+  @IsString({ message: '[Name] não está definida como string.' })
   @IsOptional()
-  name?: string
+  name?: string;
 
-  @IsString()
+  @IsString({ message: '[CPF] não está definida como string.' })
   @IsOptional()
-  cpf?: string
+  cpf?: string;
 
-  @IsString()
+  @IsString({ message: '[CNH] não está definida como string.' })
   @IsOptional()
-  cnh?: string
+  cnh?: string;
 
-  @IsString()
+  @IsDateString()
   @IsOptional()
-  validation?: string
+  validation?: Date;
 
-  @IsString()
+  @IsString({ message: '[Category] não está definida como string.' })
   @IsOptional()
-  category?: string
+  category?: string;
 }

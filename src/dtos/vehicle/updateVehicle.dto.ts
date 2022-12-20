@@ -1,44 +1,66 @@
-import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { Transform, TransformFnParams } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateVehicleDTO {
-  @IsString()
+  @IsString({ message: 'Placa não está definido para o tipo string.' })
   @IsOptional()
-  plate?: string
+  @MinLength(7, { message: 'Placa não pode conter menos que 7 dígitos.' })
+  @MaxLength(7, { message: 'Placa não pode conter mais que 7 dígitos.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  plate?: string;
 
-  @IsString()
+  @IsString({ message: 'Empresa não está definido para o tipo string.' })
   @IsOptional()
-  company?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  company?: string;
 
-  @IsString()
+  @IsString({ message: 'Tipo não está definido para o tipo string.' })
   @IsOptional()
-  type?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  type?: string;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
-  lastSurvey?: Date
+  lastSurvey?: Date;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
-  expiration?: Date
+  expiration?: Date;
 
   @IsNumber()
   @IsOptional()
-  capacity?: number
+  capacity?: number;
 
-  @IsString()
+  @IsString({ message: 'Renavam não está definido para o tipo string.' })
   @IsOptional()
-  renavam?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @MinLength(11, { message: 'Renavam não pode conter menos que 11 dígitos.' })
+  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
+  renavam?: string;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
-  lastMaintenance?: Date
+  lastMaintenance?: Date;
 
-  @IsString()
+  @IsString({ message: 'Observação não está definido para o tipo string.' })
   @IsOptional()
-  note?: string
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  note?: string;
 
-  @IsString()
+  @IsString({
+    message: 'Acessibilidade não está definido para o tipo string.',
+  })
   @IsBoolean()
   @IsOptional()
-  isAccessibility?: boolean
+  isAccessibility?: boolean;
 }

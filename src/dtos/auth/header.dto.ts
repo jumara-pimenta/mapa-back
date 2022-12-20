@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class HeaderDTO {
-    @IsString()
-    @IsNotEmpty()
-    authorization: string;
+  @IsString()
+  @IsNotEmpty()
+  authorization: string;
 }

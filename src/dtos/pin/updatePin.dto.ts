@@ -1,15 +1,22 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { Transform, TransformFnParams } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdatePinDTO {
-  @IsString()
-  @IsNotEmpty()
-  description?: string
+  @IsOptional()
+  @IsString({ message: 'Título tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Título não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  title: string;
 
-  @IsString()
-  @IsNotEmpty()
-  lat?: string 
+  @IsOptional()
+  @IsString({ message: 'Local tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Local não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  local: string;
 
-  @IsString()
-  @IsNotEmpty()
-  long?: string
+  @IsOptional()
+  @IsString({ message: 'Detalhes tem que ser do tipo string' })
+  @IsNotEmpty({ message: 'O campo Detalhes não pode ser vazio' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  details: string;
 }
