@@ -9,4 +9,5 @@ export default interface IPathRepository {
   findByRoute(routeId: string): Promise<Path[]>;
   findByDriverIdAndStatus(driverId: string, status: EStatusPath): Promise<Path>;
   update(data: Path): Promise<Path>;
+  findByEmployeeAndStatus(employeeId: string, status: EStatusPath): Promise<Path>;
 }

@@ -5,7 +5,7 @@ import { MappedPinDTO } from '../dtos/pin/mappedPin.dto';
 import { CreatePinDTO } from '../dtos/pin/createPin.dto';
 import { UpdatePinDTO } from '../dtos/pin/updatePin.dto';
 import { Page, PageResponse } from '../configs/database/page.model';
-import { FiltersPinDTO } from 'src/dtos/pin/filtersPin.dto';
+import { FiltersPinDTO } from '../dtos/pin/filtersPin.dto';
 
 @Injectable()
 export class PinService {
@@ -15,11 +15,6 @@ export class PinService {
   ) {}
 
   async create(payload: CreatePinDTO): Promise<Pin> {
-    if (Number(payload.lat) < -90 || Number(payload.lat) > 90)
-      throw new HttpException('Latitude inválida', HttpStatus.BAD_REQUEST);
-    if (Number(payload.lng) < -180 || Number(payload.lng) > 180)
-      throw new HttpException('Longitude inválida', HttpStatus.BAD_REQUEST);
-
     return await this.pinRepository.create(new Pin(payload));
   }
 
