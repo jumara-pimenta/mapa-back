@@ -240,12 +240,12 @@ export class RouteService {
         if (employee.pins.length === 0) {
           employeeArrayPins.push(employee.name);
         }
+        const _employee = [];
         employee.pins.forEach((pin: any) => {
-          if (pin.type !== route.type) {
-            console.log(pin.type, route.type);
-
-            employeeArrayPins.push(employee.name);
+          if (pin.type === route.type) {
+            _employee.push(employee.name);
           }
+          if (_employee.length === 0) employeeArrayPins.push(employee.name);
         });
       });
 
