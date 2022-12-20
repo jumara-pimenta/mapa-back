@@ -25,7 +25,7 @@ export class WebsocketGateway {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log('🔗client connected:', socket.id);
+      console.log('client connected:', socket.id);
     });
   }
 
@@ -144,7 +144,6 @@ export class WebsocketGateway {
         ...data,
       });
     } catch (error) {
-
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
