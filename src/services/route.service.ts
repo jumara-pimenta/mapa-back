@@ -107,6 +107,27 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
+  async listByDriverId(
+    id: string,
+    page: Page,
+    filters?: FiltersRouteDTO,
+  ): Promise<PageResponse<MappedRouteDTO>> {
+    const routes = await this.routeRepository.listByDriverId(id, page, filters);
+
+    if (routes.total === 0) {
+      throw new HttpException(
+        'Não existe routes para esta pesquisa!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const items = await this.mapperMany(routes.items);
+
+    return {
+      total: routes.total,
+      items,
+    };
+  }
   async listByIdWebsocket(id: string): Promise<Route> {
     const route = await this.routeRepository.findByIdWebsocket(id);
 
@@ -178,7 +199,7 @@ export class RouteService {
         type,
         route,
         data.employeeIds,
-        pathType
+        pathType,
       );
 
       for await (const path of route.paths) {

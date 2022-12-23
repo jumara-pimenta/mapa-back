@@ -57,4 +57,15 @@ export class RouteController {
   async getById(@Param('id') id: string): Promise<MappedRouteDTO> {
     return await this.routeService.listById(id);
   }
+
+  @Get('/paths/driver/:id')
+  @HttpCode(HttpStatus.OK)
+  async getPathsByDriverId(
+    @Param('id') id: string,
+    @Query() page: Page,
+    @Query() filters: FiltersRouteDTO,
+  ): Promise<PageResponse<MappedRouteDTO>> {
+    return await this.routeService.listByDriverId(id, page, filters);
+  }
+
 }
