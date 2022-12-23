@@ -1,5 +1,6 @@
 import { EStatusPath } from '../utils/ETypes';
 import { v4 as uuid } from 'uuid';
+import { Employee } from './employee.entity';
 import { EmployeesOnPath } from './employeesOnPath.entity';
 import { Route } from './route.entity';
 

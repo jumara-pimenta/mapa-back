@@ -186,6 +186,24 @@ export class PathService {
     );
   }
 
+  async listByEmployeeAndStatus(
+    employeeId: string,
+    status: EStatusPath,
+  ): Promise<MappedPathDTO> {
+    const path = await this.pathRepository.findByEmployeeAndStatus(
+      employeeId,
+      status,
+    );
+
+    if (!path)
+      throw new HttpException(
+        'O colaborador não possui trajetos em andamento!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(path);
+  }
+
   private mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 

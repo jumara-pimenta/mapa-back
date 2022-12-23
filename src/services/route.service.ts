@@ -107,7 +107,7 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
-  async listByIdWebsocket(id: string): Promise<any> {
+  async listByIdWebsocket(id: string): Promise<Route> {
     const route = await this.routeRepository.findByIdWebsocket(id);
 
     if (!route)
@@ -116,7 +116,6 @@ export class RouteService {
         HttpStatus.NOT_FOUND,
       );
 
-    // return this.mapperOne(route);
     return route;
   }
 
@@ -133,7 +132,7 @@ export class RouteService {
       );
     }
 
-    const items = this.mapperMany(routes.items);
+    const items = await this.mapperMany(routes.items);
 
     return {
       total: routes.total,
@@ -142,14 +141,14 @@ export class RouteService {
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
-    let employeeArray = [];
-    let employeeArrayPins = [];
+    const employeeArray = [];
+    const employeeArrayPins = [];
 
     const route = await this.listById(id);
 
     if (route.paths[0].finishedAt !== null)
       throw new HttpException(
-        `Não é possível alterar uma rota que já foi finalizada!`,
+        'Não é possível alterar uma rota que já foi finalizada!',
         HttpStatus.CONFLICT,
       );
 
@@ -163,19 +162,17 @@ export class RouteService {
       const type = data.type ?? route.type;
 
       await this.employeesInPins(employeesPins, type);
-      const types = route.paths.map((path) => {return path.type});
-       
-      let pathType;
+      const types = route.paths.map((path) => {
+        return path.type;
+      });
 
+      let pathType;
       if (types.length === 2) {
-        pathType = ETypePath.ROUND_TRIP
+        pathType = ETypePath.ROUND_TRIP;
       }
       if (types.length === 1) {
         pathType = types[0];
       }
-
-      
-
       await this.employeesInRouteUpdate(
         employeeInRoute,
         type,
@@ -251,12 +248,10 @@ export class RouteService {
   async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
     const route = await this.routeRepository.findById(id);
 
-    const path = await this.pathService.listById(route.path[0].id);
-
     return this.mapperOne(route);
   }
 
-  private mapperMany(routes: Route[]): MappedRouteDTO[] {
+  private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {
     return routes.map((route) => {
       const { driver, vehicle, path } = route;
 
@@ -461,23 +456,28 @@ export class RouteService {
       }
       if (route.type === ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
-
           if (path.type === ETypePath.ONE_WAY) {
-            if(pathType === ETypePath.ONE_WAY || pathType === ETypePath.ROUND_TRIP){
-            ida = path.employeesOnPath.filter((item) => {
-              return ids.includes(item.employee.id);
-            });
-            employeeOnOneWay.push(ida);
-          }
+            if (
+              pathType === ETypePath.ONE_WAY ||
+              pathType === ETypePath.ROUND_TRIP
+            ) {
+              ida = path.employeesOnPath.filter((item) => {
+                return ids.includes(item.employee.id);
+              });
+              employeeOnOneWay.push(ida);
+            }
           }
           if (path.type === ETypePath.RETURN) {
-            if(pathType === ETypePath.RETURN || pathType === ETypePath.ROUND_TRIP){
-            volta = path.employeesOnPath.filter((item) => {
-              return ids.includes(item.employee.id);
-            });
-            employeeOnReturn.push(volta);
+            if (
+              pathType === ETypePath.RETURN ||
+              pathType === ETypePath.ROUND_TRIP
+            ) {
+              volta = path.employeesOnPath.filter((item) => {
+                return ids.includes(item.employee.id);
+              });
+              employeeOnReturn.push(volta);
+            }
           }
-        }
         });
       }
     });
@@ -491,19 +491,22 @@ export class RouteService {
       );
     }
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
-      throw new HttpException({
-        status: HttpStatus.CONFLICT,
-        message:
-        [
-          employeeOnOneWay.length > 0 ?
-            `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`: null,
-          employeeOnReturn.length > 0 ?
-            `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`: null,
-        ]},
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          message: [
+            employeeOnOneWay.length > 0
+              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+              : null,
+            employeeOnReturn.length > 0
+              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+              : null,
+          ],
+        },
         HttpStatus.CONFLICT,
       );
     }
@@ -518,14 +521,14 @@ export class RouteService {
       const _employee = [];
       // console.log(employee.pins);
 
-      if(type !== ETypeRoute.EXTRA){
+      if (type !== ETypeRoute.EXTRA) {
         employee.pins.forEach((item: any) => {
           if (item.type === type) {
-          _employee.push(employee.name);
-        }
-        if (_employee.length === 0) employeeArrayPins.push(employee.name);
-      });
-    }
+            _employee.push(employee.name);
+          }
+          if (_employee.length === 0) employeeArrayPins.push(employee.name);
+        });
+      }
     });
 
     if (employeeArrayPins.length > 0) {
@@ -579,41 +582,44 @@ export class RouteService {
       .filter((_r) => _r.id != route.id && route.type === _r.type)
       .forEach((routeItem: Route) => {
         routeItem.path.forEach((path) => {
-          if(route.type !== ETypeRoute.EXTRA){
-          const employeeInPath = path.employeesOnPath.filter((item) =>
-            employeeIds.includes(item.employee.id),
-          );
+          if (route.type !== ETypeRoute.EXTRA) {
+            const employeeInPath = path.employeesOnPath.filter((item) =>
+              employeeIds.includes(item.employee.id),
+            );
 
-          employeeInPath.forEach((__r) => {
-            __r.routeName = routeItem.description;
-          });
-          if (employeeInPath) {
-            employeeArray.push(employeeInPath);
-          }
-        }
-        if (route.type === ETypeRoute.EXTRA) {
-          if (path.type === ETypePath.ONE_WAY) {
-            if(pathType === ETypePath.ONE_WAY || pathType === ETypePath.ROUND_TRIP){
-            ida = path.employeesOnPath.filter((item) => {
-              return employeeIds.includes(item.employee.id);
+            employeeInPath.forEach((__r) => {
+              __r.routeName = routeItem.description;
             });
-            employeeOnOneWay.push(ida);
+            if (employeeInPath) {
+              employeeArray.push(employeeInPath);
+            }
           }
+          if (route.type === ETypeRoute.EXTRA) {
+            if (path.type === ETypePath.ONE_WAY) {
+              if (
+                pathType === ETypePath.ONE_WAY ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                ida = path.employeesOnPath.filter((item) => {
+                  return employeeIds.includes(item.employee.id);
+                });
+                employeeOnOneWay.push(ida);
+              }
+            }
+            if (path.type === ETypePath.RETURN) {
+              if (
+                pathType === ETypePath.RETURN ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                volta = path.employeesOnPath.filter((item) => {
+                  return employeeIds.includes(item.employee.id);
+                });
+                employeeOnReturn.push(volta);
+              }
+            }
           }
-          if (path.type === ETypePath.RETURN) {
-            if(pathType === ETypePath.RETURN || pathType === ETypePath.ROUND_TRIP){
-            volta = path.employeesOnPath.filter((item) => {
-              return employeeIds.includes(item.employee.id);
-            });
-            employeeOnReturn.push(volta);
-          }
-        }
-        }
         });
-        
       });
-
-
 
     if (employeeArray.length > 0) {
       throw new HttpException(
@@ -632,19 +638,22 @@ export class RouteService {
     }
 
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
-      throw new HttpException({
-        status: HttpStatus.CONFLICT,
-        message:
-        [
-          employeeOnOneWay.length > 0 ?
-            `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`: null,
-          employeeOnReturn.length > 0 ?
-            `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`: null,
-        ]},
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          message: [
+            employeeOnOneWay.length > 0
+              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+              : null,
+            employeeOnReturn.length > 0
+              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+              : null,
+          ],
+        },
         HttpStatus.CONFLICT,
       );
     }

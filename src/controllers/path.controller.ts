@@ -8,10 +8,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
+import { EStatusPath } from '../utils/ETypes';
 import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
 import { Path } from '../entities/path.entity';
 import { PathService } from '../services/path.service';
-import { EStatusPath } from '../utils/ETypes';
 
 @Controller('/api/routes')
 export class PathController {
@@ -55,5 +55,14 @@ export class PathController {
     @Body() payload: UpdatePathDTO,
   ): Promise<Path> {
     return await this.pathService.update(id, payload);
+  }
+
+  @Get('/paths/employees/:employeeId/status/:status')
+  @HttpCode(HttpStatus.OK)
+  async getByEmployeeAndStatus(
+    @Param('employeeId') employeeId: string,
+    @Param('status') status: EStatusPath,
+  ): Promise<MappedPathDTO> {
+    return await this.pathService.listByEmployeeAndStatus(employeeId, status);
   }
 }
