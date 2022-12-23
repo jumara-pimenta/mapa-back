@@ -1,4 +1,3 @@
-
 import {
   forwardRef,
   HttpException,
@@ -16,7 +15,7 @@ import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
-import { EStatusRoute, ETypePath } from '../utils/ETypes';
+import { EStatusRoute, ETypePath, ETypeRoute } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
 import { convertTimeToDate } from 'src/utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -36,8 +35,6 @@ export class RouteService {
   ) {}
 
   async create(payload: CreateRouteDTO): Promise<Route> {
-    const employeeArray = [];
-    const employeeArrayPins = [];
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
@@ -47,18 +44,8 @@ export class RouteService {
     const employeesPins = await this.employeeService.listAllEmployeesPins(
       payload.employeeIds,
     );
-    employeesPins.forEach((employee: Employee) => {
-      if (employee.pins.length === 0) {
-        employeeArrayPins.push(employee.name);
-      }
-    });
 
-    if (employeeArrayPins.length > 0) {
-      throw new HttpException(
-        `O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto em rota do tipo ${payload.type.toLocaleLowerCase()}!`,
-        HttpStatus.CONFLICT,
-      );
-    }
+    await this.employeesInPins(employeesPins, payload.type);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
@@ -70,76 +57,16 @@ export class RouteService {
       vehicle.id,
     );
 
-    driverInRoute.forEach((route) => {
-      route.path.forEach((path) => {
-        const startedAtDate = convertTimeToDate(path.startsAt);
-        const durationTime = convertTimeToDate(path.duration);
+    await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
 
-        const finishedAtTime = addHours(
-          addMinutes(startedAtDate, durationTime.getMinutes()),
-          durationTime.getHours(),
-        );
+    await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
 
-        if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
-          throw new HttpException(
-            'O motorista já está em uma rota neste horário!',
-            HttpStatus.CONFLICT,
-          );
-        }
-        if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
-          throw new HttpException(
-            'O motorista já está em uma rota neste horário!',
-            HttpStatus.CONFLICT,
-          );
-        }
-      });
-    });
-
-    vehicleInRoute.forEach((route) => {
-      route.path.forEach((path) => {
-        const startedAtDate = convertTimeToDate(path.startsAt);
-        const durationTime = convertTimeToDate(path.duration);
-
-        const finishedAtTime = addHours(
-          addMinutes(startedAtDate, durationTime.getMinutes()),
-          durationTime.getHours(),
-        );
-
-        if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
-          throw new HttpException(
-            'O veículo já está em uma rota neste horário!',
-            HttpStatus.CONFLICT,
-          );
-        }
-        if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
-          throw new HttpException(
-            'O veículo já está em uma rota neste horário!',
-            HttpStatus.CONFLICT,
-          );
-        }
-      });
-    });
-
-    employeeInRoute.forEach((route: Route) => {
-      route.path.forEach((path) => {
-        const employeeInPath = path.employeesOnPath.filter((item) => {
-          if (payload.type === route.type) {
-            return payload.employeeIds.includes(item.employee.id);
-          }
-        });
-
-        employeeArray.push(employeeInPath);
-      });
-    });
-
-    if (employeeArray.length > 0) {
-      throw new HttpException(
-        `O(s) colaborador(es)${employeeArray.map((item) =>
-          item.map((employee) => ' ' + employee.employee.name),
-        )} já está(ão) em uma rota do tipo ${payload.type.toLocaleLowerCase()}!`,
-        HttpStatus.CONFLICT,
-      );
-    }
+    await this.employeesInRoute(
+      employeeInRoute,
+      payload.type,
+      payload.employeeIds,
+      payload.pathDetails.type,
+    );
 
     const props = new Route(
       {
@@ -176,8 +103,6 @@ export class RouteService {
         `Não foi encontrada uma rota com o id: ${id}!`,
         HttpStatus.NOT_FOUND,
       );
-
-      
 
     return this.mapperOne(route);
   }
@@ -234,54 +159,27 @@ export class RouteService {
       const employeesPins = await this.employeeService.listAllEmployeesPins(
         data.employeeIds,
       );
+      const type = data.type ?? route.type;
 
-      employeesPins.forEach((employee: Employee) => {
-        if (employee.pins.length === 0) {
-          employeeArrayPins.push(employee.name);
-        }
-        employee.pins.forEach((pin) => {
-          if (pin.type !== route.type) {
-            console.log(pin.type, route.type);
-
-            employeeArrayPins.push(employee.name);
-          }
-        });
+      await this.employeesInPins(employeesPins, type);
+      const types = route.paths.map((path) => {
+        return path.type;
       });
 
-      employeeInRoute
-        .filter((_r) => _r.id != id && route.type === _r.type)
-        .forEach((routeItem: Route) => {
-          routeItem.path.forEach((path) => {
-            const employeeInPath = path.employeesOnPath.filter((item) =>
-              data.employeeIds.includes(item.employee.id),
-            );
-            employeeInPath.forEach((r) => {
-              r.routeName = routeItem.description;
-            });
-            if (employeeInPath) {
-              employeeArray.push(employeeInPath);
-            }
-          });
-        });
-      if (employeeArray.length > 0) {
-        
-        throw new HttpException(`Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
-          (item) =>
-            item.map(
-              (employee) =>
-                ' Nome: ' +
-                employee.employee.name +
-                ' Rota: ' +
-                employee.routeName,
-            ),
-        )}`, HttpStatus.CONFLICT);
+      let pathType;
+      if (types.length === 2) {
+        pathType = ETypePath.ROUND_TRIP;
       }
-      if (employeeArrayPins.length > 0) {
-        throw new HttpException(
-          `O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto em rota do tipo ${route.type.toLocaleLowerCase()}!`,
-          HttpStatus.CONFLICT,
-        );
+      if (types.length === 1) {
+        pathType = types[0];
       }
+      await this.employeesInRouteUpdate(
+        employeeInRoute,
+        type,
+        route,
+        data.employeeIds,
+        pathType
+      );
 
       for await (const path of route.paths) {
         await this.pathService.delete(path.id);
@@ -305,6 +203,17 @@ export class RouteService {
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<any> {
+    if (payload.path.startedAt) {
+      const data = await this.listByIdWebsocket(payload.routeId);
+
+      if (data.path[0].employeesOnPath.length === 0) {
+        throw new HttpException(
+          `Não é possível iniciar uma rota sem colaboradores!`,
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
     await this.update(payload.routeId, payload.route);
 
     await this.pathService.update(payload.pathId, payload.path);
@@ -392,7 +301,7 @@ export class RouteService {
             createdAt: item.createdAt,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
-              const { pins } = employee;
+              // const { pins } = employee;
 
               return {
                 id: item.id,
@@ -401,13 +310,13 @@ export class RouteService {
                 disembarkAt: item.disembarkAt,
                 position: item.position,
                 details: {
-                  name: employee.name,
-                  address: employee.address,
-                  shift: employee.shift,
-                  registration: employee.registration,
+                  name: employee?.name,
+                  address: employee?.address,
+                  shift: employee?.shift,
+                  registration: employee?.registration,
                   location: {
-                    lat: pins.at(0).pin.lat,
-                    lng: pins.at(0).pin.lng,
+                    lat: item?.employee?.pins?.at(0)?.pin?.lat,
+                    lng: item?.employee?.pins?.at(0)?.pin?.lng,
                   },
                 },
               };
@@ -493,5 +402,260 @@ export class RouteService {
       }),
       quantityEmployees: path[0]?.employeesOnPath?.length,
     };
+  }
+
+  async driversInRoute(route: Route[], init: Date, end: Date): Promise<void> {
+    route.forEach((route) => {
+      route.path.forEach((path) => {
+        const startedAtDate = convertTimeToDate(path.startsAt);
+        const durationTime = convertTimeToDate(path.duration);
+
+        const finishedAtTime = addHours(
+          addMinutes(startedAtDate, durationTime.getMinutes()),
+          durationTime.getHours(),
+        );
+
+        if (init >= startedAtDate && init <= finishedAtTime) {
+          throw new HttpException(
+            `O motorista já está em uma rota neste horário!`,
+            HttpStatus.CONFLICT,
+          );
+        }
+        if (end >= startedAtDate && end <= finishedAtTime) {
+          throw new HttpException(
+            `O motorista já está em uma rota neste horário!`,
+            HttpStatus.CONFLICT,
+          );
+        }
+      });
+    });
+  }
+
+  async employeesInRoute(
+    employeeRoute: Route[],
+    type: string,
+    ids: string[],
+    pathType?: string,
+  ): Promise<void> {
+    let employeeArray = [];
+    let employeeOnReturn = [];
+    let employeeOnOneWay = [];
+    let ida;
+    let volta;
+    employeeRoute.forEach((route: Route) => {
+      if (route.type !== ETypeRoute.EXTRA) {
+        route.path.forEach((path) => {
+          const employeeInPath = path.employeesOnPath.filter((item) => {
+            if (type === route.type) {
+              return ids.includes(item.employee.id);
+            }
+          });
+
+          employeeArray.push(employeeInPath);
+        });
+      }
+      if (route.type === ETypeRoute.EXTRA) {
+        route.path.forEach((path) => {
+          if (path.type === ETypePath.ONE_WAY) {
+            if (
+              pathType === ETypePath.ONE_WAY ||
+              pathType === ETypePath.ROUND_TRIP
+            ) {
+              ida = path.employeesOnPath.filter((item) => {
+                return ids.includes(item.employee.id);
+              });
+              employeeOnOneWay.push(ida);
+            }
+          }
+          if (path.type === ETypePath.RETURN) {
+            if (
+              pathType === ETypePath.RETURN ||
+              pathType === ETypePath.ROUND_TRIP
+            ) {
+              volta = path.employeesOnPath.filter((item) => {
+                return ids.includes(item.employee.id);
+              });
+              employeeOnReturn.push(volta);
+            }
+          }
+        });
+      }
+    });
+
+    if (employeeArray.length > 0) {
+      throw new HttpException(
+        `O(s) colaborador(es)${employeeArray.map((item) =>
+          item.map((employee) => ' ' + employee.employee.name),
+        )} já está(ão) em uma rota do tipo ${type.toLocaleLowerCase()}!`,
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          message: [
+            employeeOnOneWay.length > 0
+              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+              : null,
+            employeeOnReturn.length > 0
+              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+              : null,
+          ],
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+
+  async employeesInPins(route: Employee[], type: string): Promise<void> {
+    let employeeArrayPins = [];
+    route.forEach((employee: Employee) => {
+      if (employee.pins.length === 0) {
+        employeeArrayPins.push(employee.name);
+      }
+      const _employee = [];
+      // console.log(employee.pins);
+
+      if (type !== ETypeRoute.EXTRA) {
+        employee.pins.forEach((item: any) => {
+          if (item.type === type) {
+            _employee.push(employee.name);
+          }
+          if (_employee.length === 0) employeeArrayPins.push(employee.name);
+        });
+      }
+    });
+
+    if (employeeArrayPins.length > 0) {
+      throw new HttpException(
+        `O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto(s)!`,
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+
+  async vehiclesInRoute(route: Route[], init: Date, end: Date): Promise<void> {
+    route.forEach((route) => {
+      route.path.forEach((path) => {
+        const startedAtDate = convertTimeToDate(path.startsAt);
+        const durationTime = convertTimeToDate(path.duration);
+
+        const finishedAtTime = addHours(
+          addMinutes(startedAtDate, durationTime.getMinutes()),
+          durationTime.getHours(),
+        );
+
+        if (init >= startedAtDate && init <= finishedAtTime) {
+          throw new HttpException(
+            `O veículo já está em uma rota neste horário!`,
+            HttpStatus.CONFLICT,
+          );
+        }
+        if (end >= startedAtDate && end <= finishedAtTime) {
+          throw new HttpException(
+            `O veículo já está em uma rota neste horário!`,
+            HttpStatus.CONFLICT,
+          );
+        }
+      });
+    });
+  }
+
+  async employeesInRouteUpdate(
+    routes: Route[],
+    type: string,
+    route: Route,
+    employeeIds: string[],
+    pathType: string,
+  ): Promise<void> {
+    let employeeArray = [];
+    let employeeOnReturn = [];
+    let employeeOnOneWay = [];
+    let ida;
+    let volta;
+    routes
+      .filter((_r) => _r.id != route.id && route.type === _r.type)
+      .forEach((routeItem: Route) => {
+        routeItem.path.forEach((path) => {
+          if (route.type !== ETypeRoute.EXTRA) {
+            const employeeInPath = path.employeesOnPath.filter((item) =>
+              employeeIds.includes(item.employee.id),
+            );
+
+            employeeInPath.forEach((__r) => {
+              __r.routeName = routeItem.description;
+            });
+            if (employeeInPath) {
+              employeeArray.push(employeeInPath);
+            }
+          }
+          if (route.type === ETypeRoute.EXTRA) {
+            if (path.type === ETypePath.ONE_WAY) {
+              if (
+                pathType === ETypePath.ONE_WAY ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                ida = path.employeesOnPath.filter((item) => {
+                  return employeeIds.includes(item.employee.id);
+                });
+                employeeOnOneWay.push(ida);
+              }
+            }
+            if (path.type === ETypePath.RETURN) {
+              if (
+                pathType === ETypePath.RETURN ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                volta = path.employeesOnPath.filter((item) => {
+                  return employeeIds.includes(item.employee.id);
+                });
+                employeeOnReturn.push(volta);
+              }
+            }
+          }
+        });
+      });
+
+    if (employeeArray.length > 0) {
+      throw new HttpException(
+        `Um ou mais coloboradores já estão em outra rota do tipo ${type.toLocaleLowerCase()}.  ${employeeArray.map(
+          (item) =>
+            item.map(
+              (employee) =>
+                ' Nome: ' +
+                employee.employee.name +
+                ' Rota: ' +
+                employee.routeName,
+            ),
+        )}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          message: [
+            employeeOnOneWay.length > 0
+              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+              : null,
+            employeeOnReturn.length > 0
+              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+                  item?.map((employee) => ' ' + employee.employee.name),
+                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+              : null,
+          ],
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
   }
 }

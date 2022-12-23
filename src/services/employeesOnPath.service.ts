@@ -114,21 +114,21 @@ export class EmployeesOnPathService {
   async update(
     id: string,
     data: UpdateEmployeesOnPathDTO,
-  ): Promise<MappedEmployeesOnPathDTO> {
+    ): Promise<any> {
+    console.log('=====>', id, data);
     const employeesOnPath = await this.listById(id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
       Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
     );
 
-    return this.mappedOne(updatedEmployeeOnPath);
+    return updatedEmployeeOnPath;
   }
 
   async updateWebsocket(
     id: string,
     data: UpdateEmployeesOnPathDTO,
   ): Promise<void> {
-    console.log('=====>', id, data);
     const employeesOnPath = await this.listById(id);
 
     await this.employeesOnPathRepository.update(
@@ -167,8 +167,8 @@ export class EmployeesOnPathService {
         shift: employee.shift,
         registration: employee.registration,
         location: {
-          lat: pins?.at(0).pin.lat,
-          lng: pins?.at(0).pin.lng,
+          lat: pins?.at(0)?.pin?.lat,
+          lng: pins?.at(0)?.pin?.lng,
         },
       },
     };

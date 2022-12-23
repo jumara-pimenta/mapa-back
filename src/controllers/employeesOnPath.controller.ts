@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
 import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
@@ -36,5 +37,24 @@ export class EmployeesOnPathController {
     @Body() payload: UpdateEmployeesStatusOnPathDTO,
   ): Promise<MappedEmployeesOnPathDTO[]> {
     return await this.employeeOnPathService.updateStatus(payload);
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.OK)
+  async updateEmployeeConfirmationById(
+    @Param('id') id: string,
+    @Body() payload: UpdateEmployeesOnPathDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
+    return await this.employeeOnPathService.update(id, payload);
+  }
+
+  @Put('/confirm/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateManyEmployeeConfirmation(
+    @Param('id') id: string,
+    @Body() payload: UpdateEmployeesOnPathDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
+    console.log(id);
+    return await this.employeeOnPathService.update(id, payload);
   }
 }

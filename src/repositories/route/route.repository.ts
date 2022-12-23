@@ -257,7 +257,28 @@ export class RouteRepository
             driver: true,
             path: {
               include: {
-                employeesOnPath: true,
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
             },
             vehicle: true,
@@ -395,6 +416,7 @@ export class RouteRepository
                 },
               },
             },
+            type: true,
             startedAt: true,
             finishedAt: true,
             status: true,
