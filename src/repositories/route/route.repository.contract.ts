@@ -10,6 +10,7 @@ export default interface IRouteRepository {
   findById(id: string): Promise<Route>;
   findByIdWebsocket(id: string): Promise<Route | any>;
   findByDriverId(id: string): Promise<Route[]>;
+  listByDriverId(id: string, page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<Route>>;
   findByVehicleId(id: string): Promise<Route[]>;
   findByEmployeeIds(id: string[]): Promise<Route[]>;
   update(data: Route): Promise<Route>;
