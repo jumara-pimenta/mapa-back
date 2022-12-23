@@ -416,6 +416,7 @@ export class RouteRepository
                 },
               },
             },
+            type: true,
             startedAt: true,
             finishedAt: true,
             status: true,
