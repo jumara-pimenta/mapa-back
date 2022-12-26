@@ -2,6 +2,7 @@ import { getDateInLocaleTime } from '../utils/Date';
 import { v4 as uuid } from 'uuid';
 import { EmployeesOnPath } from './employeesOnPath.entity';
 import { EmployeesOnPin } from './employeesOnPin.entity';
+import { Pin } from './pin.entity';
 
 export class Employee {
   id: string;
@@ -19,6 +20,7 @@ export class Employee {
 
   constructor(
     props: Omit<Employee, 'id' | 'createdAt' | 'pins' | 'employeeOnPath'>,
+    pin?: Pin,
     id?: string,
   ) {
     Object.assign(this, props);

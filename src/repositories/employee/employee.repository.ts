@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryForEmployee } from '../../utils/QueriesEmployeer';
+import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 
 @Injectable()
 export class EmployeeRepository
@@ -45,6 +45,7 @@ export class EmployeeRepository
       include: {
         pins: {
           select: {
+            type: true,
             pin: {
               select: {
                 id: true,
@@ -77,9 +78,43 @@ export class EmployeeRepository
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
           where: condition,
+          include: {
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    id: true,
+                    details: true,
+                    lat: true,
+                    lng: true,
+                    local: true,
+                    title: true
+                  }
+                }
+              }
+            },
+          },
         })
       : await this.repository.employee.findMany({
           ...this.buildPage(page),
+          include: {
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    id: true,
+                    details: true,
+                    lat: true,
+                    lng: true,
+                    local: true,
+                    title: true
+                  }
+                }
+              }
+            },
+          },
         });
 
     const total = condition
@@ -107,8 +142,8 @@ export class EmployeeRepository
         registration: data.registration,
         role: data.role,
         shift: data.shift,
-        createdAt: data.createdAt,
-      },
+        createdAt: data.createdAt
+      }
     });
   }
 
