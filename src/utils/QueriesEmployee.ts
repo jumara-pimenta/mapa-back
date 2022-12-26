@@ -1,9 +1,8 @@
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
-import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 
 export function generateQueryForEmployee(
   filters: FiltersEmployeeDTO,
-): MappedEmployeeDTO {
+) {
   const fields = {
     registration: () => ({
       registration: filters.registration,
@@ -27,9 +26,9 @@ export function generateQueryForEmployee(
 
   const keysFields = Object.keys(fields);
 
-  let query: MappedEmployeeDTO;
+  let query: FiltersEmployeeDTO;
 
-  let queryBuilder: Function;
+  let queryBuilder: () => FiltersEmployeeDTO;
 
   for (const filter in filters) {
     if (filters[filter] && keysFields.includes(filter)) {

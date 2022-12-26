@@ -9,7 +9,10 @@ import { Route } from '../entities/route.entity';
 import IRouteRepository from '../repositories/route/route.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
 import { FiltersRouteDTO } from '../dtos/route/filtersRoute.dto';
-import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
+import {
+  MappedRouteDTO,
+  MappedRouteShortDTO,
+} from '../dtos/route/mappedRoute.dto';
 import { CreateRouteDTO } from '../dtos/route/createRoute.dto';
 import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
@@ -17,10 +20,10 @@ import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import { EStatusRoute, ETypePath, ETypeRoute } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate } from 'src/utils/date.service';
+import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
-import { Employee } from 'src/entities/employee.entity';
-import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
+import { Employee } from '../entities/employee.entity';
+import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 
 @Injectable()
 export class RouteService {
@@ -229,7 +232,7 @@ export class RouteService {
 
       if (data.path[0].employeesOnPath.length === 0) {
         throw new HttpException(
-          `Não é possível iniciar uma rota sem colaboradores!`,
+          'Não é possível iniciar uma rota sem colaboradores!',
           HttpStatus.CONFLICT,
         );
       }
@@ -349,6 +352,27 @@ export class RouteService {
     });
   }
 
+  private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
+    return routes.map((route) => {
+      const { driver, vehicle } = route;
+
+      return {
+        id: route.id,
+        description: route.description,
+        distance: route.description,
+        type: route.type,
+        driver: {
+          id: driver.id,
+          name: driver.name,
+        },
+        vehicle: {
+          id: vehicle.id,
+          plate: vehicle.plate,
+        },
+      };
+    });
+  }
+
   private mapperOne(route: Route): MappedRouteDTO {
     const { driver, vehicle, path } = route;
 
@@ -438,13 +462,13 @@ export class RouteService {
 
         if (init >= startedAtDate && init <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (end >= startedAtDate && end <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -458,9 +482,9 @@ export class RouteService {
     ids: string[],
     pathType?: string,
   ): Promise<void> {
-    let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeArray = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     employeeRoute.forEach((route: Route) => {
@@ -534,7 +558,7 @@ export class RouteService {
   }
 
   async employeesInPins(route: Employee[], type: string): Promise<void> {
-    let employeeArrayPins = [];
+    const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
@@ -573,13 +597,13 @@ export class RouteService {
 
         if (init >= startedAtDate && init <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (end >= startedAtDate && end <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -594,9 +618,9 @@ export class RouteService {
     employeeIds: string[],
     pathType: string,
   ): Promise<void> {
-    let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeArray = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     routes

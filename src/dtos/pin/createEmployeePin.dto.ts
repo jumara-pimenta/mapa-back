@@ -3,7 +3,7 @@ import {
   IsEnum,
   IsOptional,
 } from 'class-validator';
-import { ECreatePin } from 'src/utils/ETypes';
+import { ECreatePin } from '../../utils/ETypes';
 
 export class CreateEmployeePinDTO {
   @IsEnum(ECreatePin, {

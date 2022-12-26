@@ -1,7 +1,7 @@
 import { IQueryDriver } from '../../dtos/driver/queryDriver.dto';
 import { FiltersDriverDTO } from '../../dtos/driver/filtersDriver.dto';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
-import { IQueryPath } from 'src/dtos/path/queryPath.dto';
+import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
+import { IQueryPath } from '../../dtos/path/queryPath.dto';
 
 export function generateQueryByFiltersForDrivers(filters: FiltersDriverDTO) {
   const fields = {

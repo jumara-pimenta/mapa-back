@@ -1,13 +1,10 @@
 import { Type } from 'class-transformer';
 import {
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
-  isIdentityCard,
   ValidateNested,
 } from 'class-validator';
-import { EStatusPath, EStatusRoute } from 'src/utils/ETypes';
 import { UpdatePathDTO } from '../path/updatePath.dto';
 import { UpdateRouteDTO } from '../route/updateRoute.dto';
 
