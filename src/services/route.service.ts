@@ -536,21 +536,27 @@ export class RouteService {
       );
     }
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+
+      let message = [
+        employeeOnOneWay.length > 0
+          ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+          : null,
+        employeeOnReturn.length > 0
+          ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+          : null,
+      ]
+
+
+      message = message.filter((item) => item !== null);
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
-          message: [
-            employeeOnOneWay.length > 0
-              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
-              : null,
-            employeeOnReturn.length > 0
-              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
-              : null,
-          ],
+          message
+          
         },
         HttpStatus.CONFLICT,
       );
@@ -683,21 +689,27 @@ export class RouteService {
     }
 
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+      let message = [
+        employeeOnOneWay.length > 0
+          ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+          : null,
+        employeeOnReturn.length > 0
+          ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+          : null,
+      ]
+
+
+      message = message.filter((item) => item !== null);
+      
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
-          message: [
-            employeeOnOneWay.length > 0
-              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
-              : null,
-            employeeOnReturn.length > 0
-              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
-              : null,
-          ],
+          ...message,
+
         },
         HttpStatus.CONFLICT,
       );
