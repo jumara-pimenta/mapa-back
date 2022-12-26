@@ -4,6 +4,9 @@ import { UpdateEmployeesOnPathDTO } from './updateEmployeesOnPath.dto';
 
 export class WebsocketUpdateEmployeesStatusOnPathDTO {
   @IsString()
+  pathId: string;
+
+  @IsString()
   routeId: string;
 
   @IsString()

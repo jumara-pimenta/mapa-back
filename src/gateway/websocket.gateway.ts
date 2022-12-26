@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, ArgumentsHost } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -83,7 +83,7 @@ export class WebsocketGateway {
 
       const data = await this.routeService.updateWebsocket(startAt);
 
-      this.server.emit(payload.routeId, {
+      this.server.emit(payload.pathId, {
         ...data,
       });
     } catch (error) {
@@ -120,7 +120,7 @@ export class WebsocketGateway {
 
       const data = await this.routeService.updateWebsocket(finishedAt);
 
-      this.server.emit(payload.routeId, {
+      this.server.emit(payload.pathId, {
         ...data,
       });
     } catch (error) {
@@ -150,7 +150,7 @@ export class WebsocketGateway {
       );
       const data = await this.routeService.listById(payload.routeId);
 
-      this.server.emit(payload.routeId, {
+      this.server.emit(payload.pathId, {
         ...data,
       });
     } catch (error) {
