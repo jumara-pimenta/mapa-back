@@ -479,7 +479,7 @@ export class RouteService {
     ids: string[],
     pathType?: string,
   ): Promise<void> {
-    const employeeArray = [];
+    let employeeArray = [];
     const employeeOnReturn = [];
     const employeeOnOneWay = [];
     let ida;
@@ -487,10 +487,8 @@ export class RouteService {
     employeeRoute.forEach((route: Route) => {
       if (route.type !== ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
-          const employeeInPath = path.employeesOnPath.filter((item) => {
-            // console.log({item, route, typePath: path.type});
+          path.employeesOnPath.filter((item) => {
             if (type === route.type) {
-
               employeeArray.push(item.employee);
             }
           });
@@ -563,7 +561,6 @@ export class RouteService {
 
 
       message = message.filter((item) => item !== null);
-      console.log("message " + message);
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
@@ -636,7 +633,7 @@ export class RouteService {
     employeeIds: string[],
     pathType: string,
   ): Promise<void> {
-    const employeeArray = [];
+    let employeeArray = [];
     const employeeOnReturn = [];
     const employeeOnOneWay = [];
     let ida;
