@@ -35,7 +35,7 @@ export class RouteService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
-  ) {}
+  ) { }
 
   async create(payload: CreateRouteDTO): Promise<Route> {
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
@@ -165,9 +165,6 @@ export class RouteService {
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
-    const employeeArray = [];
-    const employeeArrayPins = [];
-
     const route = await this.listById(id);
 
     if (route.paths[0].finishedAt !== null)
@@ -213,7 +210,7 @@ export class RouteService {
         routeId: id,
         employeeIds: data.employeeIds,
         details: {
-          type: route.paths[0].type as ETypePath,
+          type: pathType as ETypePath,
           startsAt: route.paths[0].startsAt,
           duration: route.paths[0].duration,
           isAutoRoute: true,
@@ -491,72 +488,87 @@ export class RouteService {
       if (route.type !== ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
           const employeeInPath = path.employeesOnPath.filter((item) => {
+            // console.log({item, route, typePath: path.type});
             if (type === route.type) {
-              return ids.includes(item.employee.id);
+
+              employeeArray.push(item.employee);
             }
           });
-
-          employeeArray.push(employeeInPath);
         });
       }
       if (route.type === ETypeRoute.EXTRA) {
+
         route.path.forEach((path) => {
-          if (path.type === ETypePath.ONE_WAY) {
-            if (
-              pathType === ETypePath.ONE_WAY ||
-              pathType === ETypePath.ROUND_TRIP
-            ) {
-              ida = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              });
-              employeeOnOneWay.push(ida);
+
+          if (type === ETypeRoute.EXTRA) {
+
+            if (path.type === ETypePath.ONE_WAY) {
+              if (
+                pathType === ETypePath.ONE_WAY ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                ida = path.employeesOnPath.filter((item) => {
+                  return ids.includes(item.employee.id);
+                });
+                employeeOnOneWay.push(ida);
+              }
             }
-          }
-          if (path.type === ETypePath.RETURN) {
-            if (
-              pathType === ETypePath.RETURN ||
-              pathType === ETypePath.ROUND_TRIP
-            ) {
-              volta = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              });
-              employeeOnReturn.push(volta);
+            if (path.type === ETypePath.RETURN) {
+              if (
+                pathType === ETypePath.RETURN ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                volta = path.employeesOnPath.filter((item) => {
+                  return ids.includes(item.employee.id);
+                });
+                employeeOnReturn.push(volta);
+              }
             }
           }
         });
       }
     });
-
+    employeeArray.filter((item) => item !== null);
+    console.log(employeeArray.length);
     if (employeeArray.length > 0) {
+      employeeArray = employeeArray.filter(
+        (item, index, self) =>
+          index === self.findIndex((t) => t.id === item.id),
+      );
+
       throw new HttpException(
         `O(s) colaborador(es)${employeeArray.map((item) =>
-          item.map((employee) => ' ' + employee.employee.name),
+           ' ' + item.name,
         )} já está(ão) em uma rota do tipo ${type.toLocaleLowerCase()}!`,
         HttpStatus.CONFLICT,
       );
     }
+
+
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+      
 
       let message = [
         employeeOnOneWay.length > 0
           ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
           : null,
         employeeOnReturn.length > 0
           ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
           : null,
       ]
 
 
       message = message.filter((item) => item !== null);
+      console.log("message " + message);
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
           message
-          
+
         },
         HttpStatus.CONFLICT,
       );
@@ -632,8 +644,8 @@ export class RouteService {
     routes
       .filter((_r) => _r.id != route.id && route.type === _r.type)
       .forEach((routeItem: Route) => {
+        if (route.type !== ETypeRoute.EXTRA) {
         routeItem.path.forEach((path) => {
-          if (route.type !== ETypeRoute.EXTRA) {
             const employeeInPath = path.employeesOnPath.filter((item) =>
               employeeIds.includes(item.employee.id),
             );
@@ -644,8 +656,12 @@ export class RouteService {
             if (employeeInPath) {
               employeeArray.push(employeeInPath);
             }
+          });
           }
+          
           if (route.type === ETypeRoute.EXTRA) {
+            routeItem.path.forEach((path) => {
+
             if (path.type === ETypePath.ONE_WAY) {
               if (
                 pathType === ETypePath.ONE_WAY ||
@@ -668,10 +684,11 @@ export class RouteService {
                 employeeOnReturn.push(volta);
               }
             }
-          }
-        });
+          });
+        }
       });
 
+      employeeArray.filter((item) => item !== null);
     if (employeeArray.length > 0) {
       throw new HttpException(
         `Um ou mais coloboradores já estão em outra rota do tipo ${type.toLocaleLowerCase()}.  ${employeeArray.map(
@@ -687,29 +704,31 @@ export class RouteService {
         HttpStatus.CONFLICT,
       );
     }
-
+    employeeArray = employeeArray.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.id === item.id),
+    );
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+      
       let message = [
-        employeeOnOneWay.length > 0
-          ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
-          : null,
+        employeeOnOneWay.length &&
+           `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+          ,
         employeeOnReturn.length > 0
           ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-              item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
           : null,
       ]
 
 
       message = message.filter((item) => item !== null);
-      
-      throw new HttpException(
+            throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
-          ...message,
-
+          message,
         },
         HttpStatus.CONFLICT,
       );
