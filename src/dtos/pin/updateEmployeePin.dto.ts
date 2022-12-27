@@ -1,6 +1,14 @@
-import { IsOptional, IsString } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNotEmpty,
+} from 'class-validator';
 
-export class UpdatePinDTO {
+export class UpdateEmployeePinDTO {
+  @IsString({ message: '[id] O id do ponto de embarque deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[id] O id do ponto de embarque deve ser enviado.'})
+  id?: string;
+
   @IsString({ message: '[lat] A latitude deve ser do tipo string.' })
   @IsOptional()
   lat?: string;
@@ -9,7 +17,7 @@ export class UpdatePinDTO {
   @IsOptional()
   lng?: string;
 
-  @IsString({ message: '[local] O local deve ser do tipo string string.' })
+  @IsString({ message: '[local] O local deve ser do tipo string.' })
   @IsOptional()
   local?: string;
 
