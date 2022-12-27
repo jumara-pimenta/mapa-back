@@ -50,7 +50,7 @@ export class PinService {
 
     if (!pin)
       throw new HttpException(
-        `Não foi encontrado um pin com o id: ${id}`,
+        'O ponto de embarque não foi encontrado!',
         HttpStatus.NOT_FOUND,
       );
 

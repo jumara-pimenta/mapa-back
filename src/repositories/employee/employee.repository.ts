@@ -34,8 +34,26 @@ export class EmployeeRepository
         registration: data.registration,
         role: data.role,
         shift: data.shift,
+        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
+              select: {
+                id: true,
+                details: true,
+                lat: true,
+                lng: true,
+                local: true,
+                title: true
+              }
+            }
+          }
+        },
+      }
     });
   }
 

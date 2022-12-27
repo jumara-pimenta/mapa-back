@@ -89,7 +89,7 @@ export class EmployeeService {
 
     if (!employee)
       throw new HttpException(
-        `Não foi encontrado um(a) colaborador(a) com o id: ${id}`,
+        'Colaborador(a) não foi encontrado(a)!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -118,7 +118,7 @@ export class EmployeeService {
   }
 
   async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
-    const employee = await this.employeeRepository.findById(id);
+    const employee = await this.listById(id);
 
     if (data.registration) {
       const RegistrationExists =
@@ -129,10 +129,14 @@ export class EmployeeService {
         RegistrationExists.registration !== employee.registration
       ) {
         throw new HttpException(
-          'Matrícula cadastrada para outro(a) colaborador(a)',
+          'Matrícula já cadastrada para outro(a) colaborador(a)',
           HttpStatus.CONFLICT,
         );
       }
+    }
+
+    if (data.pin.id) {
+      await this.pinService.update(data.pin.id, {...data.pin});
     }
 
     return await this.employeeRepository.update(

@@ -1,9 +1,12 @@
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
 import {
   IsDateString,
+  IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 
 export class UpdateEmployeeDTO {
   @IsString({ message: 'Matrícula não está definida como string.' })
@@ -39,4 +42,9 @@ export class UpdateEmployeeDTO {
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => UpdateEmployeePinDTO)
+  @IsNotEmpty()
+  pin?: UpdateEmployeePinDTO
 }
