@@ -136,7 +136,7 @@ export class EmployeeService {
     }
 
     if (data.pin.id) {
-      await this.pinService.update(data.pin.id, {...data.pin});
+      await this.employeeOnPinService.associateEmployee({employeeId : employee.id, pinId : data.pin.id, type : ETypePin.CONVENTIONAL})
     }
 
     return await this.employeeRepository.update(
