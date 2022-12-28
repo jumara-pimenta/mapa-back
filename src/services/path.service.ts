@@ -128,6 +128,19 @@ export class PathService {
     return this.mapperMany(path);
   }
 
+  async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
+    
+    const path = await this.pathRepository.findByEmployee(employeeId);
+
+    if (!path.length)
+      throw new HttpException(
+        'Não foram encontrados trajetos para este colaborador!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperMany(path);
+  }
+
   async listOneByDriverAndStatus(
     driverId: string,
     status: EStatusPath,
