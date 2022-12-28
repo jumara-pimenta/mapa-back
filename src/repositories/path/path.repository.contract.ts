@@ -6,6 +6,7 @@ export default interface IPathRepository {
   delete(id: string): Promise<Path>;
   findById(id: string): Promise<Path>;
   findByDriver(driverId: string): Promise<Path[]>;
+  findByEmployee(employeeId: string): Promise<Path[]>;
   findByRoute(routeId: string): Promise<Path[]>;
   findByDriverIdAndStatus(driverId: string, status: EStatusPath): Promise<Path>;
   update(data: Path): Promise<Path>;

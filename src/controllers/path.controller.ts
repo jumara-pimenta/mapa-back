@@ -39,6 +39,14 @@ export class PathController {
     return await this.pathService.listManyByDriver(driverId);
   }
 
+  @Get('/paths/employee/:employeeId')
+  @HttpCode(HttpStatus.OK)
+  async getManyByEmployee(
+    @Param('employeeId') employeeId: string,
+  ): Promise<MappedPathDTO[]> {    
+    return await this.pathService.listManyByEmployee(employeeId);
+  }
+
   @Get('/paths/drivers/:driverId/status/:status')
   @HttpCode(HttpStatus.OK)
   async getOneByStatus(
