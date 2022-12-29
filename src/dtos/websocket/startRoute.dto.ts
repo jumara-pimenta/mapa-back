@@ -1,22 +1,36 @@
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { UpdatePathDTO } from '../path/updatePath.dto';
 import { UpdateRouteDTO } from '../route/updateRoute.dto';
 
 export class StatusRouteDTO {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
+  @IsNotEmpty({ message: '[routeId] O id da rota deve ser preenchida.'})
   routeId: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
+  @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.'})
   pathId: string;
 
-  @IsNotEmpty()
+  @ValidateNested({
+    each: true,
+  })
+  @Type(() => UpdateRouteDTO)
+  @IsNotEmpty({
+    message: '[route] Os detalhes da rota devem ser preenchidos.',
+  })
   route: UpdateRouteDTO;
 
-  @IsNotEmpty()
+  @ValidateNested({
+    each: true,
+  })
+  @Type(() => UpdatePathDTO)
+  @IsNotEmpty({
+    message: '[path] Os detalhes do trajeto devem ser preenchidos.',
+  })
   path: UpdatePathDTO;
 }
