@@ -480,8 +480,8 @@ export class RouteService {
     pathType?: string,
   ): Promise<void> {
     let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     employeeRoute.forEach((route: Route) => {
@@ -573,13 +573,12 @@ export class RouteService {
   }
 
   async employeesInPins(route: Employee[], type: string): Promise<void> {
-    let employeeArrayPins = [];
+    const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
       }
       const _employee = [];
-      // console.log(employee.pins);
 
       if (type !== ETypeRoute.EXTRA) {
         employee.pins.forEach((item: any) => {
@@ -634,8 +633,8 @@ export class RouteService {
     pathType: string,
   ): Promise<void> {
     let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     routes

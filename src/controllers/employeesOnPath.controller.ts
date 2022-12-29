@@ -8,8 +8,8 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
+import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
+import { UpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 
@@ -54,7 +54,6 @@ export class EmployeesOnPathController {
     @Param('id') id: string,
     @Body() payload: UpdateEmployeesOnPathDTO,
   ): Promise<MappedEmployeesOnPathDTO> {
-    console.log(id);
     return await this.employeeOnPathService.update(id, payload);
   }
 }

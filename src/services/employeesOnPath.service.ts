@@ -114,8 +114,7 @@ export class EmployeesOnPathService {
   async update(
     id: string,
     data: UpdateEmployeesOnPathDTO,
-    ): Promise<any> {
-    console.log('=====>', id, data);
+  ): Promise<any> {
     const employeesOnPath = await this.listById(id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
