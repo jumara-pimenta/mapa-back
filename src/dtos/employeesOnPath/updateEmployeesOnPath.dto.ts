@@ -1,45 +1,24 @@
 import {
   IsBoolean,
-  IsDate,
   IsDateString,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class UpdateEmployeesOnPathDTO {
-  @IsString()
-  @IsOptional()
-  process?: string;
-
-  @IsString()
-  @MaxLength(15)
-  @IsOptional()
-  product?: string;
-
-  @IsString()
-  @IsOptional()
-  sequenceQr?: number;
-
-  @MinLength(2)
-  @MaxLength(3)
-  @IsOptional()
-  type?: string;
-
-  @IsBoolean()
+  @IsBoolean({ message: '[confirmation] A confirmação deve ser do tipo booleano.'})
   @IsOptional()
   confirmation?: boolean;
 
-  @IsDateString()
+  @IsDateString({}, { message: '[boardingAt] A data/hora do embarque deve ser do tipo date.'})
   @IsOptional()
   boardingAt?: Date;
 
-  @IsDateString()
+  @IsDateString({}, { message: '[disembarkAt] A data/hora do desembarque deve ser do tipo date.'})
   @IsOptional()
   disembarkAt?: Date;
 
-  @IsString()
+  @IsString({ message: '[description] A descrição deve ser do tipo string.'})
   @IsOptional()
   description?: string;
 }

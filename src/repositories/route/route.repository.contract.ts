@@ -16,4 +16,5 @@ export default interface IRouteRepository {
   update(data: Route): Promise<Route>;
   updateWebsocket(data: Route): Promise<RouteWebsocket>;
   softDelete(id: string): Promise<Route>;
+  listByDriverId(id: string, page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<Route>>;
 }

@@ -1,15 +1,15 @@
 import {
   IsBoolean,
-  IsOptional,
+  IsNotEmpty,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class UpdateEmployeesStatusOnPathDTO {
-  @IsString()
+  @IsString({ message: '[id] O id deve ser do tipo string.'})
+  @IsNotEmpty({ message: '[id] O id deve ser preenchido.'})
   id: string;
 
-  @IsBoolean()
+  @IsBoolean({ message: '[status] O status deve ser do tipo booleano.'})
+  @IsNotEmpty({ message: '[status] O status deve ser preenchido.'})
   status: boolean;
 }
