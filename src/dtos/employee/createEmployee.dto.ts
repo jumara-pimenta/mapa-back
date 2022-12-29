@@ -8,42 +8,41 @@ import {
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 
 export class CreateEmployeeDTO {
-  @IsString({ message: 'Matrícula não está definida como string.' })
-  @IsNotEmpty({ message: 'Matrícula não pode receber valor vazio.' })
+  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
 
-  @IsString({ message: 'Admissão não está definido como string.' })
-  @IsNotEmpty({ message: 'Admissão não pode receber valor vazio.' })
-  @IsDateString()
+  @IsDateString({}, { message: '[admission] A data de admissão deve ser do tipo date.' })
+  @IsNotEmpty({ message: '[admission] A data de admissão deve ser preenchida.' })
   admission: Date;
 
-  @IsString({ message: 'Cargo não está definido como string.' })
-  @IsNotEmpty({ message: 'Cargo não pode receber valor vazio.' })
+  @IsString({ message: '[role] O cargo deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[role] O cargo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
-  @IsString({ message: 'Name não está definido como string.' })
-  @IsNotEmpty({ message: 'Name não pode receber valor ser vazio.' })
+  @IsString({ message: '[name] O nome deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[role] O nome deve ser preenchido.' })
   name: string;
 
-  @IsString({ message: 'Turno não está definido como string.' })
-  @IsNotEmpty({ message: 'Turno não pode receber valor vazio.' })
+  @IsString({ message: '[shift] O turno deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[shift] O turno deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift: string;
 
-  @IsString({ message: 'Centro de custo não está definido como string.' })
-  @IsNotEmpty({ message: 'Centro de custo não pode receber valor vazio.' })
+  @IsString({ message: '[costCenter] O centro de custo deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[costCenter] O centro de custo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter: string;
 
-  @IsString({ message: 'Endereço não está definido como string.' })
-  @IsNotEmpty({ message: 'Endereço não pode receber valor vazio.' })
+  @IsString({ message: '[address] O endereço deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address: string;
 
   @ValidateNested({ each: true })
   @Type(() => CreateEmployeePinDTO)
-  @IsNotEmpty()
+  @IsNotEmpty({ message: '[pin] O ponto de embarque deve ser preenchido.'})
   pin: CreateEmployeePinDTO;
 }

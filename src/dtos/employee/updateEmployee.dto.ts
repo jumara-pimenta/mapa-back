@@ -9,16 +9,16 @@ import {
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 
 export class UpdateEmployeeDTO {
-  @IsString({ message: 'Matrícula não está definida como string.' })
+  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration?: string;
 
+  @IsDateString({}, { message: '[admission] A data de admissão deve ser do tipo date.' })
   @IsOptional()
-  @IsDateString()
   admission?: Date;
 
-  @IsString({ message: 'Nome não está definido como string.' })
+  @IsString({ message: '[name] O nome deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   name?: string;
@@ -28,23 +28,23 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role?: string;
 
-  @IsString({ message: 'Turno não está definido como string.' })
+  @IsString({ message: '[shift] O turno deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift?: string;
 
-  @IsString({ message: 'Centro de custo não está definido como string.' })
+  @IsString({ message: '[costCenter] O centro de custo deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter?: string;
 
-  @IsString({ message: 'Endereço não está definido como string.' })
+  @IsString({ message: '[address] O endereço deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;
 
   @ValidateNested({ each: true })
   @Type(() => UpdateEmployeePinDTO)
-  @IsNotEmpty()
+  @IsOptional()
   pin?: UpdateEmployeePinDTO
 }
