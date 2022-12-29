@@ -1,4 +1,4 @@
-import { getDateInLocaleTime } from 'src/utils/Date';
+import { getDateInLocaleTime } from '../utils/Date';
 import { v4 as uuid } from 'uuid';
 import { EmployeesOnPath } from './employeesOnPath.entity';
 import { EmployeesOnPin } from './employeesOnPin.entity';

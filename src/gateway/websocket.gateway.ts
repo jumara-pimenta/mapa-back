@@ -4,19 +4,16 @@ import {
   WebSocketGateway,
   WebSocketServer,
   MessageBody,
-  WsResponse,
   WsException,
 } from '@nestjs/websockets';
-import { Observable } from 'rxjs';
 import { Server } from 'socket.io';
-import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { WebsocketUpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
-import { CurrentLocalDTO } from 'src/dtos/websocket/currentLocal.dto';
-import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
-import { EmployeesOnPathService } from 'src/services/employeesOnPath.service';
-import { RouteService } from 'src/services/route.service';
-import { getDateInLocaleTime } from 'src/utils/date.service';
-import { EStatusRoute } from 'src/utils/ETypes';
+import { WebsocketUpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
+import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
+import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
+import { EmployeesOnPathService } from '../services/employeesOnPath.service';
+import { RouteService } from '../services/route.service';
+import { getDateInLocaleTime } from '../utils/date.service';
+import { EStatusRoute } from '../utils/ETypes';
 
 @WebSocketGateway()
 export class WebsocketGateway {
@@ -28,8 +25,7 @@ export class WebsocketGateway {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Client connected');
+      console.log('client connected:', socket.id);
     });
   }
 
@@ -38,7 +34,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -60,7 +55,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -87,7 +81,6 @@ export class WebsocketGateway {
         ...data,
       });
     } catch (error) {
-      console.log(error);
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }
@@ -98,7 +91,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -134,7 +126,6 @@ export class WebsocketGateway {
     @MessageBody(
       new ValidationPipe({
         exceptionFactory: (errors) => {
-          console.log(errors);
           return new WsException(errors);
         },
       }),
@@ -142,7 +133,6 @@ export class WebsocketGateway {
     payload: WebsocketUpdateEmployeesStatusOnPathDTO,
   ): Promise<void> {
     try {
-      console.log('==>==>=>', payload);
 
       await this.employeesOnPathService.updateWebsocket(
         payload.employeeOnPathId,
@@ -154,8 +144,6 @@ export class WebsocketGateway {
         ...data,
       });
     } catch (error) {
-      console.log(error);
-
       this.server.except(error).emit('error', error);
       throw new WsException(error.message);
     }

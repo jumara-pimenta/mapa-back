@@ -1,4 +1,3 @@
-
 import {
   forwardRef,
   HttpException,
@@ -10,7 +9,7 @@ import { Route } from '../entities/route.entity';
 import IRouteRepository from '../repositories/route/route.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
 import { FiltersRouteDTO } from '../dtos/route/filtersRoute.dto';
-import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
+import { MappedRouteDTO, MappedRouteShortDTO } from '../dtos/route/mappedRoute.dto';
 import { CreateRouteDTO } from '../dtos/route/createRoute.dto';
 import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
@@ -18,10 +17,10 @@ import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import { EStatusRoute, ETypePath } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate } from 'src/utils/date.service';
+import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
-import { Employee } from 'src/entities/employee.entity';
-import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
+import { Employee } from '../entities/employee.entity';
+import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 
 @Injectable()
 export class RouteService {
@@ -36,8 +35,8 @@ export class RouteService {
   ) {}
 
   async create(payload: CreateRouteDTO): Promise<Route> {
-    let employeeArray = [];
-    let employeeArrayPins = [];
+    const employeeArray = [];
+    const employeeArrayPins = [];
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
@@ -52,8 +51,7 @@ export class RouteService {
         employeeArrayPins.push(employee.name);
       }
       const _employee = [];
-      console.log(employee.pins);
-      
+
       employee.pins.forEach((item: any) => {
         if (item.type === payload.type) {
           _employee.push(employee.name);
@@ -91,13 +89,13 @@ export class RouteService {
 
         if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -116,13 +114,13 @@ export class RouteService {
 
         if (initRouteDate >= startedAtDate && initRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (endRouteDate >= startedAtDate && endRouteDate <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -135,7 +133,6 @@ export class RouteService {
           if (payload.type === route.type) {
             return payload.employeeIds.includes(item.employee.id);
           }
-          
         });
 
         employeeArray.push(employeeInPath);
@@ -187,12 +184,10 @@ export class RouteService {
         HttpStatus.NOT_FOUND,
       );
 
-      
-
     return this.mapperOne(route);
   }
 
-  async listByIdWebsocket(id: string): Promise<any> {
+  async listByIdWebsocket(id: string): Promise<Route> {
     const route = await this.routeRepository.findByIdWebsocket(id);
 
     if (!route)
@@ -201,7 +196,6 @@ export class RouteService {
         HttpStatus.NOT_FOUND,
       );
 
-    // return this.mapperOne(route);
     return route;
   }
 
@@ -218,7 +212,7 @@ export class RouteService {
       );
     }
 
-    const items = this.mapperMany(routes.items);
+    const items = await this.mapperMany(routes.items);
 
     return {
       total: routes.total,
@@ -227,35 +221,31 @@ export class RouteService {
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
-    let employeeArray = [];
-    let employeeArrayPins = [];
+    const employeeArray = [];
+    const employeeArrayPins = [];
 
     const route = await this.listById(id);
 
     if (route.paths[0].finishedAt !== null)
       throw new HttpException(
-        `Não é possível alterar uma rota que já foi finalizada!`,
+        'Não é possível alterar uma rota que já foi finalizada!',
         HttpStatus.CONFLICT,
       );
 
     if (data.employeeIds) {
-
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
 
       const employeesPins = await this.employeeService.listAllEmployeesPins(
         data.employeeIds,
       );
-      
 
       const _employee = [];
       employeesPins.forEach((employee: Employee) => {
         employee.pins.forEach((pin: any) => {
           if (pin.type === route.type) {
-            
             _employee.push(employee.name);
           }
-          
         });
         if (_employee.length < 1) employeeArrayPins.push(employee.name);
       });
@@ -267,10 +257,9 @@ export class RouteService {
             const employeeInPath = path.employeesOnPath.filter((item) =>
               data.employeeIds.includes(item.employee.id),
             );
-            
+
             employeeInPath.forEach((__r) => {
               __r.routeName = routeItem.description;
-              
             });
             if (employeeInPath) {
               employeeArray.push(employeeInPath);
@@ -278,19 +267,21 @@ export class RouteService {
           });
         });
       if (employeeArray.length > 0) {
-        
-        throw new HttpException(`Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
-          (item) =>
-            item.map(
-              (employee) =>
-                ' Nome: ' +
-                employee.employee.name +
-                ' Rota: ' +
-                employee.routeName,
-            ),
-        )}`, HttpStatus.CONFLICT);
+        throw new HttpException(
+          `Um ou mais coloboradores já estão em outra rota do tipo ${route.type.toLocaleLowerCase()}.  ${employeeArray.map(
+            (item) =>
+              item.map(
+                (employee) =>
+                  ' Nome: ' +
+                  employee.employee.name +
+                  ' Rota: ' +
+                  employee.routeName,
+              ),
+          )}`,
+          HttpStatus.CONFLICT,
+        );
       }
-      
+
       if (employeeArrayPins.length > 0) {
         throw new HttpException(
           `O(s) funcionário(s) ${employeeArrayPins} não pode(m) não possui(em) ponto em rota do tipo ${route.type.toLocaleLowerCase()}!`,
@@ -320,14 +311,12 @@ export class RouteService {
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<any> {
+    if (payload.path.startedAt) {
+      const data = await this.listByIdWebsocket(payload.routeId);
 
-    if(payload.path.startedAt){
-      const data = await this.listByIdWebsocket(payload.routeId)
-      console.log(data);
-      
-      if(data.path[0].employeesOnPath.length === 0){
+      if (data.path[0].employeesOnPath.length === 0) {
         throw new HttpException(
-          `Não é possível iniciar uma rota sem colaboradores!`,
+          'Não é possível iniciar uma rota sem colaboradores!',
           HttpStatus.CONFLICT,
         );
       }
@@ -349,7 +338,6 @@ export class RouteService {
       vehicle: dataFilter.vehicle.plate,
       path: dataFilter.path,
     };
-    console.log('dataFilterWebsocket', dataFilterWebsocket);
 
     return dataFilterWebsocket;
   }
@@ -368,12 +356,10 @@ export class RouteService {
   async listByIdWithPaths(id: string): Promise<MappedRouteDTO> {
     const route = await this.routeRepository.findById(id);
 
-    const path = await this.pathService.listById(route.path[0].id);
-
     return this.mapperOne(route);
   }
 
-  private mapperMany(routes: Route[]): MappedRouteDTO[] {
+  private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {
     return routes.map((route) => {
       const { driver, vehicle, path } = route;
 
@@ -423,9 +409,6 @@ export class RouteService {
             createdAt: item.createdAt,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
-              // const { pins } = employee;
-
-              
 
               return {
                 id: item.id,
@@ -452,6 +435,26 @@ export class RouteService {
     });
   }
 
+  private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
+    return routes.map(route => {
+      const { driver, vehicle } = route;
+
+    return {
+      id : route.id,
+      description : route.description,
+      distance : route.description,
+      type : route.type,
+      driver : {
+        id : driver.id,
+        name : driver.name
+      },
+      vehicle : {
+        id : vehicle.id,
+        plate : vehicle.plate
+      }}  
+    })
+  }
+  
   private mapperOne(route: Route): MappedRouteDTO {
     const { driver, vehicle, path } = route;
 
