@@ -9,22 +9,25 @@ import { ETypePath } from '../../utils/ETypes';
 import { durationPathRgx } from '../../utils/Regex';
 
 export class PathDetailsDTO {
-  @IsEnum(ETypePath)
-  @IsNotEmpty()
+  @IsEnum(ETypePath, { message: '[type] O tipo do trajeto deve ser do tipo enum: IDA | VOLTA | IDA E VOLTA'})
+  @IsNotEmpty({ message: '[type] O tipo do trajeto deve ser preenchido.'})
   type: ETypePath;
 
   @IsDefined()
   @Matches(durationPathRgx, {
     message:
-      'O valor informado é inválido. O formato esperado é HH:MM (ex. 08:30)!',
+      '[duration] A duração do trajeto deve ser do formato: HH:MM',
   })
   duration: string;
 
   @IsDefined()
-  @Matches(durationPathRgx)
+  @Matches(durationPathRgx, {
+    message:
+      '[startsAt] A hora de início do trajeto deve ser do formato: HH:MM',
+  })
   startsAt: string;
 
-  @IsBoolean()
-  @IsNotEmpty()
+  @IsBoolean({ message: '[isAutoRoute] A roteirização automática deve ser do tipo booleano.'})
+  @IsNotEmpty({ message: '[isAutoRoute] A roteirização automática deve ser preenchida.'})
   isAutoRoute: boolean;
 }
