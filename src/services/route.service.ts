@@ -103,7 +103,7 @@ export class RouteService {
     const route = await this.routeRepository.findById(id);
     if (!route)
       throw new HttpException(
-        `Não foi encontrada uma rota com o id: ${id}!`,
+        'Não foi encontrada está rota!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -349,6 +349,8 @@ export class RouteService {
     });
   }
 
+  
+
   private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
     return routes.map((route) => {
       const { driver, vehicle } = route;
@@ -480,8 +482,8 @@ export class RouteService {
     pathType?: string,
   ): Promise<void> {
     let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     employeeRoute.forEach((route: Route) => {
@@ -573,7 +575,7 @@ export class RouteService {
   }
 
   async employeesInPins(route: Employee[], type: string): Promise<void> {
-    let employeeArrayPins = [];
+    const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
@@ -634,8 +636,8 @@ export class RouteService {
     pathType: string,
   ): Promise<void> {
     let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     routes
