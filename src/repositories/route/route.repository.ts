@@ -437,5 +437,106 @@ export class RouteRepository
       },
     });
   }
+
+  async listByDriverId(  driverId: string, page: Page, filters: FiltersRouteDTO  ): Promise<PageResponse<Route>> {
+    const condition = generateQueryByFiltersForRoute(filters);
+
+    const items = condition
+      ? await this.repository.route.findMany({
+          ...this.buildPage(page),
+          where: {
+            ...condition,
+            deletedAt: null,
+            driverId,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            vehicle: true,
+          },
+        })
+      : await this.repository.route.findMany({
+          ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+            driverId,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            vehicle: true,
+          },
+        });
+
+    const total = condition
+      ? await this.repository.route.findMany({
+          where: {
+            ...condition,
+            deletedAt: null,
+            driverId,
+          },
+        })
+      : await this.repository.route.count({
+          where: {
+            deletedAt: null,
+            driverId,
+          },
+        });
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+  }
 }
 

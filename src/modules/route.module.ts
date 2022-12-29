@@ -1,5 +1,4 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { EmployeeRepository } from 'src/repositories/employee/employee.repository';
 import { RouteController } from '../controllers/route.controller';
 import { RouteRepository } from '../repositories/route/route.repository';
 import { RouteService } from '../services/route.service';

@@ -9,7 +9,10 @@ import { Route } from '../entities/route.entity';
 import IRouteRepository from '../repositories/route/route.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
 import { FiltersRouteDTO } from '../dtos/route/filtersRoute.dto';
-import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
+import {
+  MappedRouteDTO,
+  MappedRouteShortDTO,
+} from '../dtos/route/mappedRoute.dto';
 import { CreateRouteDTO } from '../dtos/route/createRoute.dto';
 import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
@@ -17,10 +20,10 @@ import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import { EStatusRoute, ETypePath, ETypeRoute } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate } from 'src/utils/date.service';
+import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
-import { Employee } from 'src/entities/employee.entity';
-import { StatusRouteDTO } from 'src/dtos/websocket/StatusRoute.dto';
+import { Employee } from '../entities/employee.entity';
+import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 
 @Injectable()
 export class RouteService {
@@ -32,7 +35,7 @@ export class RouteService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
-  ) {}
+  ) { }
 
   async create(payload: CreateRouteDTO): Promise<Route> {
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
@@ -107,6 +110,27 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
+  async listByDriverId(
+    id: string,
+    page: Page,
+    filters?: FiltersRouteDTO,
+  ): Promise<PageResponse<MappedRouteDTO>> {
+    const routes = await this.routeRepository.listByDriverId(id, page, filters);
+
+    if (routes.total === 0) {
+      throw new HttpException(
+        'Não existe routes para esta pesquisa!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const items = await this.mapperMany(routes.items);
+
+    return {
+      total: routes.total,
+      items,
+    };
+  }
   async listByIdWebsocket(id: string): Promise<Route> {
     const route = await this.routeRepository.findByIdWebsocket(id);
 
@@ -141,9 +165,6 @@ export class RouteService {
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
-    const employeeArray = [];
-    const employeeArrayPins = [];
-
     const route = await this.listById(id);
 
     if (route.paths[0].finishedAt !== null)
@@ -178,7 +199,7 @@ export class RouteService {
         type,
         route,
         data.employeeIds,
-        pathType
+        pathType,
       );
 
       for await (const path of route.paths) {
@@ -189,7 +210,7 @@ export class RouteService {
         routeId: id,
         employeeIds: data.employeeIds,
         details: {
-          type: route.paths[0].type as ETypePath,
+          type: pathType as ETypePath,
           startsAt: route.paths[0].startsAt,
           duration: route.paths[0].duration,
           isAutoRoute: true,
@@ -208,7 +229,7 @@ export class RouteService {
 
       if (data.path[0].employeesOnPath.length === 0) {
         throw new HttpException(
-          `Não é possível iniciar uma rota sem colaboradores!`,
+          'Não é possível iniciar uma rota sem colaboradores!',
           HttpStatus.CONFLICT,
         );
       }
@@ -328,6 +349,27 @@ export class RouteService {
     });
   }
 
+  private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
+    return routes.map((route) => {
+      const { driver, vehicle } = route;
+
+      return {
+        id: route.id,
+        description: route.description,
+        distance: route.description,
+        type: route.type,
+        driver: {
+          id: driver.id,
+          name: driver.name,
+        },
+        vehicle: {
+          id: vehicle.id,
+          plate: vehicle.plate,
+        },
+      };
+    });
+  }
+
   private mapperOne(route: Route): MappedRouteDTO {
     const { driver, vehicle, path } = route;
 
@@ -417,13 +459,13 @@ export class RouteService {
 
         if (init >= startedAtDate && init <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (end >= startedAtDate && end <= finishedAtTime) {
           throw new HttpException(
-            `O motorista já está em uma rota neste horário!`,
+            'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -438,74 +480,92 @@ export class RouteService {
     pathType?: string,
   ): Promise<void> {
     let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     employeeRoute.forEach((route: Route) => {
       if (route.type !== ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
-          const employeeInPath = path.employeesOnPath.filter((item) => {
+          path.employeesOnPath.filter((item) => {
             if (type === route.type) {
-              return ids.includes(item.employee.id);
+              employeeArray.push(item.employee);
             }
           });
-
-          employeeArray.push(employeeInPath);
         });
       }
       if (route.type === ETypeRoute.EXTRA) {
+
         route.path.forEach((path) => {
-          if (path.type === ETypePath.ONE_WAY) {
-            if (
-              pathType === ETypePath.ONE_WAY ||
-              pathType === ETypePath.ROUND_TRIP
-            ) {
-              ida = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              });
-              employeeOnOneWay.push(ida);
+
+          if (type === ETypeRoute.EXTRA) {
+
+            if (path.type === ETypePath.ONE_WAY) {
+              if (
+                pathType === ETypePath.ONE_WAY ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                ida = path.employeesOnPath.filter((item) => {
+                  return ids.includes(item.employee.id);
+                });
+                employeeOnOneWay.push(ida);
+              }
             }
-          }
-          if (path.type === ETypePath.RETURN) {
-            if (
-              pathType === ETypePath.RETURN ||
-              pathType === ETypePath.ROUND_TRIP
-            ) {
-              volta = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              });
-              employeeOnReturn.push(volta);
+            if (path.type === ETypePath.RETURN) {
+              if (
+                pathType === ETypePath.RETURN ||
+                pathType === ETypePath.ROUND_TRIP
+              ) {
+                volta = path.employeesOnPath.filter((item) => {
+                  return ids.includes(item.employee.id);
+                });
+                employeeOnReturn.push(volta);
+              }
             }
           }
         });
       }
     });
-
+    employeeArray.filter((item) => item !== null);
+    console.log(employeeArray.length);
     if (employeeArray.length > 0) {
+      employeeArray = employeeArray.filter(
+        (item, index, self) =>
+          index === self.findIndex((t) => t.id === item.id),
+      );
+
       throw new HttpException(
         `O(s) colaborador(es)${employeeArray.map((item) =>
-          item.map((employee) => ' ' + employee.employee.name),
+           ' ' + item.name,
         )} já está(ão) em uma rota do tipo ${type.toLocaleLowerCase()}!`,
         HttpStatus.CONFLICT,
       );
     }
+
+
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+      
+
+      let message = [
+        employeeOnOneWay.length > 0
+          ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+          : null,
+        employeeOnReturn.length > 0
+          ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+          : null,
+      ]
+
+
+      message = message.filter((item) => item !== null);
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
-          message: [
-            employeeOnOneWay.length > 0
-              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
-              : null,
-            employeeOnReturn.length > 0
-              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
-              : null,
-          ],
+          message
+
         },
         HttpStatus.CONFLICT,
       );
@@ -513,7 +573,7 @@ export class RouteService {
   }
 
   async employeesInPins(route: Employee[], type: string): Promise<void> {
-    let employeeArrayPins = [];
+    const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
       if (employee.pins.length === 0) {
         employeeArrayPins.push(employee.name);
@@ -552,13 +612,13 @@ export class RouteService {
 
         if (init >= startedAtDate && init <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
         if (end >= startedAtDate && end <= finishedAtTime) {
           throw new HttpException(
-            `O veículo já está em uma rota neste horário!`,
+            'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
@@ -574,15 +634,15 @@ export class RouteService {
     pathType: string,
   ): Promise<void> {
     let employeeArray = [];
-    let employeeOnReturn = [];
-    let employeeOnOneWay = [];
+    const employeeOnReturn = [];
+    const employeeOnOneWay = [];
     let ida;
     let volta;
     routes
       .filter((_r) => _r.id != route.id && route.type === _r.type)
       .forEach((routeItem: Route) => {
+        if (route.type !== ETypeRoute.EXTRA) {
         routeItem.path.forEach((path) => {
-          if (route.type !== ETypeRoute.EXTRA) {
             const employeeInPath = path.employeesOnPath.filter((item) =>
               employeeIds.includes(item.employee.id),
             );
@@ -593,8 +653,12 @@ export class RouteService {
             if (employeeInPath) {
               employeeArray.push(employeeInPath);
             }
+          });
           }
+          
           if (route.type === ETypeRoute.EXTRA) {
+            routeItem.path.forEach((path) => {
+
             if (path.type === ETypePath.ONE_WAY) {
               if (
                 pathType === ETypePath.ONE_WAY ||
@@ -617,10 +681,11 @@ export class RouteService {
                 employeeOnReturn.push(volta);
               }
             }
-          }
-        });
+          });
+        }
       });
 
+      employeeArray.filter((item) => item !== null);
     if (employeeArray.length > 0) {
       throw new HttpException(
         `Um ou mais coloboradores já estão em outra rota do tipo ${type.toLocaleLowerCase()}.  ${employeeArray.map(
@@ -636,23 +701,31 @@ export class RouteService {
         HttpStatus.CONFLICT,
       );
     }
-
+    employeeArray = employeeArray.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.id === item.id),
+    );
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
-      throw new HttpException(
+      
+      let message = [
+        employeeOnOneWay.length &&
+           `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+          ,
+        employeeOnReturn.length > 0
+          ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
+            item?.map((employee) => ' ' + employee.employee.name),
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+          : null,
+      ]
+
+
+      message = message.filter((item) => item !== null);
+            throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
-          message: [
-            employeeOnOneWay.length > 0
-              ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
-              : null,
-            employeeOnReturn.length > 0
-              ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-                  item?.map((employee) => ' ' + employee.employee.name),
-                )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
-              : null,
-          ],
+          message,
         },
         HttpStatus.CONFLICT,
       );
