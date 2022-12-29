@@ -1,38 +1,50 @@
 import { Transform, TransformFnParams, Type } from 'class-transformer';
 import { IsString, IsNotEmpty, ValidateNested, IsEnum } from 'class-validator';
-import { ETypePath, ETypeRoute } from '../../utils/ETypes';
+import { ETypeRoute } from '../../utils/ETypes';
 import { PathDetailsDTO } from '../path/pathDetails.dto';
 
 export class CreateRouteDTO {
-  @IsString({ message: '[Description] não está definida como string.' })
-  @IsNotEmpty({ message: '[Description] não pode receber um valor vazio.' })
+  @IsString({ message: '[description] A descrição deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[description] A descrição deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
 
-  @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.' })
-  @IsNotEmpty({ message: '[Type] não pode receber um valor vazio.' })
+  @IsEnum(ETypeRoute, {
+    message:
+      '[type] O tipo da rota deve ser do tipo enum: CONVENCIONAL | ESPECIAL | EXTRA',
+  })
+  @IsNotEmpty({ message: '[type] O tipo da rota deve ser preenchido.' })
   type: ETypeRoute;
 
-  @IsString({ message: '[DriverId] não está definida como string.' })
-  @IsNotEmpty({ message: '[DriverId] não pode receber um valor vazio.' })
+  @IsString({
+    message: '[driverId] O id do motorista deve ser do tipo string.',
+  })
+  @IsNotEmpty({ message: '[driverId] O id do motorista deve ser preenchido.' })
   driverId: string;
 
-  @IsString({ message: '[VehicleId] não está definida como string.' })
-  @IsNotEmpty({ message: '[VehicleId] não pode receber um valor vazio.' })
+  @IsString({
+    message: '[vehicleId] O id do veículo deve ser do tipo string.',
+  })
+  @IsNotEmpty({
+    message: '[vehicleId] O id do veículo deve ser preenchido.',
+  })
   vehicleId: string;
 
   @IsString({
     each: true,
-    message: '[EmployeeIds] não está definida como string.',
+    message: '[employeeIds] O id do colaborador deve ser do tipo string.',
   })
-  @IsNotEmpty({ message: '[EmployeeIds] não pode receber um valor vazio.' })
+  @IsNotEmpty({
+    message: '[employeeIds] Os ids dos colaboradores devem ser preenchidos.',
+  })
   employeeIds: string[];
 
   @ValidateNested({
     each: true,
-    message: '[PathDetails] não está definida como PathDetailsDTO.',
   })
   @Type(() => PathDetailsDTO)
-  @IsNotEmpty({ message: '[PathDetails] não pode receber um valor vazio.' })
+  @IsNotEmpty({
+    message: '[pathDetails] Os detalhes do trajeto devem ser preenchidos.',
+  })
   pathDetails: PathDetailsDTO;
 }
