@@ -322,7 +322,6 @@ export class RouteService {
             createdAt: item.createdAt,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
-              // const { pins } = employee;
 
               return {
                 id: item.id,
@@ -527,7 +526,6 @@ export class RouteService {
       }
     });
     employeeArray.filter((item) => item !== null);
-    console.log(employeeArray.length);
     if (employeeArray.length > 0) {
       employeeArray = employeeArray.filter(
         (item, index, self) =>
