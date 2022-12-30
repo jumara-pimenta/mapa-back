@@ -20,7 +20,7 @@ export class EmployeesOnPinService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-  ) {}
+  ) { }
 
   async associateEmployee(
     props: AssociateEmployeeOnPinDTO,
@@ -28,21 +28,13 @@ export class EmployeesOnPinService {
     const employee = await this.employeeService.listById(props.employeeId);
     const pin = await this.pinService.listById(props.pinId);
 
-    if (!pin) {
-      throw new HttpException(
-        'O ponto de embarque não foi encontrado!',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     if (employee.pins.length > 0) {
 
       for await (const _pin of employee.pins) {
         if (_pin.id === pin.id) {
-          throw new HttpException(
-            'O colaborador não pode ser associado ao mesmo ponto de embarque!',
-            HttpStatus.CONFLICT,
-          );
+          return await this.employeesOnPinRepository.find(
+            props.employeeId,
+            props.pinId)
         }
 
         if (_pin.type === props.type) {

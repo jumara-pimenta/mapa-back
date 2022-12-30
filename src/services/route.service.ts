@@ -103,7 +103,7 @@ export class RouteService {
     const route = await this.routeRepository.findById(id);
     if (!route)
       throw new HttpException(
-        `Não foi encontrada uma rota com o id: ${id}!`,
+        'Não foi encontrada está rota!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -347,6 +347,8 @@ export class RouteService {
       };
     });
   }
+
+  
 
   private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
     return routes.map((route) => {
