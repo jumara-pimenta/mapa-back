@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
 import { IsString, IsNotEmpty, ValidateNested, IsEnum } from 'class-validator';
+import { PathDetailsDTO } from '../path/pathDetails.dto';
 import { randomUUID } from 'crypto';
 import { ETypePath, ETypeRoute } from '../../utils/ETypes';
-import { PathDetailsDTO } from '../path/pathDetails.dto';
 
 export class CreateRouteDTO {
   @ApiProperty({ default: 'Rota 1', example: 'Rota 1' })
-  @IsString({ message: '[Description] não está definida como string.' })
-  @IsNotEmpty({ message: '[Description] não pode receber um valor vazio.' })
+  @IsString({ message: '[description] A descrição deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[description] A descrição deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
 
@@ -21,16 +21,14 @@ export class CreateRouteDTO {
   type: ETypeRoute;
 
   @ApiProperty({
-    default: '05e7ce8b-b3e2-4295-b584-8e2caae2d809',
-    example: '05e7ce8b-b3e2-4295-b584-8e2caae2d809',
+    default: '05e7ce8b-b3e2-4295-b584-8e2caae2d809'
   })
   @IsString({ message: '[DriverId] não está definida como string.' })
   @IsNotEmpty({ message: '[DriverId] não pode receber um valor vazio.' })
   driverId: string;
 
   @ApiProperty({
-    default: '41b4eb3d-e18a-4c8e-a668-49824b21579c',
-    example: '41b4eb3d-e18a-4c8e-a668-49824b21579c',
+    default: '41b4eb3d-e18a-4c8e-a668-49824b21579c'
   })
   @IsString({ message: '[VehicleId] não está definida como string.' })
   @IsNotEmpty({ message: '[VehicleId] não pode receber um valor vazio.' })
@@ -38,12 +36,6 @@ export class CreateRouteDTO {
 
   @ApiProperty({
     default: [
-      '67547947-36c1-43d2-9ae1-e545ade7f9f6',
-      'ff95411a-ca98-4400-90a8-5657115da140',
-      '514802aa-8265-432e-a7ce-30942a697a77',
-      '4b4b626c-071c-4b02-9f08-03fb919ef557',
-    ],
-    example: [
       '67547947-36c1-43d2-9ae1-e545ade7f9f6',
       'ff95411a-ca98-4400-90a8-5657115da140',
       '514802aa-8265-432e-a7ce-30942a697a77',
