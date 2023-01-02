@@ -45,9 +45,9 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;
 
-  @ApiProperty()
-  @ValidateNested({ each: true })
-  @Type(() => UpdateEmployeePinDTO)
+  @IsString({
+    message: '[pinId] O id do ponto de embarque deve ser do tipo string.',
+  })
   @IsOptional()
   pin: UpdateEmployeePinDTO;
 }
