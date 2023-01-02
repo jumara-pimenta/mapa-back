@@ -46,7 +46,7 @@ export class CreateVehicleDTO {
   @IsNotEmpty({ message: '[expiration] A expiração deve ser preenchida.' })
   expiration: string;
 
-  @ApiProperty({default: 28, example: 28})
+  @ApiProperty({default: 28})
   @IsNumber(
     { allowInfinity: true },
     { message: '[capacity] A capacidade deve ser do tipo number.' },
@@ -54,7 +54,7 @@ export class CreateVehicleDTO {
   @IsNotEmpty({ message: '[capacity] A capacidade deve ser preenchida.' })
   capacity: number;
 
-  @ApiProperty({default: '12345678901', example: '12345678901'})
+  @ApiProperty({default: '12345678901'})
   @IsString({ message: '[renavam] O RENAVAM deve ser do tipo string.' })
   @IsNotEmpty({ message: '[renavam] O RENAVAM deve ser preenchido.' })
   @Length(11, 11, {
@@ -62,7 +62,7 @@ export class CreateVehicleDTO {
   })
   renavam: string;
 
-  @ApiProperty({default: new Date(), example: new Date()})
+  @ApiProperty({default: new Date()})
   @IsDateString(
     {},
     { message: '[lastMaintenance] A última manutenção deve ser do tipo date.' },
@@ -72,14 +72,14 @@ export class CreateVehicleDTO {
   })
   lastMaintenance: Date;
 
-  @ApiProperty({default: 'Teste', example: 'Teste'})
+  @ApiProperty({default: 'Teste'})
   @IsString({
     message: '[note] O campo de observação deve ser do tipo string.',
   })
   @IsNotEmpty({ message: '[note] O campo de observação deve ser preenchido.' })
   note: string;
 
-  @ApiProperty({default: 'true', example: 'true'})
+  @ApiProperty({default: true})
   @IsBoolean({
     message:
       '[isAccessibility] O campo de acessibilidade deve ser do tipo booleano.',
