@@ -17,8 +17,11 @@ import { Vehicle } from '../entities/vehicle.entity';
 import { VehicleService } from '../services/vehicle.service';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('/api/vehicles')
+@ApiTags('Vehicles')
+
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 

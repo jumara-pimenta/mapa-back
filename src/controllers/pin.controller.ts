@@ -16,8 +16,11 @@ import { CreatePinDTO } from '../dtos/pin/createPin.dto';
 import { UpdatePinDTO } from '../dtos/pin/updatePin.dto';
 import { FiltersPinDTO } from '../dtos/pin/filtersPin.dto';
 import { Page, PageResponse } from '../configs/database/page.model';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('/api/pins')
+@ApiTags('Pins')
+
 export class PinController {
   constructor(private readonly pinService: PinService) {}
 

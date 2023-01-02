@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsDefined,
@@ -9,10 +10,12 @@ import { ETypePath } from '../../utils/ETypes';
 import { durationPathRgx } from '../../utils/Regex';
 
 export class PathDetailsDTO {
+  @ApiProperty({ default: ETypePath.ROUND_TRIP, enum: [ETypePath.ONE_WAY, ETypePath.RETURN, ETypePath.ROUND_TRIP] })
   @IsEnum(ETypePath)
   @IsNotEmpty()
   type: ETypePath;
 
+  @ApiProperty({ default: '01:30',example: '01:30' })
   @IsDefined()
   @Matches(durationPathRgx, {
     message:
@@ -20,10 +23,12 @@ export class PathDetailsDTO {
   })
   duration: string;
 
+  @ApiProperty({ default: '08:30',example: '08:30'})
   @IsDefined()
   @Matches(durationPathRgx)
   startsAt: string;
 
+  @ApiProperty({ default: true,example: true })
   @IsBoolean()
   @IsNotEmpty()
   isAutoRoute: boolean;

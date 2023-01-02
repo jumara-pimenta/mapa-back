@@ -17,8 +17,10 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('/api/drivers')
+@ApiTags('Drivers')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
