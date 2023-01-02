@@ -1,16 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FiltersEmployeeDTO {
-  @ApiProperty()
+  @ApiProperty({required: false})
   registration?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   admission?: Date;
-  @ApiProperty()
+  @ApiProperty({required: false})
   role?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   shift?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   costCenter?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   address?: string;
 }

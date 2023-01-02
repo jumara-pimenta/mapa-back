@@ -2,16 +2,16 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EStatusPath, ETypePath } from '../../utils/ETypes';
 
 export class FiltersPathDTO {
-  @ApiProperty()
+  @ApiProperty({required: false})
   status?: EStatusPath;
-  @ApiProperty()
+  @ApiProperty({required: false})
   duration?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   finishedAt?: Date;
-  @ApiProperty()
+  @ApiProperty({required: false})
   startedAt?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   startsAt?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   type?: ETypePath;
 }

@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FiltersRouteHistoryDTO {
-  @ApiProperty()
+  @ApiProperty({required: false})
   sequenceQr?: number;
-  @ApiProperty()
+  @ApiProperty({required: false})
   process?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   type?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   product?: string;
 }

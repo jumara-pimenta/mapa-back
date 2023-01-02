@@ -1,10 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FiltersPinDTO {
-  @ApiProperty()
+  @ApiProperty({required: false})
   title?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   local?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   details?: string;
 }

@@ -1,14 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FiltersDriverDTO {
-  @ApiProperty()
+  @ApiProperty({required: false})
   name?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   cpf?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   cnh?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   validation?: Date;
-  @ApiProperty()
+  @ApiProperty({required: false})
   category?: string;
 }

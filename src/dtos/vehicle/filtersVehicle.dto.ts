@@ -1,24 +1,24 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FiltersVehicleDTO {
-  @ApiProperty()
+  @ApiProperty({required: false})
   plate?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   company?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   type?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   lastSurvey?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   expiration?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   capacity?: number;
-  @ApiProperty()
+  @ApiProperty({required: false})
   renavam?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   lastMaintenance?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   note?: string;
-  @ApiProperty()
+  @ApiProperty({required: false})
   isAccessibility?: boolean;
 }
