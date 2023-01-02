@@ -9,6 +9,12 @@ import { ETypeEditionPin } from 'src/utils/ETypes';
 
 export class UpdateEmployeePinDTO {
   @ApiProperty()
+  @IsEnum(ETypeEditionPin, {
+    message: '[typeEdition] O tipo de edição deve ser do tipo enum: EXISTENTE | NOVO',
+  })
+  @IsNotEmpty({ message: '[typeEdition] O tipo de edição deve ser preenchido.'})
+  typeEdition: ETypeEditionPin;
+
   @IsString({ message: '[id] O id do ponto de embarque deve ser do tipo string.' })
   @IsOptional()
   id?: string;

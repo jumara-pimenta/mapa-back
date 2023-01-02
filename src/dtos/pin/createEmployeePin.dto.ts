@@ -1,20 +1,21 @@
-import {
-  IsString,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
-import { ETypeCreationPin } from '../../utils/ETypes';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsEnum, IsOptional, IsNotEmpty } from 'class-validator';
+import { ETypeCreationPin } from '../../utils/ETypes';
+
 export class CreateEmployeePinDTO {
   @ApiProperty({examples: ['NOVO','EXISTENTE'],enum: ETypeCreationPin, default: ETypeCreationPin.IS_NEW})
   @IsEnum(ETypeCreationPin, {
-    message: '[typeCreation] não está definido como enum.',
+    message:
+      '[typeCreation] O tipo de criação deve ser do tipo enum: EXISTENTE | NOVO',
+  })
+  @IsNotEmpty({
+    message: '[typeCreation] O tipo de criação deve ser preenchido.',
   })
   typeCreation: ETypeCreationPin;
-  
-  
-  @ApiProperty({default:null,examples: [null,'74a7134e-5062-4dd8-9167-26dd0cc4e1b7'], description: 'caso typeCreation seja EXISTENTE\n\r\nId do pin que será atualizado.'})
-  @IsString({ message: '[id] não está definido como string.' })
+
+  @IsString({
+    message: '[id] O id do ponto de embarque deve ser do tipo string.',
+  })
   @IsOptional()
   id?: string;
   
@@ -34,7 +35,9 @@ export class CreateEmployeePinDTO {
   local?: string;
   
   @ApiProperty({default: 'Detalhes do local',examples: ['Detalhes do local', null]})
-  @IsString({ message: '[details] não está definido como string.' })
+  @IsString({
+    message: '[details] O campo de detalhes deve ser do tipo string.',
+  })
   @IsOptional()
   details?: string;
   
