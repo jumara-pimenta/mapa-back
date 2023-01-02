@@ -1,5 +1,6 @@
-import { Transform, TransformFnParams } from 'class-transformer';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
+import { IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 
 export class UpdateEmployeeDTO {
   @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
@@ -41,9 +42,8 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;
 
-  @IsString({
-    message: '[pinId] O id do ponto de embarque deve ser do tipo string.',
-  })
+  @ValidateNested({ each: true })
+  @Type(() => UpdateEmployeePinDTO)
   @IsOptional()
-  pinId?: string;
+  pin: UpdateEmployeePinDTO;
 }

@@ -1,19 +1,19 @@
-import {
-  IsString,
-  IsEnum,
-  IsOptional,
-  IsNotEmpty,
-} from 'class-validator';
-import { ECreatePin } from '../../utils/ETypes';
+import { IsString, IsEnum, IsOptional, IsNotEmpty } from 'class-validator';
+import { ETypeCreationPin } from '../../utils/ETypes';
 
 export class CreateEmployeePinDTO {
-  @IsEnum(ECreatePin, {
-    message: '[typeCreation] O tipo de criação deve ser do tipo enum: EXISTENTE | NOVO',
+  @IsEnum(ETypeCreationPin, {
+    message:
+      '[typeCreation] O tipo de criação deve ser do tipo enum: EXISTENTE | NOVO',
   })
-  @IsNotEmpty({ message: '[typeCreation] O tipo de criação deve ser preenchido.'})
-  typeCreation: ECreatePin;
+  @IsNotEmpty({
+    message: '[typeCreation] O tipo de criação deve ser preenchido.',
+  })
+  typeCreation: ETypeCreationPin;
 
-  @IsString({ message: '[id] O id do ponto de embarque deve ser do tipo string.' })
+  @IsString({
+    message: '[id] O id do ponto de embarque deve ser do tipo string.',
+  })
   @IsOptional()
   id?: string;
 
@@ -29,7 +29,9 @@ export class CreateEmployeePinDTO {
   @IsOptional()
   local?: string;
 
-  @IsString({ message: '[details] O campo de detalhes deve ser do tipo string.' })
+  @IsString({
+    message: '[details] O campo de detalhes deve ser do tipo string.',
+  })
   @IsOptional()
   details?: string;
 

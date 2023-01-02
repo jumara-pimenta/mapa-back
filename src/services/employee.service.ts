@@ -14,7 +14,7 @@ import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
-import { ECreatePin, ETypePin } from '../utils/ETypes';
+import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 
 @Injectable()
@@ -42,13 +42,13 @@ export class EmployeeService {
       );
     }
 
-    if (props.pin.typeCreation === ECreatePin.IS_EXISTENT) {
+    if (props.pin.typeCreation === ETypeCreationPin.IS_EXISTENT) {
       if (!props.pin.id)
         throw new HttpException(
           'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
           HttpStatus.BAD_REQUEST,
         );
-    } else if (props.pin.typeCreation === ECreatePin.IS_NEW) {
+    } else if (props.pin.typeCreation === ETypeCreationPin.IS_NEW) {
       const { title, local, details, lat, lng } = props.pin;
 
       if (!title || !local || !details || !lat || !lng) {
@@ -72,7 +72,7 @@ export class EmployeeService {
     await this.employeeOnPinService.associateEmployee({
       employeeId: employee.id,
       pinId:
-        props.pin.typeCreation === ECreatePin.IS_EXISTENT
+        props.pin.typeCreation === ETypeCreationPin.IS_EXISTENT
           ? props.pin.id
           : pin.id,
       type: ETypePin.CONVENTIONAL,
@@ -120,8 +120,12 @@ export class EmployeeService {
     };
   }
 
-  async update(id: string, data: UpdateEmployeeDTO): Promise<MappedEmployeeDTO> {
+  async update(
+    id: string,
+    data: UpdateEmployeeDTO,
+  ): Promise<MappedEmployeeDTO> {
     const employee = await this.listById(id);
+    let pin: Pin;
 
     if (data.registration) {
       const registrationExists =
@@ -138,9 +142,37 @@ export class EmployeeService {
       }
     }
 
-    if (data.pinId) {
+    if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
+      if (!data.pin.id)
+        throw new HttpException(
+          'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+          HttpStatus.BAD_REQUEST,
+        );
+
       await this.employeeOnPinService.associateEmployeeByService(
-        data.pinId,
+        data.pin.id,
+        employee,
+      );
+    } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
+      const { title, local, details, lat, lng } = data.pin;
+
+      if (!title || !local || !details || !lat || !lng) {
+        throw new HttpException(
+          'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      pin = await this.pinService.create({
+        title,
+        local,
+        details,
+        lat,
+        lng,
+      });
+
+      await this.employeeOnPinService.associateEmployeeByService(
+        pin.id,
         employee,
       );
     }

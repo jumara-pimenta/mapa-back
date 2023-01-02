@@ -2,11 +2,19 @@ import {
   IsString,
   IsOptional,
   IsNotEmpty,
+  IsEnum,
 } from 'class-validator';
+import { ETypeEditionPin } from 'src/utils/ETypes';
 
 export class UpdateEmployeePinDTO {
+  @IsEnum(ETypeEditionPin, {
+    message: '[typeEdition] O tipo de edição deve ser do tipo enum: EXISTENTE | NOVO',
+  })
+  @IsNotEmpty({ message: '[typeEdition] O tipo de edição deve ser preenchido.'})
+  typeEdition: ETypeEditionPin;
+
   @IsString({ message: '[id] O id do ponto de embarque deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[id] O id do ponto de embarque deve ser enviado.'})
+  @IsOptional()
   id?: string;
 
   @IsString({ message: '[lat] A latitude deve ser do tipo string.' })
@@ -21,7 +29,7 @@ export class UpdateEmployeePinDTO {
   @IsOptional()
   local?: string;
 
-  @IsString({ message: '[details] O campo detalhes deve ser do tipo string.' })
+  @IsString({ message: '[details] O campo de detalhes deve ser do tipo string.' })
   @IsOptional()
   details?: string;
 
