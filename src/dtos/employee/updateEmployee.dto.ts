@@ -1,12 +1,5 @@
-import { Transform, TransformFnParams, Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
+import { Transform, TransformFnParams } from 'class-transformer';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class UpdateEmployeeDTO {
   @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
@@ -14,7 +7,10 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration?: string;
 
-  @IsDateString({}, { message: '[admission] A data de admissão deve ser do tipo date.' })
+  @IsDateString(
+    {},
+    { message: '[admission] A data de admissão deve ser do tipo date.' },
+  )
   @IsOptional()
   admission?: Date;
 
@@ -33,7 +29,9 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift?: string;
 
-  @IsString({ message: '[costCenter] O centro de custo deve ser do tipo string.' })
+  @IsString({
+    message: '[costCenter] O centro de custo deve ser do tipo string.',
+  })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter?: string;
@@ -43,8 +41,9 @@ export class UpdateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => UpdateEmployeePinDTO)
+  @IsString({
+    message: '[pinId] O id do ponto de embarque deve ser do tipo string.',
+  })
   @IsOptional()
-  pin?: UpdateEmployeePinDTO
+  pinId?: string;
 }
