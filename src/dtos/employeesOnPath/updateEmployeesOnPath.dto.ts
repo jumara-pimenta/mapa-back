@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsDateString,
@@ -6,19 +7,45 @@ import {
 } from 'class-validator';
 
 export class UpdateEmployeesOnPathDTO {
-  @IsBoolean({ message: '[confirmation] A confirmação deve ser do tipo booleano.'})
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  process?: string;
+
+  @ApiProperty()
+  @IsString()
+  @MaxLength(15)
+  @IsOptional()
+  product?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  sequenceQr?: number;
+
+  @ApiProperty()
+  @MinLength(2)
+  @MaxLength(3)
+  @IsOptional()
+  type?: string;
+
+  @ApiProperty()
+  @IsBoolean()
   @IsOptional()
   confirmation?: boolean;
 
-  @IsDateString({}, { message: '[boardingAt] A data/hora do embarque deve ser do tipo date.'})
+  @ApiProperty()
+  @IsDateString()
   @IsOptional()
   boardingAt?: Date;
 
-  @IsDateString({}, { message: '[disembarkAt] A data/hora do desembarque deve ser do tipo date.'})
+  @ApiProperty()
+  @IsDateString()
   @IsOptional()
   disembarkAt?: Date;
 
-  @IsString({ message: '[description] A descrição deve ser do tipo string.'})
+  @ApiProperty()
+  @IsString()
   @IsOptional()
   description?: string;
 }

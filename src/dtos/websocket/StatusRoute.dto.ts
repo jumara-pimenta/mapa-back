@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
@@ -8,26 +9,29 @@ import { UpdatePathDTO } from '../path/updatePath.dto';
 import { UpdateRouteDTO } from '../route/updateRoute.dto';
 
 export class StatusRouteDTO {
-  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
-  @IsNotEmpty({ message: '[routeId] O id da rota deve ser preenchida.'})
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   routeId: string;
 
-  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
-  @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.'})
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
   pathId: string;
 
-  @ValidateNested({
-    each: true,
-  })
+  @ApiProperty()
+  @IsOptional()
+  @ValidateNested({ each: true })
   @Type(() => UpdateRouteDTO)
   @IsNotEmpty({
     message: '[route] Os detalhes da rota devem ser preenchidos.',
   })
   route: UpdateRouteDTO;
 
-  @ValidateNested({
-    each: true,
-  })
+  @ApiProperty()
+  @IsOptional()
+  @ValidateNested({ each: true })
   @Type(() => UpdatePathDTO)
   @IsNotEmpty({
     message: '[path] Os detalhes do trajeto devem ser preenchidos.',

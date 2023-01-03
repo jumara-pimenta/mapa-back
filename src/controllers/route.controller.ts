@@ -17,24 +17,50 @@ import { Route } from '../entities/route.entity';
 import { RouteService } from '../services/route.service';
 import { CreateRouteDTO } from '../dtos/route/createRoute.dto';
 import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
+import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateRoute, DeleteRoute, ListRoutes, UpdateRoute } from 'src/utils/examples.swagger';
 
 @Controller('/api/routes')
+@ApiTags('Routes')
+
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
-
   @Post()
+  @ApiCreatedResponse({
+    description: 'Creates a new Route.',
+    schema: {
+      type: 'object',
+      example: CreateRoute
+    },
+  })
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateRouteDTO): Promise<Route> {
     return await this.routeService.create(payload);
   }
 
   @Delete('/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Soft delete a route.',
+    schema: {
+      type: 'object',
+      example: DeleteRoute
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Route> {
     return await this.routeService.softDelete(id);
   }
 
   @Put('/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Update a route.',
+    schema: {
+      type: 'object',
+      example: UpdateRoute
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -44,6 +70,16 @@ export class RouteController {
   }
 
   @Get()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List all routes.',
+    schema: {
+      type: 'object',
+      example: ListRoutes
+        
+      }
+    }
+  )
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -53,6 +89,14 @@ export class RouteController {
   }
 
   @Get('/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List a route by id.',
+    schema: {
+      type: 'object',
+      example: UpdateRoute
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<MappedRouteDTO> {
     return await this.routeService.listById(id);

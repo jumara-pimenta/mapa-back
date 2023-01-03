@@ -12,8 +12,11 @@ import { EStatusPath } from '../utils/ETypes';
 import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
 import { Path } from '../entities/path.entity';
 import { PathService } from '../services/path.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('/api/routes')
+@ApiTags('Paths')
+
 export class PathController {
   constructor(private readonly pathService: PathService) {}
 

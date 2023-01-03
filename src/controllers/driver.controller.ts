@@ -17,12 +17,31 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('/api/drivers')
+@ApiTags('Drivers')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'Creates a new Driver.',
+    schema: {
+      type: 'object',
+      example: {
+        id: 'dc0e9792-f935-4411-a016-de4509d55054',
+        name: 'João da Silva',
+        cpf: '96893908563',
+        cnh: '123456789',
+        // add year to date to avoid error
+        validation: new Date(Date.now() + 31536000000),
+        category: 'AB',
+        createdAt:  new Date(),
+        updatedAt: null
+      },      
+    },
+  })
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateDriverDTO): Promise<Driver> {
     return await this.driverService.create(payload);

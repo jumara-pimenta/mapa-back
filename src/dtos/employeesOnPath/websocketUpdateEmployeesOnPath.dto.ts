@@ -1,17 +1,22 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString, ValidateNested } from 'class-validator';
 import { UpdateEmployeesOnPathDTO } from './updateEmployeesOnPath.dto';
 
 export class WebsocketUpdateEmployeesStatusOnPathDTO {
-  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
+  @ApiProperty()
+  @IsString()
   pathId: string;
 
-  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
+  @ApiProperty()
+  @IsString()
   routeId: string;
 
-  @IsString({ message: '[employeeOnPathId] O id do colaborador no trajeto deve ser do tipo string.'})
+  @ApiProperty()
+  @IsString()
   employeeOnPathId: string;
 
+  @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => UpdateEmployeesOnPathDTO)
   payload: UpdateEmployeesOnPathDTO;

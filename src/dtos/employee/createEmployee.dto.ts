@@ -6,41 +6,51 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEmployeeDTO {
-  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
+  @ApiProperty({default: '123456789'})
+  @IsString({ message: 'Matrícula não está definida como string.' })
+  @IsNotEmpty({ message: 'Matrícula não pode receber valor vazio.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
 
-  @IsDateString({}, { message: '[admission] A data de admissão deve ser do tipo date.' })
-  @IsNotEmpty({ message: '[admission] A data de admissão deve ser preenchida.' })
+  @ApiProperty({default: new Date()})
+  @IsString({ message: 'Admissão não está definido como string.' })
+  @IsNotEmpty({ message: 'Admissão não pode receber valor vazio.' })
+  @IsDateString()
   admission: Date;
 
-  @IsString({ message: '[role] O cargo deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[role] O cargo deve ser preenchido.' })
+  @ApiProperty({default: 'Auxiliar de produção'})
+  @IsString({ message: 'Cargo não está definido como string.' })
+  @IsNotEmpty({ message: 'Cargo não pode receber valor vazio.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
-  @IsString({ message: '[name] O nome deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[role] O nome deve ser preenchido.' })
+  @ApiProperty({default: 'Marcus Vinicius'})
+  @IsString({ message: 'Name não está definido como string.' })
+  @IsNotEmpty({ message: 'Name não pode receber valor ser vazio.' })
   name: string;
 
-  @IsString({ message: '[shift] O turno deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[shift] O turno deve ser preenchido.' })
+  @ApiProperty({default: '1º Turno'})
+  @IsString({ message: 'Turno não está definido como string.' })
+  @IsNotEmpty({ message: 'Turno não pode receber valor vazio.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift: string;
 
-  @IsString({ message: '[costCenter] O centro de custo deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[costCenter] O centro de custo deve ser preenchido.' })
+  @ApiProperty({default: 'Almoxarife'})
+  @IsString({ message: 'Centro de custo não está definido como string.' })
+  @IsNotEmpty({ message: 'Centro de custo não pode receber valor vazio.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter: string;
 
-  @IsString({ message: '[address] O endereço deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
+  @ApiProperty({default: 'Av. Paulista, 1000'})
+  @IsString({ message: 'Endereço não está definido como string.' })
+  @IsNotEmpty({ message: 'Endereço não pode receber valor vazio.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address: string;
 
+  @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => CreateEmployeePinDTO)
   @IsNotEmpty({ message: '[pin] O ponto de embarque deve ser preenchido.'})

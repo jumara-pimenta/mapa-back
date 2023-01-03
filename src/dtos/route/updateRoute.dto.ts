@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
@@ -7,30 +8,37 @@ import {
 import { EStatusRoute, ETypeRoute } from '../../utils/ETypes';
 
 export class UpdateRouteDTO {
-  @IsString({ message: '[description] A descrição deve ser do tipo string.' })
+  @ApiProperty()
+  @IsString({ message: '[Description] não está definida como string.' })
   @IsOptional()
   description?: string;
 
-  @IsString({ message: '[distance] A distância deve ser do tipo string.' })
+  @ApiProperty()
+  @IsString({ message: '[Distance] não está definida como string.' })
   @IsOptional()
   distance?: string;
 
-  @IsEnum(ETypeRoute, { message: '[type] O tipo da rota deve ser do tipo enum: CONVENCIONAL | ESPECIAL | EXTRA' })
+  @ApiProperty()
+  @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.' })
   @IsOptional()
   type?: ETypeRoute;
 
-  @IsEnum(EStatusRoute, { message: '[status] O status deve ser do tipo enum: PENDENTE | EM ANDAMENTO' })
+  @ApiProperty()
+  @IsEnum(EStatusRoute, { message: '[Status] não está definida como enum.' })
   @IsOptional()
   status?: EStatusRoute;
 
-  @IsString({ message: '[driverId] O id do motorista deve ser do tipo string.' })
+  @ApiProperty()
+  @IsString({ message: '[DriverId] não está definida como string.' })
   @IsOptional()
   driverId?: string;
 
-  @IsString({ message: '[vehicleId] O id do veículo deve ser do tipo string.' })
+  @ApiProperty()
+  @IsString({ message: '[VehicleId] não está definida como string.' })
   @IsOptional()
   vehicleId?: string;
 
+  @ApiProperty()
   @IsString({
     each: true,
     message: '[employeeIds] O id do colaborador deve ser do tipo string.',

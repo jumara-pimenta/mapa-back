@@ -17,11 +17,35 @@ import { Employee } from '../entities/employee.entity';
 import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
+import {
+  ApiCreatedResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('/api/employees')
+@ApiTags('Employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
+  @ApiCreatedResponse({
+    description: 'Creates a new Employee.',
+    schema: {
+      type: 'object',
+      example: {
+        id: '2fce27dd-e7c4-496f-be0e-3aac0db2f82d',
+        registration: '123456789',
+        name: 'Marcus Vinicius',
+        admission: '2023-01-02T14:27:56.507Z',
+        role: 'Auxiliar de produção',
+        shift: '1º Turno',
+        costCenter: 'Almoxarife',
+        address: 'Av. Paulista, 1000',
+        createdAt: '2023-01-02T10:28:31.580Z',
+        updatedAt: null,
+      },      
+    },
+  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
