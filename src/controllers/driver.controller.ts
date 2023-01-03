@@ -30,13 +30,13 @@ export class DriverController {
     schema: {
       type: 'object',
       example: {
-        id: "dc0e9792-f935-4411-a016-de4509d55054",
-        name: "João da Silva",
-        cpf: "96893908563",
-        cnh: "123456789",
+        id: 'dc0e9792-f935-4411-a016-de4509d55054',
+        name: 'João da Silva',
+        cpf: '96893908563',
+        cnh: '123456789',
         // add year to date to avoid error
         validation: new Date(Date.now() + 31536000000),
-        category: "AB",
+        category: 'AB',
         createdAt:  new Date(),
         updatedAt: null
       },      
