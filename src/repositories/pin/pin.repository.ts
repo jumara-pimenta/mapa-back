@@ -51,9 +51,15 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
       ? await this.repository.pin.findMany({
           ...this.buildPage(page),
           where: condition,
+          orderBy: {
+            createdAt: 'desc'
+          }
         })
       : await this.repository.pin.findMany({
           ...this.buildPage(page),
+          orderBy: {
+            createdAt: 'desc'
+          }
         });
 
     const total = condition

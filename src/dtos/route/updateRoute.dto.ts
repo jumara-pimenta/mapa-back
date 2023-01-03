@@ -41,7 +41,7 @@ export class UpdateRouteDTO {
   @ApiProperty()
   @IsString({
     each: true,
-    message: '[EmployeeIds] não está definida como string.',
+    message: '[employeeIds] O id do colaborador deve ser do tipo string.',
   })
   @IsOptional()
   employeeIds?: string[];

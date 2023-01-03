@@ -7,7 +7,7 @@ export class CreateDriverDTO {
   @IsString({ message: '[name] O campo NAME deve ser do tipo string.' })
   @IsNotEmpty({ message: '[name] O campo NAME deve ser preenchido.' })
   @Length(10, 255, {
-    message: '[name] O campo NAME deve conter no mínimo 10 caracteres.',
+    message: '[name] O nome deve possuir no mínimo 10 caracteres.',
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   name: string;
@@ -29,12 +29,12 @@ export class CreateDriverDTO {
   @IsDateString(
     {},
     {
-      message: '[validation] O campo VALIDATION deve ser do tipo Date valido.',
+      message: '[validation] A validade deve ser do tipo date.',
     },
   )
   @ApiProperty({ default: new Date(), example: new Date()})
   @IsNotEmpty({
-    message: '[validation] O campo VALIDATION deve ser preenchido.',
+    message: '[validation] A validade deve ser preenchida.',
   })
   validation: Date;
 

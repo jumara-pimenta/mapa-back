@@ -3,12 +3,14 @@ import {
   IsString,
   IsOptional,
   IsNotEmpty,
+  IsEnum,
 } from 'class-validator';
+import { ETypeEditionPin } from 'src/utils/ETypes';
 
 export class UpdateEmployeePinDTO {
   @ApiProperty()
   @IsString({ message: '[id] O id do ponto de embarque deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[id] O id do ponto de embarque deve ser enviado.'})
+  @IsOptional()
   id?: string;
 
   @ApiProperty()

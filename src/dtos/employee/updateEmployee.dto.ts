@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 
 export class UpdateEmployeeDTO {
@@ -18,7 +12,6 @@ export class UpdateEmployeeDTO {
 
   @ApiProperty()
   @IsOptional()
-  @IsDateString()
   admission?: Date;
 
   @ApiProperty()
@@ -54,6 +47,6 @@ export class UpdateEmployeeDTO {
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => UpdateEmployeePinDTO)
-  @IsNotEmpty()
-  pin?: UpdateEmployeePinDTO
+  @IsOptional()
+  pin: UpdateEmployeePinDTO;
 }

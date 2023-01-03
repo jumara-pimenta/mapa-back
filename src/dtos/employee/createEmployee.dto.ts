@@ -53,6 +53,6 @@ export class CreateEmployeeDTO {
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => CreateEmployeePinDTO)
-  @IsNotEmpty()
+  @IsNotEmpty({ message: '[pin] O ponto de embarque deve ser preenchido.'})
   pin: CreateEmployeePinDTO;
 }

@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { UpdatePathDTO } from '../path/updatePath.dto';
 import { UpdateRouteDTO } from '../route/updateRoute.dto';

@@ -19,13 +19,16 @@ export class PathDetailsDTO {
   @IsDefined()
   @Matches(durationPathRgx, {
     message:
-      'O valor informado é inválido. O formato esperado é HH:MM (ex. 08:30)!',
+      '[duration] A duração do trajeto deve ser do formato: HH:MM',
   })
   duration: string;
 
   @ApiProperty({ default: '08:30',example: '08:30'})
   @IsDefined()
-  @Matches(durationPathRgx)
+  @Matches(durationPathRgx, {
+    message:
+      '[startsAt] A hora de início do trajeto deve ser do formato: HH:MM',
+  })
   startsAt: string;
 
   @ApiProperty({ default: true,example: true })

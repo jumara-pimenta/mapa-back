@@ -52,17 +52,20 @@ export class CreateRouteDTO {
   })
   @IsString({
     each: true,
-    message: '[EmployeeIds] não está definida como string.',
+    message: '[employeeIds] O id do colaborador deve ser do tipo string.',
   })
-  @IsNotEmpty({ message: '[EmployeeIds] não pode receber um valor vazio.' })
+  @IsNotEmpty({
+    message: '[employeeIds] Os ids dos colaboradores devem ser preenchidos.',
+  })
   employeeIds: string[];
 
   @ApiProperty()
   @ValidateNested({
     each: true,
-    message: '[PathDetails] não está definida como PathDetailsDTO.',
   })
   @Type(() => PathDetailsDTO)
-  @IsNotEmpty({ message: '[PathDetails] não pode receber um valor vazio.' })
+  @IsNotEmpty({
+    message: '[pathDetails] Os detalhes do trajeto devem ser preenchidos.',
+  })
   pathDetails: PathDetailsDTO;
 }

@@ -51,6 +51,9 @@ export class EmployeeRepository
                 title: true
               }
             }
+          },
+          orderBy: {
+            createdAt: 'desc'
           }
         },
       }
@@ -74,6 +77,9 @@ export class EmployeeRepository
                 title: true
               }
             }
+          },
+          orderBy: {
+            createdAt: 'desc'
           }
         },
       },
@@ -110,6 +116,9 @@ export class EmployeeRepository
                     title: true
                   }
                 }
+              },
+              orderBy: {
+                createdAt: 'desc'
               }
             },
           },
@@ -130,6 +139,9 @@ export class EmployeeRepository
                     title: true
                   }
                 }
+              },
+              orderBy: {
+                createdAt: 'desc'
               }
             },
           },
@@ -182,6 +194,9 @@ export class EmployeeRepository
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
   }
 }

@@ -14,7 +14,7 @@ import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
-import { ECreatePin, ETypePin } from '../utils/ETypes';
+import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 
 @Injectable()
@@ -31,31 +31,31 @@ export class EmployeeService {
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
 
-    const RegistrationExists = await this.employeeRepository.findByRegistration(
+    const registrationExists = await this.employeeRepository.findByRegistration(
       props.registration,
     );
 
-    if (RegistrationExists) {
+    if (registrationExists) {
       throw new HttpException(
         'Matrícula já cadastrada para outro(a) colaborador(a)!',
         HttpStatus.CONFLICT,
       );
     }
 
-    if (props.pin.typeCreation === ECreatePin.IS_EXISTENT) {
+    if (props.pin.typeCreation === ETypeCreationPin.IS_EXISTENT) {
       if (!props.pin.id)
         throw new HttpException(
           'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
           HttpStatus.BAD_REQUEST,
         );
-    } else if (props.pin.typeCreation === ECreatePin.IS_NEW) {
+    } else if (props.pin.typeCreation === ETypeCreationPin.IS_NEW) {
       const { title, local, details, lat, lng } = props.pin;
 
       if (!title || !local || !details || !lat || !lng) {
         throw new HttpException(
           'Todas as informações são obrigatórias para cadastrar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
           HttpStatus.BAD_REQUEST,
-        )
+        );
       }
 
       pin = await this.pinService.create({
@@ -71,7 +71,10 @@ export class EmployeeService {
 
     await this.employeeOnPinService.associateEmployee({
       employeeId: employee.id,
-      pinId: props.pin.typeCreation === ECreatePin.IS_EXISTENT ? props.pin.id : pin.id,
+      pinId:
+        props.pin.typeCreation === ETypeCreationPin.IS_EXISTENT
+          ? props.pin.id
+          : pin.id,
       type: ETypePin.CONVENTIONAL,
     });
 
@@ -117,31 +120,68 @@ export class EmployeeService {
     };
   }
 
-  async update(id: string, data: UpdateEmployeeDTO): Promise<Employee> {
+  async update(
+    id: string,
+    data: UpdateEmployeeDTO,
+  ): Promise<MappedEmployeeDTO> {
     const employee = await this.listById(id);
+    let pin: Pin;
 
     if (data.registration) {
-      const RegistrationExists =
+      const registrationExists =
         await this.employeeRepository.findByRegistration(data.registration);
 
       if (
-        RegistrationExists &&
-        RegistrationExists.registration !== employee.registration
+        registrationExists &&
+        registrationExists.registration !== employee.registration
       ) {
         throw new HttpException(
-          'Matrícula já cadastrada para outro(a) colaborador(a)',
+          'Matrícula já cadastrada para outro(a) colaborador(a)!',
           HttpStatus.CONFLICT,
         );
       }
     }
 
-    if (data.pin.id) {
-      await this.employeeOnPinService.associateEmployee({employeeId : employee.id, pinId : data.pin.id, type : ETypePin.CONVENTIONAL})
+    if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
+      if (!data.pin.id)
+        throw new HttpException(
+          'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+          HttpStatus.BAD_REQUEST,
+        );
+
+      await this.employeeOnPinService.associateEmployeeByService(
+        data.pin.id,
+        employee,
+      );
+    } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
+      const { title, local, details, lat, lng } = data.pin;
+
+      if (!title || !local || !details || !lat || !lng) {
+        throw new HttpException(
+          'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      pin = await this.pinService.create({
+        title,
+        local,
+        details,
+        lat,
+        lng,
+      });
+
+      await this.employeeOnPinService.associateEmployeeByService(
+        pin.id,
+        employee,
+      );
     }
 
-    return await this.employeeRepository.update(
+    const updatedEmployee = await this.employeeRepository.update(
       Object.assign(employee, { ...employee, ...data }),
     );
+
+    return this.mapperOne(updatedEmployee);
   }
 
   async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
@@ -160,7 +200,7 @@ export class EmployeeService {
         role: employee.role,
         shift: employee.shift,
         createdAt: employee.createdAt,
-        pins: employee.pins?.map(employeesOnPin => {
+        pins: employee.pins?.map((employeesOnPin) => {
           return {
             id: employeesOnPin.pin.id,
             title: employeesOnPin.pin.title,
@@ -169,8 +209,8 @@ export class EmployeeService {
             lat: employeesOnPin.pin.lat,
             lng: employeesOnPin.pin.lng,
             type: employeesOnPin.type as ETypePin,
-          }
-        })
+          };
+        }),
       };
     });
   }
@@ -186,7 +226,7 @@ export class EmployeeService {
       role: employee.role,
       shift: employee.shift,
       createdAt: employee.createdAt,
-      pins: employee.pins.map(employeesOnPin => {
+      pins: employee.pins.map((employeesOnPin) => {
         return {
           id: employeesOnPin.pin.id,
           title: employeesOnPin.pin.title,
@@ -195,8 +235,8 @@ export class EmployeeService {
           lat: employeesOnPin.pin.lat,
           lng: employeesOnPin.pin.lng,
           type: employeesOnPin.type as ETypePin,
-        }
-      })
+        };
+      }),
     };
   }
 }

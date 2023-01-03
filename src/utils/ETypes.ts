@@ -1,6 +1,5 @@
 export enum ETypePin {
   CONVENTIONAL = 'CONVENCIONAL',
-  ESPECIAL = 'ESPECIAL',
 }
 
 export enum ETypeRoute {
@@ -26,7 +25,12 @@ export enum EStatusPath {
   FINISHED = 'FINALIZADO',
 }
 
-export enum ECreatePin {
+export enum ETypeCreationPin {
+  IS_EXISTENT = 'EXISTENTE',
+  IS_NEW = 'NOVO',
+}
+
+export enum ETypeEditionPin {
   IS_EXISTENT = 'EXISTENTE',
   IS_NEW = 'NOVO',
 }

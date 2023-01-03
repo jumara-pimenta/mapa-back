@@ -5,9 +5,8 @@ import {
   IsNotEmpty,
   IsBoolean,
   IsNumber,
-  MinLength,
-  MaxLength,
   IsDateString,
+  Length,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
@@ -34,8 +33,7 @@ export class CreateVehicleDTO {
   @IsString({
     message: 'Última vistoria não está definido para o tipo string.',
   })
-  @IsNotEmpty({ message: 'Última vistoria não pode está vazio.' })
-  lastSurvey: string;
+  lastSurvey: Date;
 
   @ApiProperty({default: new Date(), example: new Date()})
   @IsString({ message: 'Expiração não está definido para o tipo string.' })
@@ -66,8 +64,11 @@ export class CreateVehicleDTO {
 
   @ApiProperty({default: true, example: true})
   @IsBoolean({
-    message: 'Acessibilidade não está definido para o tipo tipo booleans.',
+    message:
+      '[isAccessibility] O campo de acessibilidade deve ser do tipo booleano.',
   })
-  @IsNotEmpty({ message: 'Acessibilidade não pode está vazio.' })
+  @IsNotEmpty({
+    message: '[isAccessibility] O campo de acessibilidade deve ser preenchido.',
+  })
   isAccessibility: boolean;
 }
