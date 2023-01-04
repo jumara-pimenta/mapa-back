@@ -11,10 +11,9 @@ import {
 
 export class CreateVehicleDTO {
   @ApiProperty({default: 'PHP1234', example: 'PHP1234'})
-  @IsString({ message: 'Placa não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Placa não pode está vazio.' })
-  @MinLength(7, { message: 'Placa não pode conter menos que 7 dígitos.' })
-  @MaxLength(7, { message: 'Placa não pode conter mais que 7 dígitos.' })
+  @IsString({ message: '[plate] A placa deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[plate] A placa deve ser preenchida.' })
+  @Length(7,7, { message: '[plate] A placa deve possuir 7 dígitos.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   plate: string;
 
@@ -46,20 +45,19 @@ export class CreateVehicleDTO {
   capacity: number;
 
   @ApiProperty({default: '12345678901', example: '12345678901'})
-  @IsString({ message: 'Renavam não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Renavam não pode está vazio.' })
-  @MinLength(11, { message: 'Renavam não pode conter menos que 11 dígitos.' })
-  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 dígitos.' })
+  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[renavam] O RENAVAM deve ser preenchido.' })
+  @Length(11,11, { message: '[renavam] O RENAVAM deve possuir 11 dígitos.' })
   renavam: string;
 
   @ApiProperty({default: new Date(), example: new Date()})
   @IsDateString()
-  @IsNotEmpty({ message: 'Última manutenção não pode está vazio.' })
+  @IsNotEmpty({ message: '[lastMaintenance] Última manutenção não pode está vazio.' })
   lastMaintenance: string;
 
   @ApiProperty({default: 'Teste', example: 'Teste'})
-  @IsString({ message: 'Observação não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Observação não pode está vazio.' })
+  @IsString({ message: '[note] O campo de observação deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[note] O campo de observação deve ser preenchido.' })
   note: string;
 
   @ApiProperty({default: true, example: true})

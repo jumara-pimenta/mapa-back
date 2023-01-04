@@ -3,14 +3,14 @@ import {
   IsEnum,
   IsOptional,
 } from 'class-validator';
-import { ECreatePin } from '../../utils/ETypes';
 import { ApiProperty } from '@nestjs/swagger';
+import { ETypeCreationPin } from '../../utils/ETypes';
 export class CreateEmployeePinDTO {
-  @ApiProperty({examples: ['NOVO','EXISTENTE'],enum: ECreatePin, default: ECreatePin.IS_NEW})
-  @IsEnum(ECreatePin, {
+  @ApiProperty({examples: ['NOVO','EXISTENTE'],enum: ETypeCreationPin, default: ETypeCreationPin.IS_NEW})
+  @IsEnum(ETypeCreationPin, {
     message: '[typeCreation] não está definido como enum.',
   })
-  typeCreation: ECreatePin;
+  typeCreation: ETypeCreationPin;
   
   
   @ApiProperty({default:null,examples: [null,'74a7134e-5062-4dd8-9167-26dd0cc4e1b7'], description: 'caso typeCreation seja EXISTENTE\n\r\nId do pin que será atualizado.'})
