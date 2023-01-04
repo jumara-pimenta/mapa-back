@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Path } from '../entities/path.entity';
 import IPathRepository from '../repositories/path/path.repository.contract';
-import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
+import { IEmployeesOnPathDTO, MappedPathDTO } from '../dtos/path/mappedPath.dto';
 import { CreatePathDTO } from '../dtos/path/createPath.dto';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
@@ -23,7 +23,7 @@ export class PathService {
     private readonly routeService: RouteService,
     @Inject(forwardRef(() => EmployeesOnPathService))
     private readonly employeesOnPathService: EmployeesOnPathService,
-  ) {}
+  ) { }
 
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt } = props.details;
@@ -101,7 +101,53 @@ export class PathService {
         HttpStatus.NOT_FOUND,
       );
 
-    return this.mapperOne(path);
+    const data = this.mapperOne(path);
+
+    interface Teste {
+      id: string;
+      lat: string;
+      lng: string;
+      employee: IEmployeesOnPathDTO[];
+    }
+
+    const pins = data.employeesOnPath.reduce<Teste[]>((acc, employeeOnPath) => {
+
+     const pin = acc.findIndex(pin => pin.id === employeeOnPath.details.location.id);
+
+     if (pin > -1) {
+      acc.push({
+        id: employeeOnPath.details.location.id,
+        lat: employeeOnPath.details.location.lat,
+        lng: employeeOnPath.details.location.lng,
+        employee: [employeeOnPath]
+      })
+    }
+     console.log('acc',acc);
+     acc.push({
+        id: employeeOnPath.details.location.id,
+        lat: employeeOnPath.details.location.lat,
+        lng: employeeOnPath.details.location.lng,
+        employee: [employeeOnPath]
+      })
+
+
+      // console.log('employeeOnPath=<>=>>',employeeOnPath);
+
+     
+    
+      // acc.push({
+      //   id: employeeOnPath.details.location.id,
+      //   lat: employeeOnPath.details.location.lat,
+      //   lng: employeeOnPath.details.location.lng,
+      //   employeeId: employeeOnPath.details.location.id,
+      // })
+
+      return acc;
+    }, []);
+
+    
+    return data;
+
   }
 
   async listManyByRoute(routeId: string): Promise<MappedPathDTO[]> {
@@ -129,7 +175,7 @@ export class PathService {
   }
 
   async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
-    
+
     const path = await this.pathRepository.findByEmployee(employeeId);
 
     if (!path.length)
@@ -246,6 +292,7 @@ export class PathService {
             shift: employee.shift,
             registration: employee.registration,
             location: {
+              id: pins.at(0).pin.id || 'n deu',
               lat: pins.at(0).pin.lat,
               lng: pins.at(0).pin.lng,
             },
@@ -285,6 +332,7 @@ export class PathService {
               shift: employee.shift,
               registration: employee.registration,
               location: {
+                id: pins.at(0).pinId,
                 lat: pins.at(0).pin.lat,
                 lng: pins.at(0).pin.lng,
               },
