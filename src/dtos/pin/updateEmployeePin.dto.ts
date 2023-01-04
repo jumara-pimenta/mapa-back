@@ -19,6 +19,12 @@ export class UpdateEmployeePinDTO {
   @IsOptional()
   id?: string;
 
+  @ApiProperty({examples: ['NOVO','EXISTENTE'],enum: ETypeEditionPin, default: ETypeEditionPin.IS_NEW})
+  @IsEnum(ETypeEditionPin, {
+    message: '[typeCreation] não está definido como enum.',
+  })
+  typeEdition: ETypeEditionPin;
+
   @ApiProperty()
   @IsString({ message: '[lat] A latitude deve ser do tipo string.' })
   @IsOptional()

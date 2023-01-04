@@ -7,6 +7,8 @@ import {
   IsNumber,
   IsDateString,
   Length,
+  MinLength,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateVehicleDTO {

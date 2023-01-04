@@ -22,6 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { CreateEmployee } from 'src/utils/examples.swagger';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -32,19 +33,8 @@ export class EmployeeController {
     description: 'Creates a new Employee.',
     schema: {
       type: 'object',
-      example: {
-        id: '2fce27dd-e7c4-496f-be0e-3aac0db2f82d',
-        registration: '123456789',
-        name: 'Marcus Vinicius',
-        admission: '2023-01-02T14:27:56.507Z',
-        role: 'Auxiliar de produção',
-        shift: '1º Turno',
-        costCenter: 'Almoxarife',
-        address: 'Av. Paulista, 1000',
-        createdAt: '2023-01-02T10:28:31.580Z',
-        updatedAt: null,
-      },      
-    },
+      example: CreateEmployee
+    }
   })
   @Post()
   @HttpCode(HttpStatus.CREATED)
