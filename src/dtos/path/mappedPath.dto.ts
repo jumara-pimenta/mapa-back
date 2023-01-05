@@ -11,6 +11,8 @@ class IPin {
 
 class IEmployee {
   @ApiProperty()
+  employeeId: string;
+  @ApiProperty()
   name: string;
   @ApiProperty()
   address: string;
@@ -58,4 +60,48 @@ export class MappedPathDTO {
   createdAt: Date;
   @ApiProperty()
   employeesOnPath: IEmployeesOnPathDTO[];
+}
+
+
+export class MappedPathPinsDTO {
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  routeId: string;
+  @ApiProperty()
+  routeDescription: string;
+  @ApiProperty()
+  duration: string;
+  @ApiProperty()
+  finishedAt?: Date;
+  @ApiProperty()
+  startedAt?: Date;
+  @ApiProperty()
+  startsAt: string;
+  @ApiProperty()
+  status: string;
+  @ApiProperty()
+  type: string;
+  @ApiProperty()
+  createdAt: Date;
+  @ApiProperty()
+  employeesOnPins: EmployeesByPin[];
+}
+
+
+export interface EmployeesByPin {
+  position: number;
+  lat: string
+  lng: string;
+  employees: {
+    id: string;
+    name: string;
+    registration: string;
+    employeeId: string;
+    disembarkAt: Date;
+    confirmation: boolean;
+    description: string;
+    boardingAt: Date;
+  }[];
+
 }

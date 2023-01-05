@@ -730,4 +730,15 @@ export class RouteService {
       );
     }
   }
+
+  async routeIdByPathId(pathId: string): Promise<string> {
+    const path = await this.routeRepository.findRouteIdByPathId(pathId);
+    if (!path) {
+      throw new HttpException(
+        'Rota não encontrada!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return path;
+  }
 }
