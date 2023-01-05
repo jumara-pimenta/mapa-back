@@ -1,5 +1,6 @@
 export enum ETypePin {
   CONVENTIONAL = 'CONVENCIONAL',
+  ESPECIAL = 'ESPECIAL',
 }
 
 export enum ETypeRoute {

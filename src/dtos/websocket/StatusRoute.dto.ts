@@ -9,30 +9,31 @@ import {
 import { UpdatePathDTO } from '../path/updatePath.dto';
 import { UpdateRouteDTO } from '../route/updateRoute.dto';
 
-export class StatusRouteDTO {
+export class StatusRouteDTO {  
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
+  @IsNotEmpty({ message: '[routeId] O id da rota deve ser preenchida.'})
   routeId: string;
-
+  
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
+  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
+  @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.'})
   pathId: string;
-
+  
   @ApiProperty()
-  @IsOptional()
-  @ValidateNested({ each: true })
+  @ValidateNested({
+    each: true,
+  })
   @Type(() => UpdateRouteDTO)
   @IsNotEmpty({
     message: '[route] Os detalhes da rota devem ser preenchidos.',
   })
   route: UpdateRouteDTO;
-
+  
   @ApiProperty()
-  @IsOptional()
-  @ValidateNested({ each: true })
+  @ValidateNested({
+    each: true,
+  })
   @Type(() => UpdatePathDTO)
   @IsNotEmpty({
     message: '[path] Os detalhes do trajeto devem ser preenchidos.',

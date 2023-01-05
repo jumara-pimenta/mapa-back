@@ -11,8 +11,8 @@ import { durationPathRgx } from '../../utils/Regex';
 
 export class PathDetailsDTO {
   @ApiProperty({ default: ETypePath.ROUND_TRIP, enum: [ETypePath.ONE_WAY, ETypePath.RETURN, ETypePath.ROUND_TRIP] })
-  @IsEnum(ETypePath)
-  @IsNotEmpty()
+  @IsEnum(ETypePath, { message: '[type] O tipo do trajeto deve ser do tipo enum: IDA | VOLTA | IDA E VOLTA'})
+  @IsNotEmpty({ message: '[type] O tipo do trajeto deve ser preenchido.'})
   type: ETypePath;
 
   @ApiProperty({ default: '01:30',example: '01:30' })
@@ -32,7 +32,7 @@ export class PathDetailsDTO {
   startsAt: string;
 
   @ApiProperty({ default: true,example: true })
-  @IsBoolean()
-  @IsNotEmpty()
+  @IsBoolean({ message: '[isAutoRoute] A roteirização automática deve ser do tipo booleano.'})
+  @IsNotEmpty({ message: '[isAutoRoute] A roteirização automática deve ser preenchida.'})
   isAutoRoute: boolean;
 }

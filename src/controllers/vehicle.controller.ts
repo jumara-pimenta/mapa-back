@@ -31,16 +31,16 @@ export class VehicleController {
     schema: {
       type: 'object',
       example: {
-        id: "af036f4e-bfcf-4994-ab50-f167ee908f4e",
-        plate: "PHP1234",
-        company: "Expresso",
-        type: "ÔNIBUS",
+        id: 'af036f4e-bfcf-4994-ab50-f167ee908f4e',
+        plate: 'PHP1234',
+        company: 'Expresso',
+        type: 'ÔNIBUS',
         lastSurvey: new Date(),
         expiration: new Date(),
         capacity: 28,
-        renavam: "12345678901",
+        renavam: '12345678901',
         lastMaintenance: new Date(),
-        note: "Teste",
+        note: 'Teste',
         isAccessibility: true,
         createdAt: new Date(),
         updatedAt: null

@@ -124,7 +124,10 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
         employeesOnPath: {
+
+
           select: {
+            employeeId: true,
             id: true,
             boardingAt: true,
             confirmation: true,
@@ -141,6 +144,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     type: true,
                     pin: {
                       select: {
+                        id: true,
                         lat: true,
                         lng: true,
                       },

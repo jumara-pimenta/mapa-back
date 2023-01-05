@@ -5,46 +5,46 @@ import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 
 export class UpdateEmployeeDTO {
   @ApiProperty()
-  @IsString({ message: 'Matrícula não está definida como string.' })
+  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration?: string;
 
   @ApiProperty()
+  @IsDateString({}, { message: '[admission] A data de admissão deve ser do tipo date.' })
   @IsOptional()
   admission?: Date;
 
   @ApiProperty()
-  @IsString({ message: 'Nome não está definido como string.' })
+  @IsString({ message: '[name] o nome deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   name?: string;
 
   @ApiProperty()
-  @IsString({ message: 'Cargo não está definido como string.' })
+  @IsString({ message: '[rola] o cargo deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role?: string;
 
   @ApiProperty()
-  @IsString({ message: 'Turno não está definido como string.' })
+  @IsString({ message: '[shift]  o turno deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift?: string;
 
   @ApiProperty()
-  @IsString({ message: 'Centro de custo não está definido como string.' })
+  @IsString({ message: '[costCenter] o campo custo deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter?: string;
 
   @ApiProperty()
-  @IsString({ message: 'Endereço não está definido como string.' })
+  @IsString({ message: '[address] o campo endereço deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   address?: string;
 
-  @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => UpdateEmployeePinDTO)
   @IsOptional()

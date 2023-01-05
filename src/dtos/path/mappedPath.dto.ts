@@ -1,6 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 class IPin {
+  @ApiProperty()
+  id: string;
   @ApiProperty()
   lat: string;
   @ApiProperty()
@@ -20,7 +22,7 @@ class IEmployee {
   location: IPin;
 }
 
-class IEmployeesOnPathDTO {
+export class IEmployeesOnPathDTO {
   @ApiProperty()
   id: string;
   @ApiProperty()

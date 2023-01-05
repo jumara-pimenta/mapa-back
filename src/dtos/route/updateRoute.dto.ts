@@ -9,32 +9,32 @@ import { EStatusRoute, ETypeRoute } from '../../utils/ETypes';
 
 export class UpdateRouteDTO {
   @ApiProperty()
-  @IsString({ message: '[Description] não está definida como string.' })
+  @IsString({ message: '[description] A descrição deve ser do tipo string.' })
   @IsOptional()
   description?: string;
-
+  
   @ApiProperty()
-  @IsString({ message: '[Distance] não está definida como string.' })
+  @IsString({ message: '[distance] A distância deve ser do tipo string.' })
   @IsOptional()
   distance?: string;
-
+  
   @ApiProperty()
-  @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.' })
+  @IsEnum(ETypeRoute, { message: '[type] O tipo da rota deve ser do tipo enum: CONVENCIONAL | ESPECIAL | EXTRA' })
   @IsOptional()
   type?: ETypeRoute;
-
+  
   @ApiProperty()
-  @IsEnum(EStatusRoute, { message: '[Status] não está definida como enum.' })
+  @IsEnum(EStatusRoute, { message: '[status] O status deve ser do tipo enum: PENDENTE | EM ANDAMENTO' })
   @IsOptional()
   status?: EStatusRoute;
-
+  
   @ApiProperty()
-  @IsString({ message: '[DriverId] não está definida como string.' })
+  @IsString({ message: '[driverId] O id do motorista deve ser do tipo string.' })
   @IsOptional()
   driverId?: string;
-
+  
   @ApiProperty()
-  @IsString({ message: '[VehicleId] não está definida como string.' })
+  @IsString({ message: '[vehicleId] O id do veículo deve ser do tipo string.' })
   @IsOptional()
   vehicleId?: string;
 
