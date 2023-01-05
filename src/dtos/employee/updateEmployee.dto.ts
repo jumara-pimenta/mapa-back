@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 
 export class UpdateEmployeeDTO {
