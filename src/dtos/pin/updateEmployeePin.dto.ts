@@ -16,7 +16,8 @@ export class UpdateEmployeePinDTO {
   @IsEnum(ETypeEditionPin, {
     message: '[typeCreation] não está definido como enum.',
   })
-  typeEdition: ETypeEditionPin;
+  @IsOptional()
+  typeEdition?: ETypeEditionPin;
 
   @ApiProperty()
   @IsString({ message: '[lat] A latitude deve ser do tipo string.' })

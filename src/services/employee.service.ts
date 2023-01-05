@@ -141,9 +141,10 @@ export class EmployeeService {
         );
       }
     }
+    if(data.pin){
 
-    if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
-      if (!data.pin.id)
+      if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
+        if (!data.pin.id)
         throw new HttpException(
           'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
           HttpStatus.BAD_REQUEST,
@@ -152,17 +153,17 @@ export class EmployeeService {
       await this.employeeOnPinService.associateEmployeeByService(
         data.pin.id,
         employee,
-      );
-    } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
-      const { title, local, details, lat, lng } = data.pin;
-
-      if (!title || !local || !details || !lat || !lng) {
-        throw new HttpException(
+        );
+      } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
+        const { title, local, details, lat, lng } = data.pin;
+        
+        if (!title || !local || !details || !lat || !lng) {
+          throw new HttpException(
           'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
           HttpStatus.BAD_REQUEST,
         );
       }
-
+      
       pin = await this.pinService.create({
         title,
         local,
@@ -170,6 +171,7 @@ export class EmployeeService {
         lat,
         lng,
       });
+    }
 
       await this.employeeOnPinService.associateEmployeeByService(
         pin.id,
