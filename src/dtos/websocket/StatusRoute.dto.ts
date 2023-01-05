@@ -28,7 +28,7 @@ export class StatusRouteDTO {
   @IsNotEmpty({
     message: '[route] Os detalhes da rota devem ser preenchidos.',
   })
-  route: UpdateRouteDTO;
+  route?: UpdateRouteDTO;
   
   @ApiProperty()
   @ValidateNested({
@@ -38,5 +38,5 @@ export class StatusRouteDTO {
   @IsNotEmpty({
     message: '[path] Os detalhes do trajeto devem ser preenchidos.',
   })
-  path: UpdatePathDTO;
+  path?: UpdatePathDTO;
 }

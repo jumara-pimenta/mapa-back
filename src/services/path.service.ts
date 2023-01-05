@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Path } from '../entities/path.entity';
 import IPathRepository from '../repositories/path/path.repository.contract';
-import { IEmployeesOnPathDTO, MappedPathDTO } from '../dtos/path/mappedPath.dto';
+import { EmployeesByPin, IEmployeesOnPathDTO, MappedPathDTO, MappedPathPinsDTO } from '../dtos/path/mappedPath.dto';
 import { CreatePathDTO } from '../dtos/path/createPath.dto';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
@@ -97,58 +97,73 @@ export class PathService {
 
     if (!path)
       throw new HttpException(
-        `Não foi encontrado um path com o id: ${id}`,
+        `Não foi encontrado trajeto com o id: ${id}!`,
         HttpStatus.NOT_FOUND,
       );
 
-    const data = this.mapperOne(path);
+    return this.mapperOne(path);
+  }
 
-    interface Teste {
-      id: string;
-      lat: string;
-      lng: string;
-      employee: IEmployeesOnPathDTO[];
+  async listEmployeesByPathAndPin(pathId: string): Promise<MappedPathPinsDTO> {
+
+
+    const path = await this.listById(pathId);
+
+    const routeId = await this.routeService.routeIdByPathId(pathId);
+
+    const { employeesOnPath, ...data } = path;
+
+    const agroupedEmployees = [] as string[];
+
+    const employeesByPin = [] as EmployeesByPin[];
+
+    for await (const employee of employeesOnPath) {
+      const { id: pinId, lat, lng } = employee.details.location;
+
+      const employeesOnSamePin = await this.employeesOnPathService.listByPathAndPin(pathId, pinId);
+      let data = {} as EmployeesByPin;
+
+      employeesOnSamePin.forEach(employeeOnPath => {
+        const { name, registration, id: employeeId } = employeeOnPath.employee;
+
+        if (agroupedEmployees.includes(employeeOnPath.id)) return;
+
+        agroupedEmployees.push(employeeOnPath.id);
+        data = {
+          position: employeeOnPath.position,
+          lat,
+          lng,
+          employees: data.employees?.length ? data.employees : []
+        };
+        data.employees.push({
+          id: employeeOnPath.id,
+          name,
+          registration,
+          employeeId: employeeOnPath.employee.id,
+          disembarkAt: employeeOnPath.disembarkAt,
+          boardingAt: employeeOnPath.boardingAt,
+          confirmation: employeeOnPath.confirmation,
+          description: employeeOnPath.description
+        });
+      });
+
+      if (Object.keys(data).length === 0 && data.constructor === Object) continue;
+
+
+      employeesByPin.push(data as EmployeesByPin);
+
     }
+    // change position base on length of employees
+    employeesByPin.forEach((employeeByPin, index) => {
+      employeeByPin.position = index + 1;
+    });
 
-    const pins = data.employeesOnPath.reduce<Teste[]>((acc, employeeOnPath) => {
-
-     const pin = acc.findIndex(pin => pin.id === employeeOnPath.details.location.id);
-
-     if (pin > -1) {
-      acc.push({
-        id: employeeOnPath.details.location.id,
-        lat: employeeOnPath.details.location.lat,
-        lng: employeeOnPath.details.location.lng,
-        employee: [employeeOnPath]
-      })
-    }
-     console.log('acc',acc);
-     acc.push({
-        id: employeeOnPath.details.location.id,
-        lat: employeeOnPath.details.location.lat,
-        lng: employeeOnPath.details.location.lng,
-        employee: [employeeOnPath]
-      })
-
-
-      // console.log('employeeOnPath=<>=>>',employeeOnPath);
-
-     
-    
-      // acc.push({
-      //   id: employeeOnPath.details.location.id,
-      //   lat: employeeOnPath.details.location.lat,
-      //   lng: employeeOnPath.details.location.lng,
-      //   employeeId: employeeOnPath.details.location.id,
-      // })
-
-      return acc;
-    }, []);
-
-    
-    return data;
+    return { ...data, routeId: routeId, employeesOnPins: employeesByPin };
 
   }
+
+
+
 
   async listManyByRoute(routeId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByRoute(routeId);
@@ -287,6 +302,7 @@ export class PathService {
           disembarkAt: item.disembarkAt,
           position: item.position,
           details: {
+            employeeId: employee.id,
             name: employee.name,
             address: employee.address,
             shift: employee.shift,
@@ -330,6 +346,7 @@ export class PathService {
               name: employee.name,
               address: employee.address,
               shift: employee.shift,
+              employeeId: employee.id,
               registration: employee.registration,
               location: {
                 id: pins.at(0).pinId,

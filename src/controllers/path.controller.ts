@@ -76,4 +76,10 @@ export class PathController {
   ): Promise<MappedPathDTO> {
     return await this.pathService.listByEmployeeAndStatus(employeeId, status);
   }
+
+  @Get('/paths/pins/:id')
+  @HttpCode(HttpStatus.OK)
+  async pathPins(@Param('id') id: string): Promise<any> {
+    return await this.pathService.listEmployeesByPathAndPin(id);
+  }
 }

@@ -147,6 +147,19 @@ export class EmployeesOnPathService {
     return updatedEmployeeOnPath;
   }
 
+  async listByPathAndPin(pathId: string, pinId:string): Promise<EmployeesOnPath[]> {
+
+    const data = await this.employeesOnPathRepository.findByPathAndPin(pathId, pinId);
+
+    if(!data.length)
+      throw new HttpException(
+        `Não foi encontrado um colaborador no trajeto com o id: ${pathId} e o id do pin: ${pinId}`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return data;
+  }
+
   private mappedOne(
     employeesOnPath: EmployeesOnPath,
   ): MappedEmployeesOnPathDTO {
