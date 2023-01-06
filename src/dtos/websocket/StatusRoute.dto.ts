@@ -12,8 +12,8 @@ import { UpdateRouteDTO } from '../route/updateRoute.dto';
 export class StatusRouteDTO {  
   @ApiProperty()
   @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
-  @IsNotEmpty({ message: '[routeId] O id da rota deve ser preenchida.'})
-  routeId: string;
+  @IsOptional({ message: '[routeId] O id da rota deve ser preenchida.'})
+  routeId?: string;
   
   @ApiProperty()
   @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
@@ -25,7 +25,7 @@ export class StatusRouteDTO {
     each: true,
   })
   @Type(() => UpdateRouteDTO)
-  @IsNotEmpty({
+  @IsOptional({
     message: '[route] Os detalhes da rota devem ser preenchidos.',
   })
   route?: UpdateRouteDTO;
@@ -35,7 +35,7 @@ export class StatusRouteDTO {
     each: true,
   })
   @Type(() => UpdatePathDTO)
-  @IsNotEmpty({
+  @IsOptional({
     message: '[path] Os detalhes do trajeto devem ser preenchidos.',
   })
   path?: UpdatePathDTO;

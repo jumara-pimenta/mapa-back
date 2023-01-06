@@ -11,11 +11,13 @@ import { EmployeesByPin, IEmployeesOnPathDTO, MappedPathDTO, MappedPathPinsDTO }
 import { CreatePathDTO } from '../dtos/path/createPath.dto';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
-import { EStatusPath, ETypePath } from '../utils/ETypes';
+import { EStatusPath, EStatusRoute, ETypePath } from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
+import { getDateInLocaleTime } from 'src/utils/date.service';
 
 @Injectable()
 export class PathService {
+
   constructor(
     @Inject('IPathRepository')
     private readonly pathRepository: IPathRepository,
@@ -25,6 +27,56 @@ export class PathService {
     private readonly employeesOnPathService: EmployeesOnPathService,
   ) { }
 
+  async finishPath(id: string): Promise<any> {
+    const path = await this.listById(id);
+    if (path.finishedAt !== null)
+      throw new HttpException(
+        'Não é possível alterar uma rota que já foi finalizada!',
+        HttpStatus.CONFLICT,
+      );
+    const route = await this.routeService.routeIdByPathId(id)
+
+    const finishAt = {
+      routeId: route,
+      pathId: id,
+      route: {
+        status: EStatusRoute.PENDING,
+      },
+      path: {
+        finishedAt: getDateInLocaleTime(new Date()),
+        status: EStatusPath.FINISHED,
+      },
+    };
+
+    return await this.routeService.updateWebsocket(finishAt);
+
+  }
+  async startPath(id: string): Promise<any> {
+    const path = await this.listById(id);
+    if (path.finishedAt !== null)
+      throw new HttpException(
+        'Não é possível alterar uma rota que já foi finalizada!',
+        HttpStatus.CONFLICT,
+      );
+    const route = await this.routeService.routeIdByPathId(id)
+
+    const startAt = {
+      routeId: route,
+      pathId: id,
+      route: {
+        status: EStatusRoute.IN_PROGRESS,
+      },
+      path: {
+        startedAt: getDateInLocaleTime(new Date()),
+        status: EStatusPath.IN_PROGRESS,
+        finishedAt: null,
+      },
+    };
+
+    return await this.routeService.updateWebsocket(startAt);
+
+
+  }
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt } = props.details;
 
