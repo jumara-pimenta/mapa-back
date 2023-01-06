@@ -171,12 +171,13 @@ export class EmployeeService {
         lat,
         lng,
       });
-    }
-
+      
       await this.employeeOnPinService.associateEmployeeByService(
         pin.id,
         employee,
       );
+    }
+
     }
 
     const updatedEmployee = await this.employeeRepository.update(
