@@ -86,6 +86,10 @@ export class MappedPathPinsDTO {
   createdAt: Date;
   @ApiProperty()
   employeesOnPins: EmployeesByPin[];
+  @ApiProperty()
+  vehicle?: string;
+  @ApiProperty()
+  driver?: string;
 }
 
 

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Put,
 } from '@nestjs/common';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
@@ -82,4 +83,18 @@ export class PathController {
   async pathPins(@Param('id') id: string): Promise<any> {
     return await this.pathService.listEmployeesByPathAndPin(id);
   }
+
+  @Post('/paths/start/:id')
+  @HttpCode(HttpStatus.OK)
+  async startPath(@Param('id') id: string): Promise<unknown> {
+    return await this.pathService.startPath(id);
+  }
+
+  @Post('/paths/finish/:id')
+  @HttpCode(HttpStatus.OK)
+  async finishPath(@Param('id') id: string): Promise<unknown> {
+    return await this.pathService.finishPath(id);
+  }
+
+
 }

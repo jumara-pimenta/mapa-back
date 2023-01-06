@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -19,23 +20,23 @@ export class StatusRouteDTO {
   @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.'})
   pathId: string;
   
-  @ApiProperty()
+  // @ApiProperty()
   @ValidateNested({
     each: true,
   })
   @Type(() => UpdateRouteDTO)
-  @IsNotEmpty({
-    message: '[route] Os detalhes da rota devem ser preenchidos.',
+  @IsOptional({
+    // message: '[route] Os detalhes da rota devem ser preenchidos.',
   })
   route: UpdateRouteDTO;
   
-  @ApiProperty()
+  // @ApiProperty()
   @ValidateNested({
     each: true,
   })
   @Type(() => UpdatePathDTO)
-  @IsNotEmpty({
-    message: '[path] Os detalhes do trajeto devem ser preenchidos.',
+  @IsOptional({
+    // message: '[path] Os detalhes do trajeto devem ser preenchidos.',
   })
   path: UpdatePathDTO;
 }

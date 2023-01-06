@@ -7,18 +7,20 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { PathService } from 'src/services/path.service';
 import { WebsocketUpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
 import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { RouteService } from '../services/route.service';
 import { getDateInLocaleTime } from '../utils/date.service';
-import { EStatusRoute } from '../utils/ETypes';
+import { EStatusPath, EStatusRoute } from '../utils/ETypes'; 
 
 @WebSocketGateway()
 export class WebsocketGateway {
   constructor(
     private readonly routeService: RouteService,
+    private readonly pathService: PathService,
     private readonly employeesOnPathService: EmployeesOnPathService,
   ) {}
   @WebSocketServer() server: Server;
@@ -62,20 +64,7 @@ export class WebsocketGateway {
     payload: StatusRouteDTO,
   ): Promise<void> {
     try {
-      const startAt = {
-        ...payload,
-        route: {
-          ...payload.route,
-          status: 'EM ANDAMENTO' as EStatusRoute,
-        },
-        path: {
-          ...payload.path,
-          startedAt: getDateInLocaleTime(new Date()),
-          finishedAt: null,
-        },
-      };
-
-      const data = await this.routeService.updateWebsocket(startAt);
+      const data = await this.pathService.startPath(payload.pathId);
 
       this.server.emit(payload.pathId, {
         ...data,
@@ -98,20 +87,7 @@ export class WebsocketGateway {
     payload: StatusRouteDTO,
   ): Promise<void> {
     try {
-      const finishedAt = {
-        ...payload,
-        route: {
-          ...payload.route,
-          status: 'PENDENTE' as EStatusRoute,
-        },
-        path: {
-          ...payload.path,
-          finishedAt: getDateInLocaleTime(new Date()),
-        },
-      };
-
-      const data = await this.routeService.updateWebsocket(finishedAt);
-
+      const data = await this.pathService.finishPath(payload.pathId);
       this.server.emit(payload.pathId, {
         ...data,
       });
