@@ -7,6 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
+import { EmployeeAddressDTO } from './EmployeeAddress.dto';
 
 export class CreateEmployeeDTO {
   @ApiProperty()
@@ -44,10 +45,10 @@ export class CreateEmployeeDTO {
   costCenter: string;
  
   @ApiProperty()
-  @IsString({ message: '[address] O endereço deve ser do tipo string.' })
   @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  address: string;
+  @ValidateNested({ each: true })
+  @Type(() => EmployeeAddressDTO)
+  address: EmployeeAddressDTO | string;
  
   @ApiProperty()
   @ValidateNested({ each: true })

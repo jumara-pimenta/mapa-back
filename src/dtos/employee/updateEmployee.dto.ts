@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
 import { IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
+import { EmployeeAddressDTO } from './EmployeeAddress.dto';
 
 export class UpdateEmployeeDTO {
   @ApiProperty()
@@ -40,11 +41,12 @@ export class UpdateEmployeeDTO {
   costCenter?: string;
 
   @ApiProperty()
-  @IsString({ message: '[address] o campo endereço deve ser do tipo string.' })
+  @ValidateNested({ each: true })
+  @Type(() => EmployeeAddressDTO)
   @IsOptional()
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  address?: string;
-
+  address?: EmployeeAddressDTO | string;
+  
+  @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => UpdateEmployeePinDTO)
   @IsOptional()

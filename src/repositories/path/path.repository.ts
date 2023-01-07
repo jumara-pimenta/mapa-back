@@ -337,4 +337,20 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
       },
     });
   }
+
+  async findByEmployeeOnPath(employeeOnPathId: string): Promise<Partial<Path>> {
+    return await this.repository.path.findFirst({
+      where: {
+        employeesOnPath: {
+          some: {
+            id: employeeOnPathId
+          }
+        }
+      },
+      select: {
+        id: true,
+      },
+    });
+
+  }
 }

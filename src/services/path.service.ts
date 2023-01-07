@@ -77,6 +77,13 @@ export class PathService {
 
 
   }
+
+  async getPathidByEmployeeOnPathId(id: string): Promise<Partial<Path>> {
+    const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
+
+     return employeeOnPath;
+  }
+
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt } = props.details;
 
