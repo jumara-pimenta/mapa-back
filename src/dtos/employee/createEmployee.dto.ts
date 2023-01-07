@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
-import { EmployeeAddressDTO } from './EmployeeAddress.dto';
+import { EmployeeAddressDTO } from './employeeAddress.dto';
 
 export class CreateEmployeeDTO {
   @ApiProperty()

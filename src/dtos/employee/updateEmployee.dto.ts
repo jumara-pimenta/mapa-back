@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
 import { IsDateString, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
-import { EmployeeAddressDTO } from './EmployeeAddress.dto';
+import { EmployeeAddressDTO } from './employeeAddress.dto';
 
 export class UpdateEmployeeDTO {
   @ApiProperty()
