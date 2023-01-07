@@ -66,8 +66,12 @@ export class EmployeeService {
         lng,
       });
     }
+    let { address, ...employeeData } = props;
+    address = JSON.stringify(address);
 
-    const employee = await this.employeeRepository.create(new Employee(props));
+    const employee = await this.employeeRepository.create(
+      new Employee({ address, ...employeeData }),
+    );
 
     await this.employeeOnPinService.associateEmployee({
       employeeId: employee.id,
@@ -78,7 +82,7 @@ export class EmployeeService {
       type: ETypePin.CONVENTIONAL,
     });
 
-    return employee;
+    return {...employee, address: JSON.parse(employee.address)};
   }
 
   async delete(id: string): Promise<Employee> {
@@ -124,7 +128,8 @@ export class EmployeeService {
     id: string,
     data: UpdateEmployeeDTO,
   ): Promise<MappedEmployeeDTO> {
-    const employee = await this.listById(id);
+    let employee = await this.listById(id);
+    employee.address = JSON.stringify(employee.address);
     let pin: Pin;
 
     if (data.registration) {
@@ -141,43 +146,45 @@ export class EmployeeService {
         );
       }
     }
-    if(data.pin){
-
+    if (data.pin) {
       if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
         if (!data.pin.id)
-        throw new HttpException(
-          'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
-          HttpStatus.BAD_REQUEST,
-        );
+          throw new HttpException(
+            'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+            HttpStatus.BAD_REQUEST,
+          );
 
-      await this.employeeOnPinService.associateEmployeeByService(
-        data.pin.id,
-        employee,
+        await this.employeeOnPinService.associateEmployeeByService(
+          data.pin.id,
+          employee,
         );
       } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
         const { title, local, details, lat, lng } = data.pin;
-        
+
         if (!title || !local || !details || !lat || !lng) {
           throw new HttpException(
-          'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
-          HttpStatus.BAD_REQUEST,
-        );
+            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        pin = await this.pinService.create({
+          title,
+          local,
+          details,
+          lat,
+          lng,
+        });
       }
-      
-      pin = await this.pinService.create({
-        title,
-        local,
-        details,
-        lat,
-        lng,
-      });
-    }
 
       await this.employeeOnPinService.associateEmployeeByService(
         pin.id,
         employee,
       );
     }
+
+
+    data.address = JSON.stringify(data?.address);
 
     const updatedEmployee = await this.employeeRepository.update(
       Object.assign(employee, { ...employee, ...data }),
@@ -195,7 +202,7 @@ export class EmployeeService {
       return {
         id: employee.id,
         name: employee.name,
-        address: employee.address,
+        address: JSON.parse(employee.address),
         admission: employee.admission,
         costCenter: employee.costCenter,
         registration: employee.registration,
@@ -221,7 +228,7 @@ export class EmployeeService {
     return {
       id: employee.id,
       name: employee.name,
-      address: employee.address,
+      address: JSON.parse(employee.address),
       admission: employee.admission,
       costCenter: employee.costCenter,
       registration: employee.registration,

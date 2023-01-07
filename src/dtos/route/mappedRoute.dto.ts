@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { EmployeeAddressDTO } from "../employee/EmployeeAddress.dto";
 
 class IPin {
   @ApiProperty()
@@ -13,7 +14,7 @@ class IEmployee {
   @ApiProperty()
   name: string;
   @ApiProperty()
-  address: string;
+  address: EmployeeAddressDTO | string;
   @ApiProperty()
   shift: string;
   @ApiProperty()
