@@ -177,13 +177,6 @@ export class EmployeeService {
         });
       }
       
-      pin = await this.pinService.create({
-        title,
-        local,
-        details,
-        lat,
-        lng,
-      });
       
       await this.employeeOnPinService.associateEmployeeByService(
         pin.id,
