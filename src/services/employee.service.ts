@@ -66,8 +66,6 @@ export class EmployeeService {
         lng,
       });
     }
-    // const { address, ...employeeData } = props;
-    // const addressData = JSON.stringify(address);
 
     const employee = await this.employeeRepository.create(
       new Employee({ ...props, address: JSON.stringify(props.address) }),
@@ -174,13 +172,13 @@ export class EmployeeService {
           lat,
           lng,
         });
+        await this.employeeOnPinService.associateEmployeeByService(
+          pin.id,
+          employee,
+        );
       }
 
 
-      await this.employeeOnPinService.associateEmployeeByService(
-        pin.id,
-        employee,
-      );
     }
 
 
