@@ -72,6 +72,15 @@ export class EmployeesOnPathService {
     return employeesOnPath;
   }
 
+  async boardEmployee(id: string): Promise<any> {
+    await this.listById(id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+
+    await this.updateWebsocket(id, { confirmation: true, boardingAt: (new Date()) });
+
+
+  }
+
   async listByIds(id: string): Promise<EmployeesOnPath[]> {
     const employeesOnPath = await this.employeesOnPathRepository.findByIds(id);
 

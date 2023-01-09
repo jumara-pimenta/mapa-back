@@ -44,7 +44,7 @@ export class UpdateEmployeeDTO {
   @ValidateNested({ each: true })
   @Type(() => EmployeeAddressDTO)
   @IsOptional()
-  address?: EmployeeAddressDTO | string;
+  address?: EmployeeAddressDTO ;
   
   @ApiProperty()
   @ValidateNested({ each: true })

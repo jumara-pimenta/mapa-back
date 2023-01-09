@@ -26,7 +26,7 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-  ) {}
+  ) { }
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
@@ -66,11 +66,11 @@ export class EmployeeService {
         lng,
       });
     }
-    let { address, ...employeeData } = props;
-    address = JSON.stringify(address);
+    // const { address, ...employeeData } = props;
+    // const addressData = JSON.stringify(address);
 
     const employee = await this.employeeRepository.create(
-      new Employee({ address, ...employeeData }),
+      new Employee({ ...props, address: JSON.stringify(props.address) }),
     );
 
     await this.employeeOnPinService.associateEmployee({
@@ -82,7 +82,7 @@ export class EmployeeService {
       type: ETypePin.CONVENTIONAL,
     });
 
-    return {...employee, address: JSON.parse(employee.address)};
+    return { ...employee, address: JSON.parse(employee.address) };
   }
 
   async delete(id: string): Promise<Employee> {
@@ -128,8 +128,7 @@ export class EmployeeService {
     id: string,
     data: UpdateEmployeeDTO,
   ): Promise<MappedEmployeeDTO> {
-    let employee = await this.listById(id);
-    employee.address = JSON.stringify(employee.address);
+    const employee = await this.listById(id);
     let pin: Pin;
 
     if (data.registration) {
@@ -176,8 +175,8 @@ export class EmployeeService {
           lng,
         });
       }
-      
-      
+
+
       await this.employeeOnPinService.associateEmployeeByService(
         pin.id,
         employee,
@@ -185,10 +184,12 @@ export class EmployeeService {
     }
 
 
-    data.address = JSON.stringify(data?.address);
+    const address = JSON.stringify(data?.address);
+
+    const employeeDataUpdated = { ...data, address } ;
 
     const updatedEmployee = await this.employeeRepository.update(
-      Object.assign(employee, { ...employee, ...data }),
+      Object.assign(employee, { ...employee, ...employeeDataUpdated }),
     );
 
     return this.mapperOne(updatedEmployee);

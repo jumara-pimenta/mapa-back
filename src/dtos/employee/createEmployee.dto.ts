@@ -48,7 +48,7 @@ export class CreateEmployeeDTO {
   @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
   @ValidateNested({ each: true })
   @Type(() => EmployeeAddressDTO)
-  address: EmployeeAddressDTO | string;
+  address: EmployeeAddressDTO;
  
   @ApiProperty()
   @ValidateNested({ each: true })

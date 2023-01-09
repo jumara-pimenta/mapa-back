@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, isBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, isBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class EmployeeAddressDTO {
 
@@ -31,8 +31,4 @@ state: string;
 @IsString({ message: '[street] A rua deve ser do tipo string.'})
 @IsNotEmpty({ message: '[street] A rua deve ser preenchida.'})
 street: string;
-@ApiProperty()
-@IsBoolean({ message: '[type] O tipo deve ser do tipo booleano.'})
-@IsNotEmpty({ message: '[type] O tipo deve ser preenchido.'})
-type: boolean;
 }
