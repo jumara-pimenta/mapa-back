@@ -79,8 +79,8 @@ export class PathService {
   }
 
   async getPathidByEmployeeOnPathId(id: string): Promise<Partial<Path>> {
-    const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
-
+     const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
+    
      return employeeOnPath;
   }
 
@@ -202,7 +202,6 @@ export class PathService {
           disembarkAt: employeeOnPath.disembarkAt,
           boardingAt: employeeOnPath.boardingAt,
           confirmation: employeeOnPath.confirmation,
-          description: employeeOnPath.description
         });
       });
 

@@ -105,7 +105,6 @@ export interface EmployeesByPin {
     employeeId: string;
     disembarkAt: Date;
     confirmation: boolean;
-    description: string;
     boardingAt: Date;
   }[];
 
