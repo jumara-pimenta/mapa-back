@@ -26,7 +26,15 @@ export const ListRoutes = {
     {
       id: '9551bda9-25e9-4db3-92a9-fe5ae7208e59',
       name: 'Marcus Vinicius',
-      address: 'Av. Paulista, 1000',
+      address: {
+        cep: '66166155',
+        city: 'Beatriz do Norte',
+        complement: 'Moraes Rua',
+        neighborhood: 'Arthur Avenida',
+        number: '1282',
+        state: 'Pará',
+        street: 'Reis Rodovia'
+      },
       admission: '2023-01-03T14:01:20.498Z',
       costCenter: 'Almoxarife',
       registration: '123456789',
@@ -105,12 +113,32 @@ export const CreateEmployee = {
   role: 'Auxiliar de produção',
   shift: '1º Turno',
   costCenter: 'Almoxarife',
-  address: 'Av. Paulista, 1000',
+	address: {
+		cep: '69045700',
+		city: 'Manaus',
+		complement: 'Campos Eliseos',
+		neighborhood: 'Planalto',
+		number: '140',
+		state: 'AM',
+		street: 'RUA LUSAKA'
+	},
   createdAt: '2023-01-02T10:28:31.580Z',
   updatedAt: null,
 }      
 
-export const UpdateEmployee = {}
+export const UpdateEmployee = {
+  ...CreateEmployee,
+  updatedAt: new Date(),
+  role: 'desenvolvedor de software',
+}
 
-export const DeleteEmployee = {}
+export const DeleteEmployee = {...UpdateEmployee}
 
+export const GetEmployee = {...UpdateEmployee}
+
+export const GetAllEmployee = {
+  total: 1,
+  items: [
+    {...UpdateEmployee}
+  ]
+}
