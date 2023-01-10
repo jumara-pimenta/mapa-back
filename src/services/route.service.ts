@@ -168,12 +168,6 @@ export class RouteService {
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
 
-    // if (route.paths[0].finishedAt !== null)
-    //   throw new HttpException(
-    //     'Não é possível alterar uma rota que já foi finalizada!',
-    //     HttpStatus.CONFLICT,
-    //   );
-
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
