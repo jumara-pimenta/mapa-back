@@ -20,6 +20,7 @@ export class AuthService {
     @Inject('IBackOfficeUserRepository')
     private readonly backOfficeUserRepository: IBackOfficeUserRepository,
   ) {}
+  
 
   private verifyToken(token: string): any {
     try {

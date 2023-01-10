@@ -1,9 +1,13 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import {
-  BackOfficeUserCreateDTO,
-  BackOfficeUserDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { BackOfficeUserCreateDTO, BackOfficeUserDTO } from 'src/dtos/auth/backOfficeUserLogin.dto';
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';
@@ -28,4 +32,5 @@ export class AuthController {
   ): Promise<any> {
     return await this.authService.backofficeUserCreate(payload);
   }
+
 }
