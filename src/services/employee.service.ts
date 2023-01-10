@@ -86,7 +86,9 @@ export class EmployeeService {
   async delete(id: string): Promise<Employee> {
     const employee = await this.listById(id);
 
-    return await this.employeeRepository.delete(employee.id);
+    const data = await this.employeeRepository.delete(employee.id);
+
+    return { ...data, address: JSON.parse(data.address) };
   }
 
   async listById(id: string): Promise<MappedEmployeeDTO> {

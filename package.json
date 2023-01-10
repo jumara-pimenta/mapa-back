@@ -21,6 +21,7 @@
     "test:e2e": "MOCK_SERVER=true jest --config ./test/jest-e2e.json --runInBand --forceExit"
   },
   "dependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@golevelup/ts-jest": "^0.3.3",
     "@nestjs/common": "9.2.1",
     "@nestjs/config": "2.2.0",

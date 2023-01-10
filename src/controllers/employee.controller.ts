@@ -22,7 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateEmployee } from 'src/utils/examples.swagger';
+import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -43,12 +43,26 @@ export class EmployeeController {
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Employees.',
+    schema: {
+      type: 'object',
+      example: DeleteEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Employee.',
+    schema: {
+      type: 'object',
+      example: UpdateEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -57,7 +71,14 @@ export class EmployeeController {
     return await this.employeeService.update(id, data);
   }
 
-  @Get()
+  @Get()  
+  @ApiCreatedResponse({
+    description: 'Get all Employees.',
+    schema: {
+      type: 'object',
+      example: GetAllEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -67,6 +88,13 @@ export class EmployeeController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get a Employee by id.',
+    schema: {
+      type: 'object',
+      example: GetEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.listById(id);
