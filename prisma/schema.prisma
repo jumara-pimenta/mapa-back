@@ -135,3 +135,13 @@ model EmployeesOnPin {
 
   @@id([employeeId, pinId])
 }
+
+model BackOfficeUser {
+  id        String    @id @unique
+  name      String
+  email     String    @unique
+  password  String
+  role      String
+  createdAt DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt DateTime? @db.DateTimeOffset
+}
