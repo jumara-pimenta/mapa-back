@@ -44,7 +44,7 @@ export class WebsocketGateway {
     payload: CurrentLocalDTO,
   ): void {
     try {
-      this.server.emit(payload.id, {
+      this.server.emit(payload.id+'/local', {
         ...payload,
       });
     } catch (error) {
