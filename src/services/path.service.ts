@@ -34,7 +34,18 @@ export class PathService {
         'Não é possível alterar uma rota que já foi finalizada!',
         HttpStatus.CONFLICT,
       );
+
+    if (path.startedAt === null) throw new HttpException('Não é possível finalizar uma rota que não foi iniciada!', HttpStatus.CONFLICT)
+
+
     const route = await this.routeService.routeIdByPathId(id)
+
+    if (path.type === ETypePath.ONE_WAY) {
+
+      for await (const employee of path.employeesOnPath) {
+        if (employee.confirmation === true) await this.employeesOnPathService.update(employee.id, { disembarkAt: getDateInLocaleTime(new Date()) })
+      }
+    }
 
     const finishAt = {
       routeId: route,
@@ -58,6 +69,20 @@ export class PathService {
         'Não é possível alterar uma rota que já foi finalizada!',
         HttpStatus.CONFLICT,
       );
+    let confirmationCount = 0;
+    path.employeesOnPath.forEach((employee) => { if (employee.confirmation == true) confirmationCount++ });
+
+    if (confirmationCount === 0) throw new HttpException('Não é possível iniciar uma rota sem nenhum colaborador no trajeto confirmado!', HttpStatus.CONFLICT);
+
+    if (path.type === ETypePath.RETURN) {
+
+      for await (const employee of path.employeesOnPath) {
+        if (employee.confirmation === true) await this.employeesOnPathService.update(employee.id, { boardingAt: getDateInLocaleTime(new Date()) })
+      }
+    }
+
+
+
     const route = await this.routeService.routeIdByPathId(id)
 
     const startAt = {
@@ -79,9 +104,9 @@ export class PathService {
   }
 
   async getPathidByEmployeeOnPathId(id: string): Promise<Partial<Path>> {
-     const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
-    
-     return employeeOnPath;
+    const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
+
+    return employeeOnPath;
   }
 
   async generate(props: CreatePathDTO): Promise<void> {
@@ -102,10 +127,13 @@ export class PathService {
         ),
       );
 
+
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
         pathId: path.id,
+        confirmation: type === ETypePath.ONE_WAY ? true : false,
       });
+
     } else if (type === ETypePath.ROUND_TRIP) {
       const pathOneWay = await this.pathRepository.create(
         new Path(
@@ -134,11 +162,13 @@ export class PathService {
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
         pathId: pathOneWay.id,
+        confirmation: true,
       });
 
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
         pathId: pathReturn.id,
+        confirmation: false,
       });
     }
 
@@ -186,6 +216,7 @@ export class PathService {
         const { name, registration, id: employeeId } = employeeOnPath.employee;
 
         if (agroupedEmployees.includes(employeeOnPath.id)) return;
+        if (employeeOnPath.confirmation === false) return;
 
         agroupedEmployees.push(employeeOnPath.id);
         data = {
