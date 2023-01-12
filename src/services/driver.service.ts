@@ -85,7 +85,7 @@ export class DriverService {
 
     if (drivers.total === 0) {
       throw new HttpException(
-        'Não existe drivers para esta pesquisa!',
+        'Não existe motorista(s) para esta pesquisa!',
         HttpStatus.NOT_FOUND,
       );
     }

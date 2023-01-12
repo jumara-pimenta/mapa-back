@@ -259,7 +259,7 @@ export class PathService {
 
     if (!path.length)
       throw new HttpException(
-        `Não foram encontrados trajetos para a rota com o id: ${routeId}!`,
+        'Não foram encontrados trajetos para essa rota',
         HttpStatus.NOT_FOUND,
       );
 

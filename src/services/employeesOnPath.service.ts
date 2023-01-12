@@ -55,7 +55,7 @@ export class EmployeesOnPathService {
 
     if (!employeesOnPath)
       throw new HttpException(
-        `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`,
+        'Não foi encontrado um colaboradores no trajeto!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -68,7 +68,7 @@ export class EmployeesOnPathService {
 
     if (!employeesOnPath)
       throw new HttpException(
-        `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`,
+        'Não foi encontrado um colaboradores no trajeto!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -107,7 +107,7 @@ export class EmployeesOnPathService {
 
     if (!employeesOnPath)
       throw new HttpException(
-        `Não foi encontrado um colaboradores no trajeto com o id: ${id}!`,
+        'Não foi encontrado um colaboradores no trajeto!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -134,7 +134,7 @@ export class EmployeesOnPathService {
 
     if (!employeesOnPath.length)
       throw new HttpException(
-        `Não foi encontrado um trajeto para a rota: ${routeId}`,
+        'Não foi encontrado um trajeto para essa rota',
         HttpStatus.NOT_FOUND,
       );
 
@@ -183,7 +183,7 @@ export class EmployeesOnPathService {
 
     if(!data.length)
       throw new HttpException(
-        `Não foi encontrado um colaborador no trajeto com o id: ${pathId} e o id do pin: ${pinId}`,
+        `Não foi encontrado um colaborador no trajeto com este trajeto: ${pathId} e neste ponto de embarque: ${pinId}`,
         HttpStatus.NOT_FOUND,
       );
 
