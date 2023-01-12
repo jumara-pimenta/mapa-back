@@ -25,7 +25,7 @@ import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
-import * as turf from "@turf/turf"
+import * as turf from '@turf/turf';
 
 @Injectable()
 export class RouteService {
@@ -37,7 +37,7 @@ export class RouteService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
-  ) { }
+  ) {}
 
   async create(payload: CreateRouteDTO): Promise<Route> {
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
@@ -51,8 +51,8 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-      
-    const emplopyeeOrdened = orderPins(employeesPins)
+
+    const emplopyeeOrdened = orderPins(employeesPins);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
@@ -234,10 +234,10 @@ export class RouteService {
       }
     }
 
-    if(payload.route){
+    if (payload.route) {
       await this.update(payload.routeId, payload.route);
     }
-    if(payload.path){
+    if (payload.path) {
       await this.pathService.update(payload.pathId, payload.path);
     }
 
@@ -254,10 +254,15 @@ export class RouteService {
       path: dataFilter.path,
     };
 
-    const path = await this.pathService.listEmployeesByPathAndPin(payload.pathId);
+    const path = await this.pathService.listEmployeesByPathAndPin(
+      payload.pathId,
+    );
 
-
-    return {vehicle: dataFilterWebsocket.vehicle, driver: dataFilterWebsocket.driver,...path} as MappedPathPinsDTO;
+    return {
+      vehicle: dataFilterWebsocket.vehicle,
+      driver: dataFilterWebsocket.driver,
+      ...path,
+    } as MappedPathPinsDTO;
   }
 
   async softDelete(id: string): Promise<Route> {
@@ -347,8 +352,6 @@ export class RouteService {
       };
     });
   }
-
-  
 
   private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
     return routes.map((route) => {
@@ -496,11 +499,8 @@ export class RouteService {
         });
       }
       if (route.type === ETypeRoute.EXTRA) {
-
         route.path.forEach((path) => {
-
           if (type === ETypeRoute.EXTRA) {
-
             if (path.type === ETypePath.ONE_WAY) {
               if (
                 pathType === ETypePath.ONE_WAY ||
@@ -535,37 +535,32 @@ export class RouteService {
       );
 
       throw new HttpException(
-        `O(s) colaborador(es)${employeeArray.map((item) =>
-           ' ' + item.name,
+        `O(s) colaborador(es)${employeeArray.map(
+          (item) => ' ' + item.name,
         )} já está(ão) em uma rota do tipo ${type.toLocaleLowerCase()}!`,
         HttpStatus.CONFLICT,
       );
     }
 
-
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
-      
-
       let message = [
         employeeOnOneWay.length > 0
           ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
-            item?.map((employee) => ' ' + employee.employee.name),
-          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
           : null,
         employeeOnReturn.length > 0
           ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-            item?.map((employee) => ' ' + employee.employee.name),
-          )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
           : null,
-      ]
-
+      ];
 
       message = message.filter((item) => item !== null);
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
-          message
-
+          message,
         },
         HttpStatus.CONFLICT,
       );
@@ -641,7 +636,7 @@ export class RouteService {
       .filter((_r) => _r.id != route.id && route.type === _r.type)
       .forEach((routeItem: Route) => {
         if (route.type !== ETypeRoute.EXTRA) {
-        routeItem.path.forEach((path) => {
+          routeItem.path.forEach((path) => {
             const employeeInPath = path.employeesOnPath.filter((item) =>
               employeeIds.includes(item.employee.id),
             );
@@ -653,11 +648,10 @@ export class RouteService {
               employeeArray.push(employeeInPath);
             }
           });
-          }
-          
-          if (route.type === ETypeRoute.EXTRA) {
-            routeItem.path.forEach((path) => {
+        }
 
+        if (route.type === ETypeRoute.EXTRA) {
+          routeItem.path.forEach((path) => {
             if (path.type === ETypePath.ONE_WAY) {
               if (
                 pathType === ETypePath.ONE_WAY ||
@@ -684,7 +678,7 @@ export class RouteService {
         }
       });
 
-      employeeArray.filter((item) => item !== null);
+    employeeArray.filter((item) => item !== null);
     if (employeeArray.length > 0) {
       throw new HttpException(
         `Um ou mais coloboradores já estão em outra rota do tipo ${type.toLocaleLowerCase()}.  ${employeeArray.map(
@@ -701,27 +695,23 @@ export class RouteService {
       );
     }
     employeeArray = employeeArray.filter(
-      (item, index, self) =>
-        index === self.findIndex((t) => t.id === item.id),
+      (item, index, self) => index === self.findIndex((t) => t.id === item.id),
     );
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
-      
       let message = [
         employeeOnOneWay.length &&
-           `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
+          `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
             item?.map((employee) => ' ' + employee.employee.name),
-          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
-          ,
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`,
         employeeOnReturn.length > 0
           ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
-            item?.map((employee) => ' ' + employee.employee.name),
-          )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+              item?.map((employee) => ' ' + employee.employee.name),
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
           : null,
-      ]
-
+      ];
 
       message = message.filter((item) => item !== null);
-            throw new HttpException(
+      throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
           message,
@@ -734,58 +724,69 @@ export class RouteService {
   async routeIdByPathId(pathId: string): Promise<string> {
     const path = await this.routeRepository.findRouteIdByPathId(pathId);
     if (!path) {
-      throw new HttpException(
-        'Rota não encontrada!',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
     }
     return path;
   }
 }
 
-const orderPins = (arr: Employee[]) : string[] => {
+const orderPins = (arr: Employee[]): string[] => {
+  const latDenso = -3.110944;
+  const longDenso = -59.962604;
 
-  const latDenso = -3.110944
-  const longDenso = -59.962604
-  
-  let newArr = []
+  const newArr = [];
 
-  for(const employee of arr){
-    newArr.push(employee)
+  for (const employee of arr) {
+    newArr.push(employee);
   }
 
-  let n = newArr.length;
+  const n = newArr.length;
 
-  for (let i = 0; i < n - 1; i++){
-    for (let j = 0; j < n - i - 1; j++){
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      const lat = Number(
+        Number(
+          newArr[j].pins[newArr[j].pins.length - 1].pin.lat.trim(),
+        ).toFixed(5),
+      );
+      const long = Number(
+        Number(
+          newArr[j].pins[newArr[j].pins.length - 1].pin.lng.trim(),
+        ).toFixed(5),
+      );
 
-      let lat = Number((Number((newArr[j].pins[newArr[j].pins.length - 1].pin.lat).trim())).toFixed(5))
-      let long = Number((Number((newArr[j].pins[newArr[j].pins.length - 1].pin.lng).trim())).toFixed(5))
+      const latPointAhead = Number(
+        Number(
+          newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lat.trim(),
+        ).toFixed(5),
+      );
+      const longPointAhead = Number(
+        Number(
+          newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lng.trim(),
+        ).toFixed(5),
+      );
 
-      let latPointAhead = Number((Number((newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lat).trim())).toFixed(5))
-      let longPointAhead = Number((Number((newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lng).trim())).toFixed(5))
+      const fromPoint = turf.point([long, lat]);
+      const fromPointAhead = turf.point([longPointAhead, latPointAhead]);
 
-      let fromPoint = turf.point([long, lat]);
-      let fromPointAhead = turf.point([longPointAhead, latPointAhead]);
+      const toDenso = turf.point([longDenso, latDenso]);
 
-      let toDenso = turf.point([longDenso, latDenso]);
+      const distanceToDenso = turf.distance(fromPoint, toDenso);
+      const distancePointAheadToDenso = turf.distance(fromPointAhead, toDenso);
 
-      let distanceToDenso = turf.distance(fromPoint, toDenso);
-      let distancePointAheadToDenso = turf.distance(fromPointAhead, toDenso);
-
-      if(distanceToDenso < distancePointAheadToDenso){
-        let temp = newArr[j];
+      if (distanceToDenso < distancePointAheadToDenso) {
+        const temp = newArr[j];
         newArr[j] = newArr[j + 1];
         newArr[j + 1] = temp;
       }
     }
   }
 
-  let employeeIdOrdened = []
+  const employeeIdOrdened = [];
 
-  for(const employee of newArr){
-    employeeIdOrdened.push(employee.id)
+  for (const employee of newArr) {
+    employeeIdOrdened.push(employee.id);
   }
 
-  return employeeIdOrdened
-}
+  return employeeIdOrdened;
+};
