@@ -18,11 +18,16 @@ import { RouteService } from '../services/route.service';
 import { CreateRouteDTO } from '../dtos/route/createRoute.dto';
 import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateRoute, DeleteRoute, ListRoutes, UpdateRoute } from 'src/utils/examples.swagger';
+import {
+  CreateRoute,
+  DeleteRoute,
+  GetRoutesByDriver,
+  ListRoutes,
+  UpdateRoute,
+} from 'src/utils/examples.swagger';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
-
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
   @Post()
@@ -30,7 +35,7 @@ export class RouteController {
     description: 'Creates a new Route.',
     schema: {
       type: 'object',
-      example: CreateRoute
+      example: CreateRoute,
     },
   })
   @HttpCode(HttpStatus.CREATED)
@@ -44,7 +49,7 @@ export class RouteController {
     description: 'Soft delete a route.',
     schema: {
       type: 'object',
-      example: DeleteRoute
+      example: DeleteRoute,
     },
   })
   @HttpCode(HttpStatus.OK)
@@ -58,8 +63,8 @@ export class RouteController {
     description: 'Update a route.',
     schema: {
       type: 'object',
-      example: UpdateRoute
-    }
+      example: UpdateRoute,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async update(
@@ -75,11 +80,9 @@ export class RouteController {
     description: 'List all routes.',
     schema: {
       type: 'object',
-      example: ListRoutes
-        
-      }
-    }
-  )
+      example: ListRoutes,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -94,8 +97,8 @@ export class RouteController {
     description: 'List a route by id.',
     schema: {
       type: 'object',
-      example: UpdateRoute
-    }
+      example: UpdateRoute,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<MappedRouteDTO> {
@@ -103,6 +106,14 @@ export class RouteController {
   }
 
   @Get('/paths/driver/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List a route by driver.',
+    schema: {
+      type: 'object',
+      example: GetRoutesByDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getPathsByDriverId(
     @Param('id') id: string,
@@ -111,5 +122,4 @@ export class RouteController {
   ): Promise<PageResponse<MappedRouteDTO>> {
     return await this.routeService.listByDriverId(id, page, filters);
   }
-
 }

@@ -88,6 +88,74 @@ export const DeleteRoute = {
   deletedAt: new Date(),
 };
 
+export const GetRoutesByDriver = {
+  total: 1,
+  items: [
+    {
+      id: '3798a30d-344a-4317-b904-57337fbf93f7',
+      description: 'Rota #002',
+      distance: 'EM PROCESSAMENTO',
+      status: 'PENDENTE',
+      type: 'CONVENCIONAL',
+      createdAt: '2023-01-11T18:59:02.923Z',
+      driver: {
+        id: '566f9a5d-89e3-4e73-976f-e764d42de0fa',
+        name: 'Marcolino Pereira',
+        cpf: '03278555451',
+        cnh: '11225512',
+        validation: '2023-01-11T14:49:20.316Z',
+        category: 'AB',
+        createdAt: '2023-01-11T18:49:20.374Z',
+        updatedAt: null,
+      },
+      vehicle: {
+        id: '8325b66f-db3f-4bbc-91e4-e216f0a5e6eb',
+        plate: 'OAC2215',
+        company: 'Expresso',
+        type: 'ÔNIBUS',
+        lastSurvey: '2022-06-27T16:17:13.448Z',
+        expiration: '2022-06-27T16:17:13.448Z',
+        capacity: 28,
+        renavam: '12452154111',
+        lastMaintenance: '2023-01-11T18:50:32.533Z',
+        note: 'Teste',
+        isAccessibility: true,
+        createdAt: '2023-01-11T14:50:32.540Z',
+        updatedAt: null,
+      },
+      paths: [
+        {
+          id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+          duration: '01:30',
+          finishedAt: null,
+          startedAt: null,
+          startsAt: '12:59',
+          status: 'PENDENTE',
+          type: 'IDA',
+          createdAt: '2023-01-11T18:59:02.936Z',
+          employeesOnPath: [
+            {
+              id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+              boardingAt: null,
+              confirmation: false,
+              disembarkAt: null,
+              position: 1,
+              details: {
+                name: 'Davizinho',
+                location: {
+                  lat: '-3.107451943287261',
+                  lng: '-59.99183873143272',
+                },
+              },
+            },
+          ],
+        },
+      ],
+      quantityEmployees: 1,
+    },
+  ],
+};
+
 export const CreateDriver = {
   id: 'dc0e9792-f935-4411-a016-de4509d55054',
   name: 'João da Silva',
@@ -219,4 +287,508 @@ export const GetRouteHistories = {
   finishedAt: '2023-01-02T10:28:31.580Z',
   createdAt: '2023-01-02T10:28:31.580Z',
   updatedAt: null,
+};
+
+export const GetEmployeesOnPath = {
+  boardingAt: null,
+  confirmation: true,
+  disembarkAt: null,
+  position: 1,
+  createdAt: '2023-01-11T18:59:02.950Z',
+  details: {
+    name: 'Davizinho',
+    address:
+      '{"cep":"69045700","city":"Manaus","complement":"Campos Eliseos","neighborhood":"Planalto","number":"14","state":"AM","street":"RUA LUSAKA"}',
+    shift: '1º Turno',
+    registration: '787745',
+    location: {
+      lat: '-3.107451943287261',
+      lng: '-59.99183873143272',
+    },
+  },
+};
+
+export const GetEmmployeesOnPathByRoute = [
+  {
+    id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+    boardingAt: null,
+    confirmation: false,
+    disembarkAt: null,
+    position: 1,
+    createdAt: '2023-01-11T18:59:02.950Z',
+    details: {
+      name: 'Davizinho',
+      address:
+        '{"cep":"69045700","city":"Manaus","complement":"Campos Eliseos","neighborhood":"Planalto","number":"14","state":"AM","street":"RUA LUSAKA"}',
+      shift: '1º Turno',
+      registration: '787745',
+      location: {
+        lat: '-3.107451943287261',
+        lng: '-59.99183873143272',
+      },
+    },
+  },
+];
+
+export const UpdateConfirmationEmployeesOnPath = {
+  id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+  pathId: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+  confirmation: true,
+  position: 1,
+  description: null,
+  boardingAt: null,
+  disembarkAt: null,
+  createdAt: '2023-01-11T18:59:02.950Z',
+  updatedAt: new Date(),
+};
+
+export const UpdateEmployeesOnPathById = {
+  id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+  pathId: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+  confirmation: true,
+  position: 1,
+  description: null,
+  boardingAt: null,
+  disembarkAt: null,
+  createdAt: '2023-01-11T18:59:02.950Z',
+  updatedAt: new Date(),
+};
+
+export const UpdateConfirmationEmployeesOnPathById = {
+  id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+  pathId: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+  confirmation: true,
+  position: 1,
+  description: null,
+  boardingAt: null,
+  disembarkAt: null,
+  createdAt: '2023-01-11T18:59:02.950Z',
+  updatedAt: new Date(),
+};
+
+export const UpdateEmployeeOnBoard = {
+  id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  routeDescription: 'Rota #002',
+  duration: '01:30',
+  finishedAt: null,
+  startedAt: null,
+  startsAt: '12:59',
+  status: 'PENDENTE',
+  type: 'IDA',
+  createdAt: '2023-01-11T18:59:02.936Z',
+  routeId: '3798a30d-344a-4317-b904-57337fbf93f7',
+  employeesOnPins: [
+    {
+      position: 1,
+      lat: '-3.107451943287261',
+      lng: '-59.99183873143272',
+      employees: [
+        {
+          id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+          name: 'Davizinho',
+          registration: '787745',
+          employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+          disembarkAt: null,
+          boardingAt: '2023-01-12T11:08:08.701Z',
+          confirmation: true,
+        },
+      ],
+    },
+  ],
+};
+
+export const UpdateEmployeeOffBoard = {
+  id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  routeDescription: 'Rota #002',
+  duration: '01:30',
+  finishedAt: null,
+  startedAt: null,
+  startsAt: '12:59',
+  status: 'PENDENTE',
+  type: 'IDA',
+  createdAt: '2023-01-11T18:59:02.936Z',
+  routeId: '3798a30d-344a-4317-b904-57337fbf93f7',
+  employeesOnPins: [
+    {
+      position: 1,
+      lat: '-3.107451943287261',
+      lng: '-59.99183873143272',
+      employees: [
+        {
+          id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+          name: 'Davizinho',
+          registration: '787745',
+          employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+          disembarkAt: '2023-01-12T11:18:55.933Z',
+          boardingAt: '2023-01-12T11:08:08.701Z',
+          confirmation: true,
+        },
+      ],
+    },
+  ],
+};
+
+export const UpdateEmployeeOnPathNotComming = {
+  id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  routeDescription: 'Rota #002',
+  duration: '01:30',
+  finishedAt: null,
+  startedAt: null,
+  startsAt: '12:59',
+  status: 'PENDENTE',
+  type: 'IDA',
+  createdAt: '2023-01-11T18:59:02.936Z',
+  routeId: '3798a30d-344a-4317-b904-57337fbf93f7',
+  employeesOnPins: [
+    {
+      position: 1,
+      lat: '-3.107451943287261',
+      lng: '-59.99183873143272',
+      employees: [
+        {
+          id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+          name: 'Davizinho',
+          registration: '787745',
+          employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+          disembarkAt: null,
+          boardingAt: null,
+          confirmation: false,
+        },
+      ],
+    },
+  ],
+};
+
+export const GetPathById = {
+  id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  routeDescription: 'Rota #002',
+  duration: '01:30',
+  finishedAt: null,
+  startedAt: null,
+  startsAt: '12:59',
+  status: 'PENDENTE',
+  type: 'IDA',
+  createdAt: '2023-01-11T18:59:02.936Z',
+  employeesOnPath: [
+    {
+      id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+      boardingAt: null,
+      confirmation: false,
+      disembarkAt: null,
+      position: 1,
+      details: {
+        name: 'Davizinho',
+        address:
+          '{"cep":"69045700","city":"Manaus","complement":"Campos Eliseos","neighborhood":"Planalto","number":"14","state":"AM","street":"RUA LUSAKA"}',
+        shift: '1º Turno',
+        registration: '787745',
+        location: {
+          id: '1d7a860f-b354-4314-8d5d-2be01c232612',
+          lat: '-3.107451943287261',
+          lng: '-59.99183873143272',
+        },
+      },
+    },
+  ],
+};
+
+export const UpdatePathById = {
+  id: '217822b9-02f2-47e7-9d90-1ae58744acc3',
+  duration: '01:30',
+  startsAt: '08:30',
+  startedAt: null,
+  finishedAt: null,
+  type: 'IDA E VOLTA',
+  status: 'PENDENTE',
+  routeId: 'd485832a-3bc6-419f-817b-c2c1a94472be',
+  createdAt: '2023-01-12T18:43:02.367Z',
+  updatedAt: '2023-01-12T14:54:51.249Z',
+};
+
+export const GetPathByRoutes = [
+  {
+    id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+    routeDescription: 'Rota #002',
+    duration: '01:30',
+    finishedAt: null,
+    startedAt: null,
+    startsAt: '12:59',
+    status: 'PENDENTE',
+    type: 'IDA',
+    createdAt: '2023-01-11T18:59:02.936Z',
+    employeesOnPath: [
+      {
+        id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+        boardingAt: null,
+        confirmation: false,
+        disembarkAt: null,
+        position: 1,
+        details: {
+          name: 'Davizinho',
+          address:
+            '{"cep":"69045700","city":"Manaus","complement":"Campos Eliseos","neighborhood":"Planalto","number":"14","state":"AM","street":"RUA LUSAKA"}',
+          shift: '1º Turno',
+          registration: '787745',
+          location: {
+            lat: '-3.107451943287261',
+            lng: '-59.99183873143272',
+          },
+        },
+      },
+    ],
+  },
+];
+
+export const GetPathByDriver = [
+  {
+    id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+    routeDescription: 'Rota #002',
+    duration: '01:30',
+    finishedAt: '2023-01-12T14:13:17.444Z',
+    startedAt: '2023-01-12T14:10:18.084Z',
+    startsAt: '12:59',
+    status: 'FINALIZADO',
+    type: 'IDA',
+    createdAt: '2023-01-11T18:59:02.936Z',
+    employeesOnPath: [
+      {
+        id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+        boardingAt: null,
+        confirmation: false,
+        disembarkAt: null,
+        position: 1,
+        details: {
+          name: 'Davizinho',
+          address:
+            '{"cep":"69045700","city":"Manaus","complement":"Campos Eliseos","neighborhood":"Planalto","number":"14","state":"AM","street":"RUA LUSAKA"}',
+          shift: '1º Turno',
+          registration: '787745',
+          location: {
+            lat: '-3.107451943287261',
+            lng: '-59.99183873143272',
+          },
+        },
+      },
+    ],
+  },
+];
+
+export const GetPathByEmployee = [
+  {
+    id: '217822b9-02f2-47e7-9d90-1ae58744acc3',
+    routeDescription: 'Rota #088',
+    duration: '01:30',
+    finishedAt: null,
+    startedAt: null,
+    startsAt: '08:30',
+    status: 'PENDENTE',
+    type: 'VOLTA',
+    createdAt: '2023-01-12T18:43:02.367Z',
+    employeesOnPath: [
+      {
+        id: 'c426d45d-eccc-4881-93d4-bec53e012809',
+        boardingAt: null,
+        confirmation: true,
+        disembarkAt: null,
+        position: 1,
+        details: {
+          name: 'João Doe',
+          address:
+            '{"cep":"69825","city":"Manaus","complement":"Test","neighborhood":"Coroado","number":"15","state":"AM","street":"Rua C","type":true}',
+          shift: '1º Turno',
+          registration: '1116',
+          location: {
+            lat: '-3.1299786',
+            lng: '-59.99308800000001',
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'e76a6458-8db9-4df3-9d25-3212f68b2f82',
+    routeDescription: 'Rota #088',
+    duration: '01:30',
+    finishedAt: null,
+    startedAt: null,
+    startsAt: '08:30',
+    status: 'PENDENTE',
+    type: 'IDA',
+    createdAt: '2023-01-12T18:43:02.359Z',
+    employeesOnPath: [
+      {
+        id: 'f2c61dfe-074c-49d1-8be0-12ed18debe57',
+        boardingAt: null,
+        confirmation: true,
+        disembarkAt: null,
+        position: 1,
+        details: {
+          name: 'João Doe',
+          address:
+            '{"cep":"69825","city":"Manaus","complement":"Test","neighborhood":"Coroado","number":"15","state":"AM","street":"Rua C","type":true}',
+          shift: '1º Turno',
+          registration: '1116',
+          location: {
+            lat: '-3.1299786',
+            lng: '-59.99308800000001',
+          },
+        },
+      },
+    ],
+  },
+];
+
+export const GetPathByDriverAndStatus = {
+  id: 'b8f805f2-9a96-4822-9667-2b19cc344848',
+  registration: '1116',
+  name: 'João Doe',
+  admission: '2022-11-09T17:46:04.310Z',
+  role: 'auxiliar de produção',
+  shift: '1º Turno',
+  costCenter: 'Almoxarife',
+  address: {
+    cep: '69825',
+    city: 'Manaus',
+    complement: 'Test',
+    neighborhood: 'Coroado',
+    number: '15',
+    state: 'AM',
+    street: 'Rua C',
+    type: true,
+  },
+  createdAt: '2023-01-12T14:40:45.357Z',
+  updatedAt: null,
+};
+
+export const GetPathByEmployeeAndStatus = {
+  id: '217822b9-02f2-47e7-9d90-1ae58744acc3',
+  routeDescription: 'Rota #088',
+  duration: '02h00',
+  finishedAt: null,
+  startedAt: null,
+  startsAt: '08:30',
+  status: 'PENDENTE',
+  type: 'IDA E VOLTA',
+  createdAt: '2023-01-12T18:43:02.367Z',
+  employeesOnPath: [
+    {
+      id: 'c426d45d-eccc-4881-93d4-bec53e012809',
+      boardingAt: null,
+      confirmation: true,
+      disembarkAt: null,
+      position: 1,
+      details: {
+        name: 'João Doe',
+        address:
+          '{"cep":"69825","city":"Manaus","complement":"Test","neighborhood":"Coroado","number":"15","state":"AM","street":"Rua C","type":true}',
+        shift: '1º Turno',
+        registration: '1116',
+        location: {
+          id: 'n deu',
+          lat: '-3.1299786',
+          lng: '-59.99308800000001',
+        },
+      },
+    },
+  ],
+};
+
+export const GetPathByPins = {
+  id: '217822b9-02f2-47e7-9d90-1ae58744acc3',
+  routeDescription: 'Rota #088',
+  duration: '02h00',
+  finishedAt: null,
+  startedAt: null,
+  startsAt: '08:30',
+  status: 'PENDENTE',
+  type: 'IDA E VOLTA',
+  createdAt: '2023-01-12T18:43:02.367Z',
+  routeId: 'd485832a-3bc6-419f-817b-c2c1a94472be',
+  employeesOnPins: [
+    {
+      position: 1,
+      lat: '-87.8747474',
+      lng: '-87.8747474',
+      employees: [
+        {
+          id: 'c426d45d-eccc-4881-93d4-bec53e012809',
+          name: 'João Doe',
+          registration: '1116',
+          employeeId: 'b8f805f2-9a96-4822-9667-2b19cc344848',
+          disembarkAt: null,
+          boardingAt: null,
+          confirmation: true,
+        },
+      ],
+    },
+  ],
+};
+
+export const CreateStartPath = {
+  vehicle: 'OAC2215',
+  driver: 'Marcolino Pereira',
+  id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  routeDescription: 'Rota #002',
+  duration: '01:30',
+  finishedAt: null,
+  startedAt: '2023-01-12T14:10:18.084Z',
+  startsAt: '12:59',
+  status: 'EM ANDAMENTO',
+  type: 'IDA',
+  createdAt: '2023-01-11T18:59:02.936Z',
+  routeId: '3798a30d-344a-4317-b904-57337fbf93f7',
+  employeesOnPins: [
+    {
+      position: 1,
+      lat: '-3.107451943287261',
+      lng: '-59.99183873143272',
+      employees: [
+        {
+          id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+          name: 'Davizinho',
+          registration: '787745',
+          employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+          disembarkAt: null,
+          boardingAt: null,
+          confirmation: false,
+        },
+      ],
+    },
+  ],
+};
+
+export const CreateFinishPath = {
+  vehicle: 'OAC2215',
+  driver: 'Marcolino Pereira',
+  id: 'f1dfa286-bdbd-47e0-97c2-d46b089e657d',
+  routeDescription: 'Rota #002',
+  duration: '01:30',
+  finishedAt: '2023-01-12T14:13:17.444Z',
+  startedAt: '2023-01-12T14:10:18.084Z',
+  startsAt: '12:59',
+  status: 'FINALIZADO',
+  type: 'IDA',
+  createdAt: '2023-01-11T18:59:02.936Z',
+  routeId: '3798a30d-344a-4317-b904-57337fbf93f7',
+  employeesOnPins: [
+    {
+      position: 1,
+      lat: '-3.107451943287261',
+      lng: '-59.99183873143272',
+      employees: [
+        {
+          id: 'e6d0a6a5-e5fa-4f3e-a5c0-bce1370edb56',
+          name: 'Davizinho',
+          registration: '787745',
+          employeeId: 'de54e9ee-9725-43bd-b928-1ef4610fce76',
+          disembarkAt: null,
+          boardingAt: null,
+          confirmation: false,
+        },
+      ],
+    },
+  ],
 };
