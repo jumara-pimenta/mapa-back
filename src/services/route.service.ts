@@ -152,7 +152,7 @@ export class RouteService {
 
     if (routes.total === 0) {
       throw new HttpException(
-        'Não existe routes para esta pesquisa!',
+        'Não existe(m) routa(s) para esta pesquisa!',
         HttpStatus.NOT_FOUND,
       );
     }
