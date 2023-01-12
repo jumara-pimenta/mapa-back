@@ -53,7 +53,7 @@ export class VehicleService {
 
     if (!vehicle)
       throw new HttpException(
-        `Não foi encontrado um veículo com o id: ${id}`,
+        'veículo não foi encontrado',
         HttpStatus.NOT_FOUND,
       );
 
