@@ -19,9 +19,9 @@ export const ListRoutes = {
           details: ' ali perto',
           lat: '0.0000000',
           lng: '0.000000',
-          type: 'CONVENCIONAL'
-        }
-      ]
+          type: 'CONVENCIONAL',
+        },
+      ],
     },
     {
       id: '9551bda9-25e9-4db3-92a9-fe5ae7208e59',
@@ -33,7 +33,7 @@ export const ListRoutes = {
         neighborhood: 'Arthur Avenida',
         number: '1282',
         state: 'Pará',
-        street: 'Reis Rodovia'
+        street: 'Reis Rodovia',
       },
       admission: '2023-01-03T14:01:20.498Z',
       costCenter: 'Almoxarife',
@@ -45,18 +45,19 @@ export const ListRoutes = {
         {
           id: 'c30b1f44-be06-4209-abc3-e2359d5f0709',
           title: 'Título do local',
-          local: 'Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-200, Brasil',
+          local:
+            'Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-200, Brasil',
           details: 'Detalhes do local',
           lat: '-3.10719',
           lng: '-60.0261',
-          type: 'CONVENCIONAL'
-        }
-      ]
-    }
-  ]
-}
+          type: 'CONVENCIONAL',
+        },
+      ],
+    },
+  ],
+};
 
-export const CreateRoute ={
+export const CreateRoute = {
   id: '644a4b19-6133-4506-b4f7-216fb3ffd7e7',
   description: 'Rota 1',
   distance: 'EM PROCESSAMENTO',
@@ -66,13 +67,13 @@ export const CreateRoute ={
   vehicleId: '41b4eb3d-e18a-4c8e-a668-49824b21579c',
   createdAt: '2023-01-02T12:21:09.946Z',
   updatedAt: null,
-  deletedAt: null
-}   
+  deletedAt: null,
+};
 
-export const UpdateRoute ={
+export const UpdateRoute = {
   ...CreateRoute,
   updatedAt: new Date(),
-}
+};
 
 export const DeleteRoute = {
   id: '39742d0c-1e64-4ee5-82c4-8efd1b6ceed2',
@@ -84,26 +85,86 @@ export const DeleteRoute = {
   vehicleId: 'aa6b8deb-ee13-44a1-ab66-76f6fc655e26',
   createdAt: '2023-01-03T15:20:27.354Z',
   updatedAt: null,
-  deletedAt: new Date()
-}
+  deletedAt: new Date(),
+};
 
-export const CreateDriver = {}
+export const CreateDriver = {
+  id: 'dc0e9792-f935-4411-a016-de4509d55054',
+  name: 'João da Silva',
+  cpf: '96893908563',
+  cnh: '123456789',
+  // add year to date to avoid error
+  validation: new Date(Date.now() + 31536000000),
+  category: 'AB',
+  createdAt: new Date(),
+  updatedAt: null,
+};
 
-export const UpdateDriver = {}
+export const UpdateDriver = {
+  ...CreateDriver,
+  updatedAt: new Date(),
+};
 
-export const DeleteDriver = {}
+export const DeleteDriver = { ...UpdateDriver };
 
-export const CreateVehicle = {}
+export const GetDriver = { ...UpdateDriver };
 
-export const UpdateVehicle = {}
+export const GetAllDriver = {
+  total: 1,
+  items: [{ ...UpdateDriver }],
+};
 
-export const DeleteVehicle = {}
+export const CreateVehicle = {
+  id: 'af036f4e-bfcf-4994-ab50-f167ee908f4e',
+  plate: 'PHP1234',
+  company: 'Expresso',
+  type: 'ÔNIBUS',
+  lastSurvey: new Date(),
+  expiration: new Date(),
+  capacity: 28,
+  renavam: '12345678901',
+  lastMaintenance: new Date(),
+  note: 'Teste',
+  isAccessibility: true,
+  createdAt: new Date(),
+  updatedAt: null,
+};
 
-export const CreatePin = {}
+export const UpdateVehicle = {
+  ...CreateVehicle,
+  updatedAt: new Date(),
+};
 
-export const UpdatePin = {}
+export const DeleteVehicle = { ...UpdateVehicle };
 
-export const DeletePin = {}
+export const GetVehicle = { ...UpdateVehicle };
+
+export const GetAllVehicle = {
+  total: 1,
+  items: [{ ...UpdateVehicle }],
+};
+
+export const CreatePin = {
+  id: '52c6a405-0d98-42e7-86e0-95cabee5812f',
+  title: 'Título do local',
+  local: 'Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-200, Brasil',
+  details: 'Detalhes do local',
+  lat: '-60.0261',
+  lng: '-3.10719',
+  createdAt: new Date(),
+  updatedAt: null,
+};
+
+export const UpdatePin = { ...CreateDriver, updatedAt: new Date() };
+
+export const DeletePin = { ...UpdatePin };
+
+export const GetPin = { ...UpdatePin };
+
+export const GetAllPin = {
+  total: 1,
+  items: [{ ...UpdatePin }],
+};
 
 export const CreateEmployee = {
   id: '2fce27dd-e7c4-496f-be0e-3aac0db2f82d',
@@ -113,32 +174,49 @@ export const CreateEmployee = {
   role: 'Auxiliar de produção',
   shift: '1º Turno',
   costCenter: 'Almoxarife',
-	address: {
-		cep: '69045700',
-		city: 'Manaus',
-		complement: 'Campos Eliseos',
-		neighborhood: 'Planalto',
-		number: '140',
-		state: 'AM',
-		street: 'RUA LUSAKA'
-	},
+  address: {
+    cep: '69045700',
+    city: 'Manaus',
+    complement: 'Campos Eliseos',
+    neighborhood: 'Planalto',
+    number: '140',
+    state: 'AM',
+    street: 'RUA LUSAKA',
+  },
   createdAt: '2023-01-02T10:28:31.580Z',
   updatedAt: null,
-}      
+};
 
 export const UpdateEmployee = {
   ...CreateEmployee,
   updatedAt: new Date(),
   role: 'desenvolvedor de software',
-}
+};
 
-export const DeleteEmployee = {...UpdateEmployee}
+export const DeleteEmployee = { ...UpdateEmployee };
 
-export const GetEmployee = {...UpdateEmployee}
+export const GetEmployee = { ...UpdateEmployee };
 
 export const GetAllEmployee = {
   total: 1,
-  items: [
-    {...UpdateEmployee}
-  ]
-}
+  items: [{ ...UpdateEmployee }],
+};
+
+export const CreateEmployeesOnPin = {
+  employeeId: '2e2b8886-5d93-4304-b00f-aa08e895865d',
+  pinId: 'c0294d1c-5629-4969-90cb-36cc859685ae',
+  type: 'CONVENCIONAL',
+  createdAt: new Date(),
+  updatedAt: null,
+};
+
+export const GetRouteHistories = {
+  id: '644a4b19-6133-4506-b4f7-216fb3ffd7e7',
+  employeeIds:
+    '2fce27dd-e7c4-496f-be0e-3aac0db2f82d, 644a4b19-6133-4506-b4f7-216fb3ffd7e7',
+  route: '',
+  startedAt: '2023-01-02T10:28:31.580Z',
+  finishedAt: '2023-01-02T10:28:31.580Z',
+  createdAt: '2023-01-02T10:28:31.580Z',
+  updatedAt: null,
+};

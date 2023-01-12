@@ -18,10 +18,16 @@ import { VehicleService } from '../services/vehicle.service';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  CreateVehicle,
+  DeleteVehicle,
+  GetAllVehicle,
+  GetVehicle,
+  UpdateVehicle,
+} from 'src/utils/examples.swagger';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')
-
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
@@ -30,21 +36,7 @@ export class VehicleController {
     description: 'Creates a new Vehicle.',
     schema: {
       type: 'object',
-      example: {
-        id: 'af036f4e-bfcf-4994-ab50-f167ee908f4e',
-        plate: 'PHP1234',
-        company: 'Expresso',
-        type: 'ÔNIBUS',
-        lastSurvey: new Date(),
-        expiration: new Date(),
-        capacity: 28,
-        renavam: '12345678901',
-        lastMaintenance: new Date(),
-        note: 'Teste',
-        isAccessibility: true,
-        createdAt: new Date(),
-        updatedAt: null
-      },      
+      example: CreateVehicle,
     },
   })
   @HttpCode(HttpStatus.CREATED)
@@ -53,12 +45,26 @@ export class VehicleController {
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Vehicle.',
+    schema: {
+      type: 'object',
+      example: DeleteVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Vehicle> {
     return await this.vehicleService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Vehicle.',
+    schema: {
+      type: 'object',
+      example: UpdateVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -68,6 +74,14 @@ export class VehicleController {
   }
 
   @Get()
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'List all Vehicle.',
+    schema: {
+      type: 'object',
+      example: GetAllVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -77,6 +91,14 @@ export class VehicleController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get a Vehicle by id.',
+    schema: {
+      type: 'object',
+      example: GetVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Vehicle> {
     return await this.vehicleService.listById(id);
