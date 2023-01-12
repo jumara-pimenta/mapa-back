@@ -149,7 +149,7 @@ export class EmployeeService {
       if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
         if (!data.pin.id)
           throw new HttpException(
-            'O id do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+            'O do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
             HttpStatus.BAD_REQUEST,
           );
 
