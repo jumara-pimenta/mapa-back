@@ -232,6 +232,7 @@ export class PathService {
         const { name, registration, id: employeeId } = employeeOnPath.employee;
 
         if (agroupedEmployees.includes(employeeOnPath.id)) return;
+        if (employeeOnPath.confirmation === false) return;
 
         agroupedEmployees.push(employeeOnPath.id);
         data = {
