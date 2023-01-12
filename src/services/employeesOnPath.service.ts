@@ -32,8 +32,10 @@ export class EmployeesOnPathService {
     for await (const id of props.employeeIds) {
       const employee = await this.employeeService.listById(id);
 
+     
+
       await this.employeesOnPathRepository.create(
-        new EmployeesOnPath({ position }, employee, path),
+        new EmployeesOnPath({ position, confirmation:props.confirmation }, employee, path ),
       );
 
       position++;
