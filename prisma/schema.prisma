@@ -1,6 +1,6 @@
 datasource db {
-  provider          = "sqlserver"
-  url               = env("DATABASE_URL")
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
   // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
@@ -59,7 +59,8 @@ model EmployeesOnPath {
   pathId       String
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   employeeId   String
-  confirmation Boolean   @default(true)
+  confirmation Boolean
+  present      Boolean?  @default(false)
   position     Int       @db.Int
   description  String?   @db.VarChar(50)
   boardingAt   DateTime? @db.DateTimeOffset

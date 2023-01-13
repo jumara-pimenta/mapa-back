@@ -10,17 +10,28 @@ import {
 
 export class UpdateEmployeesOnPathDTO {
   @ApiProperty()
-  @IsBoolean({ message: '[confirmation] A confirmação deve ser do tipo booleano.'})
+  @IsBoolean({
+    message: '[confirmation] A confirmação deve ser do tipo booleano.',
+  })
   @IsOptional()
   confirmation?: boolean;
-  
+
   @ApiProperty()
-  @IsDateString({}, { message: '[boardingAt] A data/hora do embarque deve ser do tipo date.'})
+  @IsDateString(
+    {},
+    { message: '[boardingAt] A data/hora do embarque deve ser do tipo date.' },
+  )
   @IsOptional()
   boardingAt?: Date;
 
   @ApiProperty()
-  @IsDateString({}, { message: '[disembarkAt] A data/hora do desembarque deve ser do tipo date.'})
+  @IsDateString(
+    {},
+    {
+      message:
+        '[disembarkAt] A data/hora do desembarque deve ser do tipo date.',
+    },
+  )
   @IsOptional()
   disembarkAt?: Date;
 
@@ -28,4 +39,9 @@ export class UpdateEmployeesOnPathDTO {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty()
+  @IsBoolean({ message: '[present] A presença deve ser do tipo booleano.' })
+  @IsOptional()
+  present?: boolean;
 }
