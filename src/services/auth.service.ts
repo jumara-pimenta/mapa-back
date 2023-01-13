@@ -20,7 +20,18 @@ export class AuthService {
     @Inject('IBackOfficeUserRepository')
     private readonly backOfficeUserRepository: IBackOfficeUserRepository,
   ) {}
-  
+
+  private verifyToken(token: string): any {
+    try {
+      const decodedToken = this.jwtService.verify(token, {
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      });
+
+      return decodedToken;
+    } catch (e) {
+      throw new HttpException('Token inválido!', HttpStatus.UNAUTHORIZED);
+    }
+  }
 
   private verifyToken(token: string): any {
     try {
