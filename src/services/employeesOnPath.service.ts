@@ -32,10 +32,12 @@ export class EmployeesOnPathService {
     for await (const id of props.employeeIds) {
       const employee = await this.employeeService.listById(id);
 
-     
-
       await this.employeesOnPathRepository.create(
-        new EmployeesOnPath({ position, confirmation:props.confirmation }, employee, path ),
+        new EmployeesOnPath(
+          { position, confirmation: props.confirmation },
+          employee,
+          path,
+        ),
       );
 
       position++;
@@ -64,7 +66,7 @@ export class EmployeesOnPathService {
 
   async findById(id: string): Promise<EmployeesOnPath> {
     const employeesOnPath = await this.employeesOnPathRepository.findById(id);
-    console.log('employeesOnPath',employeesOnPath)
+    console.log('employeesOnPath', employeesOnPath);
 
     if (!employeesOnPath)
       throw new HttpException(
@@ -79,29 +81,45 @@ export class EmployeesOnPathService {
     await this.listById(id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(id);
 
-    await this.updateWebsocket(id, { confirmation: true, boardingAt: (new Date()) });
+    await this.updateWebsocket(id, {
+      confirmation: true,
+      boardingAt: new Date(),
+    });
 
-    return await this.pathService.listEmployeesByPathAndPin(path.id);
+    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
+
+    return data.employeesOnPins;
   }
-  
+
   async offboardEmployee(id: string): Promise<any> {
     await this.listById(id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(id);
 
-    await this.updateWebsocket(id, { confirmation: true, disembarkAt: (new Date()) });
+    await this.updateWebsocket(id, {
+      confirmation: true,
+      disembarkAt: new Date(),
+    });
 
-    return await this.pathService.listEmployeesByPathAndPin(path.id);
+    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
+
+    return data.employeesOnPins;
   }
 
   async employeeNotConfirmed(id: string): Promise<any> {
     await this.listById(id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(id);
 
-    await this.updateWebsocket(id, { confirmation: false, boardingAt: null, disembarkAt: null });
+    await this.updateWebsocket(id, {
+      confirmation: false,
+      boardingAt: null,
+      disembarkAt: null,
+    });
 
-    return await this.pathService.listEmployeesByPathAndPin(path.id);
+    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
+
+    return data.employeesOnPins;
   }
-  
+
   async listByIds(id: string): Promise<EmployeesOnPath[]> {
     const employeesOnPath = await this.employeesOnPathRepository.findByIds(id);
 
@@ -141,10 +159,7 @@ export class EmployeesOnPathService {
     return this.mappedMany(employeesOnPath);
   }
 
-  async update(
-    id: string,
-    data: UpdateEmployeesOnPathDTO,
-  ): Promise<any> {
+  async update(id: string, data: UpdateEmployeesOnPathDTO): Promise<any> {
     const employeesOnPath = await this.listById(id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
@@ -165,7 +180,7 @@ export class EmployeesOnPathService {
     );
   }
 
-  async  updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
+  async updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
     const employeesOnPath = await this.findById(payload.id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
@@ -177,11 +192,16 @@ export class EmployeesOnPathService {
     return updatedEmployeeOnPath;
   }
 
-  async listByPathAndPin(pathId: string, pinId:string): Promise<EmployeesOnPath[]> {
+  async listByPathAndPin(
+    pathId: string,
+    pinId: string,
+  ): Promise<EmployeesOnPath[]> {
+    const data = await this.employeesOnPathRepository.findByPathAndPin(
+      pathId,
+      pinId,
+    );
 
-    const data = await this.employeesOnPathRepository.findByPathAndPin(pathId, pinId);
-
-    if(!data.length)
+    if (!data.length)
       throw new HttpException(
         `Não foi encontrado um colaborador no trajeto com este trajeto: ${pathId} e neste ponto de embarque: ${pinId}`,
         HttpStatus.NOT_FOUND,
