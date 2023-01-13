@@ -20,6 +20,14 @@ export class BackOfficeUserRepository
     });
   }
 
+  async getByEmail(email: string): Promise<BackOfficeUser> {
+    return await this.repository.backOfficeUser.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
   async delete(id: string): Promise<BackOfficeUser> {
     return await this.repository.backOfficeUser.delete({
       where: {
