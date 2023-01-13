@@ -29,6 +29,7 @@ import {
 } from 'src/utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -53,6 +54,7 @@ export class EmployeeController {
     },
   })
   @Post()
+  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
@@ -95,6 +97,7 @@ export class EmployeeController {
       example: GetAllEmployee,
     },
   })
+  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,

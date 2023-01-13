@@ -4,6 +4,7 @@ import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
 
 export default interface IBackOfficeUserRepository {
   create(data: BackOfficeUser): Promise<BackOfficeUser>;
+  getByEmail(email: string): Promise<BackOfficeUser>;
   delete(id: string): Promise<BackOfficeUser>;
   // findAll(
   //   page: Page,
