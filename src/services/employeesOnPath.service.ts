@@ -13,6 +13,7 @@ import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
 import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employeesOnPath.repository.contract';
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
+import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -77,47 +78,52 @@ export class EmployeesOnPathService {
     return employeesOnPath;
   }
 
-  async onboardEmployee(id: string): Promise<any> {
-    await this.listById(id);
-    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+  async onboardEmployee(payload: IdUpdateDTO): Promise<any> {
+    console.log('payload', payload);
 
-    await this.updateWebsocket(id, {
+    await this.listById(payload.id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
+
+    await this.updateWebsocket(payload.id, {
       confirmation: true,
+      present: payload.present,
       boardingAt: new Date(),
     });
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
-    return data.employeesOnPins;
+    return data;
   }
 
-  async offboardEmployee(id: string): Promise<any> {
-    await this.listById(id);
-    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+  async offboardEmployee(payload: IdUpdateDTO): Promise<any> {
+    await this.listById(payload.id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
-    await this.updateWebsocket(id, {
+    await this.updateWebsocket(payload.id, {
       confirmation: true,
+      present: payload.present,
       disembarkAt: new Date(),
     });
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
-    return data.employeesOnPins;
+    return data;
   }
 
-  async employeeNotConfirmed(id: string): Promise<any> {
-    await this.listById(id);
-    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+  async employeeNotConfirmed(payload: IdUpdateDTO): Promise<any> {
+    await this.listById(payload.id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
-    await this.updateWebsocket(id, {
+    await this.updateWebsocket(payload.id, {
       confirmation: false,
+      present: payload.present,
       boardingAt: null,
       disembarkAt: null,
     });
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
-    return data.employeesOnPins;
+    return data;
   }
 
   async listByIds(id: string): Promise<EmployeesOnPath[]> {

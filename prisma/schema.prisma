@@ -60,6 +60,7 @@ model EmployeesOnPath {
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   employeeId   String
   confirmation Boolean
+  present      Boolean?  @default(false)
   position     Int       @db.Int
   description  String?   @db.VarChar(50)
   boardingAt   DateTime? @db.DateTimeOffset
