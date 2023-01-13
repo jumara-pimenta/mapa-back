@@ -88,7 +88,7 @@ export class EmployeesOnPathService {
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
-    return data.employeesOnPins;
+    return data;
   }
 
   async offboardEmployee(id: string): Promise<any> {
@@ -102,7 +102,7 @@ export class EmployeesOnPathService {
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
-    return data.employeesOnPins;
+    return data;
   }
 
   async employeeNotConfirmed(id: string): Promise<any> {
@@ -117,7 +117,7 @@ export class EmployeesOnPathService {
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
-    return data.employeesOnPins;
+    return data;
   }
 
   async listByIds(id: string): Promise<EmployeesOnPath[]> {
