@@ -63,7 +63,6 @@ export class MappedPathDTO {
   employeesOnPath: IEmployeesOnPathDTO[];
 }
 
-
 export class MappedPathPinsDTO {
   @ApiProperty()
   id: string;
@@ -93,10 +92,9 @@ export class MappedPathPinsDTO {
   driver?: string;
 }
 
-
 export interface EmployeesByPin {
   position: number;
-  lat: string
+  lat: string;
   lng: string;
   employees: {
     id: string;
@@ -106,6 +104,6 @@ export interface EmployeesByPin {
     disembarkAt: Date;
     confirmation: boolean;
     boardingAt: Date;
+    present: boolean;
   }[];
-
 }

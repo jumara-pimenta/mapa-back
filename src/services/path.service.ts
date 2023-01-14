@@ -118,6 +118,13 @@ export class PathService {
   async getPathidByEmployeeOnPathId(id: string): Promise<Partial<Path>> {
     const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
 
+    if (!employeeOnPath) {
+      throw new HttpException(
+        'Não foi possível encontrar o trajeto do colaborador!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     return employeeOnPath;
   }
 
@@ -241,6 +248,7 @@ export class PathService {
           disembarkAt: employeeOnPath.disembarkAt,
           boardingAt: employeeOnPath.boardingAt,
           confirmation: employeeOnPath.confirmation,
+          present: employeeOnPath.present,
         });
       });
 
@@ -392,6 +400,7 @@ export class PathService {
           confirmation: item.confirmation,
           disembarkAt: item.disembarkAt,
           position: item.position,
+          present: item.present,
           details: {
             employeeId: employee.id,
             name: employee.name,
@@ -433,6 +442,7 @@ export class PathService {
             confirmation: item.confirmation,
             disembarkAt: item.disembarkAt,
             position: item.position,
+            present: item.present,
             details: {
               name: employee.name,
               address: employee.address,

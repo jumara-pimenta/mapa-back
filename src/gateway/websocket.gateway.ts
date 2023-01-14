@@ -23,7 +23,7 @@ export class WebsocketGateway {
     private readonly routeService: RouteService,
     private readonly pathService: PathService,
     private readonly employeesOnPathService: EmployeesOnPathService,
-  ) { }
+  ) {}
   @WebSocketServer() server: Server;
 
   onModuleInit() {
@@ -44,7 +44,7 @@ export class WebsocketGateway {
     payload: CurrentLocalDTO,
   ): void {
     try {
-      this.server.emit(payload.id+'/local', {
+      this.server.emit(payload.id + '/local', {
         ...payload,
       });
     } catch (error) {
@@ -110,7 +110,6 @@ export class WebsocketGateway {
     payload: WebsocketUpdateEmployeesStatusOnPathDTO,
   ): Promise<void> {
     try {
-
       await this.employeesOnPathService.updateWebsocket(
         payload.employeeOnPathId,
         payload.payload,
@@ -132,13 +131,15 @@ export class WebsocketGateway {
       new ValidationPipe({
         exceptionFactory: (errors) => {
           return new WsException(errors);
-        }
-      })
+        },
+      }),
     )
     data: IdUpdateDTO,
   ): Promise<void> {
     try {
-      const employeeOnPath = await this.employeesOnPathService.onboardEmployee(data.id);
+      const employeeOnPath = await this.employeesOnPathService.onboardEmployee(
+        data,
+      );
 
       this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,
@@ -155,13 +156,15 @@ export class WebsocketGateway {
       new ValidationPipe({
         exceptionFactory: (errors) => {
           return new WsException(errors);
-        }
-      })
+        },
+      }),
     )
     data: IdUpdateDTO,
   ): Promise<void> {
     try {
-      const employeeOnPath = await this.employeesOnPathService.offboardEmployee(data.id);
+      const employeeOnPath = await this.employeesOnPathService.offboardEmployee(
+        data,
+      );
 
       this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,
@@ -178,13 +181,14 @@ export class WebsocketGateway {
       new ValidationPipe({
         exceptionFactory: (errors) => {
           return new WsException(errors);
-        }
-      })
+        },
+      }),
     )
     data: IdUpdateDTO,
   ): Promise<void> {
     try {
-      const employeeOnPath = await this.employeesOnPathService.employeeNotConfirmed(data.id);
+      const employeeOnPath =
+        await this.employeesOnPathService.employeeNotConfirmed(data);
 
       this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,
@@ -194,5 +198,4 @@ export class WebsocketGateway {
       throw new WsException(error.message);
     }
   }
-
 }
