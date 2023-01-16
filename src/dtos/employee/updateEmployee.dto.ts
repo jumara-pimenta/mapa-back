@@ -93,5 +93,3 @@ export class UpdateEmployeeDTO {
   @IsOptional()
   pin: UpdateEmployeePinDTO;
 }
-
-//  PAREI AQUI

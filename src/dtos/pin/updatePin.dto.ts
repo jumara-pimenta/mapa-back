@@ -2,27 +2,27 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdatePinDTO {
-  @ApiProperty()
+  @ApiProperty({ description: 'Latitude do Ponto de Embarque' })
   @IsString({ message: '[lat] A latitude deve ser do tipo string.' })
   @IsOptional()
   lat?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Longitude do Ponto de Embarque' })
   @IsString({ message: '[lng] A longitude deve ser do tipo string.' })
   @IsOptional()
   lng?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Local do Ponto de Embarque' })
   @IsString({ message: '[local] O local deve ser do tipo string string.' })
   @IsOptional()
   local?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Detalhes do local do Ponto de Embarque' })
   @IsString({ message: '[details] O campo detalhes deve ser do tipo string.' })
   @IsOptional()
   details?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Título do Ponto de Embarque' })
   @IsString({ message: '[title] O título deve ser do tipo string.' })
   @IsOptional()
   title?: string;
