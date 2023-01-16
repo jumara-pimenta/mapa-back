@@ -23,6 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -37,6 +38,7 @@ export class EmployeeController {
     }
   })
   @Post()
+  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
@@ -79,6 +81,7 @@ export class EmployeeController {
       example: GetAllEmployee
     }
   })
+  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,

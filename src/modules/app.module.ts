@@ -12,11 +12,13 @@ import { RouteHistoryModule } from './routeHistory.module';
 import { VehicleModule } from './vehicle.module';
 import { EmployeesOnPinModule } from './employeesOnPin.module';
 import { WebsocketModule } from './websocket.module';
+import { AuthModule } from './auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env' }),
     RepositoryModule,
+    AuthModule,
     ApiModule,
     DriverModule,
     EmployeeModule,

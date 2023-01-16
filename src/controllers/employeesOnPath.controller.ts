@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
 import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
@@ -104,44 +105,5 @@ export class EmployeesOnPathController {
     @Body() payload: UpdateEmployeesOnPathDTO,
   ): Promise<MappedEmployeesOnPathDTO> {
     return await this.employeeOnPathService.update(id, payload);
-  }
-
-  @Put('/onboard/:id')
-  @ApiCreatedResponse({
-    description: 'Update Onboard a Employee On Path by id.',
-    schema: {
-      type: 'object',
-      example: UpdateEmployeeOnBoard,
-    },
-  })
-  @HttpCode(HttpStatus.ACCEPTED)
-  async onboard(@Param('id') id: string): Promise<any> {
-    return await this.employeeOnPathService.onboardEmployee(id);
-  }
-
-  @Put('/offboard/:id')
-  @ApiCreatedResponse({
-    description: 'Update Offboard a Employee On Path by id.',
-    schema: {
-      type: 'object',
-      example: UpdateEmployeeOffBoard,
-    },
-  })
-  @HttpCode(HttpStatus.ACCEPTED)
-  async offboard(@Param('id') id: string): Promise<any> {
-    return await this.employeeOnPathService.offboardEmployee(id);
-  }
-
-  @Put('/notComming/:id')
-  @ApiCreatedResponse({
-    description: 'Update Not Comming a Employee On Path by id.',
-    schema: {
-      type: 'object',
-      example: UpdateEmployeeOnPathNotComming,
-    },
-  })
-  @HttpCode(HttpStatus.ACCEPTED)
-  async notComming(@Param('id') id: string): Promise<any> {
-    return await this.employeeOnPathService.employeeNotConfirmed(id);
   }
 }

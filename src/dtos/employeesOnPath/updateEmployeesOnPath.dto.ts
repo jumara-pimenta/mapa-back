@@ -32,4 +32,9 @@ export class UpdateEmployeesOnPathDTO {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty()
+  @IsBoolean({ message: '[present] A presença deve ser do tipo booleano.' })
+  @IsOptional()
+  present?: boolean;
 }

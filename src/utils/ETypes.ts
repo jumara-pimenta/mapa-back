@@ -35,3 +35,9 @@ export enum ETypeEditionPin {
   IS_EXISTENT = 'EXISTENTE',
   IS_NEW = 'NOVO',
 }
+
+export enum ERoles {
+  ROLE_ADMIN = 'ADMIN',
+  ROLE_EMPLOYEE = 'EMPLOYEE',
+  ROLE_DRIVER = 'DRIVER',
+}
