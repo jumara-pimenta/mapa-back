@@ -10,6 +10,8 @@ import { PinService } from './pin.service';
 import { EmployeesOnPin } from '../entities/employeesOnPin.entity';
 import IEmployeesOnPinRepository from '../repositories/employeesOnPin/employeesOnPin.repository.contract';
 import { EmployeeService } from './employee.service';
+import { ETypePin } from '../utils/ETypes';
+import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 
 @Injectable()
 export class EmployeesOnPinService {
@@ -20,7 +22,7 @@ export class EmployeesOnPinService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-  ) {}
+  ) { }
 
   async associateEmployee(
     props: AssociateEmployeeOnPinDTO,
@@ -28,21 +30,12 @@ export class EmployeesOnPinService {
     const employee = await this.employeeService.listById(props.employeeId);
     const pin = await this.pinService.listById(props.pinId);
 
-    if (!pin) {
-      throw new HttpException(
-        'O ponto de embarque não foi encontrado!',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     if (employee.pins.length > 0) {
-
       for await (const _pin of employee.pins) {
         if (_pin.id === pin.id) {
-          throw new HttpException(
-            'O colaborador não pode ser associado ao mesmo ponto de embarque!',
-            HttpStatus.CONFLICT,
-          );
+          return await this.employeesOnPinRepository.find(
+            props.employeeId,
+            props.pinId)
         }
 
         if (_pin.type === props.type) {
@@ -56,6 +49,29 @@ export class EmployeesOnPinService {
 
     return await this.employeesOnPinRepository.create(
       new EmployeesOnPin({ type: props.type }, employee, pin),
+    );
+  }
+
+  async associateEmployeeByService(
+    pinId: string,
+    employee: MappedEmployeeDTO,
+  ): Promise<EmployeesOnPin> {
+    const pin = await this.pinService.listById(pinId);
+    const { pins } = employee;
+    let pinAlreadyAssociated: any;
+
+    if (pins.length > 0) {
+      pinAlreadyAssociated = pins.filter((_pin) => {
+        if (_pin.id === pin.id) {
+          return _pin;
+        }
+      });
+    }    
+
+    if (pinAlreadyAssociated.length) return;
+
+    return await this.employeesOnPinRepository.create(
+      new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),
     );
   }
 }

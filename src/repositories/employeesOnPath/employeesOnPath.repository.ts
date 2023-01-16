@@ -279,4 +279,37 @@ export class EmployeesOnPathRepository
       where: { id: data.id },
     });
   }
+
+  findByPathAndPin(pathId: string, pinId: string): Promise<Partial<EmployeesOnPath[]>> {
+    return this.repository.employeesOnPath.findMany({
+      where: {
+        pathId,
+        employee: {
+          pins: {
+            some: {
+              pinId,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        position: true,
+        createdAt: true,
+        boardingAt: true,
+        disembarkAt: true,
+        confirmation: true,
+        description: true,
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            registration: true,
+            pins: true,
+            
+          }
+        },
+      },
+    });
+  }
 }

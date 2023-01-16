@@ -24,6 +24,7 @@ import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
+import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
 
 @Injectable()
 export class RouteService {
@@ -103,7 +104,7 @@ export class RouteService {
     const route = await this.routeRepository.findById(id);
     if (!route)
       throw new HttpException(
-        `Não foi encontrada uma rota com o id: ${id}!`,
+        'Não foi encontrada está rota!',
         HttpStatus.NOT_FOUND,
       );
 
@@ -167,12 +168,6 @@ export class RouteService {
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
 
-    if (route.paths[0].finishedAt !== null)
-      throw new HttpException(
-        'Não é possível alterar uma rota que já foi finalizada!',
-        HttpStatus.CONFLICT,
-      );
-
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
@@ -223,11 +218,12 @@ export class RouteService {
     );
   }
 
-  async updateWebsocket(payload: StatusRouteDTO): Promise<any> {
+  async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
     if (payload.path.startedAt) {
-      const data = await this.listByIdWebsocket(payload.routeId);
+      const routeData = await this.listByIdWebsocket(payload.routeId);
+      const Pathdata = await this.pathService.listById(payload.pathId);
 
-      if (data.path[0].employeesOnPath.length === 0) {
+      if (Pathdata.employeesOnPath.length === 0) {
         throw new HttpException(
           'Não é possível iniciar uma rota sem colaboradores!',
           HttpStatus.CONFLICT,
@@ -235,9 +231,12 @@ export class RouteService {
       }
     }
 
-    await this.update(payload.routeId, payload.route);
-
-    await this.pathService.update(payload.pathId, payload.path);
+    if(payload.route){
+      await this.update(payload.routeId, payload.route);
+    }
+    if(payload.path){
+      await this.pathService.update(payload.pathId, payload.path);
+    }
 
     const dataFilter = await this.listByIdWebsocket(payload.routeId);
 
@@ -252,7 +251,10 @@ export class RouteService {
       path: dataFilter.path,
     };
 
-    return dataFilterWebsocket;
+    const path = await this.pathService.listEmployeesByPathAndPin(payload.pathId);
+
+
+    return {vehicle: dataFilterWebsocket.vehicle, driver: dataFilterWebsocket.driver,...path} as MappedPathPinsDTO;
   }
 
   async softDelete(id: string): Promise<Route> {
@@ -347,6 +349,8 @@ export class RouteService {
       };
     });
   }
+
+  
 
   private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
     return routes.map((route) => {
@@ -727,5 +731,16 @@ export class RouteService {
         HttpStatus.CONFLICT,
       );
     }
+  }
+
+  async routeIdByPathId(pathId: string): Promise<string> {
+    const path = await this.routeRepository.findRouteIdByPathId(pathId);
+    if (!path) {
+      throw new HttpException(
+        'Rota não encontrada!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return path;
   }
 }

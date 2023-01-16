@@ -13,6 +13,16 @@ export class EmployeesOnPinRepository
   constructor(private readonly repository: PrismaService) {
     super();
   }
+  find(employeeId: string, pinId: string): Promise<EmployeesOnPin> {
+    return this.repository.employeesOnPin.findUnique({
+      where: {
+        employeeId_pinId: {
+          employeeId: employeeId,
+          pinId: pinId,
+        },
+      },
+    });
+  }
 
   create(data: EmployeesOnPin): Promise<EmployeesOnPin> {
     return this.repository.employeesOnPin.create({

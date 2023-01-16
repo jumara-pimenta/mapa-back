@@ -24,19 +24,65 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             id: driverId,
           },
         },
-      }
-    })
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        route: {
+          select: {
+            description: true,
+          },
+        },
+        employeesOnPath: {
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
-  findByEmployeeAndStatus(employeeId: string, status: EStatusPath): Promise<Path> {
+  findByEmployeeAndStatus(
+    employeeId: string,
+    status: EStatusPath,
+  ): Promise<Path> {
     return this.repository.path.findFirst({
       where: {
         status,
         employeesOnPath: {
           some: {
-            employeeId
-          }
-        }
+            employeeId,
+          },
+        },
       },
       select: {
         id: true,
@@ -125,6 +171,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         },
         employeesOnPath: {
           select: {
+            employeeId: true,
             id: true,
             boardingAt: true,
             confirmation: true,
@@ -141,6 +188,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     type: true,
                     pin: {
                       select: {
+                        id: true,
                         lat: true,
                         lng: true,
                       },
@@ -215,9 +263,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         finishedAt: null,
         employeesOnPath: {
           some: {
-            employeeId: employeeId
-          }
-        }
+            employeeId: employeeId,
+          },
+        },
       },
       select: {
         id: true,
@@ -330,6 +378,21 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         status: data.status,
         type: data.type,
         routeId: data.route.id,
+      },
+    });
+  }
+
+  async findByEmployeeOnPath(employeeOnPathId: string): Promise<Partial<Path>> {
+    return await this.repository.path.findFirst({
+      where: {
+        employeesOnPath: {
+          some: {
+            id: employeeOnPathId,
+          },
+        },
+      },
+      select: {
+        id: true,
       },
     });
   }

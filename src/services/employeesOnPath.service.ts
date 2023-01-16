@@ -62,6 +62,7 @@ export class EmployeesOnPathService {
 
   async findById(id: string): Promise<EmployeesOnPath> {
     const employeesOnPath = await this.employeesOnPathRepository.findById(id);
+    console.log('employeesOnPath',employeesOnPath)
 
     if (!employeesOnPath)
       throw new HttpException(
@@ -72,6 +73,33 @@ export class EmployeesOnPathService {
     return employeesOnPath;
   }
 
+  async onboardEmployee(id: string): Promise<any> {
+    await this.listById(id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+
+    await this.updateWebsocket(id, { confirmation: true, boardingAt: (new Date()) });
+
+    return await this.pathService.listEmployeesByPathAndPin(path.id);
+  }
+  
+  async offboardEmployee(id: string): Promise<any> {
+    await this.listById(id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+
+    await this.updateWebsocket(id, { confirmation: true, disembarkAt: (new Date()) });
+
+    return await this.pathService.listEmployeesByPathAndPin(path.id);
+  }
+
+  async employeeNotConfirmed(id: string): Promise<any> {
+    await this.listById(id);
+    const path = await this.pathService.getPathidByEmployeeOnPathId(id);
+
+    await this.updateWebsocket(id, { confirmation: false, boardingAt: null, disembarkAt: null });
+
+    return await this.pathService.listEmployeesByPathAndPin(path.id);
+  }
+  
   async listByIds(id: string): Promise<EmployeesOnPath[]> {
     const employeesOnPath = await this.employeesOnPathRepository.findByIds(id);
 
@@ -135,7 +163,7 @@ export class EmployeesOnPathService {
     );
   }
 
-  async updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
+  async  updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
     const employeesOnPath = await this.findById(payload.id);
 
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
@@ -145,6 +173,19 @@ export class EmployeesOnPathService {
       }),
     );
     return updatedEmployeeOnPath;
+  }
+
+  async listByPathAndPin(pathId: string, pinId:string): Promise<EmployeesOnPath[]> {
+
+    const data = await this.employeesOnPathRepository.findByPathAndPin(pathId, pinId);
+
+    if(!data.length)
+      throw new HttpException(
+        `Não foi encontrado um colaborador no trajeto com o id: ${pathId} e o id do pin: ${pinId}`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return data;
   }
 
   private mappedOne(

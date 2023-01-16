@@ -17,24 +17,54 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  CreateDriver,
+  DeleteDriver,
+  GetAllDriver,
+  GetDriver,
+  UpdateDriver,
+} from 'src/utils/examples.swagger';
 
 @Controller('/api/drivers')
+@ApiTags('Drivers')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'Creates a new Driver.',
+    schema: {
+      type: 'object',
+      example: CreateDriver,
+    },
+  })
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateDriverDTO): Promise<Driver> {
     return await this.driverService.create(payload);
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Driver.',
+    schema: {
+      type: 'object',
+      example: DeleteDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Driver.',
+    schema: {
+      type: 'object',
+      example: UpdateDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -44,6 +74,13 @@ export class DriverController {
   }
 
   @Get()
+  @ApiCreatedResponse({
+    description: 'Get all Drivers.',
+    schema: {
+      type: 'object',
+      example: GetAllDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -53,6 +90,13 @@ export class DriverController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get a Driver by id.',
+    schema: {
+      type: 'object',
+      example: GetDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.listById(id);

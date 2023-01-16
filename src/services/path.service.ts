@@ -7,12 +7,18 @@ import {
 } from '@nestjs/common';
 import { Path } from '../entities/path.entity';
 import IPathRepository from '../repositories/path/path.repository.contract';
-import { MappedPathDTO } from '../dtos/path/mappedPath.dto';
+import {
+  EmployeesByPin,
+  IEmployeesOnPathDTO,
+  MappedPathDTO,
+  MappedPathPinsDTO,
+} from '../dtos/path/mappedPath.dto';
 import { CreatePathDTO } from '../dtos/path/createPath.dto';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
-import { EStatusPath, ETypePath } from '../utils/ETypes';
+import { EStatusPath, EStatusRoute, ETypePath } from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
+import { getDateInLocaleTime } from 'src/utils/date.service';
 
 @Injectable()
 export class PathService {
@@ -24,6 +30,60 @@ export class PathService {
     @Inject(forwardRef(() => EmployeesOnPathService))
     private readonly employeesOnPathService: EmployeesOnPathService,
   ) {}
+
+  async finishPath(id: string): Promise<any> {
+    const path = await this.listById(id);
+    if (path.finishedAt !== null)
+      throw new HttpException(
+        'Não é possível alterar uma rota que já foi finalizada!',
+        HttpStatus.CONFLICT,
+      );
+    const route = await this.routeService.routeIdByPathId(id);
+
+    const finishAt = {
+      routeId: route,
+      pathId: id,
+      route: {
+        status: EStatusRoute.PENDING,
+      },
+      path: {
+        finishedAt: getDateInLocaleTime(new Date()),
+        status: EStatusPath.FINISHED,
+      },
+    };
+
+    return await this.routeService.updateWebsocket(finishAt);
+  }
+  async startPath(id: string): Promise<any> {
+    const path = await this.listById(id);
+    if (path.finishedAt !== null)
+      throw new HttpException(
+        'Não é possível alterar uma rota que já foi finalizada!',
+        HttpStatus.CONFLICT,
+      );
+    const route = await this.routeService.routeIdByPathId(id);
+
+    const startAt = {
+      routeId: route,
+      pathId: id,
+      route: {
+        status: EStatusRoute.IN_PROGRESS,
+      },
+      path: {
+        startedAt: getDateInLocaleTime(new Date()),
+        status: EStatusPath.IN_PROGRESS,
+        finishedAt: null,
+      },
+    };
+
+    return await this.routeService.updateWebsocket(startAt);
+  }
+
+  async getPathidByEmployeeOnPathId(id: string): Promise<Partial<Path>> {
+    const employeeOnPath = await this.pathRepository.findByEmployeeOnPath(id);
+
+    return employeeOnPath;
+  }
 
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt } = props.details;
@@ -97,11 +157,65 @@ export class PathService {
 
     if (!path)
       throw new HttpException(
-        `Não foi encontrado um path com o id: ${id}`,
+        `Não foi encontrado trajeto com o id: ${id}!`,
         HttpStatus.NOT_FOUND,
       );
 
     return this.mapperOne(path);
+  }
+
+  async listEmployeesByPathAndPin(pathId: string): Promise<MappedPathPinsDTO> {
+    const path = await this.listById(pathId);
+
+    const routeId = await this.routeService.routeIdByPathId(pathId);
+
+    const { employeesOnPath, ...data } = path;
+
+    const agroupedEmployees = [] as string[];
+
+    const employeesByPin = [] as EmployeesByPin[];
+
+    for await (const employee of employeesOnPath) {
+      const { id: pinId, lat, lng } = employee.details.location;
+
+      const employeesOnSamePin =
+        await this.employeesOnPathService.listByPathAndPin(pathId, pinId);
+      let data = {} as EmployeesByPin;
+
+      employeesOnSamePin.forEach((employeeOnPath) => {
+        const { name, registration, id: employeeId } = employeeOnPath.employee;
+
+        if (agroupedEmployees.includes(employeeOnPath.id)) return;
+
+        agroupedEmployees.push(employeeOnPath.id);
+        data = {
+          position: employeeOnPath.position,
+          lat,
+          lng,
+          employees: data.employees?.length ? data.employees : [],
+        };
+        data.employees.push({
+          id: employeeOnPath.id,
+          name,
+          registration,
+          employeeId: employeeOnPath.employee.id,
+          disembarkAt: employeeOnPath.disembarkAt,
+          boardingAt: employeeOnPath.boardingAt,
+          confirmation: employeeOnPath.confirmation,
+        });
+      });
+
+      if (Object.keys(data).length === 0 && data.constructor === Object)
+        continue;
+
+      employeesByPin.push(data as EmployeesByPin);
+    }
+    // change position base on length of employees
+    employeesByPin.forEach((employeeByPin, index) => {
+      employeeByPin.position = index + 1;
+    });
+
+    return { ...data, routeId: routeId, employeesOnPins: employeesByPin };
   }
 
   async listManyByRoute(routeId: string): Promise<MappedPathDTO[]> {
@@ -129,7 +243,6 @@ export class PathService {
   }
 
   async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
-    
     const path = await this.pathRepository.findByEmployee(employeeId);
 
     if (!path.length)
@@ -149,7 +262,7 @@ export class PathService {
       driverId,
       status,
     );
-
+    console.log(path);
     if (!path)
       throw new HttpException(
         `Não existe trajeto com status ${status} para este motorista!`,
@@ -241,11 +354,13 @@ export class PathService {
           disembarkAt: item.disembarkAt,
           position: item.position,
           details: {
+            employeeId: employee.id,
             name: employee.name,
             address: employee.address,
             shift: employee.shift,
             registration: employee.registration,
             location: {
+              id: pins.at(0).pin.id || 'n deu',
               lat: pins.at(0).pin.lat,
               lng: pins.at(0).pin.lng,
             },
@@ -283,8 +398,10 @@ export class PathService {
               name: employee.name,
               address: employee.address,
               shift: employee.shift,
+              employeeId: employee.id,
               registration: employee.registration,
               location: {
+                id: pins.at(0).pinId,
                 lat: pins.at(0).pin.lat,
                 lng: pins.at(0).pin.lng,
               },

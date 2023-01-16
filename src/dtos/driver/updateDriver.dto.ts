@@ -1,23 +1,49 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class UpdateDriverDTO {
-  @IsString({ message: '[name] O nome deve ser do tipo string.' })
+  @ApiProperty({
+    default: 'João da Silva',
+    example: 'João da Silva',
+    description: 'Nome do motorista',
+  })
+  @IsString({ message: '[Name] não está definida como string.' })
   @IsOptional()
   name?: string;
 
-  @IsString({ message: '[cpf] O CPF deve ser do tipo string.' })
+  @ApiProperty({
+    default: '96893908563',
+    example: '96893908563',
+    description: 'CPF do motorista',
+  })
+  @IsString({ message: '[CPF] não está definida como string.' })
   @IsOptional()
   cpf?: string;
 
-  @IsString({ message: '[cnh] A CNH deve ser do tipo string.' })
+  @ApiProperty({
+    default: '123456789',
+    example: '123456789',
+    description: 'CNH do motorista',
+  })
+  @IsString({ message: '[CNH] não está definida como string.' })
   @IsOptional()
   cnh?: string;
 
-  @IsDateString({} ,{ message: '[validation] A validade deve ser do tipo date.' })
+  @ApiProperty({
+    default: new Date(),
+    example: new Date(),
+    description: 'Data de validade da CNH do motorista',
+  })
+  @IsDateString()
   @IsOptional()
   validation?: Date;
 
-  @IsString({ message: '[category] A categoria deve ser do tipo string.' })
+  @ApiProperty({
+    default: 'AB',
+    example: 'AB',
+    description: 'Categoria da CNH do motorista',
+  })
+  @IsString({ message: '[Category] não está definida como string.' })
   @IsOptional()
   category?: string;
 }

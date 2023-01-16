@@ -16,24 +16,54 @@ import { CreatePinDTO } from '../dtos/pin/createPin.dto';
 import { UpdatePinDTO } from '../dtos/pin/updatePin.dto';
 import { FiltersPinDTO } from '../dtos/pin/filtersPin.dto';
 import { Page, PageResponse } from '../configs/database/page.model';
+import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  CreatePin,
+  DeletePin,
+  GetAllPin,
+  GetPin,
+  UpdatePin,
+} from 'src/utils/examples.swagger';
 
 @Controller('/api/pins')
+@ApiTags('Pins')
 export class PinController {
   constructor(private readonly pinService: PinService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'Creates a new Pin.',
+    schema: {
+      type: 'object',
+      example: CreatePin,
+    },
+  })
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreatePinDTO): Promise<Pin> {
     return await this.pinService.create(payload);
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Pin.',
+    schema: {
+      type: 'object',
+      example: DeletePin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Pin> {
     return await this.pinService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Pin.',
+    schema: {
+      type: 'object',
+      example: UpdatePin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -43,12 +73,27 @@ export class PinController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get a Pin by id.',
+    schema: {
+      type: 'object',
+      example: GetPin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Pin> {
     return await this.pinService.listById(id);
   }
 
   @Get()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List all Pins.',
+    schema: {
+      type: 'object',
+      example: GetAllPin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
