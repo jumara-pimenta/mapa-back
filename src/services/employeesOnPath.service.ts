@@ -79,16 +79,22 @@ export class EmployeesOnPathService {
   }
 
   async onboardEmployee(payload: IdUpdateDTO): Promise<any> {
-    console.log('payload', payload);
-
     await this.listById(payload.id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
-    await this.updateWebsocket(payload.id, {
-      confirmation: true,
-      present: payload.present,
-      boardingAt: new Date(),
-    });
+    if (payload.present === false) {
+      await this.updateWebsocket(payload.id, {
+        present: payload.present,
+        boardingAt: null,
+      });
+    }
+    if (payload.present === true) {
+      await this.updateWebsocket(payload.id, {
+        confirmation: true,
+        present: payload.present,
+        boardingAt: new Date(),
+      });
+    }
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
@@ -99,11 +105,19 @@ export class EmployeesOnPathService {
     await this.listById(payload.id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
-    await this.updateWebsocket(payload.id, {
-      confirmation: true,
-      present: payload.present,
-      disembarkAt: new Date(),
-    });
+    if (payload.present === false) {
+      await this.updateWebsocket(payload.id, {
+        present: payload.present,
+        disembarkAt: null,
+      });
+    }
+    if (payload.present === true) {
+      await this.updateWebsocket(payload.id, {
+        confirmation: true,
+        present: payload.present,
+        disembarkAt: new Date(),
+      });
+    }
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
@@ -116,7 +130,7 @@ export class EmployeesOnPathService {
 
     await this.updateWebsocket(payload.id, {
       confirmation: false,
-      present: payload.present,
+      present: false,
       boardingAt: null,
       disembarkAt: null,
     });
