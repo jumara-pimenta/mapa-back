@@ -59,8 +59,8 @@ model EmployeesOnPath {
   pathId       String
   employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   employeeId   String
-  confirmation Boolean   @default(false)
-  present      Boolean?  @default(false)
+  confirmation Boolean
+  present      Boolean?
   position     Int       @db.Int
   description  String?   @db.VarChar(50)
   boardingAt   DateTime? @db.DateTimeOffset
