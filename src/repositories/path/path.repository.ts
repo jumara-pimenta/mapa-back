@@ -24,19 +24,65 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             id: driverId,
           },
         },
-      }
-    })
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        route: {
+          select: {
+            description: true,
+          },
+        },
+        employeesOnPath: {
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
-  findByEmployeeAndStatus(employeeId: string, status: EStatusPath): Promise<Path> {
+  findByEmployeeAndStatus(
+    employeeId: string,
+    status: EStatusPath,
+  ): Promise<Path> {
     return this.repository.path.findFirst({
       where: {
         status,
         employeesOnPath: {
           some: {
-            employeeId
-          }
-        }
+            employeeId,
+          },
+        },
       },
       select: {
         id: true,
@@ -124,8 +170,6 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
         employeesOnPath: {
-
-
           select: {
             employeeId: true,
             id: true,
@@ -219,9 +263,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         finishedAt: null,
         employeesOnPath: {
           some: {
-            employeeId: employeeId
-          }
-        }
+            employeeId: employeeId,
+          },
+        },
       },
       select: {
         id: true,
@@ -343,14 +387,13 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
       where: {
         employeesOnPath: {
           some: {
-            id: employeeOnPathId
-          }
-        }
+            id: employeeOnPathId,
+          },
+        },
       },
       select: {
         id: true,
       },
     });
-
   }
 }

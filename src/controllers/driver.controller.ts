@@ -18,6 +18,13 @@ import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  CreateDriver,
+  DeleteDriver,
+  GetAllDriver,
+  GetDriver,
+  UpdateDriver,
+} from 'src/utils/examples.swagger';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -29,17 +36,7 @@ export class DriverController {
     description: 'Creates a new Driver.',
     schema: {
       type: 'object',
-      example: {
-        id: 'dc0e9792-f935-4411-a016-de4509d55054',
-        name: 'João da Silva',
-        cpf: '96893908563',
-        cnh: '123456789',
-        // add year to date to avoid error
-        validation: new Date(Date.now() + 31536000000),
-        category: 'AB',
-        createdAt:  new Date(),
-        updatedAt: null
-      },      
+      example: CreateDriver,
     },
   })
   @HttpCode(HttpStatus.CREATED)
@@ -48,12 +45,26 @@ export class DriverController {
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Driver.',
+    schema: {
+      type: 'object',
+      example: DeleteDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Driver.',
+    schema: {
+      type: 'object',
+      example: UpdateDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -63,6 +74,13 @@ export class DriverController {
   }
 
   @Get()
+  @ApiCreatedResponse({
+    description: 'Get all Drivers.',
+    schema: {
+      type: 'object',
+      example: GetAllDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -72,6 +90,13 @@ export class DriverController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get a Driver by id.',
+    schema: {
+      type: 'object',
+      example: GetDriver,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.listById(id);
