@@ -28,6 +28,7 @@ import {
   UpdateEmployee,
 } from 'src/utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
