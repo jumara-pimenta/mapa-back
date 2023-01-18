@@ -1,10 +1,18 @@
 import { v4 as uuid } from 'uuid';
+import { Driver } from './driver.entity';
+import { Path } from './path.entity';
 import { Route } from './route.entity';
+import { Vehicle } from './vehicle.entity';
 
 export class RouteHistory {
   id: string;
+  typeRoute: string;
+  nameRoute: string;
+  pathId: Path;
   employeeIds: string;
-  route?: Route;
+  driverId: Driver;
+  vehicleId: Vehicle;
+  itinerary: string;
   startedAt: Date;
   finishedAt: Date;
   createdAt: Date;
@@ -12,11 +20,11 @@ export class RouteHistory {
 
   constructor(
     props: Omit<RouteHistory, 'id' | 'createdAt' | 'route'>,
-    route: Route,
+    path: Path,
     id?: string,
   ) {
     Object.assign(this, props);
     this.id = id ?? uuid();
-    this.route = route;
+    this.pathId = path;
   }
 }
