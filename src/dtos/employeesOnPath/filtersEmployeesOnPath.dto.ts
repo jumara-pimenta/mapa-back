@@ -1,8 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class FiltersEmployeesOnPathDTO {
-  boardingAt?: Date
-  confirmation?: boolean
-  disembarkAt?: Date
-  employeeId?: string
-  pathId?: string
-  position?: number
+    @ApiProperty({required: false})
+    boardingAt?: Date;
+    @ApiProperty({required: false})
+    confirmation?: boolean;
+    @ApiProperty({required: false})
+    disembarkAt?: Date;
+    @ApiProperty({required: false})
+    employeeId?: string;
+    @ApiProperty({required: false})
+    pathId?: string;
+    @ApiProperty({required: false})
+    position?: number;
 }

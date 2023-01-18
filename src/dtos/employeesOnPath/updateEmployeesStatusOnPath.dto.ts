@@ -1,12 +1,13 @@
-import { IsBoolean, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
-
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateEmployeesStatusOnPathDTO {
-
-  @IsString()
+  @ApiProperty({ description: 'Id' })
+  @IsNotEmpty({ message: '[id] O id deve ser preenchido.' })
+  @IsString({ message: '[id] O id deve ser do tipo string.' })
   id: string;
 
-  @IsBoolean() 
+  @ApiProperty({ description: 'Status dos colaboradores no trajeto' })
+  @IsBoolean({ message: '[status] O status deve ser do tipo booleano.' })
   status: boolean;
-
 }

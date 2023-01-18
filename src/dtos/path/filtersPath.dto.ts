@@ -1,8 +1,17 @@
-import { IsNumber, IsOptional, IsString } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger';
+import { EStatusPath, ETypePath } from '../../utils/ETypes';
 
 export class FiltersPathDTO {
-  sequenceQr?: number
-  process?: string
-  type?: string
-  product?: string
+  @ApiProperty({required: false})
+  status?: EStatusPath;
+  @ApiProperty({required: false})
+  duration?: string;
+  @ApiProperty({required: false})
+  finishedAt?: Date;
+  @ApiProperty({required: false})
+  startedAt?: string;
+  @ApiProperty({required: false})
+  startsAt?: string;
+  @ApiProperty({required: false})
+  type?: ETypePath;
 }

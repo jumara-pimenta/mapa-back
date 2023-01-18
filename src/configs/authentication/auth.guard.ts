@@ -1,33 +1,52 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { RequestContext } from "nestjs-request-context";
-import { IS_PUBLIC_KEY } from "../../decorators/public.decorator";
-import { AuthService } from "../../services/auth.service";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { RequestContext } from 'nestjs-request-context';
+import { ROLES_KEY } from 'src/decorators/roles.decorator';
+import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
+import { AuthService } from '../../services/auth.service';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly authService: AuthService
-  ) { }
+    private readonly authService: AuthService,
+  ) {}
 
   async canActivate(context: ExecutionContext) {
-    try {
-      const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [
-        context.getHandler(),
-        context.getClass()
-      ])
+    const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-      if (isPublic || process.env.MOCK_SERVER === "true") return true
+    if (isPublic || process.env.NODE_ENV === 'development') return true;
 
-      const extractJwt = RequestContext.currentContext.req.header("authorization");
+    const extractJwt =
+      RequestContext.currentContext.req.header('authorization');
+    await this.authService.authenticate(extractJwt);
 
-      await this.authService.authenticate(extractJwt);
+    const user = await this.authService.decodeJWT(extractJwt);
+    console.log(user);
 
-      return true
-
-    } catch (e) {
-      throw new HttpException('unauthorized', HttpStatus.UNAUTHORIZED)
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (!requiredRoles) {
+      return true;
     }
+    if (!requiredRoles.some((role) => user.permissions?.includes(role))) {
+      throw new HttpException(
+        'Usuário não autorizado para acessar este recurso!',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return requiredRoles.some((role) => user.permissions?.includes(role));
   }
 }

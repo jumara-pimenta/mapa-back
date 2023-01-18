@@ -1,59 +1,89 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsBoolean,
-  IsDate,
-  IsEnum,
+  IsDateString,
   IsNumber,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
+  Length,
 } from 'class-validator';
 
 export class UpdateVehicleDTO {
-  @IsString({ message: 'Plate não está definido para o tipo string.' })
+  @ApiProperty({ description: 'Placa do veículo' })
+  @IsString({ message: '[plate] A placa deve ser do tipo string.' })
+  @Length(7, 7, { message: '[plate] A placa deve possuir 7 caracteres.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsOptional()
-  @MinLength(7, { message: 'Plate nao pode conter menos que 7 digitos.' })
-  @MaxLength(7, { message: 'Plate nao pode conter mais que 7 digitos.' })
   plate?: string;
 
-  @IsString({ message: 'Company não está definido para o tipo string.' })
+  @ApiProperty({ description: 'Nome da empresa responsável pelo veículo' })
+  @IsString({ message: '[company] O nome da empresa deve ser do tipo string.' })
   @IsOptional()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   company?: string;
 
-  @IsString({ message: 'Type não está definido para o tipo string.' })
+  @ApiProperty({ description: 'Tipo do veículo' })
+  @IsString({ message: '[type] O tipo deve ser do tipo string.' })
   @IsOptional()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   type?: string;
 
-  @IsDate()
+  @ApiProperty({ description: 'Data da última vistoria do veículo' })
+  @IsDateString(
+    {},
+    { message: '[lastSurvey] A última vistoria deve ser do tipo date.' },
+  )
   @IsOptional()
   lastSurvey?: Date;
 
-  @IsDate()
+  @ApiProperty({ description: 'Data de expiração da vistoria do veículo' })
+  @IsDateString(
+    {},
+    { message: '[expiration] A expiração deve ser do tipo date.' },
+  )
   @IsOptional()
   expiration?: Date;
 
-  @IsNumber()
+  @ApiProperty({ description: 'Capacidade do veículo' })
+  @IsNumber(
+    { allowInfinity: true },
+    { message: '[capacity] A capacidade deve ser do tipo number.' },
+  )
   @IsOptional()
   capacity?: number;
 
-  @IsString({ message: 'Renavam não está definido para o tipo string.' })
+  @ApiProperty({ description: 'Código Renavam do Veículo' })
+  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo string.' })
+  @Length(11, 11, {
+    message: '[renavam] O RENAVAM deve possuir 11 caracteres.',
+  })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsOptional()
-  @MinLength(11, { message: 'Renavam nao pode conter menos que 11 digitos.' })
-  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 digitos.' })
   renavam?: string;
 
-  @IsDate()
+  @ApiProperty({ description: 'Data da última manutenção do veículo' })
+  @IsDateString(
+    {},
+    { message: '[lastMaintenance] A última manutenção deve ser do tipo date.' },
+  )
   @IsOptional()
   lastMaintenance?: Date;
 
-  @IsString({ message: 'note não está definido para o tipo string.' })
+  @ApiProperty({ description: 'Campo de observação' })
+  @IsString({
+    message: '[note] O campo de observação deve ser do tipo string.',
+  })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsOptional()
   note?: string;
 
-  @IsString({
-    message: 'IsAccessibility não está definido para o tipo string.',
+  @ApiProperty({
+    description: 'Campo para informar se o veículo possui acessibilidade',
   })
-  @IsBoolean()
+  @IsBoolean({
+    message: '[isAccessibility] A acessibilidade deve ser do tipo booleano.',
+  })
   @IsOptional()
   isAccessibility?: boolean;
 }

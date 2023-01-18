@@ -1,6 +1,15 @@
-import { IsString, IsEnum, MinLength, MaxLength, IsNotEmpty } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  IsEnum,
+  MinLength,
+  MaxLength,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreateRouteHistoryDTO {
-  employeesId: string
-  routeId: string
+  @ApiProperty()
+  employeesId: string;
+  @ApiProperty()
+  routeId: string;
 }

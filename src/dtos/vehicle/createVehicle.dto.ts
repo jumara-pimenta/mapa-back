@@ -1,59 +1,120 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
   IsBoolean,
   IsNumber,
-  IsDate,
-  MinLength,
-  MaxLength,
+  IsDateString,
+  Length,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
-  @IsString({ message: 'Plate não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Plate não pode esta vazio.' })
-  @MinLength(7, { message: 'Plate nao pode conter menos que 7 digitos.' })
-  @MaxLength(7, { message: 'Plate nao pode conter mais que 7 digitos.' })
+  @ApiProperty({
+    default: 'PHP1234',
+    example: 'PHP1234',
+    description: 'Placa do veículo',
+  })
+  @IsString({ message: '[plate] A placa deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[plate] A placa deve ser preenchida.' })
+  @Length(7, 7, { message: '[plate] A placa deve possuir 7 caracteres.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   plate: string;
 
-  @IsString({ message: 'Company não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Company não pode esta vazio.' })
+  @ApiProperty({
+    default: 'Expresso',
+    example: 'Expresso',
+    description: 'Nome da empresa responsável pelo veículo',
+  })
+  @IsString({ message: '[company] O nome da empresa deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[company] O nome da empresa deve ser preenchida.' })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   company: string;
 
-  @IsString({ message: 'Type não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Type não pode esta vazio.' })
+  @ApiProperty({
+    default: 'ÔNIBUS',
+    example: 'ÔNIBUS',
+    description: 'Tipo do veículo',
+  })
+  @IsString({ message: '[type] O tipo deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[type] O tipo deve ser preenchido.' })
   type: string;
 
-  @IsString({ message: 'LastSurvey não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'LastSurvey não pode esta vazio.' })
-  lastSurvey: string;
+  @ApiProperty({
+    default: new Date(),
+    example: new Date(),
+    description: 'Data da última vistoria do veículo',
+  })
+  @IsDateString(
+    {},
+    { message: '[lastSurvey] A última vistoria deve ser do tipo date.' },
+  )
+  @IsNotEmpty({
+    message: '[lastSurvey] A última vistoria deve ser preenchida.',
+  })
+  lastSurvey: Date;
 
-  @IsString({ message: 'Expiration não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Expiration não pode esta vazio.' })
+  @ApiProperty({
+    default: 28,
+    example: 28,
+    description: 'Data de expiração da vistoria do veículo',
+  })
+  @IsDateString(
+    {},
+    { message: '[expiration] A expiração deve ser do tipo date.' },
+  )
+  @IsNotEmpty({ message: '[expiration] A expiração deve ser preenchida.' })
   expiration: string;
 
-  @IsNumber()
-  @IsNotEmpty({ message: 'capacity não pode esta vazio.' })
+  @ApiProperty({ default: 28, description: 'Capacidade do veículo' })
+  @IsNumber(
+    { allowInfinity: true },
+    { message: '[capacity] A capacidade deve ser do tipo number.' },
+  )
+  @IsNotEmpty({ message: '[capacity] A capacidade deve ser preenchida.' })
   capacity: number;
 
-  @IsString({ message: 'Renavam não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Renavam não pode esta vazio.' })
-  @MinLength(11, { message: 'Renavam nao pode conter menos que 11 digitos.' })
-  @MaxLength(11, { message: 'Renavam nao pode conter mais que 11 digitos.' })
+  @ApiProperty({
+    default: '12345678901',
+    description: 'Código Renavam do Veículo',
+  })
+  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[renavam] O RENAVAM deve ser preenchido.' })
+  @Length(11, 11, {
+    message: '[renavam] O RENAVAM deve possuir 11 caracteres.',
+  })
   renavam: string;
 
-  @IsString({
-    message: 'LastMaintenance não está definido para o tipo string.',
+  @ApiProperty({
+    default: new Date(),
+    description: 'Data da última manutenção do veículo',
   })
-  @IsNotEmpty({ message: 'LastMaintenance não pode esta vazio.' })
-  lastMaintenance: string;
+  @IsDateString(
+    {},
+    { message: '[lastMaintenance] A última manutenção deve ser do tipo date.' },
+  )
+  @IsNotEmpty({
+    message: '[lastMaintenance] A última manutenção deve ser preenchida.',
+  })
+  lastMaintenance: Date;
 
-  @IsString({ message: 'Note não está definido para o tipo string.' })
-  @IsNotEmpty({ message: 'Note não pode esta vazio.' })
+  @ApiProperty({ default: 'Teste', description: 'Campo de observação' })
+  @IsString({
+    message: '[note] O campo de observação deve ser do tipo string.',
+  })
+  @IsNotEmpty({ message: '[note] O campo de observação deve ser preenchido.' })
   note: string;
 
-  @IsBoolean({
-    message: 'isAccessibility não está definido para o tipo tipo booleans.',
+  @ApiProperty({
+    default: true,
+    description: 'Campo para informar se o veículo possui acessibilidade',
   })
-  @IsNotEmpty({ message: 'isAccessibility não pode esta vazio.' })
+  @IsBoolean({
+    message:
+      '[isAccessibility] O campo de acessibilidade deve ser do tipo booleano.',
+  })
+  @IsNotEmpty({
+    message: '[isAccessibility] O campo de acessibilidade deve ser preenchido.',
+  })
   isAccessibility: boolean;
 }

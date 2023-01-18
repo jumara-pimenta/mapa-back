@@ -1,23 +1,26 @@
-import { v4 as uuid } from "uuid";
-import { Employee } from "./employee.entity";
-import { Path } from "./path.entity";
+import { v4 as uuid } from 'uuid';
+import { Employee } from './employee.entity';
+import { Path } from './path.entity';
 
 export class EmployeesOnPath {
-  id: string
-  confirmation?: boolean
-  position: number
-  boardingAt?: Date
-  disembarkAt?: Date
-  employee?: Partial<Employee>
-  path?: Path
-  createdAt: Date
-  updatedAt?: Date
+  id: string;
+  confirmation?: boolean;
+  position: number;
+  boardingAt?: Date;
+  disembarkAt?: Date;
+  description?: string;
+  present?: boolean;
+  employee?: Partial<Employee>;
+  path?: Path;
+  createdAt: Date;
+  updatedAt?: Date;
+  routeName?: string;
 
   constructor(
-    props: Omit<EmployeesOnPath, "id" | "createdAt" | "path" | "employee">,
+    props: Omit<EmployeesOnPath, 'id' | 'createdAt' | 'path' | 'employee'>,
     employee: Employee,
     path: Path,
-    id?: string
+    id?: string,
   ) {
     Object.assign(this, props);
     this.id = id ?? uuid();

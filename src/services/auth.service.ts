@@ -1,57 +1,70 @@
-import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-// import { JwtService } from "@nestjs/jwt";
-import ICoreServiceIntegration from "../integrations/services/coreService/core.service.integration.contract";
-import { differenceInSeconds, fromUnixTime, isAfter } from "date-fns";
-import { TokenDTO } from "../dtos/auth/token.dto";
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import ICoreServiceIntegration from '../integrations/services/coreService/core.service.integration.contract';
+import { differenceInSeconds, fromUnixTime, isAfter } from 'date-fns';
+import {
+  BackOfficeUserCreateDTO,
+  BackOfficeUserDTO,
+} from 'src/dtos/auth/backOfficeUserLogin.dto';
+import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffice.repository.contract';
+import * as bcrypt from 'bcrypt';
+import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
+import { setPermissions } from 'src/utils/roles.permissions';
 
 @Injectable()
 export class AuthService {
   constructor(
-    // private readonly jwtService: JwtService,
-    @Inject("ICoreServiceIntegration")
-    private readonly coreServiceIntegration: ICoreServiceIntegration
+    private readonly jwtService: JwtService,
+    @Inject('ICoreServiceIntegration')
+    private readonly coreServiceIntegration: ICoreServiceIntegration,
+    @Inject('IBackOfficeUserRepository')
+    private readonly backOfficeUserRepository: IBackOfficeUserRepository,
   ) {}
 
-  async authenticate(token: string): Promise<boolean> {
-    const tokenExtracted = this.extractToken(token);
+  private verifyToken(token: string): any {
+    try {
+      const decodedToken = this.jwtService.verify(token, {
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      });
 
-    if (!tokenExtracted) throw new HttpException("Token não provido", HttpStatus.UNAUTHORIZED);
-
-    // const decodedToken = await this.jwtService.verify(tokenExtracted, { secret: process.env.SECRET_KEY_ACCESS_TOKEN });
-
-    // const tokenExpirationIsAfterNow = isAfter(fromUnixTime(decodedToken.exp), new Date())
-
-    // if(!tokenExpirationIsAfterNow) throw new HttpException("Token está expirado", HttpStatus.UNAUTHORIZED);
-
-    return
+      return decodedToken;
+    } catch (e) {
+      throw new HttpException('Token inválido!', HttpStatus.UNAUTHORIZED);
+    }
   }
 
-  async login(_token: string): Promise<any> {
-    const _tokenExtracted = this.extractToken(_token);
+  async authenticate(token: string): Promise<boolean> {
+    if (!token)
+      throw new HttpException('Token não provido!', HttpStatus.UNAUTHORIZED);
+    const tokenExtracted = this.extractToken(token);
 
-    if (!_tokenExtracted) throw new HttpException("token não providenciado", HttpStatus.UNAUTHORIZED);
+    const decodedToken = this.verifyToken(tokenExtracted);
 
-    const _decodedToken = await this.coreServiceIntegration.verifyToken(_tokenExtracted)
-      .catch(async e => {
-        throw new HttpException("Não autorizado", HttpStatus.UNAUTHORIZED);
-      })
+    const tokenExpirationIsAfterNow = isAfter(
+      fromUnixTime(decodedToken.exp),
+      new Date(),
+    );
 
-    // const employee = await this.employeeService.getByCode(_decodedToken.employee_code);
+    if (!tokenExpirationIsAfterNow)
+      throw new HttpException('Token está expirado', HttpStatus.UNAUTHORIZED);
 
-    // const token = this.generateToken(_decodedToken.exp, employee);
-
-    // return { token };
+    return;
   }
 
   private generateToken(_expireToken: number, employee: any) {
-    const remainingToExpire = this.getRemainingTokenTime(_expireToken);
+    const token = this.jwtService.sign(
+      { sub: employee, permissions: setPermissions(employee.role) },
+      {
+        expiresIn: '7d',
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      },
+    );
 
-    // const token = this.jwtService.sign(
-    //     { sub: employee },
-    //     { expiresIn: `${remainingToExpire}s` }
-    // );
+    return token;
+  }
 
-    // return token;
+  async generateTokenData(data: any) {
+    return this.generateToken(0, data);
   }
 
   private getRemainingTokenTime(expireToken: number): number {
@@ -59,7 +72,64 @@ export class AuthService {
   }
 
   private extractToken(tokenToExtract: string): string {
-    const [, token] = tokenToExtract.split("Bearer ");
+    const [, token] = tokenToExtract.split('Bearer ');
     return token;
+  }
+
+  async backofficeLogin(data: BackOfficeUserDTO): Promise<any> {
+    const user = await this.backOfficeUserRepository.getByEmail(data.email);
+
+    if (!user)
+      throw new HttpException(
+        'Usuário não encontrado',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const isValidPassword = bcrypt.compareSync(data.password, user.password);
+
+    if (!isValidPassword)
+      throw new HttpException(
+        'E-mail ou senha inválido',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const token = this.generateToken(1 * 1000 * 60 * 60, {
+      id: user.id,
+      role: user.role,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { updatedAt, createdAt, password, ...result } = user;
+
+    return { ...result, token };
+  }
+
+  async backofficeUserCreate(data: BackOfficeUserCreateDTO): Promise<any> {
+    const userExists = await this.backOfficeUserRepository.getByEmail(
+      data.email,
+    );
+
+    if (userExists)
+      throw new HttpException('Usuário já existe', HttpStatus.UNAUTHORIZED);
+    data.password = bcrypt.hashSync(data.password, 10);
+
+    const user = await this.backOfficeUserRepository.create(
+      new BackOfficeUser(data),
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+
+    return result;
+  }
+
+  async decodeJWT(token: string): Promise<any> {
+    const tokenExtracted = this.extractToken(token);
+
+    if (!tokenExtracted)
+      throw new HttpException('Token não provido', HttpStatus.UNAUTHORIZED);
+
+    const decodedToken = await this.jwtService.decode(tokenExtracted);
+
+    return decodedToken;
   }
 }

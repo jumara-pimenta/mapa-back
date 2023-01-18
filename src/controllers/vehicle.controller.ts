@@ -17,24 +17,54 @@ import { Vehicle } from '../entities/vehicle.entity';
 import { VehicleService } from '../services/vehicle.service';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  CreateVehicle,
+  DeleteVehicle,
+  GetAllVehicle,
+  GetVehicle,
+  UpdateVehicle,
+} from 'src/utils/examples.swagger';
 
 @Controller('/api/vehicles')
+@ApiTags('Vehicles')
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'Creates a new Vehicle.',
+    schema: {
+      type: 'object',
+      example: CreateVehicle,
+    },
+  })
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateVehicleDTO): Promise<Vehicle> {
     return await this.vehicleService.create(payload);
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Vehicle.',
+    schema: {
+      type: 'object',
+      example: DeleteVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Vehicle> {
     return await this.vehicleService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Vehicle.',
+    schema: {
+      type: 'object',
+      example: UpdateVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -44,6 +74,14 @@ export class VehicleController {
   }
 
   @Get()
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'List all Vehicle.',
+    schema: {
+      type: 'object',
+      example: GetAllVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -53,6 +91,14 @@ export class VehicleController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get a Vehicle by id.',
+    schema: {
+      type: 'object',
+      example: GetVehicle,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Vehicle> {
     return await this.vehicleService.listById(id);

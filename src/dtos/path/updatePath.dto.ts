@@ -1,21 +1,36 @@
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsDateString, IsEnum, IsOptional, Matches } from 'class-validator';
+import { DurationRgx, StartsAtRgx } from '../../utils/Regex';
+import { EStatusPath } from '../../utils/ETypes';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdatePathDTO {
-  @IsString()
+  @ApiProperty({ description: 'Tempo de duração do trajeto' })
+  @Matches(DurationRgx, {
+    message:
+      '[duration] O tempo de duração do trajeto deve ser do formato esperado: 00h00',
+  })
+  @ApiProperty()
   @IsOptional()
-  process?: string
+  duration?: string;
 
-  @IsString()
-  @MaxLength(15)
+  @ApiProperty({ description: 'Hora prevista para início do trajeto' })
+  @Matches(StartsAtRgx, {
+    message:
+      '[startsAt] A hora de início do trajeto deve ser do formato esperado: 00h00',
+  })
   @IsOptional()
-  product?: string
+  startsAt?: string;
 
-  @IsString()
+  @ApiProperty({ description: 'Hora do início do trajeto' })
+  @IsDateString()
   @IsOptional()
-  sequenceQr?: number
+  startedAt?: Date;
 
-  @MinLength(2)
-  @MaxLength(3)
+  @ApiProperty({ description: 'Status do trajeto' })
+  @IsEnum(EStatusPath, {
+    message:
+      '[status] O status do trajeto deve ser do formato esperado: PENDENTE | EM ANDAMENTO | FINALIZADO',
+  })
   @IsOptional()
-  type?: string
+  status?: EStatusPath;
 }

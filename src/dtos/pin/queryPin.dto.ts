@@ -1,5 +1,7 @@
 export interface IQueryPin {
-  description?: string
-  lat?: string 
-  long?: string
+  title?: string;
+  local?: string;
+  details?: string;
+  lat?: string;
+  lng?: string;
 }

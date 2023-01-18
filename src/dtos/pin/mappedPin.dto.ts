@@ -1,7 +1,18 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class MappedPinDTO {
-  id: string
-  description: string
-  lat: string 
-  long: string
-  createdAt: Date
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  title: string;
+  @ApiProperty()
+  local: string;
+  @ApiProperty()
+  details: string;
+  @ApiProperty()
+  lat: string;
+  @ApiProperty()
+  lng: string;
+  @ApiProperty()
+  createdAt: Date;
 }

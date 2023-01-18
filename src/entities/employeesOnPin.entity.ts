@@ -3,16 +3,17 @@ import { Employee } from './employee.entity';
 import { Pin } from './pin.entity';
 
 export class EmployeesOnPin {
-  employee?: Employee
-  pin?: Partial<Pin>
-  type: ETypePin | string
-  createdAt: Date
-  updatedAt?: Date
+  employee?: Employee;
+  pin?: Partial<Pin>;
+  pinId?: string;
+  type: ETypePin | string;
+  createdAt: Date;
+  updatedAt?: Date;
 
   constructor(
-    props: Omit<EmployeesOnPin, "employee" | "pin" | "createdAt">,
+    props: Omit<EmployeesOnPin, 'employee' | 'pin' | 'createdAt'>,
     employee: Employee,
-    pin: Pin
+    pin: Pin,
   ) {
     Object.assign(this, props);
     this.employee = employee;

@@ -1,9 +1,15 @@
-import { MappedRouteDTO } from "../route/mappedRoute.dto"
+import { ApiProperty } from '@nestjs/swagger';
+import { MappedRouteDTO } from '../route/mappedRoute.dto';
 
 export class MappedRouteHistoryDTO {
-  id: string
-  employeeIds: string   
-  startedAt: Date
-  finishedAt: Date
-  createdAt: Date
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  employeeIds: string;
+  @ApiProperty()
+  startedAt: Date;
+  @ApiProperty()
+  finishedAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 }

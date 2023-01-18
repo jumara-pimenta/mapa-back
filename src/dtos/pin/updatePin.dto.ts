@@ -1,15 +1,29 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdatePinDTO {
-  @IsString()
-  @IsNotEmpty()
-  description?: string
+  @ApiProperty({ description: 'Latitude do Ponto de Embarque' })
+  @IsString({ message: '[lat] A latitude deve ser do tipo string.' })
+  @IsOptional()
+  lat?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  lat?: string 
+  @ApiProperty({ description: 'Longitude do Ponto de Embarque' })
+  @IsString({ message: '[lng] A longitude deve ser do tipo string.' })
+  @IsOptional()
+  lng?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  long?: string
+  @ApiProperty({ description: 'Local do Ponto de Embarque' })
+  @IsString({ message: '[local] O local deve ser do tipo string string.' })
+  @IsOptional()
+  local?: string;
+
+  @ApiProperty({ description: 'Detalhes do local do Ponto de Embarque' })
+  @IsString({ message: '[details] O campo detalhes deve ser do tipo string.' })
+  @IsOptional()
+  details?: string;
+
+  @ApiProperty({ description: 'Título do Ponto de Embarque' })
+  @IsString({ message: '[title] O título deve ser do tipo string.' })
+  @IsOptional()
+  title?: string;
 }

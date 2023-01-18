@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { generateQueryByFiltersForEmployee } from '../../configs/database/Queries';
+import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 
 @Injectable()
 export class EmployeeRepository
@@ -28,26 +28,67 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
         admission: getDateInLocaleTime(new Date(data.admission)),
-
         costCenter: data.costCenter,
-        cpf: data.cpf,
         name: data.name,
         registration: data.registration,
-        rg: data.rg,
         role: data.role,
         shift: data.shift,
-        createdAt: getDateInLocaleTime(new Date()),
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
+              select: {
+                id: true,
+                details: true,
+                lat: true,
+                lng: true,
+                local: true,
+                title: true
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        },
+      }
     });
   }
 
   findById(id: string): Promise<Employee> {
     return this.repository.employee.findUnique({
       where: { id },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
+              select: {
+                id: true,
+                details: true,
+                lat: true,
+                lng: true,
+                local: true,
+                title: true
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        },
+      },
+    });
+  }
+
+  findByRegistration(registration: string): Promise<Employee> {
+    return this.repository.employee.findUnique({
+      where: { registration },
     });
   }
 
@@ -55,15 +96,55 @@ export class EmployeeRepository
     page: Page,
     filters: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>> {
-    const condition = generateQueryByFiltersForEmployee(filters);
+    const condition = generateQueryForEmployee(filters);
 
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
           where: condition,
+          include: {
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    id: true,
+                    details: true,
+                    lat: true,
+                    lng: true,
+                    local: true,
+                    title: true
+                  }
+                }
+              },
+              orderBy: {
+                createdAt: 'desc'
+              }
+            },
+          },
         })
       : await this.repository.employee.findMany({
           ...this.buildPage(page),
+          include: {
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    id: true,
+                    details: true,
+                    lat: true,
+                    lng: true,
+                    local: true,
+                    title: true
+                  }
+                }
+              },
+              orderBy: {
+                createdAt: 'desc'
+              }
+            },
+          },
         });
 
     const total = condition
@@ -85,16 +166,14 @@ export class EmployeeRepository
       data: {
         id: data.id,
         address: data.address,
-        // admission: data.admission,
-        admission: getDateInLocaleTime(new Date(data.admission)),
+        admission: data.admission,
         costCenter: data.costCenter,
-        cpf: data.cpf,
         name: data.name,
         registration: data.registration,
-        rg: data.rg,
         role: data.role,
         shift: data.shift,
-      },
+        createdAt: data.createdAt
+      }
     });
   }
 
@@ -102,8 +181,8 @@ export class EmployeeRepository
     return this.repository.employee.findMany({
       where: {
         id: {
-          in: ids
-        }
+          in: ids,
+        },
       },
       select: {
         id: true,
@@ -111,11 +190,13 @@ export class EmployeeRepository
         pins: {
           select: {
             type: true,
-            pin: true
-          }
-        }
+            pin: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
   }
-
 }

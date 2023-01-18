@@ -17,24 +17,54 @@ import { Employee } from '../entities/employee.entity';
 import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
+import {
+  ApiCreatedResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/employees')
+@ApiTags('Employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
+  @ApiCreatedResponse({
+    description: 'Creates a new Employee.',
+    schema: {
+      type: 'object',
+      example: CreateEmployee
+    }
+  })
   @Post()
+  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
   }
 
   @Delete('/:id')
+  @ApiCreatedResponse({
+    description: 'Delete a Employees.',
+    schema: {
+      type: 'object',
+      example: DeleteEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.delete(id);
   }
 
   @Put('/:id')
+  @ApiCreatedResponse({
+    description: 'Update a Employee.',
+    schema: {
+      type: 'object',
+      example: UpdateEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -43,7 +73,15 @@ export class EmployeeController {
     return await this.employeeService.update(id, data);
   }
 
-  @Get()
+  @Get()  
+  @ApiCreatedResponse({
+    description: 'Get all Employees.',
+    schema: {
+      type: 'object',
+      example: GetAllEmployee
+    }
+  })
+  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -53,8 +91,16 @@ export class EmployeeController {
   }
 
   @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get a Employee by id.',
+    schema: {
+      type: 'object',
+      example: GetEmployee
+    }
+  })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.listById(id);
   }
+  
 }

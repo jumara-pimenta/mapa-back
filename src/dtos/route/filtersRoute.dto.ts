@@ -1,7 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class FiltersRouteDTO {
-  description?: string
-  distance?: string  
-  type?: string
-  status?: string
-  driver?: string
+  @ApiProperty({required: false})
+  description?: string;
+  @ApiProperty({required: false})
+  distance?: string;
+  @ApiProperty({required: false})
+  type?: string;
+  @ApiProperty({required: false})
+  status?: string;
+  @ApiProperty({required: false})
+  driver?: string;
 }

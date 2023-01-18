@@ -1,4 +1,11 @@
+/* eslint-disable quotes */
+import { ApiProperty } from "@nestjs/swagger";
+
 export class CreateEmployeesOnPathDTO {
-  employeeIds: string[]
-  pathId: string
+  @ApiProperty()
+  employeeIds: string[];
+  @ApiProperty()
+  pathId: string;
+  @ApiProperty()
+  confirmation: boolean;
 }

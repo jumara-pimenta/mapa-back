@@ -1,22 +1,39 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { EmployeeAddressDTO } from "../employee/employeeAddress.dto";
+
 class IPin {
-  lat: string
-  long: string 
+  @ApiProperty()
+  lat: string;
+  @ApiProperty()
+  lng: string;
 }
 
 class IEmployee {
-  name: string
-  address: string
-  shift: string
-  registration: string
-  location: IPin
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  address: string | EmployeeAddressDTO;
+  @ApiProperty()
+  shift: string;
+  @ApiProperty()
+  registration: string;
+  @ApiProperty()
+  location: IPin;
 }
 
 export class MappedEmployeesOnPathDTO {
-  id: string
-  boardingAt?: Date
-  confirmation: boolean
-  disembarkAt?: Date
-  position: number
-  details: IEmployee
-  createdAt: Date
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  boardingAt?: Date;
+  @ApiProperty()
+  confirmation: boolean;
+  @ApiProperty()
+  disembarkAt?: Date;
+  @ApiProperty()
+  position: number;
+  @ApiProperty()
+  details: IEmployee;
+  @ApiProperty()
+  createdAt: Date;
 }

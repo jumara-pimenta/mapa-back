@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 1.0.0 (2022-04-21)
 
-
 ### Features
 
-* docker para producao 584f94d
+- docker para producao 584f94d

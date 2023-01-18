@@ -1,16 +1,17 @@
-import { Page, PageResponse } from "./page.model"
+import { Page, PageResponse } from './page.model';
 
 export abstract class Pageable<T> {
-    buildPage(page: Page): Page {
-        return {
-            skip: page.skip ? Number(page.skip) : 0,
-            take: page.take ? Number(page.take) : 25
-        }
-    }
+  buildPage(page: Page): Page {
+    return {
+      skip: page.skip ? Number(page.skip) : 0,
+      take: page.take ? Number(page.take) : 25,
+    };
+  }
 
-    buildPageResponse(items: T[], total: number): PageResponse<T> {
-        return {
-            items, total
-        }
-    }
+  buildPageResponse(items: T[], total: number): PageResponse<T> {
+    return {
+      items,
+      total,
+    };
+  }
 }

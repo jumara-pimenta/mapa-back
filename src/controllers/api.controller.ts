@@ -1,6 +1,8 @@
-import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller()
+@ApiTags('Api')
 export class ApiController {
   @Get('/feature')
   @HttpCode(HttpStatus.OK)

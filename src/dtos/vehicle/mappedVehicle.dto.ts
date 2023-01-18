@@ -1,14 +1,28 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class MappedVehicleDTO {
-  id: string
-  plate: string
-  company: string
-  type: string
-  lastSurvey: Date
-  expiration: Date
-  capacity: number
-  renavam: string
-  lastMaintenance: Date
-  note: string
-  isAccessibility: boolean
-  createdAt: Date
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  plate: string;
+  @ApiProperty()
+  company: string;
+  @ApiProperty()
+  type: string;
+  @ApiProperty()
+  lastSurvey: Date;
+  @ApiProperty()
+  expiration: Date;
+  @ApiProperty()
+  capacity: number;
+  @ApiProperty()
+  renavam: string;
+  @ApiProperty()
+  lastMaintenance: Date;
+  @ApiProperty()
+  note: string;
+  @ApiProperty()
+  isAccessibility: boolean;
+  @ApiProperty()
+  createdAt: Date;
 }
