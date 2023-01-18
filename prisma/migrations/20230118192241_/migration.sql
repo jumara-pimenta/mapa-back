@@ -55,7 +55,8 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [id] NVARCHAR(1000) NOT NULL,
     [pathId] NVARCHAR(1000) NOT NULL,
     [employeeId] NVARCHAR(1000) NOT NULL,
-    [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 1,
+    [confirmation] BIT NOT NULL,
+    [present] BIT,
     [position] INT NOT NULL,
     [description] VARCHAR(50),
     [boardingAt] DATETIMEOFFSET,
@@ -139,6 +140,20 @@ CREATE TABLE [dbo].[EmployeesOnPin] (
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [EmployeesOnPin_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [EmployeesOnPin_pkey] PRIMARY KEY CLUSTERED ([employeeId],[pinId])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[BackOfficeUser] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [name] NVARCHAR(1000) NOT NULL,
+    [email] NVARCHAR(1000) NOT NULL,
+    [password] NVARCHAR(1000) NOT NULL,
+    [role] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [BackOfficeUser_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIMEOFFSET,
+    CONSTRAINT [BackOfficeUser_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [BackOfficeUser_id_key] UNIQUE NONCLUSTERED ([id]),
+    CONSTRAINT [BackOfficeUser_email_key] UNIQUE NONCLUSTERED ([email])
 );
 
 -- AddForeignKey
