@@ -55,6 +55,7 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [id] NVARCHAR(1000) NOT NULL,
     [pathId] NVARCHAR(1000) NOT NULL,
     [employeeId] NVARCHAR(1000) NOT NULL,
+<<<<<<< HEAD:prisma/migrations/20230116154213_/migration.sql
 <<<<<<<< HEAD:prisma/migrations/20230125150243_initi/migration.sql
     [confirmation] BIT NOT NULL,
     [present] BIT,
@@ -62,6 +63,10 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
     [confirmation] BIT NOT NULL CONSTRAINT [EmployeesOnPath_confirmation_df] DEFAULT 0,
     [present] BIT CONSTRAINT [EmployeesOnPath_present_df] DEFAULT 0,
 >>>>>>>> b0efc6e (build: reset migrations):prisma/migrations/20230116154213_/migration.sql
+=======
+    [confirmation] BIT NOT NULL,
+    [present] BIT,
+>>>>>>> 6a8cda5 (feat: file import for employee creation):prisma/migrations/20230118165615_/migration.sql
     [position] INT NOT NULL,
     [description] VARCHAR(50),
     [boardingAt] DATETIMEOFFSET,

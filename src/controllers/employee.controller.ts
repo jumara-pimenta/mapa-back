@@ -9,6 +9,8 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
@@ -17,12 +19,15 @@ import { Employee } from '../entities/employee.entity';
 import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
-  ApiCreatedResponse,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
+  CreateEmployee,
+  DeleteEmployee,
+  GetAllEmployee,
+  GetEmployee,
+  UpdateEmployee,
+} from 'src/utils/examples.swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/employees')
@@ -30,12 +35,22 @@ import { Roles } from 'src/decorators/roles.decorator';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
+  @Post('upload')
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.employeeService.parseExcelFile(file);
+  }
+
   @ApiCreatedResponse({
     description: 'Creates a new Employee.',
     schema: {
       type: 'object',
-      example: CreateEmployee
-    }
+      example: CreateEmployee,
+    },
   })
   @Post()
   @Roles('create-employee')
@@ -49,8 +64,8 @@ export class EmployeeController {
     description: 'Delete a Employees.',
     schema: {
       type: 'object',
-      example: DeleteEmployee
-    }
+      example: DeleteEmployee,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Employee> {
@@ -62,8 +77,8 @@ export class EmployeeController {
     description: 'Update a Employee.',
     schema: {
       type: 'object',
-      example: UpdateEmployee
-    }
+      example: UpdateEmployee,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async update(
@@ -73,13 +88,13 @@ export class EmployeeController {
     return await this.employeeService.update(id, data);
   }
 
-  @Get()  
+  @Get()
   @ApiCreatedResponse({
     description: 'Get all Employees.',
     schema: {
       type: 'object',
-      example: GetAllEmployee
-    }
+      example: GetAllEmployee,
+    },
   })
   @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
@@ -95,12 +110,11 @@ export class EmployeeController {
     description: 'Get a Employee by id.',
     schema: {
       type: 'object',
-      example: GetEmployee
-    }
+      example: GetEmployee,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.listById(id);
   }
-  
 }
