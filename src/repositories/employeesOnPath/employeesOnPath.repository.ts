@@ -47,6 +47,7 @@ export class EmployeesOnPathRepository
         disembarkAt: true,
         position: true,
         createdAt: true,
+        present: true,
         employee: {
           select: {
             name: true,
@@ -77,6 +78,7 @@ export class EmployeesOnPathRepository
         confirmation: true,
         position: true,
         createdAt: true,
+        present: true,
         employee: {
           select: {
             name: true,
@@ -112,6 +114,7 @@ export class EmployeesOnPathRepository
         disembarkAt: true,
         position: true,
         createdAt: true,
+        present: true,
         employee: {
           select: {
             name: true,
@@ -159,6 +162,7 @@ export class EmployeesOnPathRepository
         disembarkAt: true,
         position: true,
         createdAt: true,
+        present: true,
         employee: {
           select: {
             name: true,
@@ -199,6 +203,7 @@ export class EmployeesOnPathRepository
             disembarkAt: true,
             position: true,
             createdAt: true,
+            present: true,
             employee: {
               select: {
                 name: true,
@@ -229,6 +234,7 @@ export class EmployeesOnPathRepository
             disembarkAt: true,
             position: true,
             createdAt: true,
+            present: true,
             employee: {
               select: {
                 name: true,
@@ -272,6 +278,7 @@ export class EmployeesOnPathRepository
         position: data.position,
         confirmation: data.confirmation,
         description: data.description,
+        present: data.present,
         disembarkAt: getDateInLocaleTime(data.disembarkAt),
         boardingAt: getDateInLocaleTime(data.boardingAt),
         updatedAt: getDateInLocaleTime(new Date()),
@@ -280,7 +287,10 @@ export class EmployeesOnPathRepository
     });
   }
 
-  findByPathAndPin(pathId: string, pinId: string): Promise<Partial<EmployeesOnPath[]>> {
+  findByPathAndPin(
+    pathId: string,
+    pinId: string,
+  ): Promise<Partial<EmployeesOnPath[]>> {
     return this.repository.employeesOnPath.findMany({
       where: {
         pathId,
@@ -300,14 +310,14 @@ export class EmployeesOnPathRepository
         disembarkAt: true,
         confirmation: true,
         description: true,
+        present: true,
         employee: {
           select: {
             id: true,
             name: true,
             registration: true,
             pins: true,
-            
-          }
+          },
         },
       },
     });

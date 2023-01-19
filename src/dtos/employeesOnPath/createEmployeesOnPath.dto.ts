@@ -6,4 +6,6 @@ export class CreateEmployeesOnPathDTO {
   employeeIds: string[];
   @ApiProperty()
   pathId: string;
+  @ApiProperty()
+  confirmation: boolean;
 }

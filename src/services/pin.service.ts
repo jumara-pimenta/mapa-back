@@ -32,7 +32,7 @@ export class PinService {
 
     if (pins.total === 0) {
       throw new HttpException(
-        'Não existe Pins para esta pesquisa!',
+        'Não existe pontos de embarque para esta pesquisa!',
         HttpStatus.NOT_FOUND,
       );
     }

@@ -155,7 +155,7 @@ export class RouteService {
 
     if (routes.total === 0) {
       throw new HttpException(
-        'Não existe routes para esta pesquisa!',
+        'Não existe(m) rota(s) para esta pesquisa!',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -262,11 +262,6 @@ export class RouteService {
 
   async softDelete(id: string): Promise<Route> {
     const route = await this.listById(id);
-    if (!route)
-      throw new HttpException(
-        `Não foi encontrada uma rota com o id: ${id}!`,
-        HttpStatus.NOT_FOUND,
-      );
 
     return await this.routeRepository.softDelete(route.id);
   }
