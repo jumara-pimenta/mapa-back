@@ -1,8 +1,6 @@
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 
-export function generateQueryForEmployee(
-  filters: FiltersEmployeeDTO,
-) {
+export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
   const fields = {
     registration: () => ({
       registration: filters.registration,
@@ -18,9 +16,6 @@ export function generateQueryForEmployee(
     }),
     costCenter: () => ({
       costCenter: filters.costCenter,
-    }),
-    address: () => ({
-      address: filters.address,
     }),
   };
 

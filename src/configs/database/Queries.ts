@@ -13,6 +13,8 @@ import { FiltersVehicleDTO } from '../../dtos/vehicle/filtersVehicle.dto';
 import { IQueryVehicle } from '../../dtos/vehicle/queryVehicle.dto';
 import { convertAndVerifyNumber } from '../../utils/Utils';
 import { IQueryPin } from '../../dtos/pin/queryPin.dto';
+import { FiltersRouteDTO } from 'src/dtos/route/filtersRoute.dto';
+import { ETypePath } from 'src/utils/ETypes';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -184,20 +186,26 @@ export function generateQueryByFiltersForVehicle(filters: any): IQueryVehicle {
   return query;
 }
 
-export function generateQueryByFiltersForRoute(filters: any): IQueryVehicle {
+export function generateQueryByFiltersForRoute(
+  filters: FiltersRouteDTO,
+): IQueryVehicle {
   const fields = {
-    sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
-    }),
-    process: () => ({
-      process: filters.process,
-    }),
     type: () => ({
       type: filters.type,
     }),
-    product: () => ({
-      product: filters.product,
+    driver: () => ({
+      driver: { name: { contains: filters.driver } },
     }),
+    vehicle: () => ({
+      vehicle: { plate: { contains: filters.vehicle } },
+    }),
+    description: () => ({
+      description: { contains: filters.description },
+    }),
+    typePath: () =>
+      filters.typePath == ETypePath.ROUND_TRIP
+        ? {}
+        : { path: { every: { type: filters.typePath } } },
   };
 
   const keysFields = Object.keys(fields);

@@ -9,6 +9,7 @@ import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
+import { Console } from 'console';
 
 @Injectable()
 export class RouteRepository
@@ -244,6 +245,7 @@ export class RouteRepository
     filters: FiltersRouteDTO,
   ): Promise<PageResponse<Route>> {
     const condition = generateQueryByFiltersForRoute(filters);
+    console.log(condition);
 
     const items = condition
       ? await this.repository.route.findMany({
@@ -571,7 +573,6 @@ export class RouteRepository
         id: true,
         vehicleId: true,
         driverId: true,
-        
       },
     });
 
