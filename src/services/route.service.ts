@@ -71,7 +71,7 @@ export class RouteService {
     await this.employeesInRoute(
       employeeInRoute,
       payload.type,
-      payload.employeeIds,
+      emplopyeeOrdened,
       payload.pathDetails.type,
     );
 
