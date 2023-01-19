@@ -194,9 +194,6 @@ export class EmployeeRepository
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
     });
   }
 }

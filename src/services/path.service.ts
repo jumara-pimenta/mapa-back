@@ -138,7 +138,7 @@ export class PathService {
       });
 
       await this.employeesOnPathService.create({
-        employeeIds: props.employeeIds,
+        employeeIds: props.employeeIds.reverse(),
         pathId: pathReturn.id,
       });
     }

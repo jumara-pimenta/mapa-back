@@ -25,6 +25,7 @@ import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
+import * as turf from "@turf/turf"
 
 @Injectable()
 export class RouteService {
@@ -50,6 +51,8 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
+      
+    const emplopyeeOrdened = orderPins(employeesPins)
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
@@ -87,7 +90,7 @@ export class RouteService {
 
     await this.pathService.generate({
       routeId: route.id,
-      employeeIds: payload.employeeIds,
+      employeeIds: emplopyeeOrdened,
       details: { ...payload.pathDetails },
     });
 
@@ -743,4 +746,51 @@ export class RouteService {
     }
     return path;
   }
+}
+
+const orderPins = (arr: Employee[]) : string[] => {
+
+  const latDenso = -3.110944
+  const longDenso = -59.962604
+  
+  let newArr = []
+
+  for(const employee of arr){
+    newArr.push(employee)
+  }
+
+  let n = newArr.length;
+
+  for (let i = 0; i < n - 1; i++){
+    for (let j = 0; j < n - i - 1; j++){
+
+      let lat = Number((Number((newArr[j].pins[newArr[j].pins.length - 1].pin.lat).trim())).toFixed(5))
+      let long = Number((Number((newArr[j].pins[newArr[j].pins.length - 1].pin.lng).trim())).toFixed(5))
+
+      let latPointAhead = Number((Number((newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lat).trim())).toFixed(5))
+      let longPointAhead = Number((Number((newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lng).trim())).toFixed(5))
+
+      let fromPoint = turf.point([long, lat]);
+      let fromPointAhead = turf.point([longPointAhead, latPointAhead]);
+      
+      let toDenso = turf.point([longDenso, latDenso]);
+
+      let distanceToDenso = turf.distance(fromPoint, toDenso);
+      let distancePointAheadToDenso = turf.distance(fromPointAhead, toDenso);
+
+      if(distanceToDenso < distancePointAheadToDenso){
+        let temp = newArr[j];
+        newArr[j] = newArr[j + 1];
+        newArr[j + 1] = temp;
+      }
+    }
+  }
+
+  let employeeIdOrdened = []
+
+  for(const employee of newArr){
+    employeeIdOrdened.push(employee.id)
+  }
+
+  return employeeIdOrdened
 }
