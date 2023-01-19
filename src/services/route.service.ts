@@ -71,7 +71,7 @@ export class RouteService {
     await this.employeesInRoute(
       employeeInRoute,
       payload.type,
-      payload.employeeIds,
+      emplopyeeOrdened,
       payload.pathDetails.type,
     );
 
@@ -767,7 +767,7 @@ const orderPins = (arr: Employee[]) : string[] => {
 
       let fromPoint = turf.point([long, lat]);
       let fromPointAhead = turf.point([longPointAhead, latPointAhead]);
-      
+
       let toDenso = turf.point([longDenso, latDenso]);
 
       let distanceToDenso = turf.distance(fromPoint, toDenso);
