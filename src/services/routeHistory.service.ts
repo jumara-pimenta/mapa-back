@@ -3,26 +3,37 @@ import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
 import { MappedRouteHistoryDTO } from '../dtos/routeHistory/mappedRouteHistory.dto';
 import { CreateRouteHistoryDTO } from '../dtos/routeHistory/createRouteHistory.dto';
-import { RouteService } from './route.service';
+import { PathService } from './path.service';
+import { DriverService } from './driver.service';
+import { VehicleService } from './vehicle.service';
 
 @Injectable()
 export class RouteHistoryService {
   constructor(
     @Inject('IRouteHistoryRepository')
     private readonly routeHistoryRepository: IRouteHistoryRepository,
-    private readonly routeService: RouteService,
+    private readonly pathService: PathService,
+    private readonly driverService: DriverService,
+    private readonly vehicleService: VehicleService,
   ) {}
 
-  async create(payload: CreateRouteHistoryDTO): Promise<RouteHistory> {
-    const route = await this.routeService.listById(payload.routeId);
+  async create(props: CreateRouteHistoryDTO): Promise<RouteHistory> {
+    const path = await this.pathService.listById(props.path);
+    const driver = await this.driverService.listById(props.driver);
+    const vehicle = await this.vehicleService.listById(props.vehicle);
 
     const newRouteHistory = new RouteHistory(
       {
-        employeeIds: payload.employeesId,
-        finishedAt: new Date(),
+        typeRoute: props.typeRoute,
+        nameRoute: props.nameRoute,
+        employeeIds: props.employeesIds,
+        itinerary: props.itinerary,
         startedAt: new Date(),
+        finishedAt: new Date(),
       },
-      route,
+      path,
+      driver,
+      vehicle,
     );
 
     return await this.routeHistoryRepository.create(newRouteHistory);

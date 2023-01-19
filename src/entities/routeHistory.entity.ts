@@ -1,17 +1,17 @@
+import { ETypeRoute } from 'src/utils/ETypes';
 import { v4 as uuid } from 'uuid';
 import { Driver } from './driver.entity';
 import { Path } from './path.entity';
-import { Route } from './route.entity';
 import { Vehicle } from './vehicle.entity';
 
 export class RouteHistory {
   id: string;
-  typeRoute: string;
+  typeRoute: ETypeRoute | string;
   nameRoute: string;
-  pathId: Path;
+  path?: Path;
   employeeIds: string;
-  driverId: Driver;
-  vehicleId: Vehicle;
+  driver?: Driver;
+  vehicle?: Vehicle;
   itinerary: string;
   startedAt: Date;
   finishedAt: Date;
@@ -19,12 +19,19 @@ export class RouteHistory {
   updatedAt?: Date;
 
   constructor(
-    props: Omit<RouteHistory, 'id' | 'createdAt' | 'route'>,
+    props: Omit<
+      RouteHistory,
+      'id' | 'createdAt' | 'vehicle' | 'paths' | 'driver'
+    >,
     path: Path,
+    driver: Driver,
+    vehicle: Vehicle,
     id?: string,
   ) {
     Object.assign(this, props);
     this.id = id ?? uuid();
-    this.pathId = path;
+    this.path = path;
+    this.driver = driver;
+    this.vehicle = vehicle;
   }
 }

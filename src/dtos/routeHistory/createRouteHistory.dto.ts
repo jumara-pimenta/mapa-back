@@ -1,16 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
-import {
-  IsString,
-  IsEnum,
-  MinLength,
-  MaxLength,
-  IsNotEmpty,
-  Matches,
-} from 'class-validator';
+import { IsString, IsNotEmpty, Matches } from 'class-validator';
 import { durationPathRgx } from 'src/utils/Regex';
 
 export class CreateRouteHistoryDTO {
+  @ApiProperty()
+  id: string;
+
   @ApiProperty({
     default: 'Convencional',
     example: 'Convencional',
@@ -36,28 +32,28 @@ export class CreateRouteHistoryDTO {
     type: 'UUID',
     description: 'Id do trajeto',
   })
-  pathId: string;
+  path: string;
 
   @ApiProperty({
     default: 'b8f805f2-9a96-4822-9667-2b19cc344848',
     type: 'UUID',
     description: 'Id do colaborador',
   })
-  employeesId: string;
+  employeesIds: string;
 
   @ApiProperty({
     default: '38e94b04-735b-41a9-a529-79023184007c',
     type: 'UUID',
     description: 'Id do motorista',
   })
-  driverId: string;
+  driver: string;
 
   @ApiProperty({
     default: '28294b80-41ce-4a89-a24e-3e3bd17701c4',
     type: 'UUID',
     description: 'Id do veículo',
   })
-  vehicleId: string;
+  vehicle: string;
 
   @ApiProperty()
   itinerary: string;
