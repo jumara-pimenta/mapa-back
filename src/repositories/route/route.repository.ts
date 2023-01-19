@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
@@ -10,11 +9,13 @@ import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
+import { Console } from 'console';
 
 @Injectable()
 export class RouteRepository
   extends Pageable<Route>
-  implements IRouteRepository {
+  implements IRouteRepository
+{
   constructor(
     private readonly repository: PrismaService,
     private readonly driverService: DriverService,
@@ -244,32 +245,34 @@ export class RouteRepository
     filters: FiltersRouteDTO,
   ): Promise<PageResponse<Route>> {
     const condition = generateQueryByFiltersForRoute(filters);
+    console.log(condition);
 
     const items = condition
       ? await this.repository.route.findMany({
-        ...this.buildPage(page),
-        where: {
-          ...condition,
-          deletedAt: null,
-        },
-        include: {
-          driver: true,
-          path: {
-            include: {
-              employeesOnPath: {
-                orderBy: {
-                  position: 'asc',
-                },
-                include: {
-                  employee: {
-                    select: {
-                      name: true,
-                      pins: {
-                        include: {
-                          pin: {
-                            select: {
-                              lat: true,
-                              lng: true,
+          ...this.buildPage(page),
+          where: {
+            ...condition,
+            deletedAt: null,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
                             },
                           },
                         },
@@ -279,33 +282,33 @@ export class RouteRepository
                 },
               },
             },
+            vehicle: true,
           },
-          vehicle: true,
-        },
-      })
+        })
       : await this.repository.route.findMany({
-        ...this.buildPage(page),
-        where: {
-          deletedAt: null,
-        },
-        include: {
-          driver: true,
-          path: {
-            include: {
-              employeesOnPath: {
-                orderBy: {
-                  position: 'asc',
-                },
-                include: {
-                  employee: {
-                    select: {
-                      name: true,
-                      pins: {
-                        include: {
-                          pin: {
-                            select: {
-                              lat: true,
-                              lng: true,
+          ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
                             },
                           },
                         },
@@ -315,58 +318,62 @@ export class RouteRepository
                 },
               },
             },
+            vehicle: true,
           },
-          vehicle: true,
-        },
-      });
+        });
 
     const total = condition
       ? await this.repository.route.findMany({
-        where: {
-          ...condition,
-          deletedAt: null,
-        },
-      })
+          where: {
+            ...condition,
+            deletedAt: null,
+          },
+        })
       : await this.repository.route.count({
-        where: {
-          deletedAt: null,
-        },
-      });
+          where: {
+            deletedAt: null,
+          },
+        });
 
     return this.buildPageResponse(
       items,
       Array.isArray(total) ? total.length : total,
     );
   }
-  async listByDriverId(driverId: string, page: Page, filters: FiltersRouteDTO): Promise<PageResponse<Route>> {
+  async listByDriverId(
+    driverId: string,
+    page: Page,
+    filters: FiltersRouteDTO,
+  ): Promise<PageResponse<Route>> {
     const condition = generateQueryByFiltersForRoute(filters);
 
     const items = condition
       ? await this.repository.route.findMany({
-        ...this.buildPage(page),
-        where: {
-          ...condition,
-          deletedAt: null,
-          driverId,
-        },
-        include: {
-          driver: true,
-          path: {
-            include: {
-              employeesOnPath: {
-                orderBy: {
-                  position: 'asc',
-                },
-                include: {
-                  employee: {
-                    select: {
-                      name: true,
-                      pins: {
-                        include: {
-                          pin: {
-                            select: {
-                              lat: true,
-                              lng: true,
+          ...this.buildPage(page),
+          where: {
+            ...condition,
+            deletedAt: null,
+            driverId,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
                             },
                           },
                         },
@@ -376,34 +383,34 @@ export class RouteRepository
                 },
               },
             },
+            vehicle: true,
           },
-          vehicle: true,
-        },
-      })
+        })
       : await this.repository.route.findMany({
-        ...this.buildPage(page),
-        where: {
-          deletedAt: null,
-          driverId,
-        },
-        include: {
-          driver: true,
-          path: {
-            include: {
-              employeesOnPath: {
-                orderBy: {
-                  position: 'asc',
-                },
-                include: {
-                  employee: {
-                    select: {
-                      name: true,
-                      pins: {
-                        include: {
-                          pin: {
-                            select: {
-                              lat: true,
-                              lng: true,
+          ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+            driverId,
+          },
+          include: {
+            driver: true,
+            path: {
+              include: {
+                employeesOnPath: {
+                  orderBy: {
+                    position: 'asc',
+                  },
+                  include: {
+                    employee: {
+                      select: {
+                        name: true,
+                        pins: {
+                          include: {
+                            pin: {
+                              select: {
+                                lat: true,
+                                lng: true,
+                              },
                             },
                           },
                         },
@@ -413,25 +420,24 @@ export class RouteRepository
                 },
               },
             },
+            vehicle: true,
           },
-          vehicle: true,
-        },
-      });
+        });
 
     const total = condition
       ? await this.repository.route.findMany({
-        where: {
-          ...condition,
-          deletedAt: null,
-          driverId,
-        },
-      })
+          where: {
+            ...condition,
+            deletedAt: null,
+            driverId,
+          },
+        })
       : await this.repository.route.count({
-        where: {
-          deletedAt: null,
-          driverId,
-        },
-      });
+          where: {
+            deletedAt: null,
+            driverId,
+          },
+        });
 
     return this.buildPageResponse(
       items,
@@ -544,7 +550,7 @@ export class RouteRepository
           some: {
             id: pathid,
           },
-        }
+        },
       },
       select: {
         id: true,
@@ -552,8 +558,5 @@ export class RouteRepository
     });
 
     return data.id;
-
-
-
   }
-  }
+}
