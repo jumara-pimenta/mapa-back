@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDateString,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class UpdateEmployeesOnPathDTO {
   @ApiProperty()
@@ -35,7 +28,7 @@ export class UpdateEmployeesOnPathDTO {
   @IsOptional()
   disembarkAt?: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Descrição' })
   @IsString()
   @IsOptional()
   description?: string;
