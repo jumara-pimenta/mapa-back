@@ -4,6 +4,7 @@ import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
 } from 'src/dtos/auth/backOfficeUserLogin.dto';
+import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';
@@ -29,4 +30,12 @@ export class AuthController {
     return await this.authService.backofficeUserCreate(payload);
   }
 
+  @Post('/backoffice/core')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async backofficeAuthCore(@Body() token: CoreTokenDTO): Promise<any> {
+    console.log(token);
+
+    return await this.authService.backofficeCore(token);
+  }
 }
