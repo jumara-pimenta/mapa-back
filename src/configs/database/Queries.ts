@@ -15,6 +15,7 @@ import { convertAndVerifyNumber } from '../../utils/Utils';
 import { IQueryPin } from '../../dtos/pin/queryPin.dto';
 import { FiltersRouteDTO } from 'src/dtos/route/filtersRoute.dto';
 import { ETypePath } from 'src/utils/ETypes';
+import { getDateStartToEndOfDay } from 'src/utils/Date';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -38,6 +39,7 @@ export function generateQueryByFiltersForEmployee(
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -89,6 +91,7 @@ export function generateQueryByFiltersForEmployeesOnPath(
 
   let query: IQueryEmployeesOnPath;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -108,19 +111,24 @@ export function generateQueryByFiltersForEmployeesOnPath(
   return query;
 }
 
-export function generateQueryByFiltersForDriver(filters: any): IQueryDriver {
+export function generateQueryByFiltersForDriver(
+  filters: FiltersDriverDTO,
+): IQueryDriver {
   const fields = {
-    sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
+    name: () => ({
+      name: { contains: filters.name },
     }),
-    process: () => ({
-      process: filters.process,
+    cpf: () => ({
+      cpf: { contains: filters.cpf },
     }),
-    type: () => ({
-      type: filters.type,
+    cnh: () => ({
+      cnh: { contains: filters.cnh },
     }),
-    product: () => ({
-      product: filters.product,
+    validation: () => ({
+      validation: { contains: filters.validation },
+    }),
+    category: () => ({
+      category: filters.category,
     }),
   };
 
@@ -128,6 +136,7 @@ export function generateQueryByFiltersForDriver(filters: any): IQueryDriver {
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -147,19 +156,61 @@ export function generateQueryByFiltersForDriver(filters: any): IQueryDriver {
   return query;
 }
 
-export function generateQueryByFiltersForVehicle(filters: any): IQueryVehicle {
+export function generateQueryByFiltersForVehicle(
+  filters: FiltersVehicleDTO,
+): IQueryVehicle {
   const fields = {
-    sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
+    plate: () => ({
+      plate: { contains: filters.plate },
     }),
-    process: () => ({
-      process: filters.process,
+    company: () => ({
+      company: { contains: filters.company },
+    }),
+    capacity: () => ({
+      capacity: convertAndVerifyNumber(filters.capacity),
     }),
     type: () => ({
       type: filters.type,
     }),
-    product: () => ({
-      product: filters.product,
+    expiration: () => {
+      const { end, start } = getDateStartToEndOfDay(filters.expiration);
+
+      return {
+        expiration: {
+          gte: start,
+          lte: end,
+        },
+      };
+    },
+    isAccessibility: () => ({
+      isAccessibility: filters.isAccessibility == 'true' ? true : false,
+    }),
+    lastSurvey: () => {
+      const { end, start } = getDateStartToEndOfDay(filters.lastSurvey);
+
+      return {
+        lastSurvey: {
+          gte: start,
+          lte: end,
+        },
+      };
+    },
+    lastMaintenance: () => {
+      const { end, start } = getDateStartToEndOfDay(filters.lastMaintenance);
+
+      return {
+        lastMaintenance: {
+          gte: start,
+          lte: end,
+        },
+      };
+    },
+
+    note: () => ({
+      note: { contains: filters.note },
+    }),
+    renavam: () => ({
+      renavam: { contains: filters.renavam },
     }),
   };
 
@@ -167,6 +218,7 @@ export function generateQueryByFiltersForVehicle(filters: any): IQueryVehicle {
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -203,15 +255,44 @@ export function generateQueryByFiltersForRoute(
       description: { contains: filters.description },
     }),
     typePath: () =>
-      filters.typePath == ETypePath.ROUND_TRIP
-        ? {}
-        : { path: { every: { type: filters.typePath } } },
+      filters.typePath == ETypePath.ROUND_TRIP ||
+      filters.typePath == ETypePath.ROUND_TRIP.toLocaleLowerCase()
+        ? {
+            AND: [
+              {
+                path: {
+                  some: {
+                    type: ETypePath.ONE_WAY,
+                  },
+                },
+              },
+              {
+                path: {
+                  some: {
+                    type: ETypePath.RETURN,
+                  },
+                },
+              },
+            ],
+          }
+        : { path: { some: { type: filters.typePath } } },
+
+    startsAt: () => ({
+      path: {
+        every: {
+          startsAt: {
+            contains: filters.startsAt,
+          },
+        },
+      },
+    }),
   };
 
   const keysFields = Object.keys(fields);
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -253,6 +334,7 @@ export function generateQueryByFiltersForRouteHistory(
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -292,6 +374,7 @@ export function generateQueryByFiltersForPath(filters: any): IQueryPath {
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {
@@ -331,6 +414,7 @@ export function generateQueryByFiltersForPin(filters: any): IQueryPin {
 
   let query: any;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {

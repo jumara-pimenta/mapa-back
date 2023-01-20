@@ -9,7 +9,7 @@ export class FiltersEmployeeDTO {
     required: false,
     example: `${faker.date.past().toISOString()}`,
   })
-  admission?: Date;
+  admission?: string;
   @ApiProperty({ required: false, example: `${faker.name.jobTitle()}` })
   role?: string;
   @ApiProperty({

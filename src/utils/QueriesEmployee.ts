@@ -1,21 +1,31 @@
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
+import { getDateStartToEndOfDay } from './Date';
 
 export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
   const fields = {
     registration: () => ({
       registration: filters.registration,
     }),
-    admission: () => ({
-      admission: filters.admission,
-    }),
+    admission: () => {
+      const { start, end } = getDateStartToEndOfDay(filters.admission);
+      return {
+        admission: {
+          gte: start,
+          lte: end,
+        },
+      };
+    },
     role: () => ({
-      role: filters.role,
+      role: { contains: filters.role },
     }),
     shift: () => ({
       shift: filters.shift,
     }),
     costCenter: () => ({
       costCenter: filters.costCenter,
+    }),
+    name: () => ({
+      name: { contains: filters.name },
     }),
   };
 
