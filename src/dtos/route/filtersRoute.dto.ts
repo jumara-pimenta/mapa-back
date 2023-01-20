@@ -15,4 +15,6 @@ export class FiltersRouteDTO {
   vehicle?: string;
   @ApiProperty({ required: false })
   typePath?: string;
+  @ApiProperty({ required: false })
+  startsAt?: string;
 }
