@@ -309,7 +309,6 @@ export class PathService {
       driverId,
       status,
     );
-    console.log(path);
     if (!path)
       throw new HttpException(
         `Não existe trajeto com status ${status} para este motorista!`,

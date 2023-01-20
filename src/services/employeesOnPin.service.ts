@@ -22,7 +22,7 @@ export class EmployeesOnPinService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-  ) { }
+  ) {}
 
   async associateEmployee(
     props: AssociateEmployeeOnPinDTO,
@@ -35,12 +35,16 @@ export class EmployeesOnPinService {
         if (_pin.id === pin.id) {
           return await this.employeesOnPinRepository.find(
             props.employeeId,
-            props.pinId)
+            props.pinId,
+          );
         }
 
         if (_pin.type === props.type) {
-          return await this.employeesOnPinRepository.update(
-            _pin.id,
+          await this.employeesOnPinRepository.delete(
+            props.employeeId,
+            props.pinId,
+          );
+          return await this.employeesOnPinRepository.create(
             new EmployeesOnPin({ type: props.type }, employee, pin),
           );
         }
@@ -66,7 +70,7 @@ export class EmployeesOnPinService {
           return _pin;
         }
       });
-    }    
+    }
 
     if (pinAlreadyAssociated.length) return;
 

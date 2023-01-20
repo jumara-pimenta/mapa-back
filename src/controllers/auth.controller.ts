@@ -34,8 +34,6 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   async backofficeAuthCore(@Body() token: CoreTokenDTO): Promise<any> {
-    console.log(token);
-
     return await this.authService.backofficeCore(token);
   }
 }

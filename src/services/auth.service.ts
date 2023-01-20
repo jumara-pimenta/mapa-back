@@ -11,6 +11,8 @@ import * as bcrypt from 'bcrypt';
 import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
 import { setPermissions } from 'src/utils/roles.permissions';
 import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
+import { VerifyTokenResponse } from 'src/integrations/services/coreService/response/verifyToken.response';
+import { ERoles } from 'src/utils/ETypes';
 
 @Injectable()
 export class AuthService {
@@ -23,13 +25,19 @@ export class AuthService {
   ) {}
 
   async backofficeCore(payload: CoreTokenDTO): Promise<any> {
-    const decodedToken = this.jwtService.decode(payload.token);
-    // verify if token is valid
-    const token = this.coreServiceIntegration.verifyToken(payload.token);
-    if (!token)
-      throw new HttpException('Token inválido', HttpStatus.UNAUTHORIZED);
+    const token = await this.coreServiceIntegration.verifyToken(payload.token);
 
-    return token;
+    const exp = differenceInSeconds(fromUnixTime(token.exp), new Date());
+
+    return {
+      token: await this.jwtService.signAsync(
+        { sub: token, permissions: setPermissions(ERoles.ROLE_ADMIN) },
+        {
+          expiresIn: exp,
+          secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+        },
+      ),
+    };
   }
 
   private verifyToken(token: string): any {

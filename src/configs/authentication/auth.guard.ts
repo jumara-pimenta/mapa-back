@@ -31,7 +31,6 @@ export class RoleGuard implements CanActivate {
     await this.authService.authenticate(extractJwt);
 
     const user = await this.authService.decodeJWT(extractJwt);
-    console.log(user);
 
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(
       ROLES_KEY,
