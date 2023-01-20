@@ -25,8 +25,19 @@ export class EmployeesOnPinRepository
   }
 
   create(data: EmployeesOnPin): Promise<EmployeesOnPin> {
-    return this.repository.employeesOnPin.create({
-      data: {
+    return this.repository.employeesOnPin.upsert({
+      where: {
+        employeeId_pinId: {
+          employeeId: data.employee.id,
+          pinId: data.pin.id,
+        },
+      },
+      create: {
+        employeeId: data.employee.id,
+        pinId: data.pin.id,
+        type: data.type,
+      },
+      update: {
         employeeId: data.employee.id,
         pinId: data.pin.id,
         type: data.type,

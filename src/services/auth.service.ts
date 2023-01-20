@@ -10,6 +10,7 @@ import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffic
 import * as bcrypt from 'bcrypt';
 import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
 import { setPermissions } from 'src/utils/roles.permissions';
+import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,16 @@ export class AuthService {
     @Inject('IBackOfficeUserRepository')
     private readonly backOfficeUserRepository: IBackOfficeUserRepository,
   ) {}
+
+  async backofficeCore(payload: CoreTokenDTO): Promise<any> {
+    const decodedToken = this.jwtService.decode(payload.token);
+    // verify if token is valid
+    const token = this.coreServiceIntegration.verifyToken(payload.token);
+    if (!token)
+      throw new HttpException('Token inválido', HttpStatus.UNAUTHORIZED);
+
+    return token;
+  }
 
   private verifyToken(token: string): any {
     try {
