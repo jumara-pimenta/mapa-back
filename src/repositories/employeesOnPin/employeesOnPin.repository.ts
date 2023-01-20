@@ -59,4 +59,16 @@ export class EmployeesOnPinRepository
       },
     });
   }
+
+  async delete(employeeId: string, pinId: string) {
+    await this.repository.employeesOnPin.delete({
+      where: {
+        employeeId_pinId: {
+          employeeId: employeeId,
+          pinId: pinId,
+        },
+      },
+    });
+    return;
+  }
 }

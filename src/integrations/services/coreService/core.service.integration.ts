@@ -41,14 +41,14 @@ export class CoreServiceIntegration implements ICoreServiceIntegration {
         '/auth/verify',
         { token },
       );
-      console.log(data);
       return data;
     } catch (e) {
-      throw new HttpException(e, HttpStatus.UNAUTHORIZED);
+      new Logger('core service integration').error('verify token', e);
+      this.error('[core service integration] verify token');
     }
   }
 
   private error(e?: string) {
-    throw new HttpException(e, HttpStatus.UNAUTHORIZED);
+    throw new HttpException('Token inválido', HttpStatus.UNAUTHORIZED);
   }
 }

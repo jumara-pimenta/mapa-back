@@ -245,7 +245,6 @@ export class RouteRepository
     filters: FiltersRouteDTO,
   ): Promise<PageResponse<Route>> {
     const condition = generateQueryByFiltersForRoute(filters);
-    console.log(condition);
 
     const items = condition
       ? await this.repository.route.findMany({
