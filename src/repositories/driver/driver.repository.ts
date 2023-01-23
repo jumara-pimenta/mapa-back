@@ -90,6 +90,7 @@ export class DriverRepository
       data: {
         id: data.id,
         category: data.category,
+        password: data.password,
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
