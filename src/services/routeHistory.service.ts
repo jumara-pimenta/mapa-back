@@ -12,28 +12,22 @@ export class RouteHistoryService {
   constructor(
     @Inject('IRouteHistoryRepository')
     private readonly routeHistoryRepository: IRouteHistoryRepository,
-    private readonly pathService: PathService,
-    private readonly driverService: DriverService,
-    private readonly vehicleService: VehicleService,
   ) {}
 
-  async create(props: CreateRouteHistoryDTO): Promise<RouteHistory> {
-    const path = await this.pathService.listById(props.path);
-    const driver = await this.driverService.listById(props.driver);
-    const vehicle = await this.vehicleService.listById(props.vehicle);
-
+  async create(props: RouteHistory): Promise<RouteHistory> {
+ 
     const newRouteHistory = new RouteHistory(
       {
         typeRoute: props.typeRoute,
         nameRoute: props.nameRoute,
-        employeeIds: props.employeesIds,
+        employeeIds: props.employeeIds,
         itinerary: props.itinerary,
         startedAt: new Date(),
         finishedAt: new Date(),
       },
-      path,
-      driver,
-      vehicle,
+      props.path,
+      props.driver,
+      props.vehicle,
     );
 
     return await this.routeHistoryRepository.create(newRouteHistory);
@@ -61,10 +55,16 @@ export class RouteHistoryService {
     return routeHistorys.map((routeHistory) => {
       return {
         id: routeHistory.id,
+        typeRoute: routeHistory.typeRoute,
+        nameRoute: routeHistory.nameRoute,
+        path: routeHistory.path.id,
         employeeIds: routeHistory.employeeIds,
-        finishedAt: routeHistory.finishedAt,
+        driver: routeHistory.driver.id,
+        vehicle: routeHistory.vehicle.id,
+        itinerary: routeHistory.itinerary,
         startedAt: routeHistory.startedAt,
-        createdAt: routeHistory.createdAt,
+        finishedAt: routeHistory.finishedAt,
+        createdAt: new Date(),
       };
     });
   }

@@ -39,7 +39,7 @@ export class CreateRouteHistoryDTO {
     type: 'UUID',
     description: 'Id do colaborador',
   })
-  employeesIds: string;
+  employeeIds: string;
 
   @ApiProperty({
     default: '38e94b04-735b-41a9-a529-79023184007c',

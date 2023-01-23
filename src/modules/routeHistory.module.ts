@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { RouteHistoryService } from '../services/routeHistory.service';
 import { RouteHistoryController } from '../controllers/routeHistory.controller';
 import { RouteHistoryRepository } from '../repositories/routeHistory/routeHistory.repository';
@@ -7,7 +7,7 @@ import { DriverModule } from './driver.module';
 import { VehicleModule } from './vehicle.module';
 
 @Module({
-  imports: [PathModule, DriverModule, VehicleModule],
+  imports: [forwardRef(() => PathModule), DriverModule, VehicleModule],
   controllers: [RouteHistoryController],
   providers: [
     RouteHistoryService,

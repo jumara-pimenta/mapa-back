@@ -1,3 +1,6 @@
+import { RouteHistoryModule } from './routeHistory.module';
+import { VehicleModule } from './vehicle.module';
+import { DriverModule } from './driver.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { PathController } from '../controllers/path.controller';
 import { PathRepository } from '../repositories/path/path.repository';
@@ -9,6 +12,9 @@ import { RouteModule } from './route.module';
   imports: [
     forwardRef(() => RouteModule),
     forwardRef(() => EmployeesOnPathModule),
+    DriverModule,
+    VehicleModule,
+    RouteHistoryModule
   ],
   controllers: [PathController],
   providers: [

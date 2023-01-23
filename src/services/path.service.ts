@@ -1,3 +1,5 @@
+import { CreateRouteHistoryDTO } from './../dtos/routeHistory/createRouteHistory.dto';
+import { RouteHistoryService } from './routeHistory.service';
 import {
   forwardRef,
   HttpException,
@@ -9,7 +11,6 @@ import { Path } from '../entities/path.entity';
 import IPathRepository from '../repositories/path/path.repository.contract';
 import {
   EmployeesByPin,
-  IEmployeesOnPathDTO,
   MappedPathDTO,
   MappedPathPinsDTO,
 } from '../dtos/path/mappedPath.dto';
@@ -19,6 +20,10 @@ import { RouteService } from './route.service';
 import { EStatusPath, EStatusRoute, ETypePath } from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
 import { getDateInLocaleTime } from 'src/utils/date.service';
+import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { DriverService } from './driver.service';
+import { VehicleService } from './vehicle.service';
+import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class PathService {
@@ -29,10 +34,20 @@ export class PathService {
     private readonly routeService: RouteService,
     @Inject(forwardRef(() => EmployeesOnPathService))
     private readonly employeesOnPathService: EmployeesOnPathService,
+    @Inject(forwardRef(() => DriverService))
+    private readonly driverService: DriverService,
+    @Inject(forwardRef(() => VehicleService))
+    private readonly vehicleService: VehicleService,
+    @Inject(forwardRef(() => RouteHistoryService))
+    private readonly routeHistoryService: RouteHistoryService,
   ) {}
 
   async finishPath(id: string): Promise<any> {
-    const path = await this.listById(id);
+    const path = await this.getPathById(id);
+    const route = await this.listEmployeesByPathAndPin(id);
+    const vehicle = await this.vehicleService.listById(route.vehicle);
+    const driver = await this.driverService.listById(route.driver);
+
     if (path.finishedAt !== null)
       throw new HttpException(
         'Não é possível alterar uma rota que já foi finalizada!',
@@ -44,21 +59,30 @@ export class PathService {
         'Não é possível finalizar uma rota que não foi iniciada!',
         HttpStatus.CONFLICT,
       );
-
-    const route = await this.routeService.routeIdByPathId(id);
-
+    const employeeArray = [] as string[];
+    const itinerariesArray = [];
     if (path.type === ETypePath.ONE_WAY) {
-      for await (const employee of path.employeesOnPath) {
-        if (employee.confirmation === true)
-          await this.employeesOnPathService.update(employee.id, {
-            disembarkAt: getDateInLocaleTime(new Date()),
-          });
+      for await (const employeesPins of route.employeesOnPins) {
+        itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
+        for await (const employee of employeesPins.employees) {
+          if (employee.confirmation === true && employee.present === true) {
+            employeeArray.push(employee.employeeId);
+            await this.employeesOnPathService.update(employee.id, {
+              disembarkAt: getDateInLocaleTime(new Date()),
+            });
+          }
+        }
       }
     }
 
+    if (employeeArray.length === 0)
+      throw new HttpException(
+        'Nenhum colaborador confirmado foi pego no seu ponto de embarque.',
+        HttpStatus.BAD_REQUEST,
+      );
     const finishAt = {
-      routeId: route,
-      pathId: id,
+      routeId: path.route.id,
+      pathId: path.id,
       route: {
         status: EStatusRoute.PENDING,
       },
@@ -67,6 +91,24 @@ export class PathService {
         status: EStatusPath.FINISHED,
       },
     };
+    path.status = EStatusPath.FINISHED;
+    const props = new RouteHistory(
+      {
+        typeRoute: path.type,
+        nameRoute: route.routeDescription,
+        employeeIds: employeeArray.join(),
+        itinerary: itinerariesArray.join(),
+        startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+        finishedAt: new Date(),
+      },
+      path,
+      driver,
+      vehicle,
+    );
+
+    if (path.status === EStatusPath.FINISHED) {
+      await this.routeHistoryService.create(props);
+    }
 
     return await this.routeService.updateWebsocket(finishAt);
   }
@@ -210,6 +252,18 @@ export class PathService {
     return this.mapperOne(path);
   }
 
+  async getPathById(id: string): Promise<Path> {
+    const path = await this.pathRepository.findById(id);
+
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado trajeto com o id: ${id}!`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return path;
+  }
+
   async listEmployeesByPathAndPin(pathId: string): Promise<MappedPathPinsDTO> {
     const path = await this.listById(pathId);
 
@@ -309,7 +363,6 @@ export class PathService {
       driverId,
       status,
     );
-    console.log(path);
     if (!path)
       throw new HttpException(
         `Não existe trajeto com status ${status} para este motorista!`,
@@ -388,6 +441,8 @@ export class PathService {
       startedAt: path.startedAt,
       startsAt: path.startsAt,
       status: path.status,
+      vehicle: path.route.vehicle!.id,
+      driver: path.route.driver!.id,
       type: path.type,
       createdAt: path.createdAt,
       employeesOnPath: employeesOnPath.map((item) => {
