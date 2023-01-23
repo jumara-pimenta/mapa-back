@@ -22,6 +22,7 @@ import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
@@ -73,8 +74,14 @@ export class EmployeeService {
       });
     }
 
+    const dataPassword = bcrypt.hashSync(props.registration, 10);
+
     const employee = await this.employeeRepository.create(
-      new Employee({ ...props, address: JSON.stringify(props.address) }),
+      new Employee({
+        ...props,
+        password: dataPassword,
+        address: JSON.stringify(props.address),
+      }),
     );
 
     await this.employeeOnPinService.associateEmployee({
@@ -85,8 +92,23 @@ export class EmployeeService {
           : pin.id,
       type: ETypePin.CONVENTIONAL,
     });
+    const { password, ...data } = employee;
 
-    return { ...employee, address: JSON.parse(employee.address) };
+    return { ...data, address: JSON.parse(data.address) };
+  }
+
+  async findByRegistration(registration: string): Promise<Employee> {
+    const employee = await this.employeeRepository.findByRegistration(
+      registration,
+    );
+
+    if (!employee)
+      throw new HttpException(
+        'Colaborador(a) não foi encontrado(a)!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return employee;
   }
 
   async delete(id: string): Promise<Employee> {
@@ -288,7 +310,10 @@ export class EmployeeService {
           await this.employeeRepository.findByRegistration(item.registration);
 
         if (!existsRegistration) {
-          await this.employeeRepository.create(new Employee({ ...item }));
+          const password = bcrypt.hashSync(item.registration, 10);
+          await this.employeeRepository.create(
+            new Employee({ ...item, password }),
+          );
           totalCreated++;
         } else alreadyExisted++;
       }
