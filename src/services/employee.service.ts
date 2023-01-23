@@ -4,6 +4,8 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  NotFoundException,
+  StreamableFile,
 } from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
@@ -23,6 +25,8 @@ import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
 import * as bcrypt from 'bcrypt';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class EmployeeService {
@@ -327,6 +331,98 @@ export class EmployeeService {
         `Quantidade total de colaboradores na planilha: ${totalToCreate}`,
       ],
     };
+  }
+
+  async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
+    const headers = [
+      'MATRICULA',
+      'NOME',
+      'BAIRRO',
+      'ENDEREÇO',
+      'NUMERO',
+      'COMPLEMENTO',
+      'CEP',
+      'C/C',
+      'SETOR',
+      'TURNO',
+      'ADMISSAO',
+    ];
+    const today = new Date().toLocaleDateString('pt-BR');
+
+    const filePath = './employee.xlsx';
+    const workSheetName = 'Colaboradores';
+
+    const employees = await this.listAll(page, filters);
+
+    const exportedEmployeeToXLSX = async (
+      employees,
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = employees.map((employee) => {
+        return [
+          employee.registration,
+          employee.name,
+          employee.address.neighborhood,
+          employee.address.street,
+          employee.address.number,
+          employee.address.complement,
+          employee.address.cep,
+          employee.costCenter,
+          employee.role,
+          employee.shift,
+          employee.admission,
+        ];
+      });
+
+      const employeeInformationHeader = [
+        [`COLABORADORES EXPORTADOS: ${today}`],
+        [`TOTAL DE COLABORADORES EXPORTADOS: ${data.length}`],
+      ];
+
+      const employeeInformationFooter = [
+        ['**********************************************'],
+        ['***********************************************'],
+        ['************************'],
+        ['*************************************'],
+        ['**********'],
+        ['************************************************************'],
+        ['**********'],
+        ['*******'],
+        ['***************************************************************'],
+        ['*********************'],
+        ['************'],
+      ];
+
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [
+        ,
+        employeeInformationHeader,
+        ,
+        employeeInformationFooter,
+        ,
+        headers,
+        ...data,
+        ,
+        employeeInformationFooter,
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedEmployeeToXLSX(
+      employees.items,
+      headers,
+      workSheetName,
+      filePath,
+    );
   }
 
   private mapperMany(employees: Employee[]): MappedEmployeeDTO[] {

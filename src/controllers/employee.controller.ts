@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Response,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -121,5 +122,23 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.listById(id);
+  }
+
+  @Get('download/file')
+  @ApiCreatedResponse({
+    description: 'Export a Employee File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFile(page, filters);
   }
 }
