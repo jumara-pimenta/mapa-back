@@ -40,10 +40,7 @@ export class EmployeesOnPinService {
         }
 
         if (_pin.type === props.type) {
-          await this.employeesOnPinRepository.delete(
-            props.employeeId,
-            props.pinId,
-          );
+          await this.employeesOnPinRepository.delete(props.employeeId, _pin.id);
           return await this.employeesOnPinRepository.create(
             new EmployeesOnPin({ type: props.type }, employee, pin),
           );
