@@ -25,12 +25,14 @@ import {
   ListRoutes,
   UpdateRoute,
 } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
   @Post()
+  @Roles('create-route')
   @ApiCreatedResponse({
     description: 'Creates a new Route.',
     schema: {
@@ -44,6 +46,7 @@ export class RouteController {
   }
 
   @Delete('/:id')
+  @Roles('delete-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Soft delete a route.',
@@ -58,6 +61,7 @@ export class RouteController {
   }
 
   @Put('/:id')
+  @Roles('edit-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Update a route.',
@@ -75,6 +79,7 @@ export class RouteController {
   }
 
   @Get()
+  @Roles('list-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List all routes.',
@@ -92,6 +97,7 @@ export class RouteController {
   }
 
   @Get('/:id')
+  @Roles('list-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List a route by id.',
@@ -106,6 +112,7 @@ export class RouteController {
   }
 
   @Get('/paths/driver/:id')
+  @Roles('list-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List a route by driver.',

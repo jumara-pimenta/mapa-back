@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
 import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
 import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
@@ -31,6 +32,7 @@ export class EmployeesOnPathController {
   constructor(private readonly employeeOnPathService: EmployeesOnPathService) {}
 
   @Get('/:id')
+  @Roles('list-employeeOnPath')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Employee On Path by id.',
@@ -45,6 +47,7 @@ export class EmployeesOnPathController {
   }
 
   @Get()
+  @Roles('list-employeeOnPath')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Employee On Path by Route.',
@@ -61,6 +64,7 @@ export class EmployeesOnPathController {
   }
 
   @Put()
+  @Roles('edit-employeeOnPath')
   @ApiCreatedResponse({
     description: 'Update Confirmation a Employee On Path.',
     schema: {
@@ -76,6 +80,7 @@ export class EmployeesOnPathController {
   }
 
   @Put(':id')
+  @Roles('edit-employeeOnPath')
   @ApiCreatedResponse({
     description: 'Update a Employee On Path by id.',
     schema: {
@@ -92,6 +97,7 @@ export class EmployeesOnPathController {
   }
 
   @Put('/confirm/:id')
+  @Roles('edit-employeeOnPath')
   @HttpCode(HttpStatus.OK)
   @ApiCreatedResponse({
     description: 'Update Confirmation a Employee On Path by id.',

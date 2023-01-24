@@ -24,6 +24,7 @@ import {
   GetPin,
   UpdatePin,
 } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/pins')
 @ApiTags('Pins')
@@ -31,6 +32,7 @@ export class PinController {
   constructor(private readonly pinService: PinService) {}
 
   @Post()
+  @Roles('create-pin')
   @ApiCreatedResponse({
     description: 'Creates a new Pin.',
     schema: {
@@ -44,6 +46,7 @@ export class PinController {
   }
 
   @Delete('/:id')
+  @Roles('delete-pin')
   @ApiCreatedResponse({
     description: 'Delete a Pin.',
     schema: {
@@ -57,6 +60,7 @@ export class PinController {
   }
 
   @Put('/:id')
+  @Roles('edit-pin')
   @ApiCreatedResponse({
     description: 'Update a Pin.',
     schema: {
@@ -73,6 +77,7 @@ export class PinController {
   }
 
   @Get('/:id')
+  @Roles('list-pin')
   @ApiCreatedResponse({
     description: 'Get a Pin by id.',
     schema: {
@@ -86,6 +91,7 @@ export class PinController {
   }
 
   @Get()
+  @Roles('list-pin')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List all Pins.',
