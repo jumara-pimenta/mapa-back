@@ -26,6 +26,7 @@ import {
   GetPathByRoutes,
   UpdatePathById,
 } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/routes')
 @ApiTags('Paths')
@@ -33,6 +34,7 @@ export class PathController {
   constructor(private readonly pathService: PathService) {}
 
   @Get('/paths/:id')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Paths by id.',
@@ -47,6 +49,7 @@ export class PathController {
   }
 
   @Get('/:routeId/paths')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Paths by Route.',
@@ -63,6 +66,7 @@ export class PathController {
   }
 
   @Get('/paths/drivers/:driverId')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Paths by Driver.',
@@ -79,6 +83,7 @@ export class PathController {
   }
 
   @Get('/paths/employee/:employeeId')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Paths by Employee.',
@@ -95,6 +100,7 @@ export class PathController {
   }
 
   @Get('/paths/drivers/:driverId/status/:status')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Paths by Driver and Status.',
@@ -112,6 +118,7 @@ export class PathController {
   }
 
   @Put('/paths/:id')
+  @Roles('edit-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Update a Paths by Id.',
@@ -129,6 +136,7 @@ export class PathController {
   }
 
   @Get('/paths/employees/:employeeId/status/:status')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'List a Paths by Employee and Status.',
@@ -146,6 +154,7 @@ export class PathController {
   }
 
   @Get('/paths/pins/:id')
+  @Roles('list-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'List a Paths by Pins.',
@@ -160,6 +169,7 @@ export class PathController {
   }
 
   @Post('/paths/start/:id')
+  @Roles('edit-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Start Path',
@@ -174,6 +184,7 @@ export class PathController {
   }
 
   @Post('/paths/finish/:id')
+  @Roles('edit-path')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Finish Path',

@@ -1,5 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 import { CreateEmployeesOnPin } from 'src/utils/examples.swagger';
 import { AssociateEmployeeOnPinDTO } from '../dtos/employeesOnPin/associateEmployeeOnPin.dto';
 import { EmployeesOnPin } from '../entities/employeesOnPin.entity';
@@ -11,6 +12,7 @@ export class EmployeesOnPinController {
   constructor(private readonly employeeOnPinService: EmployeesOnPinService) {}
 
   @Post()
+  @Roles('edit-employee')
   @ApiCreatedResponse({
     description: 'Associate a Driver with a pin.',
     schema: {

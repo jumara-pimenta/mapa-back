@@ -799,3 +799,35 @@ export const CreateFinishPath = {
     },
   ],
 };
+
+export const DriverLogin = {
+  id: '8d10e841-6bb7-4003-989e-b05011155a60',
+  name: 'Angel Lindgren',
+  cpf: '03325540740',
+  cnh: '567115091',
+  validation: '2023-01-23T16:52:01.325Z',
+  category: 'B',
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI4ZDEwZTg0MS02YmI3LTQwMDMtOTg5ZS1iMDUwMTExNTVhNjAiLCJuYW1lIjoiQW5nZWwgTGluZGdyZW4iLCJyb2xlIjoiRFJJVkVSIn0sInBlcm1pc3Npb25zIjpbImxpc3QtZHJpdmVyIiwibGlzdC1wYXRoIiwiZWRpdC1wYXRoIiwiZWRpdC1kcml2ZXIiLCJsaXN0LXZlaGljbGUiLCJlZGl0LXZlaGljbGUiLCJlZGl0LXJvdXRlIiwibGlzdC1yb3V0ZSJdLCJpYXQiOjE2NzQ1MDcyMjQsImV4cCI6MTY3NTExMjAyNH0.oS-cwbPI5T4nVZm_j9a1x114KYz2cQvTj8JOpZhQc9Y',
+};
+
+export const EmployeeLogin = {
+  id: '71b3e5f3-76e1-4dad-9638-7c9b4ad9dbcb',
+  registration: '96-750437-415126-6',
+  name: 'Miss Rosa Stokes PhD',
+  admission: '2023-01-23T18:34:26.810Z',
+  role: 'auxiliar de produção',
+  shift: '1º Turno',
+  costCenter: 'Almoxarife',
+  address: {
+    cep: '69045700',
+    city: 'Manaus',
+    complement: '',
+    neighborhood: 'Planalto',
+    number: '140',
+    state: 'AM',
+    street: 'RUA LUSAKA',
+  },
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI3MWIzZTVmMy03NmUxLTRkYWQtOTYzOC03YzliNGFkOWRiY2IiLCJuYW1lIjoiTWlzcyBSb3NhIFN0b2tlcyBQaEQiLCJyb2xlIjoiRU1QTE9ZRUUifSwicGVybWlzc2lvbnMiOlsibGlzdC1kcml2ZXIiLCJsaXN0LXBhdGgiLCJsaXN0LXZlaGljbGUiLCJsaXN0LXJvdXRlIl0sImlhdCI6MTY3NDUwNjQ4NiwiZXhwIjoxNjc1MTExMjg2fQ.PVsIM7DW3Y-NqAeu8Icmiyj6QHzfS3BhAyJyuDU6-jc',
+};

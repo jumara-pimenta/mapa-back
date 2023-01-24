@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
@@ -7,6 +7,7 @@ import {
 import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
 import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
 import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
+import { DriverLogin, EmployeeLogin } from 'src/utils/examples.swagger';
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';
@@ -41,6 +42,13 @@ export class AuthController {
 
   @Post('/employee/signin')
   @Public()
+  @ApiCreatedResponse({
+    description: 'Login for Employee.',
+    schema: {
+      type: 'object',
+      example: EmployeeLogin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async employeeAuth(@Body() payload: SignInEmployeeDTO): Promise<any> {
     return await this.authService.employeeLogin(payload);
@@ -48,6 +56,13 @@ export class AuthController {
 
   @Post('/driver/signin')
   @Public()
+  @ApiCreatedResponse({
+    description: 'Login for drivers.',
+    schema: {
+      type: 'object',
+      example: DriverLogin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async driverAuth(@Body() payload: signInDriverDTO): Promise<any> {
     return await this.authService.driverLogin(payload);

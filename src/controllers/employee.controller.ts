@@ -47,6 +47,8 @@ export class EmployeeController {
     return this.employeeService.parseExcelFile(file);
   }
 
+  @Post()
+  @Roles('create-employee')
   @ApiCreatedResponse({
     description: 'Creates a new Employee.',
     schema: {
@@ -54,14 +56,13 @@ export class EmployeeController {
       example: CreateEmployee,
     },
   })
-  @Post()
-  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
   }
 
   @Delete('/:id')
+  @Roles('delete-employee')
   @ApiCreatedResponse({
     description: 'Delete a Employees.',
     schema: {
@@ -75,6 +76,7 @@ export class EmployeeController {
   }
 
   @Put('/:id')
+  @Roles('edit-employee')
   @ApiCreatedResponse({
     description: 'Update a Employee.',
     schema: {
@@ -91,6 +93,7 @@ export class EmployeeController {
   }
 
   @Get()
+  @Roles('list-employee')
   @ApiCreatedResponse({
     description: 'Get all Employees.',
     schema: {
@@ -98,7 +101,6 @@ export class EmployeeController {
       example: GetAllEmployee,
     },
   })
-  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -108,6 +110,7 @@ export class EmployeeController {
   }
 
   @Get('/:id')
+  @Roles('list-employee')
   @ApiCreatedResponse({
     description: 'Get a Employee by id.',
     schema: {
