@@ -170,6 +170,8 @@ export class RouteRepository
     return this.repository.route.update({
       data: {
         id: data.id,
+        driverId: data.driver.id,
+        vehicleId: data.vehicle.id,
         description: data.description,
         distance: data.distance,
         status: data.status,
