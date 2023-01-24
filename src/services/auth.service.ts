@@ -13,6 +13,10 @@ import { setPermissions } from 'src/utils/roles.permissions';
 import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
 import { VerifyTokenResponse } from 'src/integrations/services/coreService/response/verifyToken.response';
 import { ERoles } from 'src/utils/ETypes';
+import { EmployeeService } from './employee.service';
+import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
+import { DriverService } from './driver.service';
+import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +26,8 @@ export class AuthService {
     private readonly coreServiceIntegration: ICoreServiceIntegration,
     @Inject('IBackOfficeUserRepository')
     private readonly backOfficeUserRepository: IBackOfficeUserRepository,
+    private readonly employeeService: EmployeeService,
+    private readonly driverService: DriverService,
   ) {}
 
   async backofficeCore(payload: CoreTokenDTO): Promise<any> {
@@ -150,5 +156,88 @@ export class AuthService {
     const decodedToken = await this.jwtService.decode(tokenExtracted);
 
     return decodedToken;
+  }
+
+  async employeeLogin(data: SignInEmployeeDTO): Promise<any> {
+    const employee = await this.employeeService.findByRegistration(
+      data.registration,
+    );
+
+    if (!employee)
+      throw new HttpException(
+        'Usuário não encontrado',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const isValidPassword = bcrypt.compareSync(
+      data.password,
+      employee.password,
+    );
+
+    if (!isValidPassword)
+      throw new HttpException(
+        'E-mail ou senha inválido',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const token = this.jwtService.sign(
+      {
+        sub: {
+          id: employee.id,
+          name: employee.name,
+          role: ERoles.ROLE_EMPLOYEE,
+        },
+        permissions: setPermissions(ERoles.ROLE_EMPLOYEE),
+      },
+      {
+        expiresIn: '7d',
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      },
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { updatedAt, createdAt, password, ...result } = employee;
+
+    result.address = JSON.parse(result.address);
+
+    return { ...result, token };
+  }
+
+  async driverLogin(data: signInDriverDTO): Promise<any> {
+    const driver = await this.driverService.getByCpf(data.cpf);
+
+    if (!driver)
+      throw new HttpException(
+        'Usuário não encontrado',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const isValidPassword = bcrypt.compareSync(data.password, driver.password);
+
+    if (!isValidPassword)
+      throw new HttpException(
+        'E-mail ou senha inválido',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const token = this.jwtService.sign(
+      {
+        sub: {
+          id: driver.id,
+          name: driver.name,
+          role: ERoles.ROLE_DRIVER,
+        },
+        permissions: setPermissions(ERoles.ROLE_DRIVER),
+      },
+      {
+        expiresIn: '7d',
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      },
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { updatedAt, createdAt, password, ...result } = driver;
+
+    return { ...result, token };
   }
 }
