@@ -12,7 +12,8 @@ export class BackOfficeUserRepository
   implements IBackOfficeUserRepository
 {
   constructor(private readonly repository: PrismaService) {
-    super();}
+    super();
+  }
 
   async create(data: BackOfficeUser): Promise<BackOfficeUser> {
     return await this.repository.backOfficeUser.create({
@@ -60,6 +61,4 @@ export class BackOfficeUserRepository
       },
     });
   }
-
-
 }
