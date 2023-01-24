@@ -124,9 +124,16 @@ export function generateQueryByFiltersForDriver(
     cnh: () => ({
       cnh: { contains: filters.cnh },
     }),
-    validation: () => ({
-      validation: { contains: filters.validation },
-    }),
+    validation: () => {
+      const { end, start } = getDateStartToEndOfDay(filters.validation);
+
+      return {
+        validation: {
+          gte: start,
+          lte: end,
+        },
+      };
+    },
     category: () => ({
       category: filters.category,
     }),
