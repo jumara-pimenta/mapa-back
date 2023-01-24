@@ -94,7 +94,7 @@ export class DriverRepository
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
-        validation: getDateInLocaleTime(new Date(data.validation)),
+        validation: new Date(data.validation),
       },
     });
   }
