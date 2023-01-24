@@ -216,9 +216,20 @@ export class RouteService {
       });
     }
 
-    return await this.routeRepository.update(
-      Object.assign(route, { ...route, ...data }),
-    );
+    let driver = route.driver;
+    let vehicle = route.vehicle;
+
+    if (data.driverId) {
+      driver = await this.driverService.listById(data.driverId);
+    }
+
+    if (data.vehicleId) {
+      vehicle = await this.vehicleService.listById(data.vehicleId);
+    }
+
+    const UpdateRoute = new Route(Object.assign(route, data), driver, vehicle);
+
+    return await this.routeRepository.update(UpdateRoute);
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
