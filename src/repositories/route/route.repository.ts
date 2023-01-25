@@ -562,19 +562,6 @@ export class RouteRepository
     return data.id;
   }
 
-  async getHistoric(): Promise<any> {
-    const routes = await this.repository.route.findMany({
-      select: {
-        path: {
-          select: {
-            type: true,
-            status: true,
-          },
-        },
-      },
-    });
-    return routes;
-}
   async findRouteDataByPathId(pathId: string): Promise<any> {
     const data = await this.repository.route.findFirst({
       where: {
@@ -592,6 +579,5 @@ export class RouteRepository
     });
 
     return data.id;
-
   }
 }

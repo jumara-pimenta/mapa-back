@@ -129,15 +129,4 @@ export class RouteController {
   ): Promise<PageResponse<MappedRouteDTO>> {
     return await this.routeService.listByDriverId(id, page, filters);
   }
-
-  @Get('/historic/quantity')
-  @Roles('list-historic')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Get the historic.',
-  })
-  @HttpCode(HttpStatus.OK)
-  async getHistoric(): Promise<any> {
-    return await this.routeService.getHistoric();
-  }
 }

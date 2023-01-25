@@ -16,6 +16,7 @@ model Driver {
   cnh          String         @unique @db.VarChar(11)
   validation   DateTime       @db.DateTimeOffset
   category     String
+  password     String
   route        Route[]
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
   updatedAt    DateTime?      @db.DateTimeOffset

@@ -22,5 +22,4 @@ export default interface IRouteRepository {
     filters?: FiltersRouteDTO,
   ): Promise<PageResponse<Route>>;
   findRouteIdByPathId(id: string): Promise<string>;
-  getHistoric(): Promise<Route[]>;
 }
