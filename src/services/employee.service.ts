@@ -23,13 +23,7 @@ import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-
 import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
-<<<<<<< HEAD
-import * as bcrypt from 'bcrypt';
-import * as path from 'path';
-import * as fs from 'fs';
-=======
 import e from 'express';
 import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
 
@@ -37,7 +31,6 @@ interface abc {
   line: number;
   employee: CreateEmployeeFileDTO;
 }
->>>>>>> cc0f1d3 (refactor: validate error import file)
 
 @Injectable()
 export class EmployeeService {
@@ -326,7 +319,7 @@ export class EmployeeService {
     let alreadyExisted = 0;
     let dataError = 0;
     const totalToCreate = employees.length;
-
+    let messagesErrors = [];
     for await (const item of employees) {
       const employee = plainToClass(CreateEmployeeFileDTO, item.employee);
 
@@ -338,6 +331,10 @@ export class EmployeeService {
             console.log('ERRO DO COLABORADOR', errors, 'linha:', lineError);
             dataError++;
             error = true;
+            messagesErrors.push({
+              message: errors[0].constraints,
+              lineError,
+            });
           }
         })
         .catch((error) => {
@@ -378,6 +375,7 @@ export class EmployeeService {
         `Colaboradores já cadastrados: ${alreadyExisted}`,
         `Colaboradores com dados inválidos: ${dataError}`,
         `Quantidade de colaboradores na planilha: ${totalToCreate}`,
+        messagesErrors,
       ],
     };
   }
