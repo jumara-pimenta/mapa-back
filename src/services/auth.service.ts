@@ -172,7 +172,7 @@ export class AuthService {
 
   async employeeLogin(data: SignInEmployeeDTO): Promise<any> {
     const employee = await this.employeeService.findByRegistration(
-      data.registration,
+      data.login,
     );
 
     if (!employee)
@@ -216,7 +216,7 @@ export class AuthService {
   }
 
   async driverLogin(data: signInDriverDTO): Promise<any> {
-    const driver = await this.driverService.getByCpf(data.cpf);
+    const driver = await this.driverService.getByCpf(data.login);
 
     if (!driver)
       throw new HttpException(

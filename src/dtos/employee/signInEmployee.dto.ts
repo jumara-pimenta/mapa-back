@@ -15,11 +15,11 @@ faker.locale = 'pt_BR';
 export class SignInEmployeeDTO {
   @ApiProperty({
     default: `${faker.random.numeric(6)}`,
-    description: '[registration]  para fazer o login',
+    description: '[login] O login:matrícula para fazer o login',
   })
-  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
-  registration: string;
+  @IsString({ message: '[login] O login:matrícula deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[login] O login:matrícula deve ser preenchida.' })
+  login: string;
 
   @ApiProperty({
     default: `${faker.internet.password()}`,
