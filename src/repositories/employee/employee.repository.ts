@@ -7,6 +7,7 @@ import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
+import { ETypeCreationPin } from 'src/utils/ETypes';
 
 @Injectable()
 export class EmployeeRepository
@@ -194,6 +195,9 @@ export class EmployeeRepository
             pin: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

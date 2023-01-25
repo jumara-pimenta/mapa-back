@@ -69,4 +69,10 @@ export class CreateEmployeeFileDTO {
   @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
   @ValidateNested({ each: true })
   address: string;
+
+  @ApiProperty()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEmployeePinDTO)
+  @IsNotEmpty({ message: '[pin] O ponto de embarque deve ser preenchido.' })
+  pin: CreateEmployeePinDTO;
 }

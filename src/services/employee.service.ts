@@ -280,6 +280,16 @@ export class EmployeeService {
         street: row['ENDEREÇO'].toString(),
         city: 'MANAUS',
         state: 'AM',
+        complement: 'Complemento default',
+      };
+
+      const pins = {
+        typeCreation: ETypeCreationPin.IS_NEW,
+        details: 'DENSO MANAUS',
+        title: 'DENSO',
+        local: 'DENSO',
+        lat: '-3.107451943287261',
+        lng: '-59.99183873143272',
       };
 
       const employee: CreateEmployeeFileDTO = {
@@ -290,8 +300,17 @@ export class EmployeeService {
         costCenter: row['C/C'].toString(),
         address: JSON.stringify(address),
         admission: new Date(),
+        pin: {
+          typeCreation: ETypeCreationPin.IS_NEW,
+          details: 'DENSO MANAUS',
+          title: 'DENSO',
+          local: 'DENSO',
+          lat: '-3.107451943287261',
+          lng: '-59.99183873143272',
+        },
       };
       employees.push(employee);
+      console.log(employees);
     }
     let totalCreated = 0;
     let alreadyExisted = 0;
