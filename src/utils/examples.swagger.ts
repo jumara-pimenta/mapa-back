@@ -824,3 +824,21 @@ export const EmployeeLogin = {
   token:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI3MWIzZTVmMy03NmUxLTRkYWQtOTYzOC03YzliNGFkOWRiY2IiLCJuYW1lIjoiTWlzcyBSb3NhIFN0b2tlcyBQaEQiLCJyb2xlIjoiRU1QTE9ZRUUifSwicGVybWlzc2lvbnMiOlsibGlzdC1kcml2ZXIiLCJsaXN0LXBhdGgiLCJsaXN0LXZlaGljbGUiLCJsaXN0LXJvdXRlIl0sImlhdCI6MTY3NDUwNjQ4NiwiZXhwIjoxNjc1MTExMjg2fQ.PVsIM7DW3Y-NqAeu8Icmiyj6QHzfS3BhAyJyuDU6-jc',
 };
+
+export const BackOfficeUserLogin = {
+  id: 'b39d2fc8-63b0-4293-a95b-d8b14d8db310',
+  name: 'Philip Pollich DVM',
+  email: 'mark@ymail.com',
+  role: 'ADMIN',
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiJiMzlkMmZjOC02M2IwLTQyOTMtYTk1Yi1kOGIxNGQ4ZGIzMTAiLCJyb2xlIjoiQURNSU4ifSwicGVybWlzc2lvbnMiOlsiY3JlYXRlLWVtcGxveWVlIiwiZWRpdC1lbXBsb3llZSIsImRlbGV0ZS1lbXBsb3llZSIsImxpc3QtZW1wbG95ZWUiLCJsaXN0LWRyaXZlciIsImNyZWF0ZS1kcml2ZXIiLCJlZGl0LWRyaXZlciIsImRlbGV0ZS1kcml2ZXIiLCJsaXN0LXBhdGgiLCJjcmVhdGUtcGF0aCIsImVkaXQtcGF0aCIsImRlbGV0ZS1wYXRoIiwibGlzdC12ZWhpY2xlIiwiY3JlYXRlLXZlaGljbGUiLCJlZGl0LXZlaGljbGUiLCJkZWxldGUtdmVoaWNsZSIsImNyZWF0ZS1yb3V0ZSIsImVkaXQtcm91dGUiLCJkZWxldGUtcm91dGUiLCJsaXN0LXJvdXRlIl0sImlhdCI6MTY3Mzg4MDgyOSwiZXhwIjoxNjc0NDg1NjI5fQ.SWQip1XgRWBsDzLKE7ZvfWj7NrfiaIQ75OuVx_mVu9k',
+};
+
+export const BackOfficeUserCreate = {
+  id: '28b41c76-9463-4e82-bad7-dd98e0a4ffff',
+  name: 'Roy Ruecker',
+  email: '2@ymail.com',
+  role: 'ADMIN',
+  createdAt: '2023-01-25T10:02:23.363Z',
+  updatedAt: null,
+};

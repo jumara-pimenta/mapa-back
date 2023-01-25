@@ -6,6 +6,7 @@ export const setPermissions = (roles: ERoles) => {
     throw new HttpException('Não autorizado', HttpStatus.UNAUTHORIZED);
   if (roles === ERoles.ROLE_ADMIN)
     return [
+      'ADMIN',
       'create-employee',
       'edit-employee',
       'delete-employee',
