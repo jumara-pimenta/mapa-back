@@ -757,6 +757,21 @@ export class RouteService {
     }
     return path;
   }
+
+  async getHistoric(): Promise<any> {
+    const historic = await this.routeRepository.getHistoric();
+    let Pending = 0;
+    let Started = 0;
+    let Finished = 0;
+    historic.map((routes) => {
+      routes.path.map((path) => {
+        if (path.status === 'PENDENTE') Pending++;
+        if (path.status === 'INICIADA') Started++;
+        if (path.status === 'FINALIZADA') Finished++;
+      });
+    });
+    return { Pending, Started, Finished };
+  }
 }
 
 const orderPins = (arr: Employee[]): string[] => {
