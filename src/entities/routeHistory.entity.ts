@@ -10,6 +10,8 @@ export class RouteHistory {
   nameRoute: string;
   path?: Path;
   employeeIds: string;
+  totalEmployees: number;
+  totalConfirmed: number;
   driver?: Driver;
   vehicle?: Vehicle;
   itinerary: string;

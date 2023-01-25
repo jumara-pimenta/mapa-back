@@ -2,10 +2,6 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
 import { MappedRouteHistoryDTO } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { CreateRouteHistoryDTO } from '../dtos/routeHistory/createRouteHistory.dto';
-import { PathService } from './path.service';
-import { DriverService } from './driver.service';
-import { VehicleService } from './vehicle.service';
 
 @Injectable()
 export class RouteHistoryService {
@@ -15,12 +11,13 @@ export class RouteHistoryService {
   ) {}
 
   async create(props: RouteHistory): Promise<RouteHistory> {
- 
     const newRouteHistory = new RouteHistory(
       {
         typeRoute: props.typeRoute,
         nameRoute: props.nameRoute,
         employeeIds: props.employeeIds,
+        totalEmployees: props.totalEmployees,
+        totalConfirmed: props.totalConfirmed,
         itinerary: props.itinerary,
         startedAt: new Date(),
         finishedAt: new Date(),

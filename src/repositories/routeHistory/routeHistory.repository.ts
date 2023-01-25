@@ -32,6 +32,8 @@ export class RouteHistoryRepository
         typeRoute: data.typeRoute,
         nameRoute: data.nameRoute,
         employeeIds: data.employeeIds,
+        totalEmployees: data.totalEmployees,
+        totalConfirmed: data.totalConfirmed,
         pathId: data.path.id,
         vehicleId: data.vehicle.id,
         driverId: data.driver.id,

@@ -61,12 +61,16 @@ export class PathService {
       );
     const employeeArray = [] as string[];
     const itinerariesArray = [];
-    if (path.type === ETypePath.ONE_WAY) {
-      for await (const employeesPins of route.employeesOnPins) {
-        itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
-        for await (const employee of employeesPins.employees) {
-          if (employee.confirmation === true && employee.present === true) {
-            employeeArray.push(employee.employeeId);
+    const totalEmployees = route.employeesOnPins.length;
+    let totalConfirmed = 0;
+
+    for await (const employeesPins of route.employeesOnPins) {
+      itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
+      for await (const employee of employeesPins.employees) {
+        if (employee.confirmation === true) totalConfirmed++;
+        if (employee.confirmation === true && employee.present === true) {
+          employeeArray.push(employee.employeeId);
+          if (path.type === ETypePath.ONE_WAY) {
             await this.employeesOnPathService.update(employee.id, {
               disembarkAt: getDateInLocaleTime(new Date()),
             });
@@ -98,6 +102,8 @@ export class PathService {
         nameRoute: route.routeDescription,
         employeeIds: employeeArray.join(),
         itinerary: itinerariesArray.join(),
+        totalEmployees: totalEmployees,
+        totalConfirmed: totalConfirmed,
         startedAt: getDateInLocaleTime(new Date(path.startedAt)),
         finishedAt: new Date(),
       },

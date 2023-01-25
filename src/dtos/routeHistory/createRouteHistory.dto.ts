@@ -42,6 +42,20 @@ export class CreateRouteHistoryDTO {
   employeeIds: string;
 
   @ApiProperty({
+    default: 10,
+    type: 'UUID',
+    description: 'Total de colaboradores na rota',
+  })
+  totalEmployees: number;
+
+  @ApiProperty({
+    default: 10,
+    type: 'UUID',
+    description: 'Total de colaboradores confirmados na rota',
+  })
+  totalConfirmed: number;
+
+  @ApiProperty({
     default: '38e94b04-735b-41a9-a529-79023184007c',
     type: 'UUID',
     description: 'Id do motorista',
