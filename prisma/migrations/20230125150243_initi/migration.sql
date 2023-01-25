@@ -74,6 +74,8 @@ CREATE TABLE [dbo].[RouteHistory] (
     [nameRoute] NVARCHAR(1000) NOT NULL,
     [pathId] NVARCHAR(1000) NOT NULL,
     [employeeIds] NVARCHAR(1000) NOT NULL,
+    [totalEmployees] INT NOT NULL,
+    [totalConfirmed] INT NOT NULL,
     [driverId] NVARCHAR(1000) NOT NULL,
     [vehicleId] NVARCHAR(1000) NOT NULL,
     [itinerary] NVARCHAR(1000) NOT NULL,
