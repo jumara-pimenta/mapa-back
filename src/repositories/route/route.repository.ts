@@ -166,10 +166,12 @@ export class RouteRepository
     });
   }
 
-  update(data: Route): Promise<Route> {
-    return this.repository.route.update({
+  async update(data: Route): Promise<Route> {
+    return await this.repository.route.update({
       data: {
         id: data.id,
+        driverId: data.driver.id,
+        vehicleId: data.vehicle.id,
         description: data.description,
         distance: data.distance,
         status: data.status,
