@@ -7,11 +7,11 @@ faker.locale = 'pt_BR';
 export class signInDriverDTO {
   @ApiProperty({
     default: `${faker.random.numeric(11)}`,
-    description: '[cpf]  para fazer o login',
+    description: '[login] cpf para fazer o login',
   })
-  @IsString({ message: '[cpf] O cpf deve ser do tipo texto.' })
-  @IsNotEmpty({ message: '[cpf] O cpf deve ser preenchido.' })
-  cpf: string;
+  @IsString({ message: '[login] O login:cpf deve ser do tipo texto.' })
+  @IsNotEmpty({ message: '[login] O login:cpf deve ser preenchido.' })
+  login: string;
 
   @ApiProperty({
     default: `${faker.internet.password()}`,
