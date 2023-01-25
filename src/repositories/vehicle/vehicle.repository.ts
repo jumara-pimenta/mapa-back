@@ -45,7 +45,7 @@ export class VehicleRepository
 
   findById(id: string): Promise<Vehicle> {
     return this.repository.vehicle.findUnique({
-      where: { id },
+      where: { id: id },
     });
   }
 
