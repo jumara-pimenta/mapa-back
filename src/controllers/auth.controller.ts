@@ -1,5 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
@@ -7,7 +8,12 @@ import {
 import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
 import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
 import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
-import { DriverLogin, EmployeeLogin } from 'src/utils/examples.swagger';
+import {
+  BackOfficeUserCreate,
+  BackOfficeUserLogin,
+  DriverLogin,
+  EmployeeLogin,
+} from 'src/utils/examples.swagger';
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';
@@ -19,13 +25,27 @@ export class AuthController {
 
   @Post('/backoffice/signin')
   @Public()
+  @ApiCreatedResponse({
+    description: 'Login for BackOfficeUser.',
+    schema: {
+      type: 'object',
+      example: BackOfficeUserLogin,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async backofficeAuth(@Body() payload: BackOfficeUserDTO): Promise<TokenDTO> {
     return await this.authService.backofficeLogin(payload);
   }
 
   @Post('/backoffice/signup')
-  @Public()
+  @Roles('ADMIN')
+  @ApiCreatedResponse({
+    description: 'Create BackOfficeUser.',
+    schema: {
+      type: 'object',
+      example: BackOfficeUserCreate,
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async backofficeAuthSignUp(
     @Body() payload: BackOfficeUserCreateDTO,

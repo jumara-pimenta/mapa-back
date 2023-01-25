@@ -574,5 +574,24 @@ export class RouteRepository
       },
     });
     return routes;
+}
+  async findRouteDataByPathId(pathId: string): Promise<any> {
+    const data = await this.repository.route.findFirst({
+      where: {
+        path: {
+          some: {
+            id: pathId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        vehicleId: true,
+        driverId: true,
+      },
+    });
+
+    return data.id;
+
   }
 }

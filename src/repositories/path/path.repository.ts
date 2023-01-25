@@ -152,9 +152,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     });
   }
 
-  findById(id: string): Promise<Path> {
-    return this.repository.path.findUnique({
-      where: { id },
+  findById(id: string): Promise<Path | null> {
+    return this.repository.path.findFirst({
+      where: { id: id },
       select: {
         id: true,
         type: true,
@@ -166,7 +166,10 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         createdAt: true,
         route: {
           select: {
+            id: true,
             description: true,
+            vehicle: true,
+            driver: true,
           },
         },
         employeesOnPath: {
@@ -177,6 +180,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             confirmation: true,
             disembarkAt: true,
             position: true,
+            description: true,
             employee: {
               select: {
                 name: true,

@@ -194,7 +194,7 @@ export class PathController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async finishPath(@Param('id') id: string): Promise<unknown> {
+  async finishPath(@Param('id') id: string): Promise<Path> {
     return await this.pathService.finishPath(id);
   }
 }
