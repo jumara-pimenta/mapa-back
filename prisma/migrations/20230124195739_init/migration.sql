@@ -8,6 +8,7 @@ CREATE TABLE [dbo].[Driver] (
     [name] VARCHAR(255) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [cnh] VARCHAR(11) NOT NULL,
+    [password] VARCHAR(255) NOT NULL,
     [validation] DATETIMEOFFSET NOT NULL,
     [category] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Driver_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -111,6 +112,7 @@ CREATE TABLE [dbo].[Employee] (
     [shift] NVARCHAR(1000) NOT NULL,
     [costCenter] NVARCHAR(1000) NOT NULL,
     [address] VARCHAR(255) NOT NULL,
+    [password] VARCHAR(255) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Employee_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Employee_pkey] PRIMARY KEY CLUSTERED ([id]),
@@ -140,6 +142,20 @@ CREATE TABLE [dbo].[EmployeesOnPin] (
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [EmployeesOnPin_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [EmployeesOnPin_pkey] PRIMARY KEY CLUSTERED ([employeeId],[pinId])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[BackOfficeUser] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [name] NVARCHAR(1000) NOT NULL,
+    [email] NVARCHAR(1000) NOT NULL,
+    [password] NVARCHAR(1000) NOT NULL,
+    [role] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [BackOfficeUser_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIMEOFFSET,
+    CONSTRAINT [BackOfficeUser_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [BackOfficeUser_id_key] UNIQUE NONCLUSTERED ([id]),
+    CONSTRAINT [BackOfficeUser_email_key] UNIQUE NONCLUSTERED ([email])
 );
 
 -- AddForeignKey
