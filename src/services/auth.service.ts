@@ -92,7 +92,7 @@ export class AuthService {
     const token = this.jwtService.sign(
       { sub: employee, permissions: setPermissions(employee.role) },
       {
-        expiresIn: '7d',
+        expiresIn: '1d',
         secret: process.env.SECRET_KEY_ACCESS_TOKEN,
       },
     );
@@ -132,7 +132,7 @@ export class AuthService {
 
     const token = this.generateToken(1 * 1000 * 60 * 60, {
       id: user.id,
-      role: user.role,
+      role: ERoles.ROLE_ADMIN,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
