@@ -25,9 +25,19 @@ import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
+<<<<<<< HEAD
 import * as bcrypt from 'bcrypt';
 import * as path from 'path';
 import * as fs from 'fs';
+=======
+import e from 'express';
+import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
+
+interface abc {
+  line: number;
+  employee: CreateEmployeeFileDTO;
+}
+>>>>>>> cc0f1d3 (refactor: validate error import file)
 
 @Injectable()
 export class EmployeeService {
@@ -219,7 +229,16 @@ export class EmployeeService {
     const employeeDataUpdated = { ...data, address };
 
     const updatedEmployee = await this.employeeRepository.update(
-      Object.assign(employee, { ...employee, ...employeeDataUpdated }),
+      Object.assign(employee, {
+        ...employee,
+        address: employeeDataUpdated.address,
+        admission: employeeDataUpdated.admission,
+        costCenter: employeeDataUpdated.costCenter,
+        name: employeeDataUpdated.name,
+        registration: employeeDataUpdated.registration,
+        role: employeeDataUpdated.role,
+        shift: employeeDataUpdated.shift,
+      }),
     );
 
     return this.mapperOne(updatedEmployee);
@@ -271,25 +290,22 @@ export class EmployeeService {
         HttpStatus.BAD_REQUEST,
       );
     const data: any = XLSX.utils.sheet_to_json(sheet);
-    const employees: CreateEmployeeFileDTO[] = [];
+    const employees: abc[] = [];
+
+    const pinDenso = await this.pinService.listByLocal(
+      'Denso Industrial da Amazônia',
+    );
+
+    let line = 0;
     for (const row of data) {
       const address = {
         cep: row['CEP'].toString(),
-        neighborhood: row['BAIRRO'].toString(),
+        neighborhood: row['BAIRRO'].toString(''),
         number: row['NUMERO'].toString(),
-        street: row['ENDEREÇO'].toString(),
+        street: row['ENDEREÇO'].toString(''),
         city: 'MANAUS',
         state: 'AM',
         complement: 'Complemento default',
-      };
-
-      const pins = {
-        typeCreation: ETypeCreationPin.IS_NEW,
-        details: 'DENSO MANAUS',
-        title: 'DENSO',
-        local: 'DENSO',
-        lat: '-3.107451943287261',
-        lng: '-59.99183873143272',
       };
 
       const employee: CreateEmployeeFileDTO = {
@@ -298,19 +314,13 @@ export class EmployeeService {
         role: row['SETOR'].toString(),
         shift: row['TURNO'].toString(),
         costCenter: row['C/C'].toString(),
-        address: JSON.stringify(address),
+        address: address,
         admission: new Date(),
-        pin: {
-          typeCreation: ETypeCreationPin.IS_NEW,
-          details: 'DENSO MANAUS',
-          title: 'DENSO',
-          local: 'DENSO',
-          lat: '-3.107451943287261',
-          lng: '-59.99183873143272',
-        },
+        pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
-      employees.push(employee);
-      console.log(employees);
+
+      line++;
+      employees.push({ line, employee });
     }
     let totalCreated = 0;
     let alreadyExisted = 0;
@@ -318,25 +328,44 @@ export class EmployeeService {
     const totalToCreate = employees.length;
 
     for await (const item of employees) {
-      const employee = plainToClass(CreateEmployeeFileDTO, item);
+      const employee = plainToClass(CreateEmployeeFileDTO, item.employee);
+
       let error = false;
-      validate(employee, { validationError: { target: false } }).then(
-        async (errors) => {
+      let lineError = item.line;
+      validate(employee, { validationError: { target: false } })
+        .then(async (errors) => {
           if (errors.length > 0) {
+            console.log('ERRO DO COLABORADOR', errors, 'linha:', lineError);
             dataError++;
             error = true;
           }
-        },
-      );
+        })
+        .catch((error) => {
+          throw new HttpException(error, HttpStatus.BAD_REQUEST);
+        });
 
       if (!error) {
         const existsRegistration =
-          await this.employeeRepository.findByRegistration(item.registration);
+          await this.employeeRepository.findByRegistration(
+            item.employee.registration,
+          );
 
         if (!existsRegistration) {
           const password = bcrypt.hashSync(item.registration, 10);
           await this.employeeRepository.create(
-            new Employee({ ...item, password }),
+            new Employee(
+              {
+                address: JSON.stringify(item.employee.address),
+                admission: item.employee.admission,
+                costCenter: item.employee.costCenter,
+                name: item.employee.name,
+                registration: item.employee.registration,
+                password,
+                role: item.employee.role,
+                shift: item.employee.shift,
+              },
+              pinDenso,
+            ),
           );
           totalCreated++;
         } else alreadyExisted++;
@@ -345,10 +374,10 @@ export class EmployeeService {
 
     return {
       message: [
-        `Cadastrado com sucesso: ${totalCreated}`,
-        `Já existia um cadastro com a mesma matrícula: ${alreadyExisted}`,
+        `Total de colaboradores cadastrados: ${totalCreated}`,
+        `Colaboradores já cadastrados: ${alreadyExisted}`,
         `Colaboradores com dados inválidos: ${dataError}`,
-        `Quantidade total de colaboradores na planilha: ${totalToCreate}`,
+        `Quantidade de colaboradores na planilha: ${totalToCreate}`,
       ],
     };
   }
@@ -475,6 +504,7 @@ export class EmployeeService {
             lat: employeesOnPin.pin.lat,
             lng: employeesOnPin.pin.lng,
             type: employeesOnPin.type as ETypePin,
+            createdAt: employeesOnPin.pin.createdAt,
           };
         }),
       };

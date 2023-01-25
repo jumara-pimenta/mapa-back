@@ -65,10 +65,9 @@ export class CreateEmployeeFileDTO {
   costCenter: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
   @ValidateNested({ each: true })
-  address: string;
+  @Type(() => EmployeeAddressDTO)
+  address: EmployeeAddressDTO;
 
   @ApiProperty()
   @ValidateNested({ each: true })

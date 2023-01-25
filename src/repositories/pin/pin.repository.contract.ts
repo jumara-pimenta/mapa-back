@@ -8,4 +8,5 @@ export default interface IPinRepository {
   delete(id: string): Promise<Pin>;
   findById(id: string): Promise<Pin>;
   update(data: Pin): Promise<Pin>;
+  findByLocal(local: string): Promise<Pin>;
 }

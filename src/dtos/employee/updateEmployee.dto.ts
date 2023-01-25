@@ -18,6 +18,7 @@ export class UpdateEmployeeDTO {
     example: `${faker.random.numeric(6)}`,
     description: 'Matrícula do colaborador',
   })
+  @ApiProperty({ required: false, example: `${faker.random.numeric(6)}` })
   @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -40,6 +41,7 @@ export class UpdateEmployeeDTO {
     example: `${faker.name.fullName()}`,
     description: 'Nome do colaborador',
   })
+  @ApiProperty({ required: false, example: `${faker.name.fullName()}` })
   @IsString({ message: '[name] o nome deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -50,6 +52,7 @@ export class UpdateEmployeeDTO {
     example: `${faker.name.jobTitle()}`,
     description: 'Cargo do colaborador',
   })
+  @ApiProperty({ required: false, example: `${faker.name.jobTitle()}` })
   @IsString({ message: '[rola] o cargo deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -73,12 +76,14 @@ export class UpdateEmployeeDTO {
     example: `${faker.random.numeric(6)}`,
     description: 'Centro de custo do colaborador',
   })
+  @ApiProperty({ required: false, example: `${faker.random.numeric(6)}` })
   @IsString({ message: '[costCenter] o campo custo deve ser do tipo string.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter?: string;
 
   @ApiProperty({ required: false, description: 'Endereço do colaborador' })
+  @ApiProperty({ required: false })
   @ValidateNested({ each: true })
   @Type(() => EmployeeAddressDTO)
   @IsOptional()
@@ -88,6 +93,7 @@ export class UpdateEmployeeDTO {
     required: false,
     description: 'Ponto de embarque do colaborador',
   })
+  @ApiProperty({ required: false })
   @ValidateNested({ each: true })
   @Type(() => UpdateEmployeePinDTO)
   @IsOptional()
