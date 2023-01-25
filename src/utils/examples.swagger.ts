@@ -285,6 +285,8 @@ export const GetRouteHistories = {
   path: '217822b9-02f2-47e7-9d90-1ae58744acc3',
   employeeIds:
     '2fce27dd-e7c4-496f-be0e-3aac0db2f82d, 644a4b19-6133-4506-b4f7-216fb3ffd7e7',
+  totalEmployees: 1,
+  totalConfirmed: 1,
   driver: '38e94b04-735b-41a9-a529-79023184007c',
   vehicle: '28294b80-41ce-4a89-a24e-3e3bd17701c4',
   itinerary: '-3.1299786, -59.99308800000001',
