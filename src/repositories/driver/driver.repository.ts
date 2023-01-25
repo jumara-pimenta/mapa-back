@@ -85,6 +85,10 @@ export class DriverRepository
     );
   }
 
+  findByDrivers(): Promise<Driver[]> {
+    return this.repository.driver.findMany();
+  }
+
   create(data: Driver): Promise<Driver> {
     return this.repository.driver.create({
       data: {

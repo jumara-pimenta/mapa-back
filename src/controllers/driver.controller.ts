@@ -9,6 +9,8 @@ import {
   Post,
   Put,
   Query,
+  Response,
+  StreamableFile,
 } from '@nestjs/common';
 import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
@@ -100,5 +102,20 @@ export class DriverController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.listById(id);
+  }
+
+  @Get('/exports')
+  @HttpCode(HttpStatus.OK)
+  async exportsDrivers(
+    @Response({ passthrough: true }) res,
+  ): Promise<StreamableFile> {
+    const fileName = 'Rotas - Motoristas.xlsx';
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    return await this.driverService.exportDrivers();
   }
 }

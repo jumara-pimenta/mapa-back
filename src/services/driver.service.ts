@@ -6,6 +6,11 @@ import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
+import {
+  generateKeyWithFilename,
+  verifyReportDirectory,
+} from 'src/utils/Utils';
+import path from 'path';
 
 @Injectable()
 export class DriverService {
@@ -139,6 +144,73 @@ export class DriverService {
         validation: driver.validation,
         createdAt: driver.createdAt,
       };
+    });
+  }
+
+  async listByDrivers(): Promise<Driver[]> {
+    const drivers = await this.driverRepository.findByDrivers();
+
+    if (!drivers.length)
+      throw new HttpException(
+        'Não foram encontrados motoristas para esta pesquisa',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return drivers;
+  }
+
+  async exportDrivers(): Promise<any> {
+    await verifyReportDirectory();
+
+    const drivers = await this.listByDrivers();
+
+    const fileName = await generateKeyWithFilename('Rotas - Motoristas.xlsx');
+    const generatedFileDirectory = path.join(
+      process.cwd(),
+      'tmp',
+      'reports',
+      fileName,
+    );
+
+    const sheetOptions = {
+      '!merges': [{ s: { c: 0, r: 0 }, e: { c: 7, r: 0 } }],
+    };
+
+    let driversDataForSheet: Array<Array<any>> = [
+      ['Motoristas cadastrados', '', '', '', '', '', ''],
+      [null, null, null, null, null, null, null, null],
+      [
+        'Nome                          ',
+        'Data de Nascimento     ',
+        'CPF',
+        'RG',
+        'CNH',
+        'Emissão',
+        'Validade',
+        'Categoria',
+      ],
+      [
+        '-------------------------------------',
+        '------------------',
+        '-------------',
+        '----------',
+        '-------------',
+        '------------------',
+        '------------------',
+        '-------',
+      ],
+    ];
+
+    drivers.forEach((driver) => {
+      driversDataForSheet.push([
+        driver.name,
+        driver.cpf,
+        driver.rg,
+        driver.sequenceQr,
+        driver.expectedProduction,
+        driver.orderQuantity,
+        1,
+      ]);
     });
   }
 }
