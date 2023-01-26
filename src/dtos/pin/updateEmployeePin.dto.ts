@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNotEmpty, IsEnum } from 'class-validator';
-import { ETypeEditionPin } from 'src/utils/ETypes';
+import { ETypeEditionPin } from '../../utils/ETypes';
 
 export class UpdateEmployeePinDTO {
   @IsString({

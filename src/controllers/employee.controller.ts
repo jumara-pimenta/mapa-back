@@ -21,17 +21,10 @@ import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import {
-  CreateEmployee,
-  DeleteEmployee,
-  GetAllEmployee,
-  GetEmployee,
-  UpdateEmployee,
-} from 'src/utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Roles } from 'src/decorators/roles.decorator';
 import { Express } from 'express';
-import { Roles } from 'src/decorators/roles.decorator';
+import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -125,6 +118,7 @@ export class EmployeeController {
   }
 
   @Get('download/file')
+  @Roles('export-employees')
   @ApiCreatedResponse({
     description: 'Export a Employee File to XLSX.',
   })

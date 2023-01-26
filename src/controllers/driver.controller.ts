@@ -24,8 +24,8 @@ import {
   GetAllDriver,
   GetDriver,
   UpdateDriver,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')

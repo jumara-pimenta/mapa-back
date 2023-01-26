@@ -8,21 +8,17 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { Roles } from '../decorators/roles.decorator';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
-import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
+import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
+import { UpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import {
   GetEmmployeesOnPathByRoute,
   GetEmployeesOnPath,
   UpdateConfirmationEmployeesOnPath,
   UpdateConfirmationEmployeesOnPathById,
-  UpdateEmployeeOffBoard,
-  UpdateEmployeeOnBoard,
-  UpdateEmployeeOnPathNotComming,
   UpdateEmployeesOnPathById,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 

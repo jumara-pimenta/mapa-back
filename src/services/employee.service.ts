@@ -4,7 +4,6 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
@@ -23,7 +22,6 @@ import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
 import * as bcrypt from 'bcrypt';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -397,14 +395,14 @@ export class EmployeeService {
 
       const workBook = XLSX.utils.book_new();
       const workSheetData = [
-        ,
+        '',
         employeeInformationHeader,
-        ,
+        '',
         employeeInformationFooter,
-        ,
+        '',
         headers,
         ...data,
-        ,
+        '',
         employeeInformationFooter,
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);

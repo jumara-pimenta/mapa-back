@@ -5,18 +5,17 @@ import { differenceInSeconds, fromUnixTime, isAfter } from 'date-fns';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffice.repository.contract';
+} from '../dtos/auth/backOfficeUserLogin.dto';
+import IBackOfficeUserRepository from '../repositories/backOfficeUser/backOffice.repository.contract';
 import * as bcrypt from 'bcrypt';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
-import { setPermissions } from 'src/utils/roles.permissions';
-import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
-import { VerifyTokenResponse } from 'src/integrations/services/coreService/response/verifyToken.response';
-import { ERoles } from 'src/utils/ETypes';
+import { BackOfficeUser } from '../entities/backOfficeUser.entity';
+import { setPermissions } from '../utils/roles.permissions';
+import { CoreTokenDTO } from '../dtos/auth/CoreToken.dto';
+import { ERoles } from '../utils/ETypes';
 import { EmployeeService } from './employee.service';
-import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
+import { SignInEmployeeDTO } from '../dtos/employee/signInEmployee.dto';
 import { DriverService } from './driver.service';
-import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
+import { signInDriverDTO } from '../dtos/driver/signInDriver.dto';
 
 @Injectable()
 export class AuthService {
@@ -44,18 +43,6 @@ export class AuthService {
         },
       ),
     };
-  }
-
-  private verifyToken(token: string): any {
-    try {
-      const decodedToken = this.jwtService.verify(token, {
-        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
-      });
-
-      return decodedToken;
-    } catch (e) {
-      throw new HttpException('Token inválido!', HttpStatus.UNAUTHORIZED);
-    }
   }
 
   private verifyToken(token: string): any {

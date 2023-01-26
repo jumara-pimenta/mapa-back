@@ -1,19 +1,19 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
-import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
-import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
+} from '../dtos/auth/backOfficeUserLogin.dto';
+import { CoreTokenDTO } from '../dtos/auth/CoreToken.dto';
+import { signInDriverDTO } from '../dtos/driver/signInDriver.dto';
+import { SignInEmployeeDTO } from '../dtos/employee/signInEmployee.dto';
 import {
   BackOfficeUserCreate,
   BackOfficeUserLogin,
   DriverLogin,
   EmployeeLogin,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';

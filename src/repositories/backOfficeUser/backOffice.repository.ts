@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { Pageable } from 'src/configs/database/pageable.service';
-import { PrismaService } from 'src/database/prisma.service';
-import { BackOfficeUserCreateDTO } from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
+import { Pageable } from '../../configs/database/pageable.service';
+import { PrismaService } from '../../database/prisma.service';
+import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
 import IBackOfficeUserRepository from './backOffice.repository.contract';
 
 @Injectable()

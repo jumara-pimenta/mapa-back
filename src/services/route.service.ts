@@ -24,7 +24,7 @@ import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
-import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
+import { MappedPathPinsDTO } from '../dtos/path/mappedPath.dto';
 import * as turf from '@turf/turf';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-
+      
     const emplopyeeOrdened = orderPins(employeesPins);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);

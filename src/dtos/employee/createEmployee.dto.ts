@@ -13,19 +13,13 @@ import { faker } from '@faker-js/faker';
 faker.locale = 'pt_BR';
 
 export class CreateEmployeeDTO {
-  @ApiProperty({
-    default: `${faker.random.numeric(6)}`,
-    description: 'Matrícula do colaborador',
-  })
+  @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
 
-  @ApiProperty({
-    default: `${faker.date.past().toISOString()}`,
-    description: 'Data de admissão do colaborador',
-  })
+  @ApiProperty({ default: `${faker.date.past().toISOString()}` })
   @IsDateString(
     {},
     { message: '[admission] A data de admissão deve ser do tipo date.' },
@@ -35,19 +29,13 @@ export class CreateEmployeeDTO {
   })
   admission: Date;
 
-  @ApiProperty({
-    default: `${faker.name.jobTitle()}`,
-    description: 'Cargo do colaborador',
-  })
+  @ApiProperty({ default: `${faker.name.jobTitle()}` })
   @IsString({ message: '[role] O cargo deve ser do tipo string.' })
   @IsNotEmpty({ message: '[role] O cargo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
-  @ApiProperty({
-    default: `${faker.name.fullName()}`,
-    description: 'Nome do colaborador',
-  })
+  @ApiProperty({ default: `${faker.name.fullName()}` })
   @IsString({ message: '[name] O nome deve ser do tipo string.' })
   @IsNotEmpty({ message: '[role] O nome deve ser preenchido.' })
   name: string;
@@ -57,17 +45,13 @@ export class CreateEmployeeDTO {
       allowLeadingZeros: false,
       bannedDigits: ['0', '5', '6', '7', '8', '9'],
     })}`,
-    description: 'Turno de trabalho do colaborador',
   })
   @IsString({ message: '[shift] O turno deve ser do tipo string.' })
   @IsNotEmpty({ message: '[shift] O turno deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shift: string;
 
-  @ApiProperty({
-    default: `${faker.random.numeric(6)}`,
-    description: 'Centro de custo do colaborador',
-  })
+  @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({
     message: '[costCenter] O centro de custo deve ser do tipo string.',
   })
@@ -77,13 +61,13 @@ export class CreateEmployeeDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter: string;
 
-  @ApiProperty({ description: 'Endereço do colaborador' })
+  @ApiProperty()
   @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
   @ValidateNested({ each: true })
   @Type(() => EmployeeAddressDTO)
   address: EmployeeAddressDTO;
 
-  @ApiProperty({ description: 'Ponto de embarque do colaborador' })
+  @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => CreateEmployeePinDTO)
   @IsNotEmpty({ message: '[pin] O ponto de embarque deve ser preenchido.' })
