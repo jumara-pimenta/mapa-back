@@ -2,27 +2,29 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
 import { MappedRouteHistoryDTO } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { CreateRouteHistoryDTO } from '../dtos/routeHistory/createRouteHistory.dto';
-import { RouteService } from './route.service';
 
 @Injectable()
 export class RouteHistoryService {
   constructor(
     @Inject('IRouteHistoryRepository')
     private readonly routeHistoryRepository: IRouteHistoryRepository,
-    private readonly routeService: RouteService,
   ) {}
 
-  async create(payload: CreateRouteHistoryDTO): Promise<RouteHistory> {
-    const route = await this.routeService.listById(payload.routeId);
-
+  async create(props: RouteHistory): Promise<RouteHistory> {
     const newRouteHistory = new RouteHistory(
       {
-        employeeIds: payload.employeesId,
+        typeRoute: props.typeRoute,
+        nameRoute: props.nameRoute,
+        employeeIds: props.employeeIds,
+        totalEmployees: props.totalEmployees,
+        totalConfirmed: props.totalConfirmed,
+        itinerary: props.itinerary,
+        startedAt: props.path.startedAt,
         finishedAt: new Date(),
-        startedAt: new Date(),
       },
-      route,
+      props.path,
+      props.driver,
+      props.vehicle,
     );
 
     return await this.routeHistoryRepository.create(newRouteHistory);
@@ -50,10 +52,16 @@ export class RouteHistoryService {
     return routeHistorys.map((routeHistory) => {
       return {
         id: routeHistory.id,
+        typeRoute: routeHistory.typeRoute,
+        nameRoute: routeHistory.nameRoute,
+        path: routeHistory.path.id,
         employeeIds: routeHistory.employeeIds,
-        finishedAt: routeHistory.finishedAt,
+        driver: routeHistory.driver.id,
+        vehicle: routeHistory.vehicle.id,
+        itinerary: routeHistory.itinerary,
         startedAt: routeHistory.startedAt,
-        createdAt: routeHistory.createdAt,
+        finishedAt: routeHistory.finishedAt,
+        createdAt: new Date(),
       };
     });
   }

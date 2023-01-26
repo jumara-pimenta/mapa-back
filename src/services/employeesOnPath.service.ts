@@ -67,7 +67,6 @@ export class EmployeesOnPathService {
 
   async findById(id: string): Promise<EmployeesOnPath> {
     const employeesOnPath = await this.employeesOnPathRepository.findById(id);
-    console.log('employeesOnPath', employeesOnPath);
 
     if (!employeesOnPath)
       throw new HttpException(
