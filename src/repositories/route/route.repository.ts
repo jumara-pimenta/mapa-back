@@ -10,6 +10,7 @@ import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 import { Console } from 'console';
+import { Path } from 'src/entities/path.entity';
 
 @Injectable()
 export class RouteRepository

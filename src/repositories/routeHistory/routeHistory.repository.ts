@@ -44,4 +44,30 @@ export class RouteHistoryRepository
       },
     });
   }
+
+  async getHistoric(): Promise<any> {
+    const routes = await this.repository.route.findMany({
+      select: {
+        path: {
+          select: {
+            type: true,
+            status: true,
+          },
+        },
+      },
+    });
+    return routes;
+  }
+
+  getHistoricByDate(dateInit: Date, dateFinal: Date): Promise<RouteHistory[]> {
+    const paths = this.repository.routeHistory.findMany({
+      where: {
+        createdAt: {
+          gte: dateInit,
+          lte: dateFinal,
+        },
+      },
+    });
+    return paths;
+  }
 }

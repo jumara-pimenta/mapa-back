@@ -758,13 +758,11 @@ export class RouteService {
     return path;
   }
 
+ 
   async routeDataByPathId(pathId: string): Promise<any> {
     const path = await this.routeRepository.findRouteDataByPathId(pathId);
     if (!path) {
-      throw new HttpException(
-        'Rota não encontrada!',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
     }
     return path;
   }
