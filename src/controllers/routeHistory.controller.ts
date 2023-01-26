@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { GetRouteHistories } from 'src/utils/examples.swagger';
+import { GetRouteHistories } from '../utils/examples.swagger';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
 
