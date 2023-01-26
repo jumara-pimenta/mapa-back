@@ -353,7 +353,16 @@ export class EmployeeService {
     const filePath = './employee.xlsx';
     const workSheetName = 'Colaboradores';
 
-    const employees = await this.listAll(page, filters);
+    // const employees = await this.listAll(page, filters);
+    const employees = await this.employeeRepository.findAll(page, filters);
+    console.log(employees);
+
+    if (employees.total === 0) {
+      throw new HttpException(
+        'Não existem colaboradores para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     const exportedEmployeeToXLSX = async (
       employees,
