@@ -2,8 +2,10 @@ import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import { unlink } from 'fs/promises';
 import * as path from 'path';
+import { pipeline } from 'stream';
 import { promisify } from 'util';
 
+export const pipelineAsync = promisify(pipeline);
 const uploadDirectory = path.join(process.cwd(), 'tmp', 'reports');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomBytesAsync = promisify(require('crypto').randomBytes);

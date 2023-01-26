@@ -104,18 +104,23 @@ export class DriverController {
     return await this.driverService.listById(id);
   }
 
-  @Get('/exports')
+  @Get('/exports/file')
+  @ApiCreatedResponse({
+    description: 'Export a Driver File to XLSX.',
+  })
   @HttpCode(HttpStatus.OK)
-  async exportsDrivers(
+  async exportDriverFile(
     @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersDriverDTO,
   ): Promise<StreamableFile> {
-    const fileName = 'Rotas - Motoristas.xlsx';
+    const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx';
 
     res.set({
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
 
-    return await this.driverService.exportDrivers();
+    return await this.driverService.exportDriverFile(page, filters);
   }
 }
