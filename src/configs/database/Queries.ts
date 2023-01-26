@@ -16,6 +16,8 @@ import { IQueryPin } from '../../dtos/pin/queryPin.dto';
 import { FiltersRouteDTO } from 'src/dtos/route/filtersRoute.dto';
 import { ETypePath } from 'src/utils/ETypes';
 import { getDateStartToEndOfDay } from 'src/utils/Date';
+import { IQueryBackOfficeUser } from 'src/dtos/auth/queryBackOfficeUser.dto';
+import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -414,6 +416,45 @@ export function generateQueryByFiltersForPin(filters: any): IQueryPin {
     }),
     product: () => ({
       product: filters.product,
+    }),
+  };
+
+  const keysFields = Object.keys(fields);
+
+  let query: any;
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  let queryBuilder: Function;
+
+  for (const filter in filters) {
+    if (keysFields.includes(filter)) {
+      queryBuilder = fields[filter];
+
+      if (query) {
+        const newCondition = queryBuilder();
+
+        Object.assign(query, { ...newCondition });
+      } else {
+        query = queryBuilder();
+      }
+    }
+  }
+
+  return query;
+}
+
+export function generateQueryByFiltersForUser(
+  filters: FilterBackOfficeUserDTO,
+): IQueryBackOfficeUser {
+  const fields = {
+    name: () => ({
+      name: { contains: filters.name },
+    }),
+    email: () => ({
+      email: { contains: filters.email },
+    }),
+    role: () => ({
+      role: { contains: filters.role },
     }),
   };
 
