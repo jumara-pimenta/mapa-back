@@ -21,7 +21,7 @@ export class RouteHistoryService {
         totalEmployees: props.totalEmployees,
         totalConfirmed: props.totalConfirmed,
         itinerary: props.itinerary,
-        startedAt: new Date(),
+        startedAt: props.path.startedAt,
         finishedAt: new Date(),
       },
       props.path,
