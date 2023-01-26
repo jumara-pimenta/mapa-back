@@ -43,6 +43,7 @@ export const setPermissions = (roles: ERoles) => {
       'list-route',
       'edit-employeeOnPath',
       'list-employeeOnPath',
+      'list-employee',
     ];
 
   if (roles === ERoles.ROLE_DRIVER)
