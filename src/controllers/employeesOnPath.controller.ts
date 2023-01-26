@@ -8,8 +8,13 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+<<<<<<< HEAD
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
+=======
+import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+>>>>>>> 0229f9a750774d48dbf7982cd5e94eaf32e97165
 import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
 import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import {
@@ -106,6 +111,7 @@ export class EmployeesOnPathController {
   ): Promise<MappedEmployeesOnPathDTO> {
     return await this.employeeOnPathService.update(id, payload);
   }
+<<<<<<< HEAD
 
   // @Put('/onboard/')
   // @HttpCode(HttpStatus.ACCEPTED)
@@ -126,4 +132,6 @@ export class EmployeesOnPathController {
   // async notComming(@Body() payload: IdUpdateDTO): Promise<any> {
   //   return await this.employeeOnPathService.employeeNotConfirmed(payload);
   // }
+=======
+>>>>>>> 0229f9a750774d48dbf7982cd5e94eaf32e97165
 }

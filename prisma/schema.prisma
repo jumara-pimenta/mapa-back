@@ -1,7 +1,7 @@
 datasource db {
   provider = "sqlserver"
   url      = env("DATABASE_URL")
-  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -10,32 +10,32 @@ generator client {
 }
 
 model Driver {
-  id         String    @id @unique
-  name       String    @db.VarChar(255)
-  cpf        String    @unique @db.VarChar(11)
-  cnh        String    @unique @db.VarChar(11)
-  validation DateTime  @db.DateTimeOffset
-  category   String
-  route      Route[]
-  createdAt  DateTime  @default(now()) @db.DateTimeOffset
-  updatedAt  DateTime? @db.DateTimeOffset
+  id           String         @id @unique
+  name         String         @db.VarChar(255)
+  cpf          String         @unique @db.VarChar(11)
+  cnh          String         @unique @db.VarChar(11)
+  validation   DateTime       @db.DateTimeOffset
+  category     String
+  route        Route[]
+  createdAt    DateTime       @default(now()) @db.DateTimeOffset
+  updatedAt    DateTime?      @db.DateTimeOffset
+  RouteHistory RouteHistory[]
 }
 
 model Route {
-  id           String         @id @unique
-  description  String
-  distance     String
-  type         String
-  status       String
-  driver       Driver         @relation(fields: [driverId], references: [id], onDelete: Cascade)
-  driverId     String
-  path         Path[]
-  vehicle      Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  vehicleId    String
-  routeHistory RouteHistory[]
-  createdAt    DateTime       @default(now()) @db.DateTimeOffset
-  updatedAt    DateTime?      @db.DateTimeOffset
-  deletedAt    DateTime?      @db.DateTimeOffset
+  id          String    @id @unique
+  description String
+  distance    String
+  type        String
+  status      String
+  driver      Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId    String
+  path        Path[]
+  vehicle     Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicleId   String
+  createdAt   DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt   DateTime? @db.DateTimeOffset
+  deletedAt   DateTime? @db.DateTimeOffset
 }
 
 model Path {
@@ -51,6 +51,7 @@ model Path {
   routeId         String
   createdAt       DateTime          @default(now()) @db.DateTimeOffset
   updatedAt       DateTime?         @db.DateTimeOffset
+  RouteHistory    RouteHistory[]
 }
 
 model EmployeesOnPath {
@@ -70,31 +71,41 @@ model EmployeesOnPath {
 }
 
 model RouteHistory {
-  id          String    @id @unique
-  employeeIds String
-  route       Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  routeId     String
-  startedAt   DateTime  @db.DateTimeOffset
-  finishedAt  DateTime  @db.DateTimeOffset
-  createdAt   DateTime  @default(now()) @db.DateTimeOffset
-  updatedAt   DateTime? @db.DateTimeOffset
+  id             String    @id @unique
+  typeRoute      String
+  nameRoute      String
+  path           Path      @relation(fields: [pathId], references: [id], onUpdate: NoAction)
+  pathId         String
+  employeeIds    String
+  totalEmployees Int
+  totalConfirmed Int
+  driver         Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId       String
+  vehicle        Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicleId      String
+  itinerary      String
+  startedAt      DateTime  @db.DateTimeOffset
+  finishedAt     DateTime  @db.DateTimeOffset
+  createdAt      DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt      DateTime? @db.DateTimeOffset
 }
 
 model Vehicle {
-  id              String    @id @unique
-  plate           String    @unique
+  id              String         @id @unique
+  plate           String         @unique
   company         String
   type            String
   lastSurvey      DateTime
   expiration      DateTime
   capacity        Int
-  renavam         String    @unique @db.VarChar(11)
-  lastMaintenance DateTime  @db.DateTimeOffset
+  renavam         String         @unique @db.VarChar(11)
+  lastMaintenance DateTime       @db.DateTimeOffset
   note            String
-  isAccessibility Boolean   @default(false)
+  isAccessibility Boolean        @default(false)
   routes          Route[]
-  createdAt       DateTime  @default(now()) @db.DateTimeOffset
-  updatedAt       DateTime? @db.DateTimeOffset
+  createdAt       DateTime       @default(now()) @db.DateTimeOffset
+  updatedAt       DateTime?      @db.DateTimeOffset
+  RouteHistory    RouteHistory[]
 }
 
 model Employee {
@@ -134,4 +145,14 @@ model EmployeesOnPin {
   updatedAt  DateTime? @db.DateTimeOffset
 
   @@id([employeeId, pinId])
+}
+
+model BackOfficeUser {
+  id        String    @id @unique
+  name      String
+  email     String    @unique
+  password  String
+  role      String
+  createdAt DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt DateTime? @db.DateTimeOffset
 }

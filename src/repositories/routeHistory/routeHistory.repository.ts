@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IRouteHistoryRepository from './routeHistory.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
-import { FiltersRouteHistoryDTO } from '../../dtos/routeHistory/filtersRouteHistory.dto';
-import { generateQueryByFiltersForRouteHistory } from '../../configs/database/Queries';
 import { RouteHistory } from '../../entities/routeHistory.entity';
 
 @Injectable()
@@ -29,14 +25,22 @@ export class RouteHistoryRepository
     });
   }
 
-  create(data: RouteHistory): Promise<RouteHistory> {
-    return this.repository.routeHistory.create({
+  async create(data: RouteHistory): Promise<RouteHistory> {
+    return await this.repository.routeHistory.create({
       data: {
         id: data.id,
+        typeRoute: data.typeRoute,
+        nameRoute: data.nameRoute,
         employeeIds: data.employeeIds,
-        finishedAt: data.finishedAt,
+        totalEmployees: data.totalEmployees,
+        totalConfirmed: data.totalConfirmed,
+        pathId: data.path.id,
+        vehicleId: data.vehicle.id,
+        driverId: data.driver.id,
+        itinerary: data.itinerary,
         startedAt: data.startedAt,
-        routeId: data.route.id,
+        finishedAt: data.finishedAt,
+        createdAt: data.createdAt,
       },
     });
   }

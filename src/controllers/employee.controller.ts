@@ -21,6 +21,7 @@ import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
+<<<<<<< HEAD
   CreateEmployee,
   DeleteEmployee,
   GetAllEmployee,
@@ -29,6 +30,14 @@ import {
 } from 'src/utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+=======
+  ApiCreatedResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+>>>>>>> 0229f9a750774d48dbf7982cd5e94eaf32e97165
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -53,6 +62,7 @@ export class EmployeeController {
     },
   })
   @Post()
+  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
@@ -95,6 +105,7 @@ export class EmployeeController {
       example: GetAllEmployee,
     },
   })
+  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
