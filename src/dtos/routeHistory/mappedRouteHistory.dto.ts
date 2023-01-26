@@ -12,6 +12,10 @@ export class MappedRouteHistoryDTO {
   @ApiProperty()
   employeeIds: string;
   @ApiProperty()
+  totalEmployees: number;
+  @ApiProperty()
+  totalConfirmed: number;
+  @ApiProperty()
   driver: string;
   @ApiProperty()
   vehicle: string;
@@ -21,6 +25,4 @@ export class MappedRouteHistoryDTO {
   startedAt: Date;
   @ApiProperty()
   finishedAt: Date;
-  @ApiProperty()
-  createdAt: Date;
 }
