@@ -11,11 +11,17 @@ import { Page, PageResponse } from '../configs/database/page.model';
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
+import { CreateEmployeeFileDTO } from '../dtos/employee/createEmployeeFile.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
+
+import * as XLSX from 'xlsx';
+import { validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
+import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -26,7 +32,7 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
-  ) { }
+  ) {}
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
@@ -179,14 +185,11 @@ export class EmployeeService {
           employee,
         );
       }
-
-
     }
-
 
     const address = JSON.stringify(data?.address);
 
-    const employeeDataUpdated = { ...data, address } ;
+    const employeeDataUpdated = { ...data, address };
 
     const updatedEmployee = await this.employeeRepository.update(
       Object.assign(employee, { ...employee, ...employeeDataUpdated }),
@@ -197,6 +200,108 @@ export class EmployeeService {
 
   async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
     return await this.employeeRepository.findByIds(ids);
+  }
+
+  async parseExcelFile(file: any) {
+    const workbook = XLSX.read(file.buffer);
+    const sheetName = workbook.SheetNames;
+    const type = 'LISTA DE COLABORADORES';
+    if (!Object.values(sheetName).includes(type))
+      throw new HttpException(
+        `Planilha tem que conter a aba de ${type}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    const sheet = workbook.Sheets[type];
+    const headers = [
+      'MATRICULA',
+      'NOME',
+      'BAIRRO',
+      'ENDEREÇO',
+      'NUMERO',
+      'CEP',
+      'C/C',
+      'SETOR',
+      'TURNO',
+      'ADMISSAO',
+    ];
+    if (
+      headers.join('') !==
+      [
+        sheet.A1.v,
+        sheet.B1.v,
+        sheet.C1.v,
+        sheet.D1.v,
+        sheet.E1.v,
+        sheet.G1.v,
+        sheet.H1.v,
+        sheet.I1.v,
+        sheet.J1.v,
+        sheet.L1.v,
+      ].join('')
+    )
+      throw new HttpException(
+        'Planilha tem que conter as colunas MATRICULA, NOME e SETOR.',
+        HttpStatus.BAD_REQUEST,
+      );
+    const data: any = XLSX.utils.sheet_to_json(sheet);
+    const employees: CreateEmployeeFileDTO[] = [];
+    for (const row of data) {
+      const address = {
+        cep: row['CEP'].toString(),
+        neighborhood: row['BAIRRO'].toString(),
+        number: row['NUMERO'].toString(),
+        street: row['ENDEREÇO'].toString(),
+        city: 'MANAUS',
+        state: 'AM',
+      };
+
+      const employee: CreateEmployeeFileDTO = {
+        name: row['NOME'].toString(),
+        registration: row['MATRICULA'].toString(),
+        role: row['SETOR'].toString(),
+        shift: row['TURNO'].toString(),
+        costCenter: row['C/C'].toString(),
+        address: JSON.stringify(address),
+        admission: new Date(),
+      };
+      employees.push(employee);
+    }
+    let totalCreated = 0;
+    let alreadyExisted = 0;
+    let dataError = 0;
+    const totalToCreate = employees.length;
+
+    for await (const item of employees) {
+      const employee = plainToClass(CreateEmployeeFileDTO, item);
+      let error = false;
+      validate(employee, { validationError: { target: false } }).then(
+        async (errors) => {
+          if (errors.length > 0) {
+            dataError++;
+            error = true;
+          }
+        },
+      );
+
+      if (!error) {
+        const existsRegistration =
+          await this.employeeRepository.findByRegistration(item.registration);
+
+        if (!existsRegistration) {
+          await this.employeeRepository.create(new Employee({ ...item }));
+          totalCreated++;
+        } else alreadyExisted++;
+      }
+    }
+
+    return {
+      message: [
+        `Cadastrado com sucesso: ${totalCreated}`,
+        `Já existia um cadastro com a mesma matrícula: ${alreadyExisted}`,
+        `Colaboradores com dados inválidos: ${dataError}`,
+        `Quantidade total de colaboradores na planilha: ${totalToCreate}`,
+      ],
+    };
   }
 
   private mapperMany(employees: Employee[]): MappedEmployeeDTO[] {
