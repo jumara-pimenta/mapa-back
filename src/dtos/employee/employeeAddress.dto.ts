@@ -21,7 +21,7 @@ export class EmployeeAddressDTO {
   city: string;
 
   @ApiProperty({
-    default: `${faker.address.streetName()}`,
+    default: `${faker.address.street()}`,
     description: 'Complemento do endereço do colaborador',
   })
   @IsString({ message: '[complement] O complemento deve ser do tipo string.' })
@@ -29,7 +29,7 @@ export class EmployeeAddressDTO {
   complement?: string;
 
   @ApiProperty({
-    default: `${faker.address.streetName()}`,
+    default: `${faker.address.street()}`,
     description: 'Bairro do endereço do colaborador',
   })
   @IsString({ message: '[neighborhood] O bairro deve ser do tipo string.' })
@@ -53,7 +53,7 @@ export class EmployeeAddressDTO {
   state: string;
 
   @ApiProperty({
-    default: `${faker.address.streetName()}`,
+    default: `${faker.address.street()}`,
     description: 'Rua do endereço do colaborador',
   })
   @IsString({ message: '[street] A rua deve ser do tipo string.' })
