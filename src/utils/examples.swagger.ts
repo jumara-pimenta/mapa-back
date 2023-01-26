@@ -296,6 +296,8 @@ export const GetRouteHistories = {
   updatedAt: null,
 };
 
+export const ListRouteHistories = {};
+
 export const GetEmployeesOnPath = {
   boardingAt: null,
   confirmation: true,

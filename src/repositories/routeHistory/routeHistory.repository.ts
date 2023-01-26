@@ -1,3 +1,5 @@
+import { Page, PageResponse } from 'src/configs/database/page.model';
+import { FiltersRouteHistoryDTO } from './../../dtos/routeHistory/filtersRouteHistory.dto';
 import { Injectable } from '@nestjs/common';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
@@ -13,16 +15,35 @@ export class RouteHistoryRepository
     super();
   }
 
-  delete(id: string): Promise<RouteHistory> {
+  delete(id: string): Promise<RouteHistory | null> {
     return this.repository.routeHistory.delete({
       where: { id },
     });
   }
 
-  findById(id: string): Promise<RouteHistory> {
+  findById(id: string): Promise<RouteHistory | null> {
     return this.repository.routeHistory.findUnique({
       where: { id },
     });
+  }
+
+  async findAll(
+    page: Page,
+    filters: FiltersRouteHistoryDTO,
+  ): Promise<PageResponse<RouteHistory>> {
+    const items = await this.repository.routeHistory.findMany({
+      ...this.buildPage(page),
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const total = await this.repository.routeHistory.count();
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
   }
 
   async create(data: RouteHistory): Promise<RouteHistory> {
