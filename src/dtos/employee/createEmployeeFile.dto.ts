@@ -15,12 +15,11 @@ faker.locale = 'pt_BR';
 
 export class CreateEmployeeFileDTO {
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
-  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @IsNumberString(
     {},
-    { message: '[registration] A matrícula deve ser conter apenas números.' },
+    { message: '[registration] A matrícula deve ser do tipo string.' },
   )
+  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
 

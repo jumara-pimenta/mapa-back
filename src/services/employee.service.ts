@@ -21,11 +21,21 @@ import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 
 import * as XLSX from 'xlsx';
-import { validate } from 'class-validator';
+import { validate, validateSync } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { EmployeeAddressDTO } from 'src/dtos/employee/employeeAddress.dto';
-import e from 'express';
 import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
+import path from 'path';
+import fs from 'fs';
+import * as bcrypt from 'bcrypt';
+import util from 'util';
+
+const validateAsync = (schema: any): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    validate(schema, { validationError: { target: false } })
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+};
 
 interface abc {
   line: number;
@@ -245,12 +255,15 @@ export class EmployeeService {
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
     const type = 'LISTA DE COLABORADORES';
+
     if (!Object.values(sheetName).includes(type))
       throw new HttpException(
         `Planilha tem que conter a aba de ${type}`,
         HttpStatus.BAD_REQUEST,
       );
+
     const sheet = workbook.Sheets[type];
+
     const headers = [
       'MATRICULA',
       'NOME',
@@ -263,6 +276,7 @@ export class EmployeeService {
       'TURNO',
       'ADMISSAO',
     ];
+
     if (
       headers.join('') !==
       [
@@ -282,6 +296,7 @@ export class EmployeeService {
         'Planilha tem que conter as colunas MATRICULA, NOME e SETOR.',
         HttpStatus.BAD_REQUEST,
       );
+
     const data: any = XLSX.utils.sheet_to_json(sheet);
     const employees: abc[] = [];
 
@@ -290,12 +305,13 @@ export class EmployeeService {
     );
 
     let line = 0;
+
     for (const row of data) {
       const address = {
         cep: row['CEP'].toString(),
-        neighborhood: row['BAIRRO'].toString(''),
+        neighborhood: row['BAIRRO'].toString(),
         number: row['NUMERO'].toString(),
-        street: row['ENDEREÇO'].toString(''),
+        street: row['ENDEREÇO'].toString(),
         city: 'MANAUS',
         state: 'AM',
         complement: 'Complemento default',
@@ -315,40 +331,30 @@ export class EmployeeService {
       line++;
       employees.push({ line, employee });
     }
+
     let totalCreated = 0;
     let alreadyExisted = 0;
-    let dataError = 0;
     const totalToCreate = employees.length;
     let messagesErrors = [];
+
     for await (const item of employees) {
-      const employee = plainToClass(CreateEmployeeFileDTO, item.employee);
-
       let error = false;
-      let lineError = item.line;
-      validate(employee, { validationError: { target: false } })
-        .then(async (errors) => {
-          if (errors.length > 0) {
-            console.log('ERRO DO COLABORADOR', errors, 'linha:', lineError);
-            dataError++;
-            error = true;
-            messagesErrors.push({
-              message: errors[0].constraints,
-              lineError,
-            });
-          }
-        })
-        .catch((error) => {
-          throw new HttpException(error, HttpStatus.BAD_REQUEST);
-        });
 
-      if (!error) {
+      const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
+      let line = item.line;
+
+      const errorsTest = await validateAsync(employeeSchema);
+
+      console.log(errorsTest);
+
+      if (!errorsTest.length) {
         const existsRegistration =
           await this.employeeRepository.findByRegistration(
             item.employee.registration,
           );
 
         if (!existsRegistration) {
-          const password = bcrypt.hashSync(item.registration, 10);
+          // const password = bcrypt.hashSync(item.employee.registration, 10);
           await this.employeeRepository.create(
             new Employee(
               {
@@ -357,7 +363,7 @@ export class EmployeeService {
                 costCenter: item.employee.costCenter,
                 name: item.employee.name,
                 registration: item.employee.registration,
-                password,
+                password: bcrypt.hashSync(item.employee.registration, 10),
                 role: item.employee.role,
                 shift: item.employee.shift,
               },
@@ -377,15 +383,6 @@ export class EmployeeService {
     };
 
     return errors;
-    // return {
-    //   message: [
-    //     `Total de colaboradores cadastrados: ${totalCreated}`,
-    //     `Colaboradores já cadastrados: ${alreadyExisted}`,
-    //     `Colaboradores com dados inválidos: ${dataError}`,
-    //     `Quantidade de colaboradores na planilha: ${totalToCreate}`,
-    //     messagesErrors,
-    //   ],
-    // };
   }
 
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
