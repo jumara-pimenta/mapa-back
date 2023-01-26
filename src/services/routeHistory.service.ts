@@ -111,7 +111,7 @@ export class RouteHistoryService {
         data.totalEmployessConfirmed - data.totalEmployessPresent;
       response.push(data);
     });
-    response[0].date = '2023-01-24';
+
     const reponseReduce = response.reduce<RouteHistoryByDate[]>((acc, curr) => {
       const { date } = curr;
       const index = acc.findIndex((d) => d.date === date);
