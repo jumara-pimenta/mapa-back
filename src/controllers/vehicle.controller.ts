@@ -9,6 +9,8 @@ import {
   Post,
   Put,
   Query,
+  Response,
+  StreamableFile,
 } from '@nestjs/common';
 import { FiltersVehicleDTO } from '../dtos/vehicle/filtersVehicle.dto';
 import { MappedVehicleDTO } from '../dtos/vehicle/mappedVehicle.dto';
@@ -108,5 +110,25 @@ export class VehicleController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Vehicle> {
     return await this.vehicleService.listById(id);
+  }
+
+  @Get('/exports/file')
+  @ApiCreatedResponse({
+    description: 'Export a Vehicle File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportVehicleFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersVehicleDTO,
+  ): Promise<StreamableFile> {
+    const fileName = 'Sonar Rotas - Veículos Exportados.xlsx';
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    return await this.vehicleService.exportVehicleFile(page, filters);
   }
 }
