@@ -9,6 +9,8 @@ import {
   Post,
   Put,
   Query,
+  Response,
+  StreamableFile,
 } from '@nestjs/common';
 import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
@@ -100,5 +102,25 @@ export class DriverController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.listById(id);
+  }
+
+  @Get('/exports/file')
+  @ApiCreatedResponse({
+    description: 'Export a Driver File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportDriverFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersDriverDTO,
+  ): Promise<StreamableFile> {
+    const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx';
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    return await this.driverService.exportDriverFile(page, filters);
   }
 }
