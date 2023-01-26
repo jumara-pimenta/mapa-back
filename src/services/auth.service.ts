@@ -5,6 +5,7 @@ import { differenceInSeconds, fromUnixTime, isAfter } from 'date-fns';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
+  BackOfficeUserUpdateDTO,
 } from 'src/dtos/auth/backOfficeUserLogin.dto';
 import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffice.repository.contract';
 import * as bcrypt from 'bcrypt';
@@ -17,6 +18,9 @@ import { EmployeeService } from './employee.service';
 import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
 import { DriverService } from './driver.service';
 import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
+import { Page, PageResponse } from 'src/configs/database/page.model';
+import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
+import { MappedBackOfficeUserDTO } from 'src/dtos/auth/mappedBackOfficeUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -159,9 +163,7 @@ export class AuthService {
   }
 
   async employeeLogin(data: SignInEmployeeDTO): Promise<any> {
-    const employee = await this.employeeService.findByRegistration(
-      data.login,
-    );
+    const employee = await this.employeeService.findByRegistration(data.login);
 
     if (!employee)
       throw new HttpException(
@@ -239,5 +241,63 @@ export class AuthService {
     const { updatedAt, createdAt, password, ...result } = driver;
 
     return { ...result, token };
+  }
+
+  async listBackOfficeUsers(
+    page: Page,
+    filters?: FilterBackOfficeUserDTO,
+  ): Promise<PageResponse<MappedBackOfficeUserDTO>> {
+    const users = await this.backOfficeUserRepository.findAll(page, filters);
+    console.log(users);
+
+    if (users.total === 0)
+      throw new HttpException(
+        {
+          message: 'Nenhum usuário encontrado',
+          status: HttpStatus.NO_CONTENT,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+
+    const items = this.mapperMany(users.items);
+
+    return { total: users.total, items };
+  }
+
+  async updateBackOfficeUser(
+    id: string,
+    data: BackOfficeUserUpdateDTO,
+  ): Promise<MappedBackOfficeUserDTO> {
+    const user = await this.backOfficeUserRepository.findById(id);
+
+    if (!user)
+      throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
+
+    const updatedUser = await this.backOfficeUserRepository.update(id, data);
+
+    return this.mapper(updatedUser);
+  }
+
+  async deleteBackOfficeUser(id: string): Promise<MappedBackOfficeUserDTO> {
+    const user = await this.backOfficeUserRepository.findById(id);
+
+    if (!user)
+      throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
+
+    const deletedUser = await this.backOfficeUserRepository.delete(id);
+
+    return this.mapper(deletedUser);
+  }
+
+  private mapperMany(
+    BackOfficeUsers: BackOfficeUser[],
+  ): MappedBackOfficeUserDTO[] {
+    return BackOfficeUsers.map((BackOfficeUser) => this.mapper(BackOfficeUser));
+  }
+
+  private mapper(BackOfficeUser: BackOfficeUser): MappedBackOfficeUserDTO {
+    const { password, ...result } = BackOfficeUser;
+
+    return result;
   }
 }

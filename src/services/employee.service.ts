@@ -386,12 +386,12 @@ export class EmployeeService {
         ];
       });
 
-      let employeeInformationHeader = [
+      const employeeInformationHeader = [
         [`COLABORADORES EXPORTADOS: ${today}`],
         [`TOTAL DE COLABORADORES EXPORTADOS: ${data.length}`],
       ];
 
-      let employeeInformationFooter = [
+      const employeeInformationFooter = [
         ['**********************************************'],
         ['***********************************************'],
         ['************************'],
