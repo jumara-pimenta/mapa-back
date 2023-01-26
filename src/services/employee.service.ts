@@ -369,15 +369,23 @@ export class EmployeeService {
       }
     }
 
-    return {
-      message: [
-        `Total de colaboradores cadastrados: ${totalCreated}`,
-        `Colaboradores já cadastrados: ${alreadyExisted}`,
-        `Colaboradores com dados inválidos: ${dataError}`,
-        `Quantidade de colaboradores na planilha: ${totalToCreate}`,
-        messagesErrors,
-      ],
+    const errors: ValidationFileDTO = {
+      newEmployeesCreated: totalCreated,
+      employeesAlreadyExistent: alreadyExisted,
+      quantityEmployeesOnSheet: totalToCreate,
+      errors: messagesErrors,
     };
+
+    return errors;
+    // return {
+    //   message: [
+    //     `Total de colaboradores cadastrados: ${totalCreated}`,
+    //     `Colaboradores já cadastrados: ${alreadyExisted}`,
+    //     `Colaboradores com dados inválidos: ${dataError}`,
+    //     `Quantidade de colaboradores na planilha: ${totalToCreate}`,
+    //     messagesErrors,
+    //   ],
+    // };
   }
 
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {

@@ -9,5 +9,5 @@ export class ValidationFileDTO {
   employeesAlreadyExistent: number;
   quantityEmployeesOnSheet: number;
   errors: IErrors[];
-  length: number;
+  // length: number;
 }
