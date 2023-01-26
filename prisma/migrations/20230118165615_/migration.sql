@@ -118,10 +118,7 @@ CREATE TABLE [dbo].[Employee] (
     [shift] NVARCHAR(1000) NOT NULL,
     [costCenter] NVARCHAR(1000) NOT NULL,
     [address] VARCHAR(255) NOT NULL,
-<<<<<<< HEAD
     [password] VARCHAR(255) NOT NULL,
-=======
->>>>>>> feat/export-vehicle
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Employee_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Employee_pkey] PRIMARY KEY CLUSTERED ([id]),
