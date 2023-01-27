@@ -33,6 +33,7 @@ export class CreateEmployeePinDTO {
     examples: ['-3.10719', null],
     description: 'Latidude da localização',
   })
+  @ApiProperty({ default: '-3.10719', examples: ['-3.10719', null] })
   @IsString({ message: '[lat] não está definido como string.' })
   @IsOptional()
   lat?: string;
@@ -42,6 +43,7 @@ export class CreateEmployeePinDTO {
     examples: ['-60.0261', null],
     description: 'Longitude da localização',
   })
+  @ApiProperty({ default: '-60.0261', examples: ['-60.0261', null] })
   @IsString({ message: '[lng] não está definido como string.' })
   @IsOptional()
   lng?: string;
@@ -74,6 +76,7 @@ export class CreateEmployeePinDTO {
     default: 'Título do local',
     description: 'Título do local',
   })
+  @ApiProperty({ default: 'Título do local' })
   @IsString({ message: '[title] não está definido como string.' })
   @IsOptional()
   title?: string;

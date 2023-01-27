@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsDateString,
   ValidateNested,
+  IsNumberString,
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
@@ -14,7 +15,10 @@ faker.locale = 'pt_BR';
 
 export class CreateEmployeeDTO {
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
-  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
+  @IsNumberString(
+    {},
+    { message: '[registration] A matrícula deve ser do tipo string.' },
+  )
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
