@@ -2,12 +2,17 @@ import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { Route } from '../../entities/route.entity';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
+import { ETypeRouteExport } from 'src/utils/ETypes';
 
 export default interface IRouteRepository {
   findRouteDataByPathId(pathId: string): unknown;
   create(data: Route): Promise<Route>;
   delete(id: string): Promise<Route>;
   findAll(page: Page, filters?: FiltersRouteDTO): Promise<PageResponse<Route>>;
+  findAllToExport(
+    page: Page,
+    type: ETypeRouteExport,
+  ): Promise<PageResponse<Route>>;
   findById(id: string): Promise<Route>;
   findByIdWebsocket(id: string): Promise<Route | any>;
   findByDriverId(id: string): Promise<Route[]>;

@@ -11,6 +11,7 @@ import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 import { Console } from 'console';
 import { Path } from 'src/entities/path.entity';
+import { ETypeRouteExport } from 'src/utils/ETypes';
 
 @Injectable()
 export class RouteRepository
@@ -342,6 +343,62 @@ export class RouteRepository
       Array.isArray(total) ? total.length : total,
     );
   }
+
+  async findAllToExport(
+    page: Page,
+    type: ETypeRouteExport,
+  ): Promise<PageResponse<Route>> {
+    const items = await this.repository.route.findMany({
+      ...this.buildPage(page),
+      where: {
+        type: type,
+        deletedAt: null,
+      },
+      include: {
+        driver: true,
+        path: {
+          include: {
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              include: {
+                employee: {
+                  select: {
+                    name: true,
+                    pins: {
+                      include: {
+                        pin: {
+                          select: {
+                            lat: true,
+                            lng: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: true,
+      },
+    });
+
+    const total = await this.repository.route.findMany({
+      where: {
+        type: type,
+        deletedAt: null,
+      },
+    });
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+  }
+
   async listByDriverId(
     driverId: string,
     page: Page,
