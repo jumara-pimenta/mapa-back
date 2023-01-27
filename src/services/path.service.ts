@@ -44,7 +44,6 @@ export class PathService {
   async finishPath(id: string): Promise<any> {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
-    console.log(route.employeesOnPins);
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const driver = await this.driverService.listById(route.driver);
 
@@ -260,7 +259,7 @@ export class PathService {
     if (path.type === ETypePath.ONE_WAY) {
       const pathData = this.mapperOne(path) as any;
       const denso = {
-        id: 'Denso',
+        id: process.env.DENSO_ID,
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
@@ -285,11 +284,11 @@ export class PathService {
     if (path.type === ETypePath.RETURN) {
       const pathData = this.mapperOne(path) as any;
       const denso = {
-        id: 'Denso',
+        id: path.employeesOnPath[0].id,
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
-        position: 99,
+        position: 0,
         details: {
           name: 'DENSO',
           address: 'null',
@@ -374,7 +373,6 @@ export class PathService {
       }
       if (pinId === process.env.DENSO_ID) {
         let data = {} as EmployeesByPin;
-        console.log(employee);
         data = {
           position: employee.position,
           lat,
