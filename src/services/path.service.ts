@@ -255,8 +255,6 @@ export class PathService {
       );
 
     if (path.type === ETypePath.ONE_WAY) {
-      path;
-
       const pathData = this.mapperOne(path) as any;
       const denso = {
         id: 'DENSO',
@@ -270,7 +268,7 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
-            id: 'DENSO',
+            id: null,
             lat: '-3.1112953',
             lng: '-59.9643917',
           },
@@ -280,7 +278,32 @@ export class PathService {
 
       return pathData;
     }
-    return this.mapperOne(path);
+
+    if (path.type === ETypePath.RETURN) {
+      const pathData = this.mapperOne(path) as any;
+      const denso = {
+        id: 'DENSO',
+        boardingAt: null,
+        confirmation: true,
+        disembarkAt: null,
+        position: 99,
+        details: {
+          name: 'DENSO',
+          address: 'null',
+          shift: 'DENSO',
+          registration: 'DENSO',
+          location: {
+            lat: '-3.1112953',
+            lng: '-59.9643917',
+          },
+        },
+      };
+      pathData.employeesOnPath.unshift(denso);
+
+      return pathData;
+    }
+
+    // return this.mapperOne(path);
   }
 
   async getPathById(id: string): Promise<Path> {
@@ -346,17 +369,6 @@ export class PathService {
     employeesByPin.forEach((employeeByPin, index) => {
       employeeByPin.position = index + 1;
     });
-
-    const datadenso = {
-      position: 99,
-      lat: '-3.1112953',
-      lng: '-59.9643917',
-      employees: [],
-    };
-
-    if (path.type === ETypePath.ONE_WAY) {
-      employeesByPin.push(datadenso);
-    }
 
     return { ...data, routeId: routeId, employeesOnPins: employeesByPin };
   }

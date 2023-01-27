@@ -238,7 +238,7 @@ export class RouteService {
     if (data.vehicleId) {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
-    const { path, ...rest } = routeEntity;
+    const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
       Object.assign(rest, data),
@@ -252,7 +252,6 @@ export class RouteService {
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
     if (payload.path.startedAt) {
-      const routeData = await this.listByIdWebsocket(payload.routeId);
       const Pathdata = await this.pathService.listById(payload.pathId);
 
       if (Pathdata.employeesOnPath.length === 0) {
