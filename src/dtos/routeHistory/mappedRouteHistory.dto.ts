@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class LatAndLong {
+  @ApiProperty()
+  lat: string;
+  @ApiProperty()
+  lng: string;
+}
+
 export class MappedRouteHistoryDTO {
   @ApiProperty()
   id: string;
@@ -20,7 +27,7 @@ export class MappedRouteHistoryDTO {
   @ApiProperty()
   vehicle: string;
   @ApiProperty()
-  itinerary: string;
+  itinerary: LatAndLong[];
   @ApiProperty()
   startedAt: Date;
   @ApiProperty()
