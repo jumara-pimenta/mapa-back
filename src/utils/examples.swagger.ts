@@ -872,3 +872,15 @@ export const GetSinisterById = {
   createdAt: '2023-01-26T20:15:45.137Z',
   updatedAt: null,
 };
+
+export const GetAllSinister = {
+  total: 1,
+  items: [
+    {
+      id: 'a3ae6574-7f45-4c95-ac93-4b1c53ccd0fb',
+      type: 'Assalto',
+      description: 'Assalto na parada de ônibus',
+      createdAt: '2023-01-27T10:10:59.710Z',
+    },
+  ],
+};

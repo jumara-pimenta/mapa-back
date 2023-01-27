@@ -1,3 +1,4 @@
+import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
 import { FiltersDriverDTO } from '../../dtos/driver/filtersDriver.dto';
 import { IQueryDriver } from '../../dtos/driver/queryDriver.dto';
 import { FiltersEmployeeDTO } from '../../dtos/employee/filtersEmployee.dto';
@@ -15,6 +16,7 @@ import { ETypePath } from 'src/utils/ETypes';
 import { getDateStartToEndOfDay } from 'src/utils/Date';
 import { IQueryBackOfficeUser } from 'src/dtos/auth/queryBackOfficeUser.dto';
 import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
+import { IQuerySinister } from 'src/dtos/sinister/querySinister.dto';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -452,6 +454,42 @@ export function generateQueryByFiltersForUser(
     }),
     role: () => ({
       role: { contains: filters.role },
+    }),
+  };
+
+  const keysFields = Object.keys(fields);
+
+  let query: any;
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  let queryBuilder: Function;
+
+  for (const filter in filters) {
+    if (keysFields.includes(filter)) {
+      queryBuilder = fields[filter];
+
+      if (query) {
+        const newCondition = queryBuilder();
+
+        Object.assign(query, { ...newCondition });
+      } else {
+        query = queryBuilder();
+      }
+    }
+  }
+
+  return query;
+}
+
+export function generateQueryByFiltersForSinister(
+  filters: FiltersSinisterDTO,
+): IQuerySinister {
+  const fields = {
+    type: () => ({
+      type: { contains: filters.type },
+    }),
+    description: () => ({
+      description: { contains: filters.description },
     }),
   };
 

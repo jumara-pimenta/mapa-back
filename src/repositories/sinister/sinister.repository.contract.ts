@@ -6,9 +6,8 @@ export default interface ISinisterRepository {
   create(data: Sinister): Promise<Sinister>;
   update(data: Sinister): Promise<Sinister>;
   findById(id: string): Promise<Sinister>;
-  /*   findAll(
+  findAll(
     page: Page,
     filters?: FiltersSinisterDTO,
   ): Promise<PageResponse<Sinister>>;
-  delete(id: string): Promise<Sinister>; */
 }
