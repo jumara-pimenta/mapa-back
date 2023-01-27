@@ -9,6 +9,7 @@ import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
+import { Console } from 'console';
 
 @Injectable()
 export class RouteRepository
@@ -169,6 +170,8 @@ export class RouteRepository
     return this.repository.route.update({
       data: {
         id: data.id,
+        driverId: data.driver.id,
+        vehicleId: data.vehicle.id,
         description: data.description,
         distance: data.distance,
         status: data.status,
@@ -571,7 +574,6 @@ export class RouteRepository
         id: true,
         vehicleId: true,
         driverId: true,
-        
       },
     });
 

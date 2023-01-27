@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { EmployeeAddressDTO } from "../employee/employeeAddress.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
 
 class IPin {
   @ApiProperty()

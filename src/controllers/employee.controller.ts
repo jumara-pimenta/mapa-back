@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Response,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,24 +21,10 @@ import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import {
-<<<<<<< HEAD
-  CreateEmployee,
-  DeleteEmployee,
-  GetAllEmployee,
-  GetEmployee,
-  UpdateEmployee,
-} from 'src/utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-=======
-  ApiCreatedResponse,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
->>>>>>> 0229f9a750774d48dbf7982cd5e94eaf32e97165
+import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -54,6 +41,8 @@ export class EmployeeController {
     return this.employeeService.parseExcelFile(file);
   }
 
+  @Post()
+  @Roles('create-employee')
   @ApiCreatedResponse({
     description: 'Creates a new Employee.',
     schema: {
@@ -61,14 +50,13 @@ export class EmployeeController {
       example: CreateEmployee,
     },
   })
-  @Post()
-  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
   }
 
   @Delete('/:id')
+  @Roles('delete-employee')
   @ApiCreatedResponse({
     description: 'Delete a Employees.',
     schema: {
@@ -82,6 +70,7 @@ export class EmployeeController {
   }
 
   @Put('/:id')
+  @Roles('edit-employee')
   @ApiCreatedResponse({
     description: 'Update a Employee.',
     schema: {
@@ -98,6 +87,7 @@ export class EmployeeController {
   }
 
   @Get()
+  @Roles('list-employee')
   @ApiCreatedResponse({
     description: 'Get all Employees.',
     schema: {
@@ -105,7 +95,6 @@ export class EmployeeController {
       example: GetAllEmployee,
     },
   })
-  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -115,6 +104,7 @@ export class EmployeeController {
   }
 
   @Get('/:id')
+  @Roles('list-employee')
   @ApiCreatedResponse({
     description: 'Get a Employee by id.',
     schema: {
@@ -125,5 +115,24 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.listById(id);
+  }
+
+  @Get('download/file')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Export a Employee File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFile(page, filters);
   }
 }

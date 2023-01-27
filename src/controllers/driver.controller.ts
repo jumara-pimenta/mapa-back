@@ -26,7 +26,8 @@ import {
   GetAllDriver,
   GetDriver,
   UpdateDriver,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -34,6 +35,7 @@ export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
   @Post()
+  @Roles('create-driver')
   @ApiCreatedResponse({
     description: 'Creates a new Driver.',
     schema: {
@@ -47,6 +49,7 @@ export class DriverController {
   }
 
   @Delete('/:id')
+  @Roles('delete-driver')
   @ApiCreatedResponse({
     description: 'Delete a Driver.',
     schema: {
@@ -60,6 +63,7 @@ export class DriverController {
   }
 
   @Put('/:id')
+  @Roles('edit-driver')
   @ApiCreatedResponse({
     description: 'Update a Driver.',
     schema: {
@@ -76,6 +80,7 @@ export class DriverController {
   }
 
   @Get()
+  @Roles('list-driver')
   @ApiCreatedResponse({
     description: 'Get all Drivers.',
     schema: {
@@ -92,6 +97,7 @@ export class DriverController {
   }
 
   @Get('/:id')
+  @Roles('list-driver')
   @ApiCreatedResponse({
     description: 'Get a Driver by id.',
     schema: {

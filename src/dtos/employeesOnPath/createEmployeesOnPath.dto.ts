@@ -1,5 +1,4 @@
-/* eslint-disable quotes */
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEmployeesOnPathDTO {
   @ApiProperty()

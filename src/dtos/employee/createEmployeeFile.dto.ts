@@ -1,13 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, TransformFnParams, Type } from 'class-transformer';
+import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
-  IsDateString,
   ValidateNested,
 } from 'class-validator';
-import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
-import { EmployeeAddressDTO } from './employeeAddress.dto';
 import { faker } from '@faker-js/faker';
 
 faker.locale = 'pt_BR';
@@ -18,14 +15,6 @@ export class CreateEmployeeFileDTO {
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
-
-  // VERIFICAR CAMPO DE ADMISSÃO
-
-  //   @ApiProperty({ default: `${faker.date.past().toISOString()}` })
-  //   @IsDateString(
-  //     {},
-  //     { message: '[admission] A data de admissão deve ser do tipo date.' },
-  //   )
 
   @IsNotEmpty({
     message: '[admission] A data de admissão deve ser preenchida.',

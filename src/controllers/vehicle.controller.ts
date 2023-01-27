@@ -26,7 +26,8 @@ import {
   GetAllVehicle,
   GetVehicle,
   UpdateVehicle,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')
@@ -34,6 +35,7 @@ export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   @Post()
+  @Roles('create-vehicle')
   @ApiCreatedResponse({
     description: 'Creates a new Vehicle.',
     schema: {
@@ -47,6 +49,7 @@ export class VehicleController {
   }
 
   @Delete('/:id')
+  @Roles('delete-vehicle')
   @ApiCreatedResponse({
     description: 'Delete a Vehicle.',
     schema: {
@@ -60,6 +63,7 @@ export class VehicleController {
   }
 
   @Put('/:id')
+  @Roles('edit-vehicle')
   @ApiCreatedResponse({
     description: 'Update a Vehicle.',
     schema: {
@@ -76,6 +80,7 @@ export class VehicleController {
   }
 
   @Get()
+  @Roles('list-vehicle')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'List all Vehicle.',
@@ -93,6 +98,7 @@ export class VehicleController {
   }
 
   @Get('/:id')
+  @Roles('list-vehicle')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Vehicle by id.',
