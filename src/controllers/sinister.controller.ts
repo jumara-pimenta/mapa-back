@@ -1,4 +1,3 @@
-import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
 import { Page, PageResponse } from 'src/configs/database/page.model';
 import {
   Body,
@@ -24,6 +23,7 @@ import {
   UpdateSinister,
 } from 'src/utils/examples.swagger';
 import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
+import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
 
 @Controller('/api/sinister')
 @ApiTags('Sinister')

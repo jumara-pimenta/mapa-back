@@ -1,4 +1,3 @@
-import { IQuerySinister } from 'src/dtos/sinister/querySinister.dto';
 import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
 import { FiltersDriverDTO } from '../../dtos/driver/filtersDriver.dto';
 import { IQueryDriver } from '../../dtos/driver/queryDriver.dto';
@@ -15,6 +14,7 @@ import { IQueryPin } from '../../dtos/pin/queryPin.dto';
 import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { ETypePath } from '../../utils/ETypes';
 import { getDateStartToEndOfDay } from '../../utils/Date';
+import { IQuerySinister } from 'src/dtos/sinister/querySinister.dto';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
