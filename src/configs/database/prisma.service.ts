@@ -186,34 +186,53 @@ export class PrismaService
           }
         }
       }
-      const backOfficeUser = await this.backOfficeUser.findFirst({
-        where: {
-          email: 'admin@rotas.com.br',
-        },
-      });
-
-      if (!backOfficeUser) {
-        await this.backOfficeUser.upsert({
-          where: {
-            email: 'admin@rotas.com.br',
-          },
-          create: {
-            id: uuid(),
-            email: 'admin@rotas.com.br',
-            password: await bcrypt.hash('Denso', 10),
-            name: 'Admin',
-            role: 'ADMIN',
-            createdAt: new Date(),
-          },
-          update: {
-            email: 'admin@rotas.com.br',
-            password: await bcrypt.hash('Denso', 10),
-            name: 'Admin',
-            role: 'ADMIN',
-          },
-        });
-      }
     }
+
+    await this.backOfficeUser.upsert({
+      where: {
+        email: 'admin@rotas.com.br',
+      },
+      create: {
+        id: uuid(),
+        email: 'admin@rotas.com.br',
+        password: await bcrypt.hash('Denso', 10),
+        name: 'Admin',
+        role: 'ADMIN',
+        createdAt: new Date(),
+      },
+      update: {
+        email: 'admin@rotas.com.br',
+        password: await bcrypt.hash('Denso', 10),
+        name: 'Admin',
+        role: 'ADMIN',
+      },
+    });
+
+    await this.pin.upsert({
+      where: {
+        id: process.env.DENSO_ID,
+      },
+      create: {
+        id: process.env.DENSO_ID,
+        title: 'Denso',
+        local: 'Denso LTDA ',
+        details:
+          'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
+        lat: '-3.1112953',
+        lng: '-59.9643917',
+        createdAt: new Date(),
+      },
+      update: {
+        id: process.env.DENSO_ID,
+        title: 'Denso',
+        local: 'Denso LTDA ',
+        details:
+          'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
+        lat: '-3.1112953',
+        lng: '-59.9643917',
+        createdAt: new Date(),
+      },
+    });
   }
   async onModuleDestroy() {
     await this.$disconnect();
