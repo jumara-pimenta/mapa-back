@@ -14,8 +14,8 @@ model Driver {
   name         String         @db.VarChar(255)
   cpf          String         @unique @db.VarChar(11)
   cnh          String         @unique @db.VarChar(11)
-  validation   DateTime       @db.DateTimeOffset
   password     String         @db.VarChar(255)
+  validation   DateTime       @db.DateTimeOffset
   category     String
   route        Route[]
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
@@ -157,4 +157,12 @@ model BackOfficeUser {
   role      String
   createdAt DateTime  @default(now()) @db.DateTimeOffset
   updatedAt DateTime? @db.DateTimeOffset
+}
+
+model Sinister {
+  id          String    @id @unique
+  type        String
+  description String
+  createdAt   DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt   DateTime? @db.DateTimeOffset
 }

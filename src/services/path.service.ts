@@ -19,11 +19,10 @@ import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
 import { EStatusPath, EStatusRoute, ETypePath } from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
-import { getDateInLocaleTime } from 'src/utils/date.service';
-import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { getDateInLocaleTime } from '../utils/date.service';
+import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
-import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class PathService {
@@ -246,7 +245,7 @@ export class PathService {
     return await this.pathRepository.delete(path.id);
   }
 
-  async listById(id: string): Promise<MappedPathDTO> {
+  async listById(id: string): Promise<any> {
     const path = await this.pathRepository.findById(id);
 
     if (!path)
@@ -255,6 +254,32 @@ export class PathService {
         HttpStatus.NOT_FOUND,
       );
 
+    if (path.type === ETypePath.ONE_WAY) {
+      path;
+
+      const pathData = this.mapperOne(path) as any;
+      const denso = {
+        id: 'DENSO',
+        boardingAt: null,
+        confirmation: true,
+        disembarkAt: null,
+        position: 99,
+        details: {
+          name: 'DENSO',
+          address: 'null',
+          shift: 'DENSO',
+          registration: 'DENSO',
+          location: {
+            id: 'DENSO',
+            lat: '-3.1112953',
+            lng: '-59.9643917',
+          },
+        },
+      };
+      pathData.employeesOnPath.push(denso);
+
+      return pathData;
+    }
     return this.mapperOne(path);
   }
 
@@ -321,6 +346,17 @@ export class PathService {
     employeesByPin.forEach((employeeByPin, index) => {
       employeeByPin.position = index + 1;
     });
+
+    const datadenso = {
+      position: 99,
+      lat: '-3.1112953',
+      lng: '-59.9643917',
+      employees: [],
+    };
+
+    if (path.type === ETypePath.ONE_WAY) {
+      employeesByPin.push(datadenso);
+    }
 
     return { ...data, routeId: routeId, employeesOnPins: employeesByPin };
   }

@@ -51,7 +51,6 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-
     const emplopyeeOrdened = orderPins(employeesPins);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
@@ -177,6 +176,17 @@ export class RouteService {
       total: routes.total,
       items,
     };
+  }
+
+  async getById(id: string): Promise<Route> {
+    const route = await this.routeRepository.findById(id);
+    if (!route)
+      throw new HttpException(
+        'Não foi encontrada esta rota!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return route;
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {

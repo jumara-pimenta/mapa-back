@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RequestContext } from 'nestjs-request-context';
-import { ROLES_KEY } from 'src/decorators/roles.decorator';
+import { ROLES_KEY } from '../../decorators/roles.decorator';
 import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
 import { AuthService } from '../../services/auth.service';
 

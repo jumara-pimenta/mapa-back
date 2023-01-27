@@ -407,14 +407,14 @@ export class EmployeeService {
 
       const workBook = XLSX.utils.book_new();
       const workSheetData = [
-        ,
+        '',
         employeeInformationHeader,
-        ,
+        '',
         employeeInformationFooter,
-        ,
+        '',
         headers,
         ...data,
-        ,
+        '',
         employeeInformationFooter,
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
