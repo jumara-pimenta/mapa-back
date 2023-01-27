@@ -4,11 +4,13 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
 import {
+  EmployeeHistoryDTO,
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
 import { compareDates } from 'src/utils/Date';
 import { RouteHistoryByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
+import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dto';
 
 @Injectable()
 export class RouteHistoryService {
@@ -70,7 +72,7 @@ export class RouteHistoryService {
         HttpStatus.NOT_FOUND,
       );
     }
-    console.log(routeHistory.items);
+
     const items = await this.mapperMany(routeHistory.items);
 
     return {
@@ -80,7 +82,7 @@ export class RouteHistoryService {
   }
 
   private async mapperMany(
-    routeHistories: RouteHistory[],
+    routeHistories: any,
   ): Promise<MappedRouteHistoryDTO[]> {
     return routeHistories.map((routeHistory) => {
       return {
@@ -98,6 +100,22 @@ export class RouteHistoryService {
         finishedAt: routeHistory.finishedAt,
       };
     });
+  }
+
+  private async mapperPath(routeHistory: any): Promise<MappedPathHistoryDTO> {
+    return {
+      id: routeHistory.id,
+      typeRoute: routeHistory.typeRoute,
+      nameRoute: routeHistory.nameRoute,
+      path: routeHistory.path.id,
+      totalEmployees: routeHistory.totalEmployees,
+      totalConfirmed: routeHistory.totalConfirmed,
+      driverName: routeHistory.driver.name,
+      vehiclePlate: routeHistory.vehicle.plate,
+      itinerary: this.separateItinerary(routeHistory.itinerary),
+      startedAt: routeHistory.startedAt,
+      finishedAt: routeHistory.finishedAt,
+    };
   }
 
   private toDTO(routeHistorys: RouteHistory[]): MappedRouteHistoryDTO[] {
@@ -131,6 +149,26 @@ export class RouteHistoryService {
     return latAndLong;
   }
 
+  async listAllEmployess(id: string): Promise<any> {
+    const path = await this.routeHistoryRepository.findById(id);
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado um routeHistory com o id: ${id}`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    const employeesHistory: EmployeeHistoryDTO[] = [];
+
+    for await (const employee of path.employeeIds.split(',')) {
+      const employeeHistory = await this.routeHistoryRepository.getEmployeeById(
+        employee,
+      );
+      employeesHistory.push(employeeHistory);
+    }
+
+    const pathMapped = await this.mapperPath(path);
+    return { ...pathMapped, employeesHistory };
+  }
   async getHistoric(): Promise<any> {
     const historic = await this.routeHistoryRepository.getHistoric();
     let Pending = 0;

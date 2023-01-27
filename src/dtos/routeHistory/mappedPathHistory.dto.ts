@@ -1,22 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { LatAndLong } from './mappedRouteHistory.dto';
 
-export class LatAndLong {
-  @ApiProperty()
-  lat: string;
-  @ApiProperty()
-  lng: string;
-}
-
-export class EmployeeHistoryDTO {
-  @ApiProperty()
-  name: string;
-  @ApiProperty()
-  costCenter: string;
-  @ApiProperty()
-  registration: string;
-}
-
-export class MappedRouteHistoryDTO {
+export class MappedPathHistoryDTO {
   @ApiProperty()
   id: string;
   @ApiProperty()
@@ -26,15 +11,13 @@ export class MappedRouteHistoryDTO {
   @ApiProperty()
   path: string;
   @ApiProperty()
-  employeeIds: string;
-  @ApiProperty()
   totalEmployees: number;
   @ApiProperty()
   totalConfirmed: number;
   @ApiProperty()
-  driver: string;
+  driverName: string;
   @ApiProperty()
-  vehicle: string;
+  vehiclePlate: string;
   @ApiProperty()
   itinerary: LatAndLong[];
   @ApiProperty()
