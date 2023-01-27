@@ -2,12 +2,9 @@ import { faker } from '@faker-js/faker';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-<<<<<<< HEAD
 import { CreateEmployeeDTO } from 'src/dtos/employee/createEmployee.dto';
 import { Employee } from 'src/entities/employee.entity';
-=======
->>>>>>> qa
-import { ETypePath, ETypePin, ETypeRoute } from 'src/utils/ETypes';
+import { EStatusPath, ETypePath, ETypePin, ETypeRoute } from 'src/utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
 faker.locale = 'pt_BR';
@@ -142,7 +139,7 @@ export class PrismaService
                   duration: '00:10',
                   startsAt: '08:00',
                   type: ETypePath.ONE_WAY,
-                  status: 'ACTIVE',
+                  status: EStatusPath.PENDING,
                   createdAt: new Date(),
                 },
                 {
@@ -150,7 +147,7 @@ export class PrismaService
                   duration: '00:10',
                   startsAt: '19:00',
                   type: ETypePath.RETURN,
-                  status: 'ACTIVE',
+                  status: EStatusPath.PENDING,
                   createdAt: new Date(),
                 },
               ],
