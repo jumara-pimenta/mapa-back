@@ -1,3 +1,5 @@
+import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
+import { Page, PageResponse } from 'src/configs/database/page.model';
 import {
   Body,
   Controller,
@@ -7,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -16,9 +19,11 @@ import { Sinister } from 'src/entities/sinister.entity';
 import { SinisterService } from 'src/services/sinister.service';
 import {
   CreateSinister,
+  GetAllSinister,
   GetSinisterById,
   UpdateSinister,
 } from 'src/utils/examples.swagger';
+import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
 
 @Controller('/api/sinister')
 @ApiTags('Sinister')
@@ -68,5 +73,22 @@ export class SinisterController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Sinister> {
     return await this.sinisterService.listById(id);
+  }
+
+  @Get()
+  @Roles('list-sinister')
+  @ApiCreatedResponse({
+    description: 'Get all Sinisters.',
+    schema: {
+      type: 'object',
+      example: GetAllSinister,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAll(
+    @Query() page: Page,
+    @Query() filters: FiltersSinisterDTO,
+  ): Promise<PageResponse<MappedSinisterDTO>> {
+    return await this.sinisterService.listAll(page, filters);
   }
 }
