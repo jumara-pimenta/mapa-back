@@ -36,6 +36,21 @@ export class RouteHistoryRepository
       orderBy: {
         createdAt: 'desc',
       },
+      select: {
+        id: true,
+        typeRoute: true,
+        nameRoute: true,
+        path: true,
+        employeeIds: true,
+        totalEmployees: true,
+        totalConfirmed: true,
+        driver: true,
+        vehicle: true,
+        itinerary: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+      },
     });
 
     const total = await this.repository.routeHistory.count();

@@ -3,7 +3,10 @@ import { Page, PageResponse } from 'src/configs/database/page.model';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
-import { MappedRouteHistoryDTO } from '../dtos/routeHistory/mappedRouteHistory.dto';
+import {
+  LatAndLong,
+  MappedRouteHistoryDTO,
+} from '../dtos/routeHistory/mappedRouteHistory.dto';
 import { compareDates } from 'src/utils/Date';
 import { RouteHistoryByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 
@@ -67,7 +70,7 @@ export class RouteHistoryService {
         HttpStatus.NOT_FOUND,
       );
     }
-
+    console.log(routeHistory.items);
     const items = await this.mapperMany(routeHistory.items);
 
     return {
@@ -84,13 +87,13 @@ export class RouteHistoryService {
         id: routeHistory.id,
         typeRoute: routeHistory.typeRoute,
         nameRoute: routeHistory.nameRoute,
-        path: routeHistory.path.id,
+        path: routeHistory.id,
         employeeIds: routeHistory.employeeIds,
         totalEmployees: routeHistory.totalEmployees,
         totalConfirmed: routeHistory.totalConfirmed,
         driver: routeHistory.driver.id,
         vehicle: routeHistory.vehicle.id,
-        itinerary: routeHistory.itinerary,
+        itinerary: this.separateItinerary(routeHistory.itinerary),
         startedAt: routeHistory.startedAt,
         finishedAt: routeHistory.finishedAt,
       };
@@ -109,11 +112,23 @@ export class RouteHistoryService {
         totalConfirmed: routeHistory.totalConfirmed,
         driver: routeHistory.driver.id,
         vehicle: routeHistory.vehicle.id,
-        itinerary: routeHistory.itinerary,
+        itinerary: this.separateItinerary(routeHistory.itinerary),
         startedAt: routeHistory.startedAt,
         finishedAt: routeHistory.finishedAt,
       };
     });
+  }
+
+  separateItinerary(itinerary: string): LatAndLong[] {
+    const split = itinerary.split(',');
+    const latAndLong: LatAndLong[] = [];
+    for (let i = 0; i < split.length; i += 2) {
+      latAndLong.push({
+        lat: split[i],
+        lng: split[i + 1],
+      });
+    }
+    return latAndLong;
   }
 
   async getHistoric(): Promise<any> {
