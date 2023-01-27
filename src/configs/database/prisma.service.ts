@@ -4,7 +4,13 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CreateEmployeeDTO } from 'src/dtos/employee/createEmployee.dto';
 import { Employee } from 'src/entities/employee.entity';
-import { EStatusPath, ETypePath, ETypePin, ETypeRoute } from 'src/utils/ETypes';
+import {
+  EStatusPath,
+  EStatusRoute,
+  ETypePath,
+  ETypePin,
+  ETypeRoute,
+} from 'src/utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
 faker.locale = 'pt_BR';
@@ -129,7 +135,7 @@ export class PrismaService
           driverId: driverId[i].id,
           vehicleId: vehicleId[i].id,
           distance: 'PENDENTE',
-          status: 'ACTIVE',
+          status: EStatusRoute.PENDING,
           type: ETypeRoute.CONVENTIONAL,
           path: {
             createMany: {
