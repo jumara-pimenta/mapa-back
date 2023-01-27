@@ -13,6 +13,13 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
   constructor(private readonly repository: PrismaService) {
     super();
   }
+  findByLocal(local: string): Promise<Pin> {
+    return this.repository.pin.findFirst({
+      where: {
+        local,
+      },
+    });
+  }
 
   delete(id: string): Promise<any> {
     return this.repository.pin.delete({
@@ -52,14 +59,14 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
           ...this.buildPage(page),
           where: condition,
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: 'desc',
+          },
         })
       : await this.repository.pin.findMany({
           ...this.buildPage(page),
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: 'desc',
+          },
         });
 
     const total = condition

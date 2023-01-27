@@ -2,8 +2,11 @@ import { faker } from '@faker-js/faker';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+<<<<<<< HEAD
 import { CreateEmployeeDTO } from 'src/dtos/employee/createEmployee.dto';
 import { Employee } from 'src/entities/employee.entity';
+=======
+>>>>>>> qa
 import { ETypePath, ETypePin, ETypeRoute } from 'src/utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
