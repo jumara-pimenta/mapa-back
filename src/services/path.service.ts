@@ -308,7 +308,7 @@ export class PathService {
 
     for await (const employee of employeesOnPath) {
       const { id: pinId, lat, lng } = employee.details.location;
-
+      console.log({ pathId, pinId });
       const employeesOnSamePin =
         await this.employeesOnPathService.listByPathAndPin(pathId, pinId);
       let data = {} as EmployeesByPin;

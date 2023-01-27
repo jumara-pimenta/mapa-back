@@ -113,16 +113,6 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
-  async getById(id: string): Promise<Route> {
-    const route = await this.routeRepository.findById(id);
-    if (!route)
-      throw new HttpException(
-        'Não foi encontrada está rota!',
-        HttpStatus.NOT_FOUND,
-      );
-
-    return route;
-  }
 
   async listByDriverId(
     id: string,
