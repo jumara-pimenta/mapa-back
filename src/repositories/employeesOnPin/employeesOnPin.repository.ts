@@ -44,6 +44,7 @@ export class EmployeesOnPinRepository
       },
     });
   }
+
   update(pinId: string, data: EmployeesOnPin): Promise<EmployeesOnPin> {
     return this.repository.employeesOnPin.update({
       where: {
