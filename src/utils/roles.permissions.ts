@@ -47,6 +47,9 @@ export const setPermissions = (roles: ERoles) => {
       'edit-employeeOnPath',
       'list-employeeOnPath',
       'list-employee',
+      'create-sinister',
+      'list-sinister',
+      'edit-sinister',
     ];
 
   if (roles === ERoles.ROLE_DRIVER)
@@ -62,5 +65,8 @@ export const setPermissions = (roles: ERoles) => {
       'edit-employeeOnPath',
       'list-employeeOnPath',
       'list-employee',
+      'create-sinister',
+      'list-sinister',
+      'edit-sinister',
     ];
 };
