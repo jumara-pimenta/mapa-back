@@ -87,7 +87,7 @@ export class RouteHistoryService {
         id: routeHistory.id,
         typeRoute: routeHistory.typeRoute,
         nameRoute: routeHistory.nameRoute,
-        path: routeHistory.id,
+        path: routeHistory.path.id,
         employeeIds: routeHistory.employeeIds,
         totalEmployees: routeHistory.totalEmployees,
         totalConfirmed: routeHistory.totalConfirmed,
