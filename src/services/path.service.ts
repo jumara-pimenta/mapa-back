@@ -44,6 +44,7 @@ export class PathService {
   async finishPath(id: string): Promise<any> {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
+    console.log(route.employeesOnPins);
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const driver = await this.driverService.listById(route.driver);
 
@@ -58,10 +59,13 @@ export class PathService {
         'Não é possível finalizar uma rota que não foi iniciada!',
         HttpStatus.CONFLICT,
       );
+    const totalInEachPin = route.employeesOnPins.map((item) => {
+      return item.employees.length;
+    });
     const employeeArray = [] as string[];
     const itinerariesArray = [];
-    const totalEmployees = route.employeesOnPins.length;
-    let totalConfirmed = 0;
+    const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0) - 1;
+    let totalConfirmed = -1;
 
     for await (const employeesPins of route.employeesOnPins) {
       itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
@@ -247,7 +251,6 @@ export class PathService {
 
   async listById(id: string): Promise<any> {
     const path = await this.pathRepository.findById(id);
-
     if (!path)
       throw new HttpException(
         `Não foi encontrado trajeto com o id: ${id}!`,
@@ -257,7 +260,7 @@ export class PathService {
     if (path.type === ETypePath.ONE_WAY) {
       const pathData = this.mapperOne(path) as any;
       const denso = {
-        id: 'DENSO',
+        id: 'Denso',
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
@@ -268,7 +271,7 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
-            id: null,
+            id: process.env.DENSO_ID,
             lat: '-3.1112953',
             lng: '-59.9643917',
           },
@@ -282,7 +285,7 @@ export class PathService {
     if (path.type === ETypePath.RETURN) {
       const pathData = this.mapperOne(path) as any;
       const denso = {
-        id: 'DENSO',
+        id: 'Denso',
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
@@ -293,6 +296,7 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
+            id: process.env.DENSO_ID,
             lat: '-3.1112953',
             lng: '-59.9643917',
           },
@@ -320,7 +324,6 @@ export class PathService {
 
   async listEmployeesByPathAndPin(pathId: string): Promise<MappedPathPinsDTO> {
     const path = await this.listById(pathId);
-
     const routeId = await this.routeService.routeIdByPathId(pathId);
 
     const { employeesOnPath, ...data } = path;
@@ -331,39 +334,70 @@ export class PathService {
 
     for await (const employee of employeesOnPath) {
       const { id: pinId, lat, lng } = employee.details.location;
-      console.log({ pathId, pinId });
-      const employeesOnSamePin =
-        await this.employeesOnPathService.listByPathAndPin(pathId, pinId);
-      let data = {} as EmployeesByPin;
+      if (pinId !== process.env.DENSO_ID) {
+        const employeesOnSamePin =
+          await this.employeesOnPathService.listByPathAndPin(pathId, pinId);
+        let data = {} as EmployeesByPin;
 
-      employeesOnSamePin.forEach((employeeOnPath) => {
-        const { name, registration, id: employeeId } = employeeOnPath.employee;
+        employeesOnSamePin.forEach((employeeOnPath) => {
+          const {
+            name,
+            registration,
+            id: employeeId,
+          } = employeeOnPath.employee;
 
-        if (agroupedEmployees.includes(employeeOnPath.id)) return;
+          if (agroupedEmployees.includes(employeeOnPath.id)) return;
 
-        agroupedEmployees.push(employeeOnPath.id);
+          agroupedEmployees.push(employeeOnPath.id);
+          data = {
+            position: employeeOnPath.position,
+            lat,
+            lng,
+            employees: data.employees?.length ? data.employees : [],
+          };
+          data.employees.push({
+            id: employeeOnPath.id,
+            name,
+            registration,
+            employeeId: employeeOnPath.employee.id,
+            disembarkAt: employeeOnPath.disembarkAt,
+            boardingAt: employeeOnPath.boardingAt,
+            confirmation: employeeOnPath.confirmation,
+            present: employeeOnPath.present,
+          });
+        });
+
+        if (Object.keys(data).length === 0 && data.constructor === Object)
+          continue;
+
+        employeesByPin.push(data as EmployeesByPin);
+      }
+      if (pinId === process.env.DENSO_ID) {
+        let data = {} as EmployeesByPin;
+        console.log(employee);
         data = {
-          position: employeeOnPath.position,
+          position: employee.position,
           lat,
           lng,
           employees: data.employees?.length ? data.employees : [],
         };
         data.employees.push({
-          id: employeeOnPath.id,
-          name,
-          registration,
-          employeeId: employeeOnPath.employee.id,
-          disembarkAt: employeeOnPath.disembarkAt,
-          boardingAt: employeeOnPath.boardingAt,
-          confirmation: employeeOnPath.confirmation,
-          present: employeeOnPath.present,
+          id: employee.id,
+          name: 'Denso',
+          registration: 'Denso',
+          employeeId: employee.id,
+          disembarkAt: employee.disembarkAt,
+          boardingAt: employee.boardingAt,
+          confirmation: employee.confirmation,
+          present: employee.present,
         });
-      });
-
-      if (Object.keys(data).length === 0 && data.constructor === Object)
-        continue;
-
-      employeesByPin.push(data as EmployeesByPin);
+        if (path.type === ETypePath.ONE_WAY) {
+          employeesByPin.push(data);
+        }
+        if (path.type === ETypePath.RETURN) {
+          employeesByPin.unshift(data);
+        }
+      }
     }
     // change position base on length of employees
     employeesByPin.forEach((employeeByPin, index) => {

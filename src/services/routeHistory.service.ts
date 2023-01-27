@@ -174,6 +174,7 @@ export class RouteHistoryService {
         data.totalEmployessConfirmed - data.totalEmployessPresent;
       response.push(data);
     });
+    console.log(historic);
 
     const reponseReduce = response.reduce<RouteHistoryByDate[]>((acc, curr) => {
       const { date } = curr;
