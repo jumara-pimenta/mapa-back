@@ -142,7 +142,7 @@ export class RouteController {
     @Query() page: Page,
     @Query() filter: FilterRouteExport,
   ): Promise<any> {
-    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    const fileName = 'Sonar Rotas - Rotas Exportadas.xlsx';
     res.set({
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="${fileName}"`,

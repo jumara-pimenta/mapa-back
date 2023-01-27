@@ -33,8 +33,8 @@ import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
 import * as turf from '@turf/turf';
 import * as XLSX from 'xlsx';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class RouteService {
@@ -831,9 +831,6 @@ export class RouteService {
         ['************************************************************'],
         ['**********'],
         ['*******'],
-        ['***************************************************************'],
-        ['*********************'],
-        ['************'],
       ];
 
       const workBook = XLSX.utils.book_new();
