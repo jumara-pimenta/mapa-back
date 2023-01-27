@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  StreamableFile,
 } from '@nestjs/common';
 import { Route } from '../entities/route.entity';
 import IRouteRepository from '../repositories/route/route.repository.contract';
@@ -18,7 +19,12 @@ import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
-import { EStatusRoute, ETypePath, ETypeRoute } from '../utils/ETypes';
+import {
+  EStatusRoute,
+  ETypePath,
+  ETypeRoute,
+  ETypeRouteExport,
+} from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
 import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -26,6 +32,9 @@ import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
 import * as turf from '@turf/turf';
+import * as XLSX from 'xlsx';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class RouteService {
@@ -112,7 +121,6 @@ export class RouteService {
 
     return this.mapperOne(route);
   }
-
 
   async listByDriverId(
     id: string,
@@ -757,13 +765,95 @@ export class RouteService {
     return path;
   }
 
- 
   async routeDataByPathId(pathId: string): Promise<any> {
     const path = await this.routeRepository.findRouteDataByPathId(pathId);
     if (!path) {
       throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
     }
     return path;
+  }
+
+  async exportsRouteFile(page: Page, type: ETypeRouteExport): Promise<any> {
+    const headers = [
+      'DESCRIÇÃO',
+      'DISTÂNCIA',
+      'MOTORISTA',
+      'ESTADO',
+      'TIPO DA ROTA',
+      'VEÍCULO',
+      'QUANTIDADE DE COLABORADORES',
+    ];
+    const today = new Date().toLocaleDateString('pt-BR');
+
+    const filePath = './routes.xlsx';
+    const workSheetName = 'Rotas';
+
+    // const employees = await this.listAll(page, filters);
+    const route = await this.routeRepository.findAllToExport(page, type);
+    if (route.total === 0) {
+      throw new HttpException(
+        'Não existem rotas para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const exportedRouteToXLSX = async (
+      routes: Route[],
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = routes.map((route) => {
+        return [
+          route.description,
+          route.distance,
+          route.driver.name,
+          route.status,
+          route.type,
+          route.vehicle.plate,
+          route.path[0].employeesOnPath.length,
+        ];
+      });
+
+      const routeInformationHeader = [
+        [`ROTAS EXPORTADOS: ${today}`],
+        [`TOTAL DE ROTAS EXPORTADAS: ${data.length}`],
+      ];
+
+      const routeInformationFooter = [
+        ['**********************************************'],
+        ['***********************************************'],
+        ['************************'],
+        ['*************************************'],
+        ['**********'],
+        ['************************************************************'],
+        ['**********'],
+        ['*******'],
+      ];
+
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [
+        '',
+        routeInformationHeader,
+        '',
+        routeInformationFooter,
+        '',
+        headers,
+        ...data,
+        '',
+        routeInformationFooter,
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedRouteToXLSX(route.items, headers, workSheetName, filePath);
   }
 }
 

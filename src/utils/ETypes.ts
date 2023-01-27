@@ -9,6 +9,11 @@ export enum ETypeRoute {
   EXTRA = 'EXTRA',
 }
 
+export enum ETypeRouteExport {
+  CONVENTIONAL = 'CONVENCIONAL',
+  EXTRA = 'EXTRA',
+}
+
 export enum EStatusRoute {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
