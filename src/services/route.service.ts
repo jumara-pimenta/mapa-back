@@ -113,17 +113,6 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
-  async getById(id: string): Promise<Route> {
-    const route = await this.routeRepository.findById(id);
-    if (!route)
-      throw new HttpException(
-        'Não foi encontrada está rota!',
-        HttpStatus.NOT_FOUND,
-      );
-
-    return route;
-  }
-
   async listByDriverId(
     id: string,
     page: Page,
@@ -248,7 +237,7 @@ export class RouteService {
     if (data.vehicleId) {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
-    const { path, ...rest } = routeEntity;
+    const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
       Object.assign(rest, data),
@@ -262,7 +251,6 @@ export class RouteService {
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
     if (payload.path.startedAt) {
-      const routeData = await this.listByIdWebsocket(payload.routeId);
       const Pathdata = await this.pathService.listById(payload.pathId);
 
       if (Pathdata.employeesOnPath.length === 0) {
