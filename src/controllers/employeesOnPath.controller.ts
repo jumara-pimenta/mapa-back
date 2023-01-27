@@ -18,11 +18,8 @@ import {
   GetEmployeesOnPath,
   UpdateConfirmationEmployeesOnPath,
   UpdateConfirmationEmployeesOnPathById,
-  UpdateEmployeeOffBoard,
-  UpdateEmployeeOnBoard,
-  UpdateEmployeeOnPathNotComming,
   UpdateEmployeesOnPathById,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 

@@ -101,7 +101,6 @@ export class EmployeeController {
       example: GetAllEmployee,
     },
   })
-  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,

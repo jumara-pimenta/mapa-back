@@ -7,7 +7,6 @@ import { AuthController } from '../controllers/auth.controller';
 import { RequestContextModule } from 'nestjs-request-context';
 import { CoreServiceIntegration } from '../integrations/services/coreService/core.service.integration';
 import { BackOfficeUserRepository } from 'src/repositories/backOfficeUser/backOffice.repository';
-import { PrismaService } from 'src/database/prisma.service';
 import { PrismaModule } from 'src/database/prisma.module';
 import { EmployeeModule } from './employee.module';
 import { DriverModule } from './driver.module';

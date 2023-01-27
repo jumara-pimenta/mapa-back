@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsString, IsNotEmpty, Matches } from 'class-validator';
-import { durationPathRgx } from 'src/utils/Regex';
+import { durationPathRgx } from '../../utils/Regex';
 
 export class CreateRouteHistoryDTO {
   @ApiProperty()

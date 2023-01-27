@@ -58,5 +58,6 @@ export const setPermissions = (roles: ERoles) => {
       'list-route',
       'edit-employeeOnPath',
       'list-employeeOnPath',
+      'list-employee',
     ];
 };

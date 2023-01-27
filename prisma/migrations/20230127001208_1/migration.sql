@@ -8,6 +8,7 @@ CREATE TABLE [dbo].[Driver] (
     [name] VARCHAR(255) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [cnh] VARCHAR(11) NOT NULL,
+    [password] VARCHAR(255) NOT NULL,
     [validation] DATETIMEOFFSET NOT NULL,
     [category] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Driver_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -162,6 +163,17 @@ CREATE TABLE [dbo].[BackOfficeUser] (
     CONSTRAINT [BackOfficeUser_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [BackOfficeUser_id_key] UNIQUE NONCLUSTERED ([id]),
     CONSTRAINT [BackOfficeUser_email_key] UNIQUE NONCLUSTERED ([email])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[Sinister] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [type] NVARCHAR(1000) NOT NULL,
+    [description] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Sinister_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIMEOFFSET,
+    CONSTRAINT [Sinister_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [Sinister_id_key] UNIQUE NONCLUSTERED ([id])
 );
 
 -- AddForeignKey
