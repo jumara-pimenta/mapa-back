@@ -20,23 +20,19 @@ export class StatusRouteDTO {
   @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.'})
   pathId: string;
   
-  // @ApiProperty()
+  @ApiProperty()
   @ValidateNested({
     each: true,
   })
   @Type(() => UpdateRouteDTO)
-  @IsOptional({
-    // message: '[route] Os detalhes da rota devem ser preenchidos.',
-  })
+  @IsOptional()
   route: UpdateRouteDTO;
   
-  // @ApiProperty()
+  @ApiProperty()
   @ValidateNested({
     each: true,
   })
   @Type(() => UpdatePathDTO)
-  @IsOptional({
-    // message: '[path] Os detalhes do trajeto devem ser preenchidos.',
-  })
+  @IsOptional()
   path: UpdatePathDTO;
 }

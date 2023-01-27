@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { EmployeeAddressDTO } from "../employee/employeeAddress.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
 
 class IPin {
   @ApiProperty()
@@ -132,41 +132,38 @@ export class MappedRouteDTO {
 
 export class MappedRouteShortDTO {
   @ApiProperty()
-	id: string
+  id: string;
   @ApiProperty()
-	description: string
+  description: string;
   @ApiProperty()
-	distance: string
+  distance: string;
   @ApiProperty()
-	driver: IDriverShort
+  driver: IDriverShort;
   @ApiProperty()
-	type: string
+  type: string;
   @ApiProperty()
-	vehicle: IVehicleShort
+  vehicle: IVehicleShort;
 }
-
 
 class IDriverShort {
   @ApiProperty()
-  id: string
+  id: string;
   @ApiProperty()
-  name: string
+  name: string;
 }
 
 class IVehicleShort {
   @ApiProperty()
-  id: string
+  id: string;
   @ApiProperty()
-  plate: string
+  plate: string;
 }
-
 
 class IPathShort {
   @ApiProperty()
-  id: string
+  id: string;
   @ApiProperty()
-  startsAt: string
+  startsAt: string;
   @ApiProperty()
-  employeesOnPath: IEmployeesOnPathDTO[]
-
+  employeesOnPath: IEmployeesOnPathDTO[];
 }

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ETypePin } from '../../utils/ETypes';
-import { EmployeeAddressDTO } from './employeeAddress.dto';
 
 export class MappedEmployeeDTO {
   @ApiProperty()
