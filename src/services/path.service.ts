@@ -269,7 +269,7 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
-            id: 'DENSO',
+            id: null,
             lat: '-3.1112953',
             lng: '-59.9643917',
           },
@@ -294,7 +294,6 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
-            id: 'DENSO',
             lat: '-3.1112953',
             lng: '-59.9643917',
           },
@@ -371,17 +370,6 @@ export class PathService {
     employeesByPin.forEach((employeeByPin, index) => {
       employeeByPin.position = index + 1;
     });
-
-    const datadenso = {
-      position: 99,
-      lat: '-3.1112953',
-      lng: '-59.9643917',
-      employees: [],
-    };
-
-    if (path.type === ETypePath.ONE_WAY) {
-      employeesByPin.push(datadenso);
-    }
 
     return { ...data, routeId: routeId, employeesOnPins: employeesByPin };
   }
