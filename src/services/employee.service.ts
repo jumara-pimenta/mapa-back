@@ -4,7 +4,6 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
 import { Employee } from '../entities/employee.entity';
@@ -21,22 +20,20 @@ import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 
 import * as XLSX from 'xlsx';
-import { validate, validateSync } from 'class-validator';
+import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
 import path from 'path';
 import fs from 'fs';
 import * as bcrypt from 'bcrypt';
-import util from 'util';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
     validate(schema, { validationError: { target: false } })
-      .then((response) => resolve(response))
+      .then((response) => resolve(response.map((i) => i)))
       .catch((error: any) => reject(error));
   });
 };
-
 interface abc {
   line: number;
   employee: CreateEmployeeFileDTO;
@@ -304,7 +301,8 @@ export class EmployeeService {
       'Denso Industrial da Amazônia',
     );
 
-    let line = 0;
+    var line = 0;
+    let messagesErrors = [];
 
     for (const row of data) {
       const address = {
@@ -331,21 +329,43 @@ export class EmployeeService {
       line++;
       employees.push({ line, employee });
     }
-
     let totalCreated = 0;
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
-    let messagesErrors = [];
 
     for await (const item of employees) {
       let error = false;
 
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
-      let line = item.line;
+      var lineE = item.line;
 
       const errorsTest = await validateAsync(employeeSchema);
 
-      console.log(errorsTest);
+      const [teste] = errorsTest;
+      let cont = 0;
+
+      messagesErrors.push({
+        line: lineE,
+        // field: errorsTest,
+        meesage: teste,
+      });
+      const testew = messagesErrors.map((i) => {
+        return i.meesage;
+      });
+
+      var aa = testew.map((i) => [
+        {
+          field: i?.property,
+          message: i?.constraints,
+        },
+      ]);
+
+      // aa.push({ ...aa, line: lineE });
+
+      // console.log(aa);
+      // console.log('Employee', employees);
+
+      // if (errorsTest) console.log(errorsTest);
 
       if (!errorsTest.length) {
         const existsRegistration =
@@ -354,7 +374,6 @@ export class EmployeeService {
           );
 
         if (!existsRegistration) {
-          // const password = bcrypt.hashSync(item.employee.registration, 10);
           await this.employeeRepository.create(
             new Employee(
               {
@@ -375,11 +394,11 @@ export class EmployeeService {
       }
     }
 
-    const errors: ValidationFileDTO = {
+    const errors: any = {
       newEmployeesCreated: totalCreated,
       employeesAlreadyExistent: alreadyExisted,
       quantityEmployeesOnSheet: totalToCreate,
-      errors: messagesErrors,
+      errors: aa,
     };
 
     return errors;
