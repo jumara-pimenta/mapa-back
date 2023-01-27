@@ -775,7 +775,6 @@ export class RouteService {
 
   async exportsRouteFile(page: Page, type: ETypeRouteExport): Promise<any> {
     const headers = [
-      'ID',
       'DESCRIÇÃO',
       'DISTÂNCIA',
       'MOTORISTA',
@@ -806,7 +805,6 @@ export class RouteService {
     ) => {
       const data = routes.map((route) => {
         return [
-          route.id,
           route.description,
           route.distance,
           route.driver.name,
