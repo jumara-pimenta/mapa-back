@@ -1,22 +1,39 @@
+import { ETypeRoute } from '../utils/ETypes';
 import { v4 as uuid } from 'uuid';
-import { Route } from './route.entity';
+import { Driver } from './driver.entity';
+import { Path } from './path.entity';
+import { Vehicle } from './vehicle.entity';
 
 export class RouteHistory {
   id: string;
+  typeRoute: ETypeRoute | string;
+  nameRoute: string;
+  path?: Path;
   employeeIds: string;
-  route?: Route;
+  totalEmployees: number;
+  totalConfirmed: number;
+  driver?: Driver;
+  vehicle?: Vehicle;
+  itinerary: string;
   startedAt: Date;
   finishedAt: Date;
   createdAt: Date;
   updatedAt?: Date;
 
   constructor(
-    props: Omit<RouteHistory, 'id' | 'createdAt' | 'route'>,
-    route: Route,
+    props: Omit<
+      RouteHistory,
+      'id' | 'createdAt' | 'vehicle' | 'paths' | 'driver'
+    >,
+    path: Path,
+    driver: Driver,
+    vehicle: Vehicle,
     id?: string,
   ) {
     Object.assign(this, props);
     this.id = id ?? uuid();
-    this.route = route;
+    this.path = path;
+    this.driver = driver;
+    this.vehicle = vehicle;
   }
 }

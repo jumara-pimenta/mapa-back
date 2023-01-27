@@ -8,6 +8,7 @@ CREATE TABLE [dbo].[Driver] (
     [name] VARCHAR(255) NOT NULL,
     [cpf] VARCHAR(11) NOT NULL,
     [cnh] VARCHAR(11) NOT NULL,
+    [password] VARCHAR(255) NOT NULL,
     [validation] DATETIMEOFFSET NOT NULL,
     [category] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Driver_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -70,8 +71,15 @@ CREATE TABLE [dbo].[EmployeesOnPath] (
 -- CreateTable
 CREATE TABLE [dbo].[RouteHistory] (
     [id] NVARCHAR(1000) NOT NULL,
+    [typeRoute] NVARCHAR(1000) NOT NULL,
+    [nameRoute] NVARCHAR(1000) NOT NULL,
+    [pathId] NVARCHAR(1000) NOT NULL,
     [employeeIds] NVARCHAR(1000) NOT NULL,
-    [routeId] NVARCHAR(1000) NOT NULL,
+    [totalEmployees] INT NOT NULL,
+    [totalConfirmed] INT NOT NULL,
+    [driverId] NVARCHAR(1000) NOT NULL,
+    [vehicleId] NVARCHAR(1000) NOT NULL,
+    [itinerary] NVARCHAR(1000) NOT NULL,
     [startedAt] DATETIMEOFFSET NOT NULL,
     [finishedAt] DATETIMEOFFSET NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [RouteHistory_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -111,6 +119,7 @@ CREATE TABLE [dbo].[Employee] (
     [shift] NVARCHAR(1000) NOT NULL,
     [costCenter] NVARCHAR(1000) NOT NULL,
     [address] VARCHAR(255) NOT NULL,
+    [password] VARCHAR(255) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Employee_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
     CONSTRAINT [Employee_pkey] PRIMARY KEY CLUSTERED ([id]),
@@ -172,7 +181,13 @@ ALTER TABLE [dbo].[EmployeesOnPath] ADD CONSTRAINT [EmployeesOnPath_pathId_fkey]
 ALTER TABLE [dbo].[EmployeesOnPath] ADD CONSTRAINT [EmployeesOnPath_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[Employee]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[RouteHistory] ADD CONSTRAINT [RouteHistory_routeId_fkey] FOREIGN KEY ([routeId]) REFERENCES [dbo].[Route]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE [dbo].[RouteHistory] ADD CONSTRAINT [RouteHistory_pathId_fkey] FOREIGN KEY ([pathId]) REFERENCES [dbo].[Path]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE [dbo].[RouteHistory] ADD CONSTRAINT [RouteHistory_driverId_fkey] FOREIGN KEY ([driverId]) REFERENCES [dbo].[Driver]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE [dbo].[RouteHistory] ADD CONSTRAINT [RouteHistory_vehicleId_fkey] FOREIGN KEY ([vehicleId]) REFERENCES [dbo].[Vehicle]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[EmployeesOnPin] ADD CONSTRAINT [EmployeesOnPin_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[Employee]([id]) ON DELETE CASCADE ON UPDATE CASCADE;

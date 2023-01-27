@@ -10,8 +10,10 @@ export class Route {
   type: string;
   status: string;
   driver?: Driver;
+  driverId?: string;
   path?: Partial<Path>[];
   vehicle?: Vehicle;
+  vehicleId?: string;
   createdAt: Date;
   updatedAt?: Date;
   deletedAt?: Date;

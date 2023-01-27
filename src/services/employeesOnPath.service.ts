@@ -13,7 +13,7 @@ import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
 import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employeesOnPath.repository.contract';
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
-import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
+import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -67,7 +67,6 @@ export class EmployeesOnPathService {
 
   async findById(id: string): Promise<EmployeesOnPath> {
     const employeesOnPath = await this.employeesOnPathRepository.findById(id);
-    console.log('employeesOnPath', employeesOnPath);
 
     if (!employeesOnPath)
       throw new HttpException(

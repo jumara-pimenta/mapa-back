@@ -1,5 +1,4 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
 import { EmployeesOnPinController } from '../controllers/employeesOnPin.controller';
 import { EmployeesOnPinRepository } from '../repositories/employeesOnPin/employeesOnPin.repository';
 import { EmployeesOnPinService } from '../services/employeesOnPin.service';

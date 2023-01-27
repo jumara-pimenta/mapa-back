@@ -5,11 +5,17 @@ import { differenceInSeconds, fromUnixTime, isAfter } from 'date-fns';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffice.repository.contract';
+} from '../dtos/auth/backOfficeUserLogin.dto';
+import IBackOfficeUserRepository from '../repositories/backOfficeUser/backOffice.repository.contract';
 import * as bcrypt from 'bcrypt';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
-import { setPermissions } from 'src/utils/roles.permissions';
+import { BackOfficeUser } from '../entities/backOfficeUser.entity';
+import { setPermissions } from '../utils/roles.permissions';
+import { CoreTokenDTO } from '../dtos/auth/CoreToken.dto';
+import { ERoles } from '../utils/ETypes';
+import { EmployeeService } from './employee.service';
+import { SignInEmployeeDTO } from '../dtos/employee/signInEmployee.dto';
+import { DriverService } from './driver.service';
+import { signInDriverDTO } from '../dtos/driver/signInDriver.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +25,25 @@ export class AuthService {
     private readonly coreServiceIntegration: ICoreServiceIntegration,
     @Inject('IBackOfficeUserRepository')
     private readonly backOfficeUserRepository: IBackOfficeUserRepository,
+    private readonly employeeService: EmployeeService,
+    private readonly driverService: DriverService,
   ) {}
+
+  async backofficeCore(payload: CoreTokenDTO): Promise<any> {
+    const token = await this.coreServiceIntegration.verifyToken(payload.token);
+
+    const exp = differenceInSeconds(fromUnixTime(token.exp), new Date());
+
+    return {
+      token: await this.jwtService.signAsync(
+        { sub: token, permissions: setPermissions(ERoles.ROLE_ADMIN) },
+        {
+          expiresIn: exp,
+          secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+        },
+      ),
+    };
+  }
 
   private verifyToken(token: string): any {
     try {
@@ -55,7 +79,7 @@ export class AuthService {
     const token = this.jwtService.sign(
       { sub: employee, permissions: setPermissions(employee.role) },
       {
-        expiresIn: '7d',
+        expiresIn: '1d',
         secret: process.env.SECRET_KEY_ACCESS_TOKEN,
       },
     );
@@ -95,7 +119,7 @@ export class AuthService {
 
     const token = this.generateToken(1 * 1000 * 60 * 60, {
       id: user.id,
-      role: user.role,
+      role: ERoles.ROLE_ADMIN,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -131,5 +155,88 @@ export class AuthService {
     const decodedToken = await this.jwtService.decode(tokenExtracted);
 
     return decodedToken;
+  }
+
+  async employeeLogin(data: SignInEmployeeDTO): Promise<any> {
+    const employee = await this.employeeService.findByRegistration(
+      data.login,
+    );
+
+    if (!employee)
+      throw new HttpException(
+        'Usuário não encontrado',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const isValidPassword = bcrypt.compareSync(
+      data.password,
+      employee.password,
+    );
+
+    if (!isValidPassword)
+      throw new HttpException(
+        'E-mail ou senha inválido',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const token = this.jwtService.sign(
+      {
+        sub: {
+          id: employee.id,
+          name: employee.name,
+          role: ERoles.ROLE_EMPLOYEE,
+        },
+        permissions: setPermissions(ERoles.ROLE_EMPLOYEE),
+      },
+      {
+        expiresIn: '7d',
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      },
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { updatedAt, createdAt, password, ...result } = employee;
+
+    result.address = JSON.parse(result.address);
+
+    return { ...result, token };
+  }
+
+  async driverLogin(data: signInDriverDTO): Promise<any> {
+    const driver = await this.driverService.getByCpf(data.login);
+
+    if (!driver)
+      throw new HttpException(
+        'Usuário não encontrado',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const isValidPassword = bcrypt.compareSync(data.password, driver.password);
+
+    if (!isValidPassword)
+      throw new HttpException(
+        'E-mail ou senha inválido',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const token = this.jwtService.sign(
+      {
+        sub: {
+          id: driver.id,
+          name: driver.name,
+          role: ERoles.ROLE_DRIVER,
+        },
+        permissions: setPermissions(ERoles.ROLE_DRIVER),
+      },
+      {
+        expiresIn: '7d',
+        secret: process.env.SECRET_KEY_ACCESS_TOKEN,
+      },
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { updatedAt, createdAt, password, ...result } = driver;
+
+    return { ...result, token };
   }
 }

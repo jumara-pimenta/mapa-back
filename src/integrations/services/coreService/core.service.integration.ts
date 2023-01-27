@@ -1,7 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { coreApi } from '../../../integrations/api';
-import { IntegrationException } from '../../../exceptions/integrationException';
 import ICoreServiceIntegration from './core.service.integration.contract';
 import { LogoutRequest } from './request/logout.request';
 import { VerifyTokenResponse } from './response/verifyToken.response';
@@ -49,6 +48,6 @@ export class CoreServiceIntegration implements ICoreServiceIntegration {
   }
 
   private error(e?: string) {
-    throw new IntegrationException(e);
+    throw new HttpException('Token inválido', HttpStatus.UNAUTHORIZED);
   }
 }

@@ -13,20 +13,13 @@ import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
-import {
-  generateKeyWithFilename,
-  pipelineAsync,
-  verifyReportDirectory,
-} from 'src/utils/Utils';
 import * as fs from 'fs';
 import * as path from 'path';
-import xlsx from 'node-xlsx';
 import * as XLSX from 'xlsx';
-import { Readable, Writable } from 'stream';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-/* import { ConfirmedDriversDTO } from 'src/dtos/driversConfirmed.dto';
- */
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class DriverService {
   constructor(
@@ -75,7 +68,10 @@ export class DriverService {
         HttpStatus.CONFLICT,
       );
     } else {
-      return await this.driverRepository.create(new Driver(payload));
+      const password = bcrypt.hashSync(payload.cpf, 10);
+      return await this.driverRepository.create(
+        new Driver({ ...payload, password }),
+      );
     }
   }
 
@@ -146,6 +142,18 @@ export class DriverService {
     return await this.driverRepository.update(
       Object.assign(driver, { ...driver, ...data }),
     );
+  }
+
+  async getByCpf(cpf: string): Promise<Driver> {
+    const driver = await this.driverRepository.findByCpf(cpf);
+
+    if (!driver)
+      throw new HttpException(
+        `Não foi encontrado um motorista com o cpf: ${cpf}`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return driver;
   }
 
   private toDTO(drivers: Driver[]): MappedDriverDTO[] {

@@ -8,6 +8,7 @@ export class Employee {
   id: string;
   name: string;
   registration: string;
+  password?: string;
   admission: Date;
   role: string;
   shift: string;

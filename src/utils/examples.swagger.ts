@@ -280,9 +280,16 @@ export const CreateEmployeesOnPin = {
 
 export const GetRouteHistories = {
   id: '644a4b19-6133-4506-b4f7-216fb3ffd7e7',
+  typeRoute: 'CONVENCIONAL',
+  nameRoute: 'Rota 1',
+  path: '217822b9-02f2-47e7-9d90-1ae58744acc3',
   employeeIds:
     '2fce27dd-e7c4-496f-be0e-3aac0db2f82d, 644a4b19-6133-4506-b4f7-216fb3ffd7e7',
-  route: '',
+  totalEmployees: 1,
+  totalConfirmed: 1,
+  driver: '38e94b04-735b-41a9-a529-79023184007c',
+  vehicle: '28294b80-41ce-4a89-a24e-3e3bd17701c4',
+  itinerary: '-3.1299786, -59.99308800000001',
   startedAt: '2023-01-02T10:28:31.580Z',
   finishedAt: '2023-01-02T10:28:31.580Z',
   createdAt: '2023-01-02T10:28:31.580Z',
@@ -791,4 +798,54 @@ export const CreateFinishPath = {
       ],
     },
   ],
+};
+
+export const DriverLogin = {
+  id: '8d10e841-6bb7-4003-989e-b05011155a60',
+  name: 'Angel Lindgren',
+  cpf: '03325540740',
+  cnh: '567115091',
+  validation: '2023-01-23T16:52:01.325Z',
+  category: 'B',
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI4ZDEwZTg0MS02YmI3LTQwMDMtOTg5ZS1iMDUwMTExNTVhNjAiLCJuYW1lIjoiQW5nZWwgTGluZGdyZW4iLCJyb2xlIjoiRFJJVkVSIn0sInBlcm1pc3Npb25zIjpbImxpc3QtZHJpdmVyIiwibGlzdC1wYXRoIiwiZWRpdC1wYXRoIiwiZWRpdC1kcml2ZXIiLCJsaXN0LXZlaGljbGUiLCJlZGl0LXZlaGljbGUiLCJlZGl0LXJvdXRlIiwibGlzdC1yb3V0ZSJdLCJpYXQiOjE2NzQ1MDcyMjQsImV4cCI6MTY3NTExMjAyNH0.oS-cwbPI5T4nVZm_j9a1x114KYz2cQvTj8JOpZhQc9Y',
+};
+
+export const EmployeeLogin = {
+  id: '71b3e5f3-76e1-4dad-9638-7c9b4ad9dbcb',
+  registration: '96-750437-415126-6',
+  name: 'Miss Rosa Stokes PhD',
+  admission: '2023-01-23T18:34:26.810Z',
+  role: 'auxiliar de produção',
+  shift: '1º Turno',
+  costCenter: 'Almoxarife',
+  address: {
+    cep: '69045700',
+    city: 'Manaus',
+    complement: '',
+    neighborhood: 'Planalto',
+    number: '140',
+    state: 'AM',
+    street: 'RUA LUSAKA',
+  },
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI3MWIzZTVmMy03NmUxLTRkYWQtOTYzOC03YzliNGFkOWRiY2IiLCJuYW1lIjoiTWlzcyBSb3NhIFN0b2tlcyBQaEQiLCJyb2xlIjoiRU1QTE9ZRUUifSwicGVybWlzc2lvbnMiOlsibGlzdC1kcml2ZXIiLCJsaXN0LXBhdGgiLCJsaXN0LXZlaGljbGUiLCJsaXN0LXJvdXRlIl0sImlhdCI6MTY3NDUwNjQ4NiwiZXhwIjoxNjc1MTExMjg2fQ.PVsIM7DW3Y-NqAeu8Icmiyj6QHzfS3BhAyJyuDU6-jc',
+};
+
+export const BackOfficeUserLogin = {
+  id: 'b39d2fc8-63b0-4293-a95b-d8b14d8db310',
+  name: 'Philip Pollich DVM',
+  email: 'mark@ymail.com',
+  role: 'ADMIN',
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiJiMzlkMmZjOC02M2IwLTQyOTMtYTk1Yi1kOGIxNGQ4ZGIzMTAiLCJyb2xlIjoiQURNSU4ifSwicGVybWlzc2lvbnMiOlsiY3JlYXRlLWVtcGxveWVlIiwiZWRpdC1lbXBsb3llZSIsImRlbGV0ZS1lbXBsb3llZSIsImxpc3QtZW1wbG95ZWUiLCJsaXN0LWRyaXZlciIsImNyZWF0ZS1kcml2ZXIiLCJlZGl0LWRyaXZlciIsImRlbGV0ZS1kcml2ZXIiLCJsaXN0LXBhdGgiLCJjcmVhdGUtcGF0aCIsImVkaXQtcGF0aCIsImRlbGV0ZS1wYXRoIiwibGlzdC12ZWhpY2xlIiwiY3JlYXRlLXZlaGljbGUiLCJlZGl0LXZlaGljbGUiLCJkZWxldGUtdmVoaWNsZSIsImNyZWF0ZS1yb3V0ZSIsImVkaXQtcm91dGUiLCJkZWxldGUtcm91dGUiLCJsaXN0LXJvdXRlIl0sImlhdCI6MTY3Mzg4MDgyOSwiZXhwIjoxNjc0NDg1NjI5fQ.SWQip1XgRWBsDzLKE7ZvfWj7NrfiaIQ75OuVx_mVu9k',
+};
+
+export const BackOfficeUserCreate = {
+  id: '28b41c76-9463-4e82-bad7-dd98e0a4ffff',
+  name: 'Roy Ruecker',
+  email: '2@ymail.com',
+  role: 'ADMIN',
+  createdAt: '2023-01-25T10:02:23.363Z',
+  updatedAt: null,
 };

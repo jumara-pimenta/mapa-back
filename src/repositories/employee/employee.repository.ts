@@ -48,15 +48,15 @@ export class EmployeeRepository
                 lat: true,
                 lng: true,
                 local: true,
-                title: true
-              }
-            }
+                title: true,
+              },
+            },
           },
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: 'desc',
+          },
         },
-      }
+      },
     });
   }
 
@@ -74,13 +74,13 @@ export class EmployeeRepository
                 lat: true,
                 lng: true,
                 local: true,
-                title: true
-              }
-            }
+                title: true,
+              },
+            },
           },
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: 'desc',
+          },
         },
       },
     });
@@ -113,13 +113,13 @@ export class EmployeeRepository
                     lat: true,
                     lng: true,
                     local: true,
-                    title: true
-                  }
-                }
+                    title: true,
+                  },
+                },
               },
               orderBy: {
-                createdAt: 'desc'
-              }
+                createdAt: 'desc',
+              },
             },
           },
         })
@@ -136,13 +136,13 @@ export class EmployeeRepository
                     lat: true,
                     lng: true,
                     local: true,
-                    title: true
-                  }
-                }
+                    title: true,
+                  },
+                },
               },
               orderBy: {
-                createdAt: 'desc'
-              }
+                createdAt: 'desc',
+              },
             },
           },
         });
@@ -170,10 +170,11 @@ export class EmployeeRepository
         costCenter: data.costCenter,
         name: data.name,
         registration: data.registration,
+        password: data.password,
         role: data.role,
         shift: data.shift,
-        createdAt: data.createdAt
-      }
+        createdAt: data.createdAt,
+      },
     });
   }
 
@@ -194,9 +195,6 @@ export class EmployeeRepository
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
     });
   }
 }
