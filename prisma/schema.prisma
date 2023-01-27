@@ -158,3 +158,11 @@ model BackOfficeUser {
   createdAt DateTime  @default(now()) @db.DateTimeOffset
   updatedAt DateTime? @db.DateTimeOffset
 }
+
+model Sinister {
+  id          String    @id @unique
+  type        String
+  description String
+  createdAt   DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt   DateTime? @db.DateTimeOffset
+}

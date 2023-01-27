@@ -165,6 +165,17 @@ CREATE TABLE [dbo].[BackOfficeUser] (
     CONSTRAINT [BackOfficeUser_email_key] UNIQUE NONCLUSTERED ([email])
 );
 
+-- CreateTable
+CREATE TABLE [dbo].[Sinister] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [type] NVARCHAR(1000) NOT NULL,
+    [description] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Sinister_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIMEOFFSET,
+    CONSTRAINT [Sinister_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [Sinister_id_key] UNIQUE NONCLUSTERED ([id])
+);
+
 -- AddForeignKey
 ALTER TABLE [dbo].[Route] ADD CONSTRAINT [Route_driverId_fkey] FOREIGN KEY ([driverId]) REFERENCES [dbo].[Driver]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
