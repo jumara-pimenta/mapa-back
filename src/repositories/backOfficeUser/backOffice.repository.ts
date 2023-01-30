@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Page, PageResponse } from 'src/configs/database/page.model';
 import { Pageable } from 'src/configs/database/pageable.service';
 import { generateQueryByFiltersForUser } from 'src/configs/database/Queries';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../../configs/database/prisma.service';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserUpdateDTO,
