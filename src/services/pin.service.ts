@@ -24,6 +24,39 @@ export class PinService {
     return await this.pinRepository.delete(pin.id);
   }
 
+  async seed() {
+    const pin = await this.pinRepository.findByLocal(
+      'Denso Industrial da Amazônia',
+    );
+
+    if (pin) return;
+    await this.create({
+      details:
+        'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69075-000, Brasil',
+      lat: '-3.1110442',
+      lng: '-59.9623179',
+      local: 'Denso Industrial da Amazônia',
+      title: 'denso',
+    });
+  }
+
+  async onModuleInit() {
+    await this.seed();
+  }
+
+  async listByLocal(local: string) {
+    const pin = await this.pinRepository.findByLocal(local);
+
+    if (!pin) {
+      throw new HttpException(
+        'O ponto de embarque não foi encontrado!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return pin;
+  }
+
   async listAll(
     page: Page,
     filters?: FiltersPinDTO,

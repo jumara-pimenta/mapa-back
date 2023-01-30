@@ -35,3 +35,9 @@ export function getDateStartToEndOfDay(date: string): DateStartEnd {
 
   return { start: getDateInLocaleTime(start), end: getDateInLocaleTime(end) };
 }
+
+export function compareDates(dateInit: Date, dateFinal: Date) {
+  const atual = getDateInLocaleTime(new Date(dateInit));
+  const final = getDateInLocaleTime(new Date(dateFinal));
+  return atual < final;
+}

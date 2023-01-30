@@ -1,18 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ETypePin } from '../../utils/ETypes';
 
-export class MappedDriverDTO {
+export class MappedBackOfficeUserDTO {
   @ApiProperty()
   id: string;
   @ApiProperty()
   name: string;
   @ApiProperty()
-  cpf: string;
-  @ApiProperty()
-  cnh: string;
-  @ApiProperty()
-  validation: Date;
-  @ApiProperty()
-  category: string;
+  role: string;
   @ApiProperty()
   createdAt: Date;
 }

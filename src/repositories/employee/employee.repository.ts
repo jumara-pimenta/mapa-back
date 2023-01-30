@@ -7,6 +7,7 @@ import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
+import { ETypeCreationPin, ETypePin } from 'src/utils/ETypes';
 
 @Injectable()
 export class EmployeeRepository
@@ -174,6 +175,25 @@ export class EmployeeRepository
         role: data.role,
         shift: data.shift,
         createdAt: data.createdAt,
+        pins: data.pin
+          ? {
+              connectOrCreate: {
+                create: {
+                  type: ETypePin.CONVENTIONAL,
+                  pinId: data.pin.id,
+                },
+                where: {
+                  employeeId_pinId: {
+                    pinId: data.pin.id,
+                    employeeId: data.id,
+                  },
+                },
+              },
+            }
+          : undefined,
+      },
+      include: {
+        pins: true,
       },
     });
   }
@@ -194,6 +214,9 @@ export class EmployeeRepository
             pin: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

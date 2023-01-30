@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { BackOfficeUserUpdateDTO } from 'src/dtos/auth/backOfficeUserLogin.dto';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../database/prisma.service';
 import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
@@ -35,10 +36,13 @@ export class BackOfficeUserRepository
     });
   }
 
-  async update(data: BackOfficeUser): Promise<BackOfficeUser> {
+  async update(
+    id: string,
+    data: BackOfficeUserUpdateDTO,
+  ): Promise<BackOfficeUser> {
     return await this.repository.backOfficeUser.update({
       where: {
-        id: data.id,
+        id,
       },
       data,
     });

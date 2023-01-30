@@ -18,13 +18,24 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
-
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
+import path from 'path';
+import fs from 'fs';
 import * as bcrypt from 'bcrypt';
-import * as path from 'path';
-import * as fs from 'fs';
+
+const validateAsync = (schema: any): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    validate(schema, { validationError: { target: false } })
+      .then((response) => resolve(response.map((i) => i)))
+      .catch((error: any) => reject(error));
+  });
+};
+interface abc {
+  line: number;
+  employee: CreateEmployeeFileDTO;
+}
 
 @Injectable()
 export class EmployeeService {
@@ -216,7 +227,16 @@ export class EmployeeService {
     const employeeDataUpdated = { ...data, address };
 
     const updatedEmployee = await this.employeeRepository.update(
-      Object.assign(employee, { ...employee, ...employeeDataUpdated }),
+      Object.assign(employee, {
+        ...employee,
+        address: employeeDataUpdated.address,
+        admission: employeeDataUpdated.admission,
+        costCenter: employeeDataUpdated.costCenter,
+        name: employeeDataUpdated.name,
+        registration: employeeDataUpdated.registration,
+        role: employeeDataUpdated.role,
+        shift: employeeDataUpdated.shift,
+      }),
     );
 
     return this.mapperOne(updatedEmployee);
@@ -230,12 +250,15 @@ export class EmployeeService {
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
     const type = 'LISTA DE COLABORADORES';
+
     if (!Object.values(sheetName).includes(type))
       throw new HttpException(
         `Planilha tem que conter a aba de ${type}`,
         HttpStatus.BAD_REQUEST,
       );
+
     const sheet = workbook.Sheets[type];
+
     const headers = [
       'MATRICULA',
       'NOME',
@@ -248,6 +271,7 @@ export class EmployeeService {
       'TURNO',
       'ADMISSAO',
     ];
+
     if (
       headers.join('') !==
       [
@@ -267,8 +291,17 @@ export class EmployeeService {
         'Planilha tem que conter as colunas MATRICULA, NOME e SETOR.',
         HttpStatus.BAD_REQUEST,
       );
+
     const data: any = XLSX.utils.sheet_to_json(sheet);
-    const employees: CreateEmployeeFileDTO[] = [];
+    const employees: abc[] = [];
+
+    const pinDenso = await this.pinService.listByLocal(
+      'Denso Industrial da Amazônia',
+    );
+
+    let line = 0;
+    const messagesErrors = [];
+
     for (const row of data) {
       const address = {
         cep: row['CEP'].toString(),
@@ -277,6 +310,7 @@ export class EmployeeService {
         street: row['ENDEREÇO'].toString(),
         city: 'MANAUS',
         state: 'AM',
+        complement: 'Complemento default',
       };
 
       const employee: CreateEmployeeFileDTO = {
@@ -285,50 +319,79 @@ export class EmployeeService {
         role: row['SETOR'].toString(),
         shift: row['TURNO'].toString(),
         costCenter: row['C/C'].toString(),
-        address: JSON.stringify(address),
+        address: address,
         admission: new Date(),
+        pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
-      employees.push(employee);
+
+      line++;
+      employees.push({ line, employee });
     }
     let totalCreated = 0;
     let alreadyExisted = 0;
-    let dataError = 0;
     const totalToCreate = employees.length;
+    let aa
 
     for await (const item of employees) {
-      const employee = plainToClass(CreateEmployeeFileDTO, item);
-      let error = false;
-      validate(employee, { validationError: { target: false } }).then(
-        async (errors) => {
-          if (errors.length > 0) {
-            dataError++;
-            error = true;
-          }
-        },
-      );
 
-      if (!error) {
+      const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
+      const lineE = item.line;
+
+      const errorsTest = await validateAsync(employeeSchema);
+
+      const [teste] = errorsTest;
+
+      messagesErrors.push({
+        line: lineE,
+        // field: errorsTest,
+        meesage: teste,
+      });
+      const testew = messagesErrors.map((i) => {
+        return i.meesage;
+      });
+
+      aa = testew.map((i) => [
+        {
+          field: i?.property,
+          message: i?.constraints,
+        },
+      ]);
+
+      if (!errorsTest.length) {
         const existsRegistration =
-          await this.employeeRepository.findByRegistration(item.registration);
+          await this.employeeRepository.findByRegistration(
+            item.employee.registration,
+          );
 
         if (!existsRegistration) {
-          const password = bcrypt.hashSync(item.registration, 10);
           await this.employeeRepository.create(
-            new Employee({ ...item, password }),
+            new Employee(
+              {
+                address: JSON.stringify(item.employee.address),
+                admission: item.employee.admission,
+                costCenter: item.employee.costCenter,
+                name: item.employee.name,
+                registration: item.employee.registration,
+                password: bcrypt.hashSync(item.employee.registration, 10),
+                role: item.employee.role,
+                shift: item.employee.shift,
+              },
+              pinDenso,
+            ),
           );
           totalCreated++;
         } else alreadyExisted++;
       }
     }
 
-    return {
-      message: [
-        `Cadastrado com sucesso: ${totalCreated}`,
-        `Já existia um cadastro com a mesma matrícula: ${alreadyExisted}`,
-        `Colaboradores com dados inválidos: ${dataError}`,
-        `Quantidade total de colaboradores na planilha: ${totalToCreate}`,
-      ],
+    const errors: any = {
+      newEmployeesCreated: totalCreated,
+      employeesAlreadyExistent: alreadyExisted,
+      quantityEmployeesOnSheet: totalToCreate,
+      errors: aa,
     };
+
+    return errors;
   }
 
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
@@ -444,6 +507,7 @@ export class EmployeeService {
             lat: employeesOnPin.pin.lat,
             lng: employeesOnPin.pin.lng,
             type: employeesOnPin.type as ETypePin,
+            createdAt: employeesOnPin.pin.createdAt,
           };
         }),
       };

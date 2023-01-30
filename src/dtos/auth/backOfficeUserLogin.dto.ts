@@ -1,9 +1,6 @@
-
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { faker } from '@faker-js/faker';
-import { isRegExp } from 'util/types';
-
 
 export class BackOfficeUserDTO {
   @ApiProperty({ example: faker.internet.email() })
@@ -39,3 +36,19 @@ export class BackOfficeUserCreateDTO {
   role: string;
 }
 
+export class BackOfficeUserUpdateDTO {
+  @ApiProperty({ example: faker.internet.email() })
+  @IsOptional()
+  @IsEmail({}, { message: '[email] o Email deve ser válido' })
+  email?: string;
+
+  @ApiProperty({ example: faker.name.fullName() })
+  @IsOptional()
+  @IsString({ message: '[name] o nome deve ser uma string' })
+  name?: string;
+
+  @ApiProperty({ example: faker.name.jobTitle() })
+  @IsOptional()
+  @IsString({ message: '[role] a função deve ser uma string' })
+  role?: string;
+}

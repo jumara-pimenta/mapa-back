@@ -4,6 +4,7 @@ import { ERoles } from './ETypes';
 export const setPermissions = (roles: ERoles) => {
   if (!roles)
     throw new HttpException('Não autorizado', HttpStatus.UNAUTHORIZED);
+
   if (roles === ERoles.ROLE_ADMIN)
     return [
       'ADMIN',

@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  StreamableFile,
+} from '@nestjs/common';
 import { Driver } from '../entities/driver.entity';
 import IDriverRepository from '../repositories/driver/driver.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -6,6 +12,11 @@ import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as XLSX from 'xlsx';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -156,5 +167,143 @@ export class DriverService {
         createdAt: driver.createdAt,
       };
     });
+  }
+
+  async parseExcelFile(file: any) {
+    const workbook = XLSX.read(file.buffer);
+    const sheetName = workbook.SheetNames;
+    const type = 'LISTA DE MOTORISTAS';
+    if (!Object.values(sheetName).includes(type))
+      throw new HttpException(
+        `Planilha tem que conter a aba de ${type}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    const sheet = workbook.Sheets[type];
+    const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
+    if (
+      headers.join('') !==
+      [sheet.A1.v, sheet.B1.v, sheet.C1.v, sheet.D1.v, sheet.E1.v].join('')
+    )
+      throw new HttpException(
+        'Planilha tem que conter as colunas Nome, CPF, CNH, Validade, Categoria',
+        HttpStatus.BAD_REQUEST,
+      );
+    const data: any = XLSX.utils.sheet_to_json(sheet);
+    const drivers: CreateDriverDTO[] = [];
+    for (const row of data) {
+      const driver: CreateDriverDTO = {
+        name: row['NOME'].toString(),
+        cpf: row['CPF'].toString(),
+        cnh: row['CNH'].toString(),
+        validation: row['VALIDADE'].toString(),
+        category: row['CATEGORIA'].toString(),
+      };
+      drivers.push(driver);
+    }
+    const totalCreated = 0;
+    let dataError = 0;
+    const totalToCreate = drivers.length;
+
+    for await (const item of drivers) {
+      const driver = plainToClass(CreateDriverDTO, item);
+      let error = false;
+      validate(driver, { validationError: { target: false } }).then(
+        async (errors) => {
+          if (errors.length > 0) {
+            dataError++;
+            error = true;
+          }
+        },
+      );
+    }
+
+    return {
+      message: [
+        `Cadastrado com sucesso: ${totalCreated}`,
+        `Motoristas com dados inválidos: ${dataError}`,
+        `Quantidade total de motoristas na planilha: ${totalToCreate}`,
+      ],
+    };
+  }
+
+  async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
+    const headers = [
+      'Nome                          ',
+      'CPF',
+      'CNH',
+      'Validade',
+      'Categoria',
+    ];
+    const today = new Date().toLocaleDateString('pt-BR');
+
+    const filePath = './driver.xlsx';
+    const workSheetName = 'Motorista';
+
+    const drivers = await this.listAll(page, filters);
+
+    const exportedDriverToXLSX = async (
+      drivers,
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = drivers.map((driver) => {
+        return [
+          driver.name,
+          driver.cpf,
+          driver.cnh,
+          driver.validation,
+          driver.category,
+        ];
+      });
+
+      if (!data.length)
+        throw new HttpException(
+          'Não foram encontrados motoristas para serem exportados',
+          HttpStatus.NOT_FOUND,
+        );
+
+      const driverInformationHeader = [
+        [`MOTORISTAS EXPORTADOS: ${today}`, '', '', '', '', ''],
+        [`TOTAL DE MOTORISTAS EXPORTADOS: ${data.length}`],
+      ];
+
+      const driverInformationFooter = [
+        ['**********************************************'],
+        ['***************'],
+        ['***************'],
+        ['***************'],
+        ['*****'],
+      ];
+
+      const workBook = XLSX.utils.book_new();
+      // eslint-disable-next-line no-sparse-arrays
+      const workSheetData = [
+        ,
+        driverInformationHeader,
+        ,
+        driverInformationFooter,
+        ,
+        headers,
+        ...data,
+        ,
+        driverInformationFooter,
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(
+      drivers.items,
+      headers,
+      workSheetName,
+      filePath,
+    );
   }
 }

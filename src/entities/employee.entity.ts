@@ -15,17 +15,22 @@ export class Employee {
   costCenter: string;
   address: string;
   pins?: Partial<EmployeesOnPin>[];
+  pin?: Pin;
   employeeOnPath?: EmployeesOnPath;
   createdAt: Date;
   updatedAt?: Date;
 
   constructor(
-    props: Omit<Employee, 'id' | 'createdAt' | 'pins' | 'employeeOnPath'>,
+    props: Omit<
+      Employee,
+      'id' | 'createdAt' | 'pins' | 'pin' | 'employeeOnPath'
+    >,
     pin?: Pin,
     id?: string,
   ) {
     Object.assign(this, props);
     this.createdAt = getDateInLocaleTime(new Date());
     this.id = id ?? uuid();
+    this.pin = pin;
   }
 }
