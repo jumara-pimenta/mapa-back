@@ -12,6 +12,8 @@ import IEmployeesOnPinRepository from '../repositories/employeesOnPin/employeesO
 import { EmployeeService } from './employee.service';
 import { ETypePin } from '../utils/ETypes';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
+import { Employee } from 'src/entities/employee.entity';
+import { Pin } from 'src/entities/pin.entity';
 
 @Injectable()
 export class EmployeesOnPinService {
@@ -55,14 +57,14 @@ export class EmployeesOnPinService {
 
   async associateEmployeeByService(
     pinId: string,
-    employee: MappedEmployeeDTO,
+    employee: Employee,
   ): Promise<EmployeesOnPin> {
     const pin = await this.pinService.listById(pinId);
     const { pins } = employee;
     let pinAlreadyAssociated: any;
 
     if (pins.length > 0) {
-      pinAlreadyAssociated = pins.filter((_pin) => {
+      pinAlreadyAssociated = pins.filter((_pin: Pin) => {
         if (_pin.id === pin.id) {
           return _pin;
         }

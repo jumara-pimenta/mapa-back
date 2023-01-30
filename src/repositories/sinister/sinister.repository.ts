@@ -1,5 +1,5 @@
 import { Page, PageResponse } from 'src/configs/database/page.model';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../../configs/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Pageable } from 'src/configs/database/pageable.service';
 import { Sinister } from 'src/entities/sinister.entity';
