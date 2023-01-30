@@ -25,8 +25,8 @@ import {
   GetPathByPins,
   GetPathByRoutes,
   UpdatePathById,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/routes')
 @ApiTags('Paths')

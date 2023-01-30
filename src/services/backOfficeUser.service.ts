@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
-import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffice.repository.contract';
+} from '../dtos/auth/backOfficeUserLogin.dto';
+import { BackOfficeUser } from '../entities/backOfficeUser.entity';
+import IBackOfficeUserRepository from '../repositories/backOfficeUser/backOffice.repository.contract';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

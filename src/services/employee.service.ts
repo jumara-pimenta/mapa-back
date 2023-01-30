@@ -18,11 +18,9 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
-
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
 import path from 'path';
 import fs from 'fs';
 import * as bcrypt from 'bcrypt';
@@ -301,8 +299,8 @@ export class EmployeeService {
       'Denso Industrial da Amazônia',
     );
 
-    var line = 0;
-    let messagesErrors = [];
+    let line = 0;
+    const messagesErrors = [];
 
     for (const row of data) {
       const address = {
@@ -332,17 +330,16 @@ export class EmployeeService {
     let totalCreated = 0;
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
+    let aa
 
     for await (const item of employees) {
-      let error = false;
 
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
-      var lineE = item.line;
+      const lineE = item.line;
 
       const errorsTest = await validateAsync(employeeSchema);
 
       const [teste] = errorsTest;
-      let cont = 0;
 
       messagesErrors.push({
         line: lineE,
@@ -353,19 +350,12 @@ export class EmployeeService {
         return i.meesage;
       });
 
-      var aa = testew.map((i) => [
+      aa = testew.map((i) => [
         {
           field: i?.property,
           message: i?.constraints,
         },
       ]);
-
-      // aa.push({ ...aa, line: lineE });
-
-      // console.log(aa);
-      // console.log('Employee', employees);
-
-      // if (errorsTest) console.log(errorsTest);
 
       if (!errorsTest.length) {
         const existsRegistration =
@@ -423,16 +413,7 @@ export class EmployeeService {
     const filePath = './employee.xlsx';
     const workSheetName = 'Colaboradores';
 
-    // const employees = await this.listAll(page, filters);
-    const employees = await this.employeeRepository.findAll(page, filters);
-    console.log(employees);
-
-    if (employees.total === 0) {
-      throw new HttpException(
-        'Não existem colaboradores para serem exportados!',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const employees = await this.listAll(page, filters);
 
     const exportedEmployeeToXLSX = async (
       employees,
@@ -477,14 +458,14 @@ export class EmployeeService {
 
       const workBook = XLSX.utils.book_new();
       const workSheetData = [
-        ,
+        '',
         employeeInformationHeader,
-        ,
+        '',
         employeeInformationFooter,
-        ,
+        '',
         headers,
         ...data,
-        ,
+        '',
         employeeInformationFooter,
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);

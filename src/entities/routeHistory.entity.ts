@@ -1,4 +1,4 @@
-import { ETypeRoute } from 'src/utils/ETypes';
+import { ETypeRoute } from '../utils/ETypes';
 import { v4 as uuid } from 'uuid';
 import { Driver } from './driver.entity';
 import { Path } from './path.entity';

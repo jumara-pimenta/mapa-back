@@ -4,20 +4,15 @@ import { FiltersEmployeeDTO } from '../../dtos/employee/filtersEmployee.dto';
 import { IQueryEmployee } from '../../dtos/employee/queryEmployee.dto';
 import { FiltersEmployeesOnPathDTO } from '../../dtos/employeesOnPath/filtersEmployeesOnPath.dto';
 import { IQueryEmployeesOnPath } from '../../dtos/employeesOnPath/queryEmployeesOnPath.dto';
-import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
 import { IQueryPath } from '../../dtos/path/queryPath.dto';
-import { FiltersPinDTO } from '../../dtos/pin/filtersPin.dto';
-import { FiltersRouteHistoryDTO } from '../../dtos/routeHistory/filtersRouteHistory.dto';
 import { IQueryRouteHistory } from '../../dtos/routeHistory/queryRouteHistory.dto';
 import { FiltersVehicleDTO } from '../../dtos/vehicle/filtersVehicle.dto';
 import { IQueryVehicle } from '../../dtos/vehicle/queryVehicle.dto';
 import { convertAndVerifyNumber } from '../../utils/Utils';
 import { IQueryPin } from '../../dtos/pin/queryPin.dto';
-import { FiltersRouteDTO } from 'src/dtos/route/filtersRoute.dto';
-import { ETypePath } from 'src/utils/ETypes';
-import { getDateStartToEndOfDay } from 'src/utils/Date';
-import { IQueryBackOfficeUser } from 'src/dtos/auth/queryBackOfficeUser.dto';
-import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
+import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
+import { ETypePath } from '../../utils/ETypes';
+import { getDateStartToEndOfDay } from '../../utils/Date';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -416,45 +411,6 @@ export function generateQueryByFiltersForPin(filters: any): IQueryPin {
     }),
     product: () => ({
       product: filters.product,
-    }),
-  };
-
-  const keysFields = Object.keys(fields);
-
-  let query: any;
-
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  let queryBuilder: Function;
-
-  for (const filter in filters) {
-    if (keysFields.includes(filter)) {
-      queryBuilder = fields[filter];
-
-      if (query) {
-        const newCondition = queryBuilder();
-
-        Object.assign(query, { ...newCondition });
-      } else {
-        query = queryBuilder();
-      }
-    }
-  }
-
-  return query;
-}
-
-export function generateQueryByFiltersForUser(
-  filters: FilterBackOfficeUserDTO,
-): IQueryBackOfficeUser {
-  const fields = {
-    name: () => ({
-      name: { contains: filters.name },
-    }),
-    email: () => ({
-      email: { contains: filters.email },
-    }),
-    role: () => ({
-      role: { contains: filters.role },
     }),
   };
 

@@ -1,15 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { Pageable } from 'src/configs/database/pageable.service';
-import { generateQueryByFiltersForUser } from 'src/configs/database/Queries';
-import { PrismaService } from 'src/database/prisma.service';
-import {
-  BackOfficeUserCreateDTO,
-  BackOfficeUserUpdateDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
-import { generateQueryForEmployee } from 'src/utils/QueriesEmployee';
+import { BackOfficeUserUpdateDTO } from 'src/dtos/auth/backOfficeUserLogin.dto';
+import { Pageable } from '../../configs/database/pageable.service';
+import { PrismaService } from '../../database/prisma.service';
+import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
 import IBackOfficeUserRepository from './backOffice.repository.contract';
 
 @Injectable()
@@ -69,35 +62,5 @@ export class BackOfficeUserRepository
         email,
       },
     });
-  }
-
-  async findAll(
-    page: Page,
-    filters?: FilterBackOfficeUserDTO,
-  ): Promise<PageResponse<BackOfficeUser>> {
-    const condition = generateQueryByFiltersForUser(filters);
-    const where = {
-      ...condition,
-    };
-
-    const items = condition
-      ? await this.repository.backOfficeUser.findMany({
-          ...this.buildPage(page),
-          where,
-        })
-      : await this.repository.backOfficeUser.findMany({
-          ...this.buildPage(page),
-        });
-
-    const total = condition
-      ? await this.repository.backOfficeUser.findMany({
-          where,
-        })
-      : await this.repository.backOfficeUser.count();
-
-    return this.buildPageResponse(
-      items,
-      Array.isArray(total) ? total.length : total,
-    );
   }
 }

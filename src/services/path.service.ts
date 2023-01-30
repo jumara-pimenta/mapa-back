@@ -1,4 +1,3 @@
-import { CreateRouteHistoryDTO } from './../dtos/routeHistory/createRouteHistory.dto';
 import { RouteHistoryService } from './routeHistory.service';
 import {
   forwardRef,
@@ -19,11 +18,10 @@ import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
 import { EStatusPath, EStatusRoute, ETypePath } from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
-import { getDateInLocaleTime } from 'src/utils/date.service';
-import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { getDateInLocaleTime } from '../utils/date.service';
+import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
-import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class PathService {

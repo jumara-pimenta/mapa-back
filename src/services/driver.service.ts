@@ -3,7 +3,6 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  Logger,
   StreamableFile,
 } from '@nestjs/common';
 import { Driver } from '../entities/driver.entity';
@@ -13,12 +12,12 @@ import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
-import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class DriverService {

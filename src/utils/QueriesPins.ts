@@ -18,6 +18,7 @@ export function generateQueryForPins(filters: FiltersPinDTO): MappedPinDTO {
 
   let query: MappedPinDTO;
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let queryBuilder: Function;
 
   for (const filter in filters) {

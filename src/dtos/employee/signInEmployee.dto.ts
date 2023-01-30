@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, TransformFnParams, Type } from 'class-transformer';
-import {
-  IsString,
-  IsNotEmpty,
-  IsDateString,
-  ValidateNested,
-} from 'class-validator';
-import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
-import { EmployeeAddressDTO } from './employeeAddress.dto';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { faker } from '@faker-js/faker';
 
 faker.locale = 'pt_BR';

@@ -1,32 +1,19 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Page } from 'src/configs/database/page.model';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
-  BackOfficeUserUpdateDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
-import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
-import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
+} from '../dtos/auth/backOfficeUserLogin.dto';
+import { CoreTokenDTO } from '../dtos/auth/CoreToken.dto';
+import { signInDriverDTO } from '../dtos/driver/signInDriver.dto';
+import { SignInEmployeeDTO } from '../dtos/employee/signInEmployee.dto';
 import {
   BackOfficeUserCreate,
   BackOfficeUserLogin,
   DriverLogin,
   EmployeeLogin,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';
@@ -99,32 +86,5 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async driverAuth(@Body() payload: signInDriverDTO): Promise<any> {
     return await this.authService.driverLogin(payload);
-  }
-
-  @Get('/backoffice')
-  @Roles('ADMIN')
-  @HttpCode(HttpStatus.OK)
-  async backofficeAuthGet(
-    @Query() page: Page,
-    @Query() filters: any,
-  ): Promise<any> {
-    return await this.authService.listBackOfficeUsers(page, filters);
-  }
-
-  @Put('/backoffice/:id')
-  @Roles('ADMIN')
-  @HttpCode(HttpStatus.OK)
-  async backofficeAuthUpdate(
-    @Param('id') id: string,
-    @Body() payload: BackOfficeUserUpdateDTO,
-  ): Promise<any> {
-    return await this.authService.updateBackOfficeUser(id, payload);
-  }
-
-  @Delete('/backoffice/:id')
-  @Roles('ADMIN')
-  @HttpCode(HttpStatus.OK)
-  async backofficeAuthDelete(@Param('id') id: string): Promise<any> {
-    return await this.authService.deleteBackOfficeUser(id);
   }
 }

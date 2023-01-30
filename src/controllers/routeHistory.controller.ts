@@ -7,11 +7,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { DateFilterDTO } from 'src/dtos/routeHistory/dateFilter.dto';
-import { GetRouteHistories } from 'src/utils/examples.swagger';
+import { GetRouteHistories } from '../utils/examples.swagger';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
+import { Roles } from 'src/decorators/roles.decorator';
+import { DateFilterDTO } from 'src/dtos/routeHistory/dateFilter.dto';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')

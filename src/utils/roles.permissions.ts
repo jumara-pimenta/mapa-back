@@ -4,6 +4,7 @@ import { ERoles } from './ETypes';
 export const setPermissions = (roles: ERoles) => {
   if (!roles)
     throw new HttpException('Não autorizado', HttpStatus.UNAUTHORIZED);
+
   if (roles === ERoles.ROLE_ADMIN)
     return [
       'ADMIN',
@@ -43,6 +44,7 @@ export const setPermissions = (roles: ERoles) => {
       'list-route',
       'edit-employeeOnPath',
       'list-employeeOnPath',
+      'list-employee',
     ];
 
   if (roles === ERoles.ROLE_DRIVER)
@@ -57,5 +59,6 @@ export const setPermissions = (roles: ERoles) => {
       'list-route',
       'edit-employeeOnPath',
       'list-employeeOnPath',
+      'list-employee',
     ];
 };

@@ -1,4 +1,4 @@
-import { ValidationPipe, ArgumentsHost } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -7,15 +7,13 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
-import { PathService } from 'src/services/path.service';
+import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { PathService } from '../services/path.service';
 import { WebsocketUpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
 import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { RouteService } from '../services/route.service';
-import { getDateInLocaleTime } from '../utils/date.service';
-import { EStatusPath, EStatusRoute } from '../utils/ETypes';
 
 @WebSocketGateway()
 export class WebsocketGateway {

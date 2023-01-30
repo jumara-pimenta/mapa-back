@@ -8,21 +8,17 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { Roles } from '../decorators/roles.decorator';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
-import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
+import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
+import { UpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import {
   GetEmmployeesOnPathByRoute,
   GetEmployeesOnPath,
   UpdateConfirmationEmployeesOnPath,
   UpdateConfirmationEmployeesOnPathById,
-  UpdateEmployeeOffBoard,
-  UpdateEmployeeOnBoard,
-  UpdateEmployeeOnPathNotComming,
   UpdateEmployeesOnPathById,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 
@@ -112,24 +108,4 @@ export class EmployeesOnPathController {
   ): Promise<MappedEmployeesOnPathDTO> {
     return await this.employeeOnPathService.update(id, payload);
   }
-
-  // @Put('/onboard/')
-  // @HttpCode(HttpStatus.ACCEPTED)
-  // async onboard(@Body() payload: IdUpdateDTO): Promise<any> {
-  //   console.log('payload', payload);
-
-  //   return await this.employeeOnPathService.onboardEmployee(payload);
-  // }
-
-  // @Put('/offboard')
-  // @HttpCode(HttpStatus.ACCEPTED)
-  // async offboard(@Body() payload: IdUpdateDTO): Promise<any> {
-  //   return await this.employeeOnPathService.offboardEmployee(payload);
-  // }
-
-  // @Put('/notComming')
-  // @HttpCode(HttpStatus.ACCEPTED)
-  // async notComming(@Body() payload: IdUpdateDTO): Promise<any> {
-  //   return await this.employeeOnPathService.employeeNotConfirmed(payload);
-  // }
 }
