@@ -297,12 +297,10 @@ export class EmployeeService {
     const data: any = XLSX.utils.sheet_to_json(sheet);
     const employees: abc[] = [];
 
-    const pinDenso = await this.pinService.listByLocal(
-      'Denso Industrial da Amazônia',
-    );
+    const pinDenso = await this.pinService.listByLocal('Denso LTDA ');
 
-    var line = 0;
-    let messagesErrors = [];
+    let line = 0;
+    const messagesErrors = [];
 
     for (const row of data) {
       const address = {
@@ -334,15 +332,15 @@ export class EmployeeService {
     const totalToCreate = employees.length;
 
     for await (const item of employees) {
-      let error = false;
+      const error = false;
 
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
-      var lineE = item.line;
+      const lineE = item.line;
 
       const errorsTest = await validateAsync(employeeSchema);
 
       const [teste] = errorsTest;
-      let cont = 0;
+      const cont = 0;
 
       messagesErrors.push({
         line: lineE,
