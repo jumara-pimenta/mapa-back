@@ -124,6 +124,7 @@ export class AuthService {
 
     const token = this.generateToken(1 * 1000 * 60 * 60, {
       id: user.id,
+      name: user.name,
       role: ERoles.ROLE_ADMIN,
     });
 
