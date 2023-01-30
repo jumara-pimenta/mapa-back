@@ -5,6 +5,7 @@ import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IRouteHistoryRepository from './routeHistory.repository.contract';
 import { RouteHistory } from '../../entities/routeHistory.entity';
+import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 
 @Injectable()
 export class RouteHistoryRepository
@@ -21,9 +22,32 @@ export class RouteHistoryRepository
     });
   }
 
-  findById(id: string): Promise<RouteHistory | null> {
+  findById(id: string): Promise<any> {
     return this.repository.routeHistory.findUnique({
-      where: { id },
+      where: { id: id },
+      select: {
+        id: true,
+        typeRoute: true,
+        nameRoute: true,
+        path: true,
+        employeeIds: true,
+        totalEmployees: true,
+        totalConfirmed: true,
+        driver: {
+          select: {
+            name: true,
+          },
+        },
+        vehicle: {
+          select: {
+            plate: true,
+          },
+        },
+        itinerary: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+      },
     });
   }
 
@@ -105,5 +129,16 @@ export class RouteHistoryRepository
       },
     });
     return paths;
+  }
+
+  async getEmployeeById(id: string): Promise<EmployeeHistoryDTO> {
+    return await this.repository.employee.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        costCenter: true,
+        registration: true,
+      },
+    });
   }
 }

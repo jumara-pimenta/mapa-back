@@ -1,6 +1,7 @@
 import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
 import { Page, PageResponse } from 'src/configs/database/page.model';
 import { RouteHistory } from '../../entities/routeHistory.entity';
+import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 
 export default interface IRouteHistoryRepository {
   getHistoric(): Promise<any>;
@@ -12,4 +13,5 @@ export default interface IRouteHistoryRepository {
     page: Page,
     filters: FiltersRouteHistoryDTO,
   ): Promise<PageResponse<RouteHistory>>;
+  getEmployeeById(id: string): Promise<EmployeeHistoryDTO>;
 }
