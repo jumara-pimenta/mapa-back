@@ -284,7 +284,7 @@ export class PathService {
     if (path.type === ETypePath.RETURN) {
       const pathData = this.mapperOne(path) as any;
       const denso = {
-        id: path.employeesOnPath[0].id,
+        id: path.employeesOnPath[0]?.id,
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
