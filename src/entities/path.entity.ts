@@ -4,17 +4,17 @@ import { EmployeesOnPath } from './employeesOnPath.entity';
 import { Route } from './route.entity';
 
 export class Path {
-  id: string
-  duration: string
-  startsAt: string
-  startedAt?: Date
-  finishedAt?: Date
-  type: string
+  id: string;
+  duration: string;
+  startsAt: string;
+  startedAt?: Date;
+  finishedAt?: Date;
+  type: string;
   status: string | EStatusPath;
-  employeesOnPath?: Partial<EmployeesOnPath>[]
-  route?: Partial<Route>
-  createdAt: Date
-  updatedAt?: Date
+  employeesOnPath?: Partial<EmployeesOnPath>[];
+  route?: Partial<Route>;
+  createdAt: Date;
+  updatedAt?: Date;
 
   constructor(
     props: Omit<Path, 'id' | 'createdAt' | 'employeesOnPath' | 'route'>,

@@ -1,17 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
   ValidateNested,
+  IsNumberString,
 } from 'class-validator';
 import { faker } from '@faker-js/faker';
+import { EmployeeAddressDTO } from './employeeAddress.dto';
+import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 
 faker.locale = 'pt_BR';
 
 export class CreateEmployeeFileDTO {
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
-  @IsString({ message: '[registration] A matrícula deve ser do tipo string.' })
+  @IsNumberString(
+    {},
+    { message: '[registration] A matrícula deve ser do tipo string.' },
+  )
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   registration: string;
@@ -54,8 +60,13 @@ export class CreateEmployeeFileDTO {
   costCenter: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })
   @ValidateNested({ each: true })
-  address: string;
+  @Type(() => EmployeeAddressDTO)
+  address: EmployeeAddressDTO;
+
+  @ApiProperty()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEmployeePinDTO)
+  @IsNotEmpty({ message: '[pin] O ponto de embarque deve ser preenchido.' })
+  pin: CreateEmployeePinDTO;
 }

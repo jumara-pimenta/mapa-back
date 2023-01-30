@@ -1,8 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AssociateEmployeeOnPinDTO } from '../dtos/employeesOnPin/associateEmployeeOnPin.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPin } from '../entities/employeesOnPin.entity';

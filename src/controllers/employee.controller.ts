@@ -23,8 +23,14 @@ import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from '../utils/examples.swagger';
-import { Roles } from '../decorators/roles.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
+import {
+  CreateEmployee,
+  DeleteEmployee,
+  GetAllEmployee,
+  GetEmployee,
+  UpdateEmployee,
+} from '../utils/examples.swagger';
 
 @Controller('/api/employees')
 @ApiTags('Employees')

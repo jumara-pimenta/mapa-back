@@ -51,7 +51,7 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-      
+
     const emplopyeeOrdened = orderPins(employeesPins);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
@@ -114,6 +114,17 @@ export class RouteService {
     return this.mapperOne(route);
   }
 
+  async getById(id: string): Promise<Route> {
+    const route = await this.routeRepository.findById(id);
+    if (!route)
+      throw new HttpException(
+        'Não foi encontrada está rota!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return route;
+  }
+
   async listByDriverId(
     id: string,
     page: Page,
@@ -166,17 +177,6 @@ export class RouteService {
       total: routes.total,
       items,
     };
-  }
-
-  async getById(id: string): Promise<Route> {
-    const route = await this.routeRepository.findById(id);
-    if (!route)
-      throw new HttpException(
-        'Não foi encontrada está rota!',
-        HttpStatus.NOT_FOUND,
-      );
-
-    return route;
   }
 
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {

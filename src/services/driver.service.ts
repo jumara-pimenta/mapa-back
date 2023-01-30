@@ -201,7 +201,6 @@ export class DriverService {
       drivers.push(driver);
     }
     const totalCreated = 0;
-    const alreadyExisted = 0;
     let dataError = 0;
     const totalToCreate = drivers.length;
 

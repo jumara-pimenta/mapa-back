@@ -158,9 +158,7 @@ export class AuthService {
   }
 
   async employeeLogin(data: SignInEmployeeDTO): Promise<any> {
-    const employee = await this.employeeService.findByRegistration(
-      data.login,
-    );
+    const employee = await this.employeeService.findByRegistration(data.login);
 
     if (!employee)
       throw new HttpException(

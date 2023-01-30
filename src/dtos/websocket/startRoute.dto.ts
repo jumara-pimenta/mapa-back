@@ -9,17 +9,17 @@ import {
 import { UpdatePathDTO } from '../path/updatePath.dto';
 import { UpdateRouteDTO } from '../route/updateRoute.dto';
 
-export class StatusRouteDTO {  
+export class StatusRouteDTO {
   @ApiProperty()
-  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
-  @IsNotEmpty({ message: '[routeId] O id da rota deve ser preenchida.'})
+  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[routeId] O id da rota deve ser preenchida.' })
   routeId: string;
-  
+
   @ApiProperty()
-  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
-  @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.'})
+  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[pathId] O id do trajeto deve ser preenchida.' })
   pathId: string;
-  
+
   @ApiProperty()
   @ValidateNested({
     each: true,
@@ -27,7 +27,7 @@ export class StatusRouteDTO {
   @Type(() => UpdateRouteDTO)
   @IsOptional()
   route: UpdateRouteDTO;
-  
+
   @ApiProperty()
   @ValidateNested({
     each: true,
