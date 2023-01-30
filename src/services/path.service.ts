@@ -248,7 +248,7 @@ export class PathService {
     return await this.pathRepository.delete(path.id);
   }
 
-  async listById(id: string): Promise<any> {
+  async listByIdMobile(id: string): Promise<any> {
     const path = await this.pathRepository.findById(id);
     if (!path)
       throw new HttpException(
@@ -307,6 +307,17 @@ export class PathService {
     }
 
     // return this.mapperOne(path);
+  }
+
+  async listById(id: string): Promise<any> {
+    const path = await this.pathRepository.findById(id);
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado trajeto com o id: ${id}!`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(path);
   }
 
   async getPathById(id: string): Promise<Path> {

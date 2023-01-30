@@ -45,7 +45,7 @@ export class PathController {
   })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Path> {
-    return await this.pathService.listById(id);
+    return await this.pathService.listByIdMobile(id);
   }
 
   @Get('/:routeId/paths')
