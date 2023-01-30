@@ -6,15 +6,24 @@ import { UpdateSinisterDTO } from 'src/dtos/sinister/updateSinister.dto';
 import ISinisterRepository from 'src/repositories/sinister/sinister.repository.contract';
 import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
 import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
-
+import { PathService } from './path.service';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class SinisterService {
   constructor(
     @Inject('ISinisterRepository')
     private readonly sinisterRepository: ISinisterRepository,
+    private readonly pathService: PathService,
+    private readonly JwtServiceDecode: JwtService,
   ) {}
 
-  async create(payload: CreateSinisterDTO): Promise<Sinister> {
+  async create(payload: CreateSinisterDTO, token: string): Promise<Sinister> {
+    const decodedToken = await this.JwtServiceDecode.decode(
+      token.split(' ')[1],
+    );
+    console.log(decodedToken.sub.id);
+    const path = await this.pathService.getPathById(payload.pathId);
+
     return await this.sinisterRepository.create(new Sinister(payload));
   }
 

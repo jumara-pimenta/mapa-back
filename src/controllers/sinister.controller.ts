@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  Header,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -40,8 +42,11 @@ export class SinisterController {
     },
   })
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() payload: CreateSinisterDTO): Promise<Sinister> {
-    return await this.sinisterService.create(payload);
+  async create(
+    @Body() payload: CreateSinisterDTO,
+    @Headers('authorization') token: string,
+  ): Promise<Sinister> {
+    return await this.sinisterService.create(payload, token);
   }
 
   @Put('/:id')
