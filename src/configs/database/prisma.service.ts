@@ -66,10 +66,6 @@ export class PrismaService
           createdAt: new Date(),
         });
 
-        // details: 'R. Paço Real, 144 - Raiz, Manaus - AM, 69068-650',
-
-        // random boolean
-
         employees.push({
           name: faker.name.fullName(),
           address: JSON.stringify({
@@ -206,20 +202,15 @@ export class PrismaService
         for await (const path of paths) {
           let incremetable = 0;
           for await (const employee of employeesId) {
-            const random = +faker.random.numeric(1);
             await this.employeesOnPath.create({
               data: {
                 pathId: path.id,
                 employeeId: employee.id,
                 confirmation: true,
-                createdAt: faker.date.past(0, '2022-12-20T00:00:00.000Z'),
+                createdAt: new Date(),
                 description: 'test',
                 position: incremetable++,
-                present: random % 2 === 0 ? true : false,
-                boardingAt:
-                  random % 2 === 0
-                    ? faker.date.past(0, '2023-01-01T00:00:00.000Z')
-                    : null,
+                boardingAt: null,
                 id: uuid(),
               },
             });
