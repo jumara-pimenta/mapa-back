@@ -36,6 +36,7 @@ export const setPermissions = (roles: ERoles) => {
       'create-sinister',
       'list-sinister',
       'edit-sinister',
+      'list-historic',
     ];
 
   if (roles === ERoles.ROLE_EMPLOYEE)
