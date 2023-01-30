@@ -64,14 +64,12 @@ export class EmployeesOnPinService {
     let pinAlreadyAssociated: any;
 
     if (pins.length > 0) {
-      pinAlreadyAssociated = pins.filter((_pin: Pin) => {
+      pins.filter(async (_pin: Pin) => {
         if (_pin.id === pin.id) {
-          return _pin;
+          await this.employeesOnPinRepository.delete(employee.id, _pin.id);
         }
       });
     }
-
-    if (pinAlreadyAssociated.length) return;
 
     return await this.employeesOnPinRepository.create(
       new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),

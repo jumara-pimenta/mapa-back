@@ -13,8 +13,6 @@ import {
 } from 'src/utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
-faker.locale = 'pt_BR';
-
 @Injectable()
 export class PrismaService
   extends PrismaClient
@@ -25,22 +23,53 @@ export class PrismaService
 
     let paths = await this.path.findMany();
 
+    await this.backOfficeUser.upsert({
+      where: {
+        email: 'admin@rotas.com.br',
+      },
+      create: {
+        id: uuid(),
+        email: 'admin@rotas.com.br',
+        password: await bcrypt.hash('Denso', 10),
+        name: 'Admin',
+        role: 'ADMIN',
+        createdAt: new Date(),
+      },
+      update: {
+        email: 'admin@rotas.com.br',
+        password: await bcrypt.hash('Denso', 10),
+        name: 'Admin',
+        role: 'ADMIN',
+      },
+    });
+
     if (paths.length === 0) {
+      faker.locale = 'pt_BR';
       const employees: any[] = [];
 
-      const pin = await this.pin.create({
-        data: {
-          id: uuid(),
-          title: 'Em Frente ao principe do açai',
-          local: 'Príncipe do Açaí Frozen ',
-          details: 'R. Paço Real, 144 - Raiz, Manaus - AM, 69068-650',
-          lat: '-3.127925',
-          lng: '-59.992930',
-          createdAt: new Date(),
-        },
-      });
+      const pins = [];
 
       for (let i = 0; i < 12; i++) {
+        pins.push({
+          id: uuid(),
+          title: faker.address.direction(),
+          local: faker.address.streetAddress(true),
+          details:
+            faker.address.streetAddress(true) +
+            ', ' +
+            faker.address.buildingNumber() +
+            ', ' +
+            'Manaus - AM ,' +
+            faker.address.zipCodeByState('AM'),
+          lat: faker.address.latitude(-2.9469, -3.1589, 6),
+          lng: faker.address.longitude(-59.8246, -60.1083, 6),
+          createdAt: new Date(),
+        });
+
+        // details: 'R. Paço Real, 144 - Raiz, Manaus - AM, 69068-650',
+
+        // random boolean
+
         employees.push({
           name: faker.name.fullName(),
           address: JSON.stringify({
@@ -63,6 +92,10 @@ export class PrismaService
         });
       }
 
+      await this.pin.createMany({
+        data: pins,
+      });
+
       await this.employee.createMany({
         data: employees,
       });
@@ -73,16 +106,15 @@ export class PrismaService
         },
       });
 
-      employeesId.forEach(async (employee) => {
+      for (let i = 0; i < 12; i++) {
         await this.employeesOnPin.create({
           data: {
-            pinId: pin.id,
-            employeeId: employee.id,
+            pinId: pins[i].id,
+            employeeId: employeesId[i].id,
             type: ETypePin.CONVENTIONAL,
           },
         });
-      });
-
+      }
       const driverId = [];
 
       for (let i = 0; i < 4; i++) {
@@ -127,31 +159,31 @@ export class PrismaService
 
       const routeId = [];
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < 2; i++) {
         routeId.push({
-          id: uuid(),
-          description: 'Rota ' + i + 1,
+          id: uuid() + i,
+          description: 'Rota ' + `${i + 1}`,
           createdAt: new Date(),
           driverId: driverId[i].id,
           vehicleId: vehicleId[i].id,
           distance: 'PENDENTE',
           status: EStatusRoute.PENDING,
-          type: ETypeRoute.CONVENTIONAL,
+          type: i === 0 ? ETypeRoute.CONVENTIONAL : ETypeRoute.EXTRA,
           path: {
             createMany: {
               data: [
                 {
                   id: uuid(),
-                  duration: '00:10',
-                  startsAt: '08:00',
+                  duration: '00:01',
+                  startsAt: `0${6 + i}:00`,
                   type: ETypePath.ONE_WAY,
                   status: EStatusPath.PENDING,
                   createdAt: new Date(),
                 },
                 {
                   id: uuid(),
-                  duration: '00:10',
-                  startsAt: '19:00',
+                  duration: '00:01',
+                  startsAt: `${19 + i}:00`,
                   type: ETypePath.RETURN,
                   status: EStatusPath.PENDING,
                   createdAt: new Date(),
@@ -162,24 +194,32 @@ export class PrismaService
         });
 
         for await (const route of routeId) {
-          await this.route.create({
-            data: route,
-          });
+          if (routeId.length === 2) {
+            await this.route.create({
+              data: route,
+            });
+          }
         }
 
         paths = await this.path.findMany();
 
         for await (const path of paths) {
           let incremetable = 0;
-          for await (const employee of employees) {
+          for await (const employee of employeesId) {
+            const random = +faker.random.numeric(1);
             await this.employeesOnPath.create({
               data: {
                 pathId: path.id,
                 employeeId: employee.id,
                 confirmation: true,
-                createdAt: new Date(),
+                createdAt: faker.date.past(0, '2022-12-20T00:00:00.000Z'),
                 description: 'test',
                 position: incremetable++,
+                present: random % 2 === 0 ? true : false,
+                boardingAt:
+                  random % 2 === 0
+                    ? faker.date.past(0, '2023-01-01T00:00:00.000Z')
+                    : null,
                 id: uuid(),
               },
             });
@@ -187,26 +227,6 @@ export class PrismaService
         }
       }
     }
-
-    await this.backOfficeUser.upsert({
-      where: {
-        email: 'admin@rotas.com.br',
-      },
-      create: {
-        id: uuid(),
-        email: 'admin@rotas.com.br',
-        password: await bcrypt.hash('Denso', 10),
-        name: 'Admin',
-        role: 'ADMIN',
-        createdAt: new Date(),
-      },
-      update: {
-        email: 'admin@rotas.com.br',
-        password: await bcrypt.hash('Denso', 10),
-        name: 'Admin',
-        role: 'ADMIN',
-      },
-    });
 
     await this.pin.upsert({
       where: {
