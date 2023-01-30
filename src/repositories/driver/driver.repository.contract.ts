@@ -13,4 +13,5 @@ export default interface IDriverRepository {
   findByCpf(cpf: string): Promise<Driver>;
   findByCnh(cnh: string): Promise<Driver>;
   update(data: Driver): Promise<Driver>;
+  findByDrivers(): Promise<Driver[]>;
 }

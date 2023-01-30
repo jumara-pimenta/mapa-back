@@ -1,4 +1,15 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as XLSX from 'xlsx';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  StreamableFile,
+} from '@nestjs/common';
 import { Vehicle } from '../entities/vehicle.entity';
 import IVehicleRepository from '../repositories/vehicle/vehicle.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -132,5 +143,175 @@ export class VehicleService {
         createdAt: vehicle.createdAt,
       };
     });
+  }
+
+  async parseExcelFile(file: any) {
+    const workbook = XLSX.read(file.buffer);
+    const sheetName = workbook.SheetNames;
+    const type = 'LISTA DE VEÍCULOS';
+    if (!Object.values(sheetName).includes(type))
+      throw new HttpException(
+        `Planilha tem que conter a aba de ${type}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    const sheet = workbook.Sheets[type];
+    const headers = [
+      'Placa',
+      'Empresa',
+      'Tipo do carro',
+      'Última vistoria',
+      'Vencimento',
+      'Capacidade',
+      'Acessibilidade',
+      'Última manutenção',
+    ];
+    if (
+      headers.join('') !==
+      [
+        sheet.A1.v,
+        sheet.B1.v,
+        sheet.C1.v,
+        sheet.D1.v,
+        sheet.E1.v,
+        sheet.F1.v,
+        sheet.G1.v,
+        sheet.H1.v,
+      ].join('')
+    )
+      throw new HttpException(
+        'Planilha tem que conter as colunas Placa, Empresa, Tipo do carro, Última vistoria, Vencimento, Capacidade, Acessibilidade, Última manutenção',
+        HttpStatus.BAD_REQUEST,
+      );
+    const data: any = XLSX.utils.sheet_to_json(sheet);
+    const vehicles: CreateVehicleDTO[] = [];
+    for (const row of data) {
+      const driver: CreateVehicleDTO = {
+        plate: row['PLACA'].toString(),
+        company: row['EMPRESA'].toString(),
+        type: row['TIPO DO CARRO'].toString(),
+        lastSurvey: row['ÚLTIMA VISTORIA'].toString(),
+        expiration: row['VENCIMENTO'].toString(),
+        capacity: row['CAPACIDADE'].toString(),
+        isAccessibility: row['ACESSIBILIDADE'].toString(),
+        lastMaintenance: row['ÚLTIMA MANUTENÇÃO'].toString(),
+        renavam: row['RENAVAM'].toString(),
+        note: row['OBSERVAÇÃO'].toString(),
+      };
+      vehicles.push(driver);
+    }
+    const totalCreated = 0;
+    let dataError = 0;
+    const totalToCreate = vehicles.length;
+
+    for await (const item of vehicles) {
+      const driver = plainToClass(CreateVehicleDTO, item);
+      let error = false;
+      validate(driver, { validationError: { target: false } }).then(
+        async (errors) => {
+          if (errors.length > 0) {
+            dataError++;
+            error = true;
+          }
+        },
+      );
+    }
+
+    return {
+      message: [
+        `Cadastrado com sucesso: ${totalCreated}`,
+        `Veículos com dados inválidos: ${dataError}`,
+        `Quantidade total de veículos na planilha: ${totalToCreate}`,
+      ],
+    };
+  }
+
+  async exportVehicleFile(page: Page, filters?: FiltersVehicleDTO) {
+    const headers = [
+      'Placa',
+      'Empresa',
+      'Tipo do carro',
+      'Última vistoria',
+      'Vencimento',
+      'Capacidade',
+      'Acessibilidade',
+      'Última manutenção',
+    ];
+    const today = new Date().toLocaleDateString('pt-BR');
+
+    const filePath = './vehicle.xlsx';
+    const workSheetName = 'Veículos';
+
+    const vehicles = await this.listAll(page, filters);
+
+    const exportedDriverToXLSX = async (
+      vehicles,
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = vehicles.map((vehicle) => {
+        return [
+          vehicle.plate,
+          vehicle.company,
+          vehicle.type,
+          vehicle.lastSurvey,
+          vehicle.expiration,
+          vehicle.capacity,
+          vehicle.lastMaintenance,
+          vehicle.isAccessibility,
+        ];
+      });
+
+      if (!data.length)
+        throw new HttpException(
+          'Não foram encontrados veículos para serem exportados',
+          HttpStatus.NOT_FOUND,
+        );
+
+      const vehicleInformationHeader = [
+        [`VEÍCULOS EXPORTADOS: ${today}`, '', '', '', '', ''],
+        [`TOTAL DE VEÍCULOS EXPORTADOS: ${data.length}`],
+      ];
+
+      const vehicleInformationFooter = [
+        ['***********'],
+        ['*****************************'],
+        ['***************'],
+        ['***************'],
+        ['***************'],
+        ['****'],
+        ['***************'],
+        ['*****'],
+      ];
+
+      const workBook = XLSX.utils.book_new();
+      // eslint-disable-next-line no-sparse-arrays
+      const workSheetData = [
+        ,
+        vehicleInformationHeader,
+        ,
+        vehicleInformationFooter,
+        ,
+        headers,
+        ...data,
+        ,
+        vehicleInformationFooter,
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(
+      vehicles.items,
+      headers,
+      workSheetName,
+      filePath,
+    );
   }
 }
