@@ -856,3 +856,36 @@ export const BackOfficeUserCreate = {
   createdAt: '2023-01-25T10:02:23.363Z',
   updatedAt: null,
 };
+
+export const CreateSinister = {
+  id: '9b357440-f716-49a2-b4b7-83e65b72b1b5',
+  type: 'Assalto',
+  description: 'Assalto na parada de ônibus',
+  createdAt: '2023-01-26T20:15:45.137Z',
+  updatedAt: null,
+};
+
+export const UpdateSinister = {
+  ...CreateSinister,
+  updatedAt: new Date(),
+};
+
+export const GetSinisterById = {
+  id: '9b357440-f716-49a2-b4b7-83e65b72b1b5',
+  type: 'Assalto',
+  description: 'Assalto na parada de ônibus da Suframa',
+  createdAt: '2023-01-26T20:15:45.137Z',
+  updatedAt: null,
+};
+
+export const GetAllSinister = {
+  total: 1,
+  items: [
+    {
+      id: 'a3ae6574-7f45-4c95-ac93-4b1c53ccd0fb',
+      type: 'Assalto',
+      description: 'Assalto na parada de ônibus',
+      createdAt: '2023-01-27T10:10:59.710Z',
+    },
+  ],
+};
