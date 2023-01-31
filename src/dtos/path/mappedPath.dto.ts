@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Sinister } from '@prisma/client';
 import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
 
 class IPin {
@@ -55,6 +56,8 @@ export class MappedPathDTO {
   startsAt: string;
   @ApiProperty()
   status: string;
+  @ApiProperty()
+  sinister?: Partial<Sinister>[];
   @ApiProperty()
   type: string;
   @ApiProperty()

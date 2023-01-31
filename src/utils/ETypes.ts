@@ -46,3 +46,9 @@ export enum ERoles {
   ROLE_EMPLOYEE = 'EMPLOYEE',
   ROLE_DRIVER = 'DRIVER',
 }
+
+export enum ETypePeriodHistory {
+  WEEKLY = 'SEMANAL',
+  BIWEEKLY = 'QUINZENAL',
+  MONTHLY = 'MENSAL',
+}

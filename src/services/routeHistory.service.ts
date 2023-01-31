@@ -1,6 +1,12 @@
 import { FiltersRouteHistoryDTO } from './../dtos/routeHistory/filtersRouteHistory.dto';
 import { Page, PageResponse } from 'src/configs/database/page.model';
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
 import {
@@ -8,15 +14,19 @@ import {
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { compareDates } from 'src/utils/Date';
+import { compareDates, getPeriod } from 'src/utils/Date';
 import { RouteHistoryByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dto';
+import { SinisterService } from './sinister.service';
+import { ETypePeriodHistory } from 'src/utils/ETypes';
 
 @Injectable()
 export class RouteHistoryService {
   constructor(
     @Inject('IRouteHistoryRepository')
     private readonly routeHistoryRepository: IRouteHistoryRepository,
+    @Inject(forwardRef(() => SinisterService))
+    private readonly sinisterService: SinisterService,
   ) {}
 
   async create(props: RouteHistory): Promise<RouteHistory> {
@@ -34,6 +44,7 @@ export class RouteHistoryService {
       props.path,
       props.driver,
       props.vehicle,
+      props.sinister,
     );
 
     return await this.routeHistoryRepository.create(newRouteHistory);
@@ -184,17 +195,12 @@ export class RouteHistoryService {
     return { Pending, Started, Finished };
   }
 
-  async getHistoricByDate(dateInit: Date, dateFinal: Date): Promise<any> {
-    const date = compareDates(dateInit, dateFinal);
-    if (!date)
-      throw new HttpException(
-        'Data inicial tem que ser menor que a data final',
-        HttpStatus.BAD_REQUEST,
-      );
-
+  async getHistoricByDate(period: ETypePeriodHistory): Promise<any> {
+    const dates = getPeriod(period);
+    console.log(dates);
     const historic = await this.routeHistoryRepository.getHistoricByDate(
-      dateInit,
-      dateFinal,
+      dates.dateInitial,
+      dates.dateFinal,
     );
     const response: RouteHistoryByDate[] = [];
 

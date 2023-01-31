@@ -21,6 +21,8 @@ export class SinisterRepository
       data: {
         id: data.id,
         type: data.type,
+        pathId: data.Path.id,
+        createdBy: data.createdBy,
         description: data.description,
         createdAt: data.createdAt,
       },
@@ -72,5 +74,18 @@ export class SinisterRepository
       items,
       Array.isArray(total) ? total.length : total,
     );
+  }
+
+  vinculatePath(sinisters: Sinister[], pathId: string): Promise<any> {
+    return this.repository.sinister.updateMany({
+      data: {
+        pathId: pathId,
+      },
+      where: {
+        id: {
+          in: sinisters.map((sinister) => sinister.id),
+        },
+      },
+    });
   }
 }

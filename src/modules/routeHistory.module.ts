@@ -5,9 +5,15 @@ import { RouteHistoryRepository } from '../repositories/routeHistory/routeHistor
 import { PathModule } from './path.module';
 import { DriverModule } from './driver.module';
 import { VehicleModule } from './vehicle.module';
+import { SinisterModule } from './sinister.module';
 
 @Module({
-  imports: [forwardRef(() => PathModule), DriverModule, VehicleModule],
+  imports: [
+    forwardRef(() => PathModule),
+    DriverModule,
+    VehicleModule,
+    forwardRef(() => SinisterModule),
+  ],
   controllers: [RouteHistoryController],
   providers: [
     RouteHistoryService,

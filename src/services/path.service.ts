@@ -98,6 +98,7 @@ export class PathService {
       },
     };
     path.status = EStatusPath.FINISHED;
+
     const props = new RouteHistory(
       {
         typeRoute: path.type,
@@ -112,6 +113,7 @@ export class PathService {
       path,
       driver,
       vehicle,
+      path.sinister,
     );
 
     if (path.status === EStatusPath.FINISHED) {
@@ -528,6 +530,14 @@ export class PathService {
       startsAt: path.startsAt,
       status: path.status,
       vehicle: path.route.vehicle!.id,
+      sinister: path.sinister?.map((item) => {
+        return {
+          id: item.id,
+          description: item.description,
+          createdBy: item.createdBy,
+          type: item.type,
+        };
+      }),
       driver: path.route.driver!.id,
       type: path.type,
       createdAt: path.createdAt,

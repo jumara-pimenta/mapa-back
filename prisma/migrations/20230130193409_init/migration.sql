@@ -168,10 +168,12 @@ CREATE TABLE [dbo].[BackOfficeUser] (
 -- CreateTable
 CREATE TABLE [dbo].[Sinister] (
     [id] NVARCHAR(1000) NOT NULL,
+    [pathId] NVARCHAR(1000) NOT NULL,
     [type] NVARCHAR(1000) NOT NULL,
     [description] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Sinister_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
+    [routeHistoryId] NVARCHAR(1000),
     CONSTRAINT [Sinister_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Sinister_id_key] UNIQUE NONCLUSTERED ([id])
 );
@@ -205,6 +207,12 @@ ALTER TABLE [dbo].[EmployeesOnPin] ADD CONSTRAINT [EmployeesOnPin_employeeId_fke
 
 -- AddForeignKey
 ALTER TABLE [dbo].[EmployeesOnPin] ADD CONSTRAINT [EmployeesOnPin_pinId_fkey] FOREIGN KEY ([pinId]) REFERENCES [dbo].[Pin]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Sinister] ADD CONSTRAINT [Sinister_pathId_fkey] FOREIGN KEY ([pathId]) REFERENCES [dbo].[Path]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Sinister] ADD CONSTRAINT [Sinister_routeHistoryId_fkey] FOREIGN KEY ([routeHistoryId]) REFERENCES [dbo].[RouteHistory]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 COMMIT TRAN;
 

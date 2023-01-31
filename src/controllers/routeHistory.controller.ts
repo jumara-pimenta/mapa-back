@@ -19,6 +19,7 @@ import { RouteHistoryService } from '../services/routeHistory.service';
 import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
 import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
+import * as moment from 'moment';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')
@@ -57,11 +58,8 @@ export class RouteHistoryController {
     description: 'Get the historic of paths between 2 dates.',
   })
   @HttpCode(HttpStatus.OK)
-  async getHistoricByDate(@Query() dates: DateFilterDTO): Promise<any> {
-    return await this.RouteHistoryService.getHistoricByDate(
-      dates.dateInit,
-      dates.dateFinal,
-    );
+  async getHistoricByDate(@Query() type: DateFilterDTO): Promise<any> {
+    return await this.RouteHistoryService.getHistoricByDate(type.period);
   }
 
   @Get('/all')

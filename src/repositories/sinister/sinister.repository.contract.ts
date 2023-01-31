@@ -10,4 +10,5 @@ export default interface ISinisterRepository {
     page: Page,
     filters?: FiltersSinisterDTO,
   ): Promise<PageResponse<Sinister>>;
+  vinculatePath(sinister: Sinister[], pathId: string): Promise<Sinister[]>;
 }

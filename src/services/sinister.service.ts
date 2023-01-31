@@ -8,6 +8,7 @@ import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
 import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
 import { PathService } from './path.service';
 import { JwtService } from '@nestjs/jwt';
+import { EStatusPath } from 'src/utils/ETypes';
 @Injectable()
 export class SinisterService {
   constructor(
@@ -21,10 +22,23 @@ export class SinisterService {
     const decodedToken = await this.JwtServiceDecode.decode(
       token.split(' ')[1],
     );
-    console.log(decodedToken.sub.id);
+    if (!decodedToken.sub.name)
+      throw new HttpException(
+        'O usuário não foi encontrado!',
+        HttpStatus.NOT_FOUND,
+      );
+
     const path = await this.pathService.getPathById(payload.pathId);
 
-    return await this.sinisterRepository.create(new Sinister(payload));
+    if (path.status === EStatusPath.PENDING)
+      throw new HttpException(
+        'Não é possível cadastrar um sinistro para um trajeto pendente!',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return await this.sinisterRepository.create(
+      new Sinister(payload, path, decodedToken.sub.name),
+    );
   }
 
   async listById(id: string): Promise<Sinister> {
@@ -45,6 +59,10 @@ export class SinisterService {
     return await this.sinisterRepository.update(
       Object.assign(sinister, { ...sinister, ...data }),
     );
+  }
+
+  async vinculatePath(sinister: Sinister[], pathId: string) {
+    return await this.sinisterRepository.vinculatePath(sinister, pathId);
   }
 
   async listAll(
