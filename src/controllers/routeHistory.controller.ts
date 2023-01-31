@@ -7,7 +7,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GetRouteHistories } from '../utils/examples.swagger';
+import {
+  GetRouteHistories,
+  GetRouteHistoriesByDate,
+  GetRouteHistoriesByQuantity,
+} from '../utils/examples.swagger';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -37,6 +41,10 @@ export class RouteHistoryController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get the historic.',
+    schema: {
+      type: 'object',
+      example: GetRouteHistoriesByQuantity,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getHistoric(): Promise<any> {
@@ -48,6 +56,10 @@ export class RouteHistoryController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get the historic of paths between 2 dates.',
+    schema: {
+      type: 'object',
+      example: GetRouteHistoriesByDate,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getHistoricByDate(@Query() dates: DateFilterDTO): Promise<any> {

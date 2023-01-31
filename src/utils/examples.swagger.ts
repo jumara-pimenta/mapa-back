@@ -157,14 +157,14 @@ export const GetRoutesByDriver = {
 };
 
 export const CreateDriver = {
-  id: 'dc0e9792-f935-4411-a016-de4509d55054',
-  name: 'João da Silva',
-  cpf: '96893908563',
-  cnh: '123456789',
-  // add year to date to avoid error
-  validation: new Date(Date.now() + 31536000000),
+  id: '5d8dacf7-ddf5-4ac0-a302-6a85e048398c',
+  name: 'Marcos Paulo',
+  cpf: '02157444525',
+  cnh: '11111111111',
+  password: '$2b$10$m0.v5CS50WhJeousFro7ROGjDqTHkCChvlWqsd9i7.9tqntJVHEe.',
+  validation: '2022-11-09T17:46:10.037Z',
   category: 'AB',
-  createdAt: new Date(),
+  createdAt: '2023-01-31T15:05:31.564Z',
   updatedAt: null,
 };
 
@@ -279,22 +279,29 @@ export const CreateEmployeesOnPin = {
 };
 
 export const GetRouteHistories = {
-  id: '644a4b19-6133-4506-b4f7-216fb3ffd7e7',
-  typeRoute: 'CONVENCIONAL',
-  nameRoute: 'Rota 1',
-  path: '217822b9-02f2-47e7-9d90-1ae58744acc3',
-  employeeIds:
-    '2fce27dd-e7c4-496f-be0e-3aac0db2f82d, 644a4b19-6133-4506-b4f7-216fb3ffd7e7',
+  id: 'ae117ec0-6fa6-4c6e-b725-1fff6569aa59',
+  typeRoute: 'IDA',
+  nameRoute: 'Rota #002',
+  pathId: 'be59edcd-e4f2-4221-8d18-0a16ef2fc514',
+  employeeIds: '42b2b0c0-2e8c-4065-a01a-5096159ef72f',
   totalEmployees: 1,
   totalConfirmed: 1,
-  driver: '38e94b04-735b-41a9-a529-79023184007c',
-  vehicle: '28294b80-41ce-4a89-a24e-3e3bd17701c4',
-  itinerary: '-3.1299786, -59.99308800000001',
-  startedAt: '2023-01-02T10:28:31.580Z',
-  finishedAt: '2023-01-02T10:28:31.580Z',
-  createdAt: '2023-01-02T10:28:31.580Z',
+  driverId: '5d8dacf7-ddf5-4ac0-a302-6a85e048398c',
+  vehicleId: '2f18a229-e9c9-405c-813d-b1b35b369d30',
+  itinerary: '-3.1299786,-59.99308800000001',
+  startedAt: '2023-01-31T11:21:02.797Z',
+  finishedAt: '2023-01-31T15:21:11.508Z',
+  createdAt: '2023-01-31T15:21:11.510Z',
   updatedAt: null,
 };
+
+export const GetRouteHistoriesByQuantity = {
+  Pending: 0,
+  Started: 0,
+  Finished: 1,
+};
+
+export const GetRouteHistoriesByDate = {};
 
 export const GetEmployeesOnPath = {
   boardingAt: null,
