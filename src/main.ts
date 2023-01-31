@@ -11,15 +11,23 @@ async function bootstrap() {
     origin: '*',
   });
 
-  app.useGlobalPipes(new ValidationPipe({
-    forbidUnknownValues: false
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      forbidUnknownValues: false,
+    }),
+  );
 
   const config = new DocumentBuilder()
-  .setTitle('Sonar Rotas API')
-  .setDescription('Descrições dos endpoints da API')
-  .setVersion('1.0')
-  .build();
+    .setTitle('Sonar Rotas API')
+    .setDescription('Descrições dos endpoints da API')
+    .addSecurity('bearer', {
+      bearerFormat: 'JWT',
+      type: 'http',
+      scheme: 'bearer',
+    })
+    .addSecurityRequirements('bearer')
+    .setVersion('1.0')
+    .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
