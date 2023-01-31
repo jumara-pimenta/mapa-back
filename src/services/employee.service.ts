@@ -23,8 +23,8 @@ import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 
 const validateAsync = (schema: any): Promise<any> => {
@@ -423,7 +423,6 @@ export class EmployeeService {
 
     // const employees = await this.listAll(page, filters);
     const employees = await this.employeeRepository.findAll(page, filters);
-    console.log(employees);
 
     if (employees.total === 0) {
       throw new HttpException(
