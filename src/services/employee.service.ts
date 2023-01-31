@@ -18,13 +18,12 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
-
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 
 const validateAsync = (schema: any): Promise<any> => {
@@ -297,12 +296,10 @@ export class EmployeeService {
     const data: any = XLSX.utils.sheet_to_json(sheet);
     const employees: abc[] = [];
 
-    const pinDenso = await this.pinService.listByLocal(
-      'Denso Industrial da Amazônia',
-    );
+    const pinDenso = await this.pinService.listByLocal('Denso LTDA ');
 
-    var line = 0;
-    let messagesErrors = [];
+    let line = 0;
+    const messagesErrors = [];
 
     for (const row of data) {
       const address = {
@@ -332,17 +329,18 @@ export class EmployeeService {
     let totalCreated = 0;
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
+    let aa;
 
     for await (const item of employees) {
-      let error = false;
+      const error = false;
 
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
-      var lineE = item.line;
+      const lineE = item.line;
 
       const errorsTest = await validateAsync(employeeSchema);
 
       const [teste] = errorsTest;
-      let cont = 0;
+      const cont = 0;
 
       messagesErrors.push({
         line: lineE,
@@ -353,19 +351,12 @@ export class EmployeeService {
         return i.meesage;
       });
 
-      var aa = testew.map((i) => [
+      aa = testew.map((i) => [
         {
           field: i?.property,
           message: i?.constraints,
         },
       ]);
-
-      // aa.push({ ...aa, line: lineE });
-
-      // console.log(aa);
-      // console.log('Employee', employees);
-
-      // if (errorsTest) console.log(errorsTest);
 
       if (!errorsTest.length) {
         const existsRegistration =
@@ -425,7 +416,6 @@ export class EmployeeService {
 
     // const employees = await this.listAll(page, filters);
     const employees = await this.employeeRepository.findAll(page, filters);
-    console.log(employees);
 
     if (employees.total === 0) {
       throw new HttpException(

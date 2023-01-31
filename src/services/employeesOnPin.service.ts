@@ -1,10 +1,4 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AssociateEmployeeOnPinDTO } from '../dtos/employeesOnPin/associateEmployeeOnPin.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPin } from '../entities/employeesOnPin.entity';
@@ -64,14 +58,12 @@ export class EmployeesOnPinService {
     let pinAlreadyAssociated: any;
 
     if (pins.length > 0) {
-      pinAlreadyAssociated = pins.filter((_pin: Pin) => {
+      pins.filter(async (_pin: Pin) => {
         if (_pin.id === pin.id) {
-          return _pin;
+          await this.employeesOnPinRepository.delete(employee.id, _pin.id);
         }
       });
     }
-
-    if (pinAlreadyAssociated.length) return;
 
     return await this.employeesOnPinRepository.create(
       new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),

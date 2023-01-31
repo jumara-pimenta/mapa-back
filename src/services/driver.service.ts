@@ -3,7 +3,6 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  Logger,
   StreamableFile,
 } from '@nestjs/common';
 import { Driver } from '../entities/driver.entity';

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import { EmployeesOnPin } from '../../entities/employeesOnPin.entity';
