@@ -13,6 +13,8 @@ import { DateFilterDTO } from 'src/dtos/routeHistory/dateFilter.dto';
 import {
   GetRouteHistories,
   ListRouteHistories,
+  GetRouteHistoriesByDate,
+  GetRouteHistoriesByQuantity,
 } from 'src/utils/examples.swagger';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
@@ -44,6 +46,10 @@ export class RouteHistoryController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get the historic.',
+    schema: {
+      type: 'object',
+      example: GetRouteHistoriesByQuantity,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getHistoric(): Promise<any> {
@@ -55,6 +61,10 @@ export class RouteHistoryController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get the historic of paths between 2 dates.',
+    schema: {
+      type: 'object',
+      example: GetRouteHistoriesByDate,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getHistoricByDate(@Query() dates: DateFilterDTO): Promise<any> {

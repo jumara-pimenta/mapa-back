@@ -44,6 +44,7 @@
     "fs": "^0.0.1-security",
     "mssql": "9.1.1",
     "nestjs-request-context": "2.1.0",
+    "node-xlsx": "^0.21.0",
     "path": "^0.12.7",
     "promisify": "^0.0.3",
     "reflect-metadata": "^0.1.13",

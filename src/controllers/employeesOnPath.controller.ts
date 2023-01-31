@@ -109,24 +109,4 @@ export class EmployeesOnPathController {
   ): Promise<MappedEmployeesOnPathDTO> {
     return await this.employeeOnPathService.update(id, payload);
   }
-
-  // @Put('/onboard/')
-  // @HttpCode(HttpStatus.ACCEPTED)
-  // async onboard(@Body() payload: IdUpdateDTO): Promise<any> {
-  //   console.log('payload', payload);
-
-  //   return await this.employeeOnPathService.onboardEmployee(payload);
-  // }
-
-  // @Put('/offboard')
-  // @HttpCode(HttpStatus.ACCEPTED)
-  // async offboard(@Body() payload: IdUpdateDTO): Promise<any> {
-  //   return await this.employeeOnPathService.offboardEmployee(payload);
-  // }
-
-  // @Put('/notComming')
-  // @HttpCode(HttpStatus.ACCEPTED)
-  // async notComming(@Body() payload: IdUpdateDTO): Promise<any> {
-  //   return await this.employeeOnPathService.employeeNotConfirmed(payload);
-  // }
 }

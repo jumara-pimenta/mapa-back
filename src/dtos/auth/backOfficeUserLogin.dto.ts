@@ -1,7 +1,6 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { faker } from '@faker-js/faker';
-import { isRegExp } from 'util/types';
 
 export class BackOfficeUserDTO {
   @ApiProperty({ example: faker.internet.email() })

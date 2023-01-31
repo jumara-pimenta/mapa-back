@@ -18,7 +18,6 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
-
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
@@ -330,6 +329,7 @@ export class EmployeeService {
     let totalCreated = 0;
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
+    let aa;
 
     for await (const item of employees) {
       const error = false;
@@ -351,19 +351,12 @@ export class EmployeeService {
         return i.meesage;
       });
 
-      var aa = testew.map((i) => [
+      aa = testew.map((i) => [
         {
           field: i?.property,
           message: i?.constraints,
         },
       ]);
-
-      // aa.push({ ...aa, line: lineE });
-
-      // console.log(aa);
-      // console.log('Employee', employees);
-
-      // if (errorsTest) console.log(errorsTest);
 
       if (!errorsTest.length) {
         const existsRegistration =

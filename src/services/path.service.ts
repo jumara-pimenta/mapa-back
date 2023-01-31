@@ -1,4 +1,3 @@
-import { CreateRouteHistoryDTO } from './../dtos/routeHistory/createRouteHistory.dto';
 import { RouteHistoryService } from './routeHistory.service';
 import {
   forwardRef,
