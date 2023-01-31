@@ -7,6 +7,7 @@ import { PathRepository } from '../repositories/path/path.repository';
 import { PathService } from '../services/path.service';
 import { EmployeesOnPathModule } from './employeesOnPath.module';
 import { RouteModule } from './route.module';
+import { SinisterModule } from './sinister.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { RouteModule } from './route.module';
     forwardRef(() => EmployeesOnPathModule),
     DriverModule,
     VehicleModule,
-    RouteHistoryModule
+    RouteHistoryModule,
+    forwardRef(() => SinisterModule),
   ],
   controllers: [PathController],
   providers: [

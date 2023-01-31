@@ -21,6 +21,7 @@ import { RouteHistoryService } from '../services/routeHistory.service';
 import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
 import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
+import * as moment from 'moment';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')
@@ -56,7 +57,7 @@ export class RouteHistoryController {
     return await this.RouteHistoryService.getHistoric();
   }
 
-  @Get('/historic/date')
+  @Get('/period/date')
   @Roles('list-historic')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -67,11 +68,8 @@ export class RouteHistoryController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async getHistoricByDate(@Query() dates: DateFilterDTO): Promise<any> {
-    return await this.RouteHistoryService.getHistoricByDate(
-      dates.dateInit,
-      dates.dateFinal,
-    );
+  async getHistoricByDate(@Query() type: DateFilterDTO): Promise<any> {
+    return await this.RouteHistoryService.getHistoricByDate(type.period);
   }
 
   @Get('/all')

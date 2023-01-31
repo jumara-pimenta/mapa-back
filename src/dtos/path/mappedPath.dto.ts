@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Sinister } from '@prisma/client';
 import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
 
 class IPin {

@@ -22,6 +22,7 @@ import { getDateInLocaleTime } from '../utils/date.service';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
+import { SinisterService } from './sinister.service';
 
 @Injectable()
 export class PathService {
@@ -38,6 +39,8 @@ export class PathService {
     private readonly vehicleService: VehicleService,
     @Inject(forwardRef(() => RouteHistoryService))
     private readonly routeHistoryService: RouteHistoryService,
+    @Inject(forwardRef(() => SinisterService))
+    private readonly sinisterService: SinisterService,
   ) {}
 
   async finishPath(id: string): Promise<any> {
@@ -45,7 +48,7 @@ export class PathService {
     const route = await this.listEmployeesByPathAndPin(id);
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const driver = await this.driverService.listById(route.driver);
-
+    const sinister = await this.sinisterService.listByPathId(path.id);
     if (path.finishedAt !== null)
       throw new HttpException(
         'Não é possível alterar uma rota que já foi finalizada!',
@@ -62,8 +65,8 @@ export class PathService {
     });
     const employeeArray = [] as string[];
     const itinerariesArray = [];
-    const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0) - 1;
-    let totalConfirmed = -1;
+    const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
+    let totalConfirmed = 0;
 
     for await (const employeesPins of route.employeesOnPins) {
       itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
@@ -97,6 +100,7 @@ export class PathService {
       },
     };
     path.status = EStatusPath.FINISHED;
+
     const props = new RouteHistory(
       {
         typeRoute: path.type,
@@ -111,6 +115,7 @@ export class PathService {
       path,
       driver,
       vehicle,
+      sinister,
     );
 
     if (path.status === EStatusPath.FINISHED) {
@@ -254,7 +259,7 @@ export class PathService {
         `Não foi encontrado trajeto com o id: ${id}!`,
         HttpStatus.NOT_FOUND,
       );
-
+    console.log(path);
     if (path.type === ETypePath.ONE_WAY) {
       const pathData = this.mapperOne(path) as any;
       const denso = {
@@ -454,7 +459,7 @@ export class PathService {
   async listOneByDriverAndStatus(
     driverId: string,
     status: EStatusPath,
-  ): Promise<Path> {
+  ): Promise<any> {
     const path = await this.pathRepository.findByDriverIdAndStatus(
       driverId,
       status,

@@ -33,6 +33,7 @@ export class RouteHistoryRepository
         employeeIds: true,
         totalEmployees: true,
         totalConfirmed: true,
+        sinister: true,
         driver: {
           select: {
             name: true,
@@ -67,6 +68,7 @@ export class RouteHistoryRepository
         path: true,
         employeeIds: true,
         totalEmployees: true,
+        sinister: true,
         totalConfirmed: true,
         driver: true,
         vehicle: true,
@@ -126,6 +128,9 @@ export class RouteHistoryRepository
           gte: dateInit,
           lte: dateFinal,
         },
+      },
+      include: {
+        sinister: true,
       },
     });
     return paths;

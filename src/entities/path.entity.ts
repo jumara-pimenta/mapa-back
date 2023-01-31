@@ -2,6 +2,7 @@ import { EStatusPath } from '../utils/ETypes';
 import { v4 as uuid } from 'uuid';
 import { EmployeesOnPath } from './employeesOnPath.entity';
 import { Route } from './route.entity';
+import { Sinister } from './sinister.entity';
 
 export class Path {
   id: string;

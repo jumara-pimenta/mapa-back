@@ -863,6 +863,8 @@ export const CreateSinister = {
   id: '9b357440-f716-49a2-b4b7-83e65b72b1b5',
   type: 'Assalto',
   description: 'Assalto na parada de ônibus',
+  pathId: 'a3ae6574-7f45-4c95-ac93-4b1c53ccd0fb',
+  createdBy: '71b3e5f3-76e1-4dad-9638-7c9b4ad9dbcb',
   createdAt: '2023-01-26T20:15:45.137Z',
   updatedAt: null,
 };

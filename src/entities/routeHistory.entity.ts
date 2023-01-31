@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Driver } from './driver.entity';
 import { Path } from './path.entity';
 import { Vehicle } from './vehicle.entity';
+import { Sinister } from './sinister.entity';
 
 export class RouteHistory {
   id: string;
@@ -12,6 +13,7 @@ export class RouteHistory {
   employeeIds: string;
   totalEmployees: number;
   totalConfirmed: number;
+  sinister?: Sinister[];
   driver?: Driver;
   vehicle?: Vehicle;
   itinerary: string;
@@ -23,11 +25,12 @@ export class RouteHistory {
   constructor(
     props: Omit<
       RouteHistory,
-      'id' | 'createdAt' | 'vehicle' | 'paths' | 'driver'
+      'id' | 'createdAt' | 'vehicle' | 'paths' | 'driver' | 'sinister'
     >,
     path: Path,
     driver: Driver,
     vehicle: Vehicle,
+    sinister: Sinister[],
     id?: string,
   ) {
     Object.assign(this, props);
@@ -35,5 +38,6 @@ export class RouteHistory {
     this.path = path;
     this.driver = driver;
     this.vehicle = vehicle;
+    this.sinister = sinister;
   }
 }

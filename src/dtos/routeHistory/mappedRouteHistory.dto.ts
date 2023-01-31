@@ -16,6 +16,17 @@ export class EmployeeHistoryDTO {
   registration: string;
 }
 
+export class SinisterDTO {
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  type: string;
+  @ApiProperty()
+  description: string;
+  @ApiProperty()
+  createdBy: string;
+}
+
 export class MappedRouteHistoryDTO {
   @ApiProperty()
   id: string;
@@ -31,6 +42,10 @@ export class MappedRouteHistoryDTO {
   totalEmployees: number;
   @ApiProperty()
   totalConfirmed: number;
+  @ApiProperty()
+  sinister: SinisterDTO[];
+  @ApiProperty()
+  sinisterTotal: number;
   @ApiProperty()
   driver: string;
   @ApiProperty()
