@@ -51,7 +51,7 @@ export class RouteHistoryController {
     return await this.RouteHistoryService.getHistoric();
   }
 
-  @Get('/historic/date')
+  @Get('/period/date')
   @Roles('list-historic')
   @ApiResponse({
     status: HttpStatus.OK,

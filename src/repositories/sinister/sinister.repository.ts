@@ -6,6 +6,8 @@ import { Sinister } from 'src/entities/sinister.entity';
 import ISinisterRepository from './sinister.repository.contract';
 import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
 import { generateQueryByFiltersForSinister } from 'src/configs/database/Queries';
+import { Path } from 'src/entities/path.entity';
+import { getDateInLocaleTime } from 'src/utils/Date';
 
 @Injectable()
 export class SinisterRepository
@@ -16,12 +18,19 @@ export class SinisterRepository
     super();
   }
 
+  listByPathId(id: string): Promise<Sinister[]> {
+    return this.repository.sinister.findMany({
+      where: {
+        pathId: id,
+      },
+    });
+  }
   create(data: Sinister): Promise<Sinister> {
     return this.repository.sinister.create({
       data: {
         id: data.id,
         type: data.type,
-        pathId: data.Path.id,
+        pathId: data.pathId,
         createdBy: data.createdBy,
         description: data.description,
         createdAt: data.createdAt,
@@ -76,15 +85,19 @@ export class SinisterRepository
     );
   }
 
-  vinculatePath(sinisters: Sinister[], pathId: string): Promise<any> {
-    return this.repository.sinister.updateMany({
+  async vinculatePath(
+    sinister: Sinister,
+    routeHistoryId: string,
+    path: Path,
+  ): Promise<any> {
+    return this.repository.sinister.update({
       data: {
-        pathId: pathId,
+        routeHistoryId: routeHistoryId,
+        pathId: '',
+        updatedAt: getDateInLocaleTime(new Date()),
       },
       where: {
-        id: {
-          in: sinisters.map((sinister) => sinister.id),
-        },
+        id: sinister.id,
       },
     });
   }

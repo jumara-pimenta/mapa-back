@@ -47,9 +47,17 @@ export function compareDates(dateInit: Date, dateFinal: Date) {
 }
 
 export function getPeriod(period: ETypePeriodHistory): PeriodInDate {
-  const today = getDateInLocaleTime(new Date());
-  console.log(period);
-  console.log(moment().subtract(7, 'days').calendar());
+  const newDate = getDateInLocaleTime(new Date());
+
+  const today = new Date(
+    newDate.getFullYear(),
+    newDate.getMonth(),
+    newDate.getDate(),
+    23,
+    59,
+    59,
+    999,
+  );
   if (period === ETypePeriodHistory.WEEKLY) {
     const dateInitial = moment().subtract(7, 'days').toDate();
     return { dateInitial, dateFinal: today };

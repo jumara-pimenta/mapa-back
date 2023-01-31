@@ -8,7 +8,15 @@ export class PeriodInDate {
   dateFinal: Date;
 }
 export class DateFilterDTO {
-  @ApiProperty()
+  @ApiProperty({
+    default: ETypePeriodHistory.WEEKLY,
+    enum: [
+      ETypePeriodHistory.WEEKLY,
+      ETypePeriodHistory.BIWEEKLY,
+      ETypePeriodHistory.MONTHLY,
+    ],
+    description: 'Tipo do período: Semanal, Quinzenal ou Mensal',
+  })
   @IsEnum(ETypePeriodHistory, {
     message:
       '[period] O PERIOD tem que ser do tipo: SEMANAL, QUINZENAL Ou MENSAL',

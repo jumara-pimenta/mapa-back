@@ -113,7 +113,7 @@ export class PathController {
   async getOneByStatus(
     @Param('driverId') driverId: string,
     @Param('status') status: EStatusPath,
-  ): Promise<Path> {
+  ): Promise<any> {
     return await this.pathService.listOneByDriverAndStatus(driverId, status);
   }
 

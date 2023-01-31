@@ -57,8 +57,6 @@ export class MappedPathDTO {
   @ApiProperty()
   status: string;
   @ApiProperty()
-  sinister?: Partial<Sinister>[];
-  @ApiProperty()
   type: string;
   @ApiProperty()
   createdAt: Date;

@@ -53,7 +53,6 @@ model Path {
   createdAt       DateTime          @default(now()) @db.DateTimeOffset
   updatedAt       DateTime?         @db.DateTimeOffset
   RouteHistory    RouteHistory[]
-  Sinister        Sinister[]
 }
 
 model EmployeesOnPath {
@@ -163,8 +162,7 @@ model BackOfficeUser {
 
 model Sinister {
   id             String        @id @unique
-  path           Path?         @relation(fields: [pathId], references: [id], onUpdate: NoAction)
-  pathId         String
+  pathId         String?
   type           String
   description    String
   createdBy      String

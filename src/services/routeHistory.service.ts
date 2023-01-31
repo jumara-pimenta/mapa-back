@@ -46,8 +46,21 @@ export class RouteHistoryService {
       props.vehicle,
       props.sinister,
     );
+    const routeHistory = await this.routeHistoryRepository.create(
+      newRouteHistory,
+    );
 
-    return await this.routeHistoryRepository.create(newRouteHistory);
+    if (newRouteHistory.sinister) {
+      for await (const sinister of newRouteHistory.sinister) {
+        await this.sinisterService.vinculatePath(
+          sinister,
+          routeHistory.id,
+          props.path,
+        );
+      }
+    }
+
+    return routeHistory;
   }
 
   async delete(id: string): Promise<RouteHistory> {
@@ -76,7 +89,7 @@ export class RouteHistoryService {
       page,
       filters,
     );
-
+    console.log(routeHistory);
     if (routeHistory.total === 0) {
       throw new HttpException(
         'Não existe(m) histórico(s) de trajeto(s) para esta pesquisa!',
@@ -84,6 +97,7 @@ export class RouteHistoryService {
       );
     }
 
+    console.log(routeHistory.items);
     const items = await this.mapperMany(routeHistory.items);
 
     return {
@@ -104,6 +118,18 @@ export class RouteHistoryService {
         employeeIds: routeHistory.employeeIds,
         totalEmployees: routeHistory.totalEmployees,
         totalConfirmed: routeHistory.totalConfirmed,
+        sinister:
+          routeHistory.sinister.length > 0
+            ? routeHistory.sinister.map((item) => {
+                return {
+                  id: item.id,
+                  description: item.description,
+                  type: item.type,
+                  createdBy: item.createdBy,
+                };
+              })
+            : [],
+        siniterTotal: routeHistory.sinister.length,
         driver: routeHistory.driver.id,
         vehicle: routeHistory.vehicle.id,
         itinerary: this.separateItinerary(routeHistory.itinerary),
@@ -122,6 +148,7 @@ export class RouteHistoryService {
       totalEmployees: routeHistory.totalEmployees,
       totalConfirmed: routeHistory.totalConfirmed,
       driverName: routeHistory.driver.name,
+
       vehiclePlate: routeHistory.vehicle.plate,
       itinerary: this.separateItinerary(routeHistory.itinerary),
       startedAt: routeHistory.startedAt,
@@ -139,6 +166,18 @@ export class RouteHistoryService {
         employeeIds: routeHistory.employeeIds,
         totalEmployees: routeHistory.totalEmployees,
         totalConfirmed: routeHistory.totalConfirmed,
+        sinister:
+          routeHistory.sinister.length > 0
+            ? routeHistory.sinister.map((item) => {
+                return {
+                  id: item.id,
+                  description: item.description,
+                  type: item.type,
+                  createdBy: item.createdBy,
+                };
+              })
+            : [],
+        sinisterTotal: routeHistory.sinister.length,
         driver: routeHistory.driver.id,
         vehicle: routeHistory.vehicle.id,
         itinerary: this.separateItinerary(routeHistory.itinerary),
@@ -197,7 +236,6 @@ export class RouteHistoryService {
 
   async getHistoricByDate(period: ETypePeriodHistory): Promise<any> {
     const dates = getPeriod(period);
-    console.log(dates);
     const historic = await this.routeHistoryRepository.getHistoricByDate(
       dates.dateInitial,
       dates.dateFinal,
@@ -206,7 +244,7 @@ export class RouteHistoryService {
 
     historic.map((paths) => {
       const data = new RouteHistoryByDate();
-
+      console.log(paths);
       data.date = paths.startedAt.toISOString().split('T')[0];
       data.totalPaths = 1;
       data.totalEmployess = paths.totalEmployees;
@@ -216,9 +254,9 @@ export class RouteHistoryService {
       data.totalEmployessPresent = paths.employeeIds.split(',').length;
       data.totalEmployessConfirmedButNotPresent =
         data.totalEmployessConfirmed - data.totalEmployessPresent;
+      data.totalSinister = paths.sinister.length;
       response.push(data);
     });
-    console.log(historic);
 
     const reponseReduce = response.reduce<RouteHistoryByDate[]>((acc, curr) => {
       const { date } = curr;
@@ -237,6 +275,7 @@ export class RouteHistoryService {
           curr.totalEmployessNotConfirmed;
         acc[index].totalEmployessPresent += curr.totalEmployessPresent;
         acc[index].totalPaths += curr.totalPaths;
+        acc[index].totalSinister += curr.totalSinister;
       }
 
       return acc;

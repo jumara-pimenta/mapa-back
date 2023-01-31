@@ -14,7 +14,6 @@ export class Path {
   type: string;
   status: string | EStatusPath;
   employeesOnPath?: Partial<EmployeesOnPath>[];
-  sinister?: Partial<Sinister>[];
   route?: Partial<Route>;
   createdAt: Date;
   updatedAt?: Date;

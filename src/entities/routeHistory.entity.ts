@@ -13,7 +13,7 @@ export class RouteHistory {
   employeeIds: string;
   totalEmployees: number;
   totalConfirmed: number;
-  sinister?: Partial<Sinister>[];
+  sinister?: Sinister[];
   driver?: Driver;
   vehicle?: Vehicle;
   itinerary: string;
@@ -30,7 +30,7 @@ export class RouteHistory {
     path: Path,
     driver: Driver,
     vehicle: Vehicle,
-    sinister: Partial<Sinister>[],
+    sinister: Sinister[],
     id?: string,
   ) {
     Object.assign(this, props);

@@ -9,6 +9,7 @@ import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
 import { PathService } from './path.service';
 import { JwtService } from '@nestjs/jwt';
 import { EStatusPath } from 'src/utils/ETypes';
+import { Path } from 'src/entities/path.entity';
 @Injectable()
 export class SinisterService {
   constructor(
@@ -37,8 +38,12 @@ export class SinisterService {
       );
 
     return await this.sinisterRepository.create(
-      new Sinister(payload, path, decodedToken.sub.name),
+      new Sinister(payload, path.id, decodedToken.sub.name),
     );
+  }
+
+  async listByPathId(id: string): Promise<Sinister[]> {
+    return await this.sinisterRepository.listByPathId(id);
   }
 
   async listById(id: string): Promise<Sinister> {
@@ -61,8 +66,16 @@ export class SinisterService {
     );
   }
 
-  async vinculatePath(sinister: Sinister[], pathId: string) {
-    return await this.sinisterRepository.vinculatePath(sinister, pathId);
+  async vinculatePath(
+    sinister: Sinister,
+    routeHistoryId: string,
+    pathId: Path,
+  ) {
+    return await this.sinisterRepository.vinculatePath(
+      sinister,
+      routeHistoryId,
+      pathId,
+    );
   }
 
   async listAll(
