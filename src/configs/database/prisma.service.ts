@@ -69,7 +69,7 @@ export class PrismaService
         employees.push({
           name: faker.name.fullName(),
           address: JSON.stringify({
-            cep: faker.address.zipCodeByState('AM'),
+            cep: faker.address.zipCodeByState('AM').replace('-', ''),
             city: faker.address.city(),
             complement: '',
             neighborhood: faker.address.secondaryAddress(),
