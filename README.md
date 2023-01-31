@@ -1,8 +1,6 @@
-# sonar-rotas-back
+# SONAR ROTAS BACK
 
 ![ROTAS](/uploads/e44c21637ef17a54a11b36ace6f005fb/ROTAS.png)
-
-=================
 
 Este repositório contém as informações necessárias para facilitar deploy e instalação, do back-end do sistema SONAR - ROTAS no seu ambiente de desenvolvimento ou de produção.
 
@@ -283,24 +281,24 @@ node --version
 `
     ou
 
-        ```sh
-        npm --version
-        ```
+                        ```sh
+                        npm --version
+                        ```
 
-        se a instalação estiver correta a respostado terminal deve conter algo assim.
+                        se a instalação estiver correta a respostado terminal deve conter algo assim.
 
-        ```sh
-        $ node --version
-        v16.14.2
+                        ```sh
+                        $ node --version
+                        v16.14.2
 
-            $ npm --version
-            8.1.2
+                            $ npm --version
+                            8.1.2
 
-        ```
+                        ```
 
-        ```
+                        ```
 
-        ```
+                        ```
 
 - Instalar Yarn versão 1.22.18 LTS (ou versão superior LTS)
 
@@ -344,8 +342,11 @@ node --version
 ## 4. Clonando o repositório de back-end do projeto SONAR ROTAS
 
 - Clonar o repositório
+
   - git clone -b develop <endereço-do-repositório>
+
   - OBS: Por padrão o comando git clone clona a branch main do projeto, quando usamos a tag -b develop estamos clonando diretamente a branch develop.
+
   - Abrir a pasta clonada
     <br /><br />
 
@@ -359,10 +360,10 @@ node --version
 
 - Abra o arquivo. env que você acabou de criar e edite as variáveis de ambiente de acordo com as configurações do sistema onde o projeto vai ser instalado.
 
-  - DATABASE_URL=sqlserver://<host>:<port>;database=<database>;user=<user>;password=<password>;encrypt=true;trustServerCertificate=true
+  - DATABASE_URL=sqlserver://host:port;database=database;user=user;password=password;encrypt=true;trustServerCertificate=true
   - PORT_BACKEND=porta-do-backend
   - NODE_ENV=<'development' | 'production'>
-  - SECRET_KEY_ACCESS_TOKEN=<secret-jwt>
+  - SECRET_KEY_ACCESS_TOKEN=secret-jwt
 
   <br /><br />
 
