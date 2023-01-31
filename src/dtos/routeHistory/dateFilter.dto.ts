@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsDefined, IsEnum, IsNotEmpty } from 'class-validator';
 import { ETypePeriodHistory } from 'src/utils/ETypes';
 
 export class PeriodInDate {
@@ -24,6 +24,9 @@ export class DateFilterDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty({
     message: '[period] O PERIOD não pode ser vazio.',
+  })
+  @IsDefined({
+    message: '[period] O PERIOD tem que ser definido.',
   })
   period: ETypePeriodHistory;
 }
