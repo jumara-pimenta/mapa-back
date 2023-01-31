@@ -1,3 +1,4 @@
+import { SinisterModule } from './sinister.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ApiModule } from './api.module';
@@ -30,6 +31,7 @@ import { AuthModule } from './auth.module';
     RouteHistoryModule,
     VehicleModule,
     WebsocketModule,
+    SinisterModule,
   ],
 })
 export class AppModule {}
