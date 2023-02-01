@@ -21,8 +21,8 @@ import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 
 const validateAsync = (schema: any): Promise<any> => {
@@ -330,10 +330,9 @@ export class EmployeeService {
     let totalCreated = 0;
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
-    let aa
+    let aa;
 
     for await (const item of employees) {
-
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
 
@@ -414,7 +413,7 @@ export class EmployeeService {
     const workSheetName = 'Colaboradores';
 
     const employees = await this.listAll(page, filters);
-
+    console.log(employees);
     const exportedEmployeeToXLSX = async (
       employees,
       headers,
@@ -469,6 +468,19 @@ export class EmployeeService {
         employeeInformationFooter,
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 30 },
+      ];
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);

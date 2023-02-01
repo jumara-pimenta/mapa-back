@@ -26,7 +26,6 @@ export class RoleGuard implements CanActivate {
 
     if (isPublic || process.env.NODE_ENV === 'development') return true;
 
-    return true;
     const extractJwt =
       RequestContext.currentContext.req.header('authorization');
     await this.authService.authenticate(extractJwt);
