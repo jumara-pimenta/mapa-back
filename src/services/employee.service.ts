@@ -24,6 +24,7 @@ import { plainToClass } from 'class-transformer';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
+import { json } from 'stream/consumers';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -412,7 +413,15 @@ export class EmployeeService {
     const filePath = './employee.xlsx';
     const workSheetName = 'Colaboradores';
 
-    const employees = await this.listAll(page, filters);
+    // const employees = await this.listAll(page, filters);
+    const employees = await this.employeeRepository.findAll(page, filters);
+
+    if (employees.total === 0) {
+      throw new HttpException(
+        'Não existem colaboradores para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     console.log(employees);
     const exportedEmployeeToXLSX = async (
       employees,
@@ -421,14 +430,15 @@ export class EmployeeService {
       filePath,
     ) => {
       const data = employees.map((employee) => {
+        const address = JSON.parse(employee.address);
         return [
           employee.registration,
           employee.name,
-          employee.address.neighborhood,
-          employee.address.street,
-          employee.address.number,
-          employee.address.complement,
-          employee.address.cep,
+          address.neighborhood,
+          address.street,
+          address.number,
+          address.complement,
+          address.cep,
           employee.costCenter,
           employee.role,
           employee.shift,
