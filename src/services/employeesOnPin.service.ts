@@ -57,16 +57,19 @@ export class EmployeesOnPinService {
     const { pins } = employee;
     let pinAlreadyAssociated: any;
 
-    if (pins.length > 0) {
-      pins.filter(async (_pin: Pin) => {
-        if (_pin.id === pin.id) {
-          await this.employeesOnPinRepository.delete(employee.id, _pin.id);
-        }
-      });
-    }
+    const employeeOnPin = await this.employeesOnPinRepository.find(
+      employee.id,
+      pinId,
+    );
+    if (employeeOnPin)
+      await this.employeesOnPinRepository.delete(employee.id, pinId);
 
     return await this.employeesOnPinRepository.create(
       new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),
     );
+  }
+
+  async delete(employeeId: string, pinId: string): Promise<void> {
+    return await this.employeesOnPinRepository.delete(employeeId, pinId);
   }
 }

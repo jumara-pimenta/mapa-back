@@ -195,6 +195,11 @@ export class EmployeeService {
             HttpStatus.BAD_REQUEST,
           );
 
+        await this.employeeOnPinService.delete(
+          employee.id,
+          employee.pins[0].id,
+        );
+
         await this.employeeOnPinService.associateEmployeeByService(
           data.pin.id,
           employee,
@@ -216,6 +221,10 @@ export class EmployeeService {
           lat,
           lng,
         });
+        await this.employeeOnPinService.delete(
+          employee.id,
+          employee.pins[0].id,
+        );
         await this.employeeOnPinService.associateEmployeeByService(
           pin.id,
           employee,
@@ -230,13 +239,13 @@ export class EmployeeService {
     const updatedEmployee = await this.employeeRepository.update(
       Object.assign(employee, {
         ...employee,
-        address: employeeDataUpdated.address,
-        admission: employeeDataUpdated.admission,
-        costCenter: employeeDataUpdated.costCenter,
-        name: employeeDataUpdated.name,
-        registration: employeeDataUpdated.registration,
-        role: employeeDataUpdated.role,
-        shift: employeeDataUpdated.shift,
+        address: employeeDataUpdated?.address,
+        admission: employeeDataUpdated?.admission,
+        costCenter: employeeDataUpdated?.costCenter,
+        name: employeeDataUpdated?.name,
+        registration: employeeDataUpdated?.registration,
+        role: employeeDataUpdated?.role,
+        shift: employeeDataUpdated?.shift,
       }),
     );
 
