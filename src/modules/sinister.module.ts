@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { SinisterController } from 'src/controllers/sinister.controller';
-import { SinisterRepository } from 'src/repositories/sinister/sinister.repository';
-import { SinisterService } from 'src/services/sinister.service';
+import { SinisterController } from '../controllers/sinister.controller';
+import { SinisterRepository } from '../repositories/sinister/sinister.repository';
+import { SinisterService } from '../services/sinister.service';
 
 @Module({
   controllers: [SinisterController],

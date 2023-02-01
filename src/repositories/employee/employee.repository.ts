@@ -7,7 +7,7 @@ import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
-import { ETypeCreationPin, ETypePin } from 'src/utils/ETypes';
+import { ETypePin } from '../../utils/ETypes';
 
 @Injectable()
 export class EmployeeRepository

@@ -1,11 +1,11 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { PrismaService } from 'src/database/prisma.service';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { PrismaService } from '../../database/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Pageable } from 'src/configs/database/pageable.service';
-import { Sinister } from 'src/entities/sinister.entity';
+import { Pageable } from '../../configs/database/pageable.service';
+import { Sinister } from '../../entities/sinister.entity';
 import ISinisterRepository from './sinister.repository.contract';
-import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
-import { generateQueryByFiltersForSinister } from 'src/configs/database/Queries';
+import { FiltersSinisterDTO } from '../../dtos/sinister/filtersSinister.dto';
+import { generateQueryByFiltersForSinister } from '../../configs/database/Queries';
 
 @Injectable()
 export class SinisterRepository

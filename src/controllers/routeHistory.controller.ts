@@ -14,8 +14,8 @@ import {
 } from '../utils/examples.swagger';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
-import { Roles } from 'src/decorators/roles.decorator';
-import { DateFilterDTO } from 'src/dtos/routeHistory/dateFilter.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { DateFilterDTO } from '../dtos/routeHistory/dateFilter.dto';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')

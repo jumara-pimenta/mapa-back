@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BackOfficeUserUpdateDTO } from 'src/dtos/auth/backOfficeUserLogin.dto';
+import { BackOfficeUserUpdateDTO } from '../../dtos/auth/backOfficeUserLogin.dto';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../database/prisma.service';
 import { BackOfficeUser } from '../../entities/backOfficeUser.entity';

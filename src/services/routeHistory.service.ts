@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import IRouteHistoryRepository from '../repositories/routeHistory/routeHistory.repository.contract';
 import { MappedRouteHistoryDTO } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { compareDates } from 'src/utils/Date';
-import { RouteHistoryByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
+import { compareDates } from '../utils/Date';
+import { RouteHistoryByDate } from '../dtos/routeHistory/routeHistoryByDate.dto';
 
 @Injectable()
 export class RouteHistoryService {
