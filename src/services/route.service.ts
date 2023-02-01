@@ -35,6 +35,8 @@ import * as turf from '@turf/turf';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
 import * as fs from 'fs';
+import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
+import { Path } from 'src/entities/path.entity';
 
 @Injectable()
 export class RouteService {
@@ -772,7 +774,6 @@ export class RouteService {
     }
     return path;
   }
-
   async exportsRouteFile(page: Page, type: ETypeRouteExport): Promise<any> {
     const headers = [
       'DESCRIÇÃO',
@@ -854,6 +855,81 @@ export class RouteService {
     };
 
     return exportedRouteToXLSX(route.items, headers, workSheetName, filePath);
+  }
+
+
+
+  async exportsPathToFile(id : string): Promise<any> {
+   
+    
+    const today = new Date().toLocaleDateString('pt-BR');
+    const filePath = './routes.xlsx';
+    const workSheetName = 'Rotas';
+    const workSheetPath = 'Trajetos';
+
+    // const employees = await this.listAll(page, filters);
+    const route = await this.routeRepository.findById(id);
+
+    //dean aqui
+    const paths: Path[] = [];
+
+    
+    const exportedPathToXLSX = async (
+      routes: Route,
+      workSheetName,
+      workSheetPath,
+      filePath,
+    ) => {
+     /*  const data1 = routes.map((route) => {
+        return [
+          route.description,
+          route.distance,
+          route.driver.name,
+          route.status,
+          route.type,
+          route.vehicle.plate,
+          route.path[0].employeesOnPath.length,
+        ];
+      });
+ */
+      const data =[
+          [ route.description],
+          [`Motorista: ${route.driver.name}`, `Tipo da Rota: ${route.type}`, `Veículo: ${route.vehicle.plate}`, `Quantidade de Colaboradores: ${route.path[0].employeesOnPath.length}`],
+         
+        ];
+      for await (const path of route.path) {
+        data.push([''])
+        data.push([''])
+        data.push(['', `Trajeto de ${path.type}`, '']);
+        data.push(['Posição', 'Colaborador', 'Endereço'])
+        for await (const employee of path.employeesOnPath) {        
+          data.push([employee.position.toString(), employee.employee.name, employee.employee.pins[0].pin.details]);
+        }
+      }
+
+
+
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [
+       
+        
+        ...data,
+      ];
+      const sheetOptions = [{wch: 20}, {wch: 40}, {wch: 60}, {wch: 40},{wch: 40},{wch: 40},{wch: 40},];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols']= sheetOptions;
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetPath);
+
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+      
+      const exportedKanbans = fs.createReadStream(pathFile);
+      
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedPathToXLSX(route, workSheetName,workSheetPath, filePath);
   }
 }
 

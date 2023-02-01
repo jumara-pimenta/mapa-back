@@ -227,6 +227,7 @@ export class RouteRepository
                         type: true,
                         pin: {
                           select: {
+                            details:true,
                             lat: true,
                             lng: true,
                           },
