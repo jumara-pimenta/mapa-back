@@ -265,15 +265,18 @@ export class DriverService {
 
       const driverInformationHeader = [
         [`MOTORISTAS EXPORTADOS: ${today}`, '', '', '', '', ''],
+      ];
+
+      const driverInformationSubHeader = [
         [`TOTAL DE MOTORISTAS EXPORTADOS: ${data.length}`],
       ];
 
       const driverInformationFooter = [
-        ['**********************************************'],
+        ['*************************************'],
         ['***************'],
         ['***************'],
         ['***************'],
-        ['*****'],
+        ['***********'],
       ];
 
       const workBook = XLSX.utils.book_new();
@@ -281,6 +284,8 @@ export class DriverService {
       const workSheetData = [
         ,
         driverInformationHeader,
+        ,
+        driverInformationSubHeader,
         ,
         driverInformationFooter,
         ,
@@ -290,6 +295,15 @@ export class DriverService {
         driverInformationFooter,
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 30 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 9 },
+      ];
+      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
+
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);
