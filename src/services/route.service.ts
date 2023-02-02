@@ -870,10 +870,11 @@ export class RouteService {
     // const employees = await this.listAll(page, filters);
     const route = await this.routeRepository.findById(id);
 
-    //dean aqui
+    if(!route )
+    throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
+
     const paths: Path[] = [];
 
-    
     const exportedPathToXLSX = async (
       routes: Route,
       workSheetName,

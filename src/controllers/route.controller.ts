@@ -152,7 +152,7 @@ export class RouteController {
 
   @Get('/export/route/:id')
   @ApiCreatedResponse({
-    description: 'Export a Route File to XLSX.',
+    description: 'Export a Paths pf a route File to XLSX.',
   })
   @HttpCode(HttpStatus.OK)
   async exportPathToFile(
