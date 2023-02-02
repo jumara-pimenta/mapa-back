@@ -249,7 +249,6 @@ export class AuthService {
     filters?: FilterBackOfficeUserDTO,
   ): Promise<PageResponse<MappedBackOfficeUserDTO>> {
     const users = await this.backOfficeUserRepository.findAll(page, filters);
-    console.log(users);
 
     if (users.total === 0)
       throw new HttpException(

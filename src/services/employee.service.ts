@@ -257,6 +257,9 @@ export class EmployeeService {
   }
 
   async parseExcelFile(file: any) {
+    if(!file)
+    throw new HttpException('Arquivo não encontrado.', HttpStatus.BAD_REQUEST);
+
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
     const type = 'LISTA DE COLABORADORES';
