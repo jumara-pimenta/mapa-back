@@ -257,6 +257,9 @@ export class EmployeeService {
   }
 
   async parseExcelFile(file: any) {
+    if(!file)
+    throw new HttpException('Arquivo não encontrado.', HttpStatus.BAD_REQUEST);
+
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
     const type = 'LISTA DE COLABORADORES';
@@ -270,16 +273,21 @@ export class EmployeeService {
     const sheet = workbook.Sheets[type];
 
     const headers = [
-      'MATRICULA',
-      'NOME',
-      'BAIRRO',
-      'ENDEREÇO',
-      'NUMERO',
+      'Matricula',
+      'Nome Colaborador',
+      'Admissão',
+      'Cargo',
+      'Turno',
+      'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
       'CEP',
-      'C/C',
-      'SETOR',
-      'TURNO',
-      'ADMISSAO',
+      'Cidade',
+      'UF',
+      'PONTO DE COLETA',
+      'Referencia',
     ];
 
     if (
@@ -290,15 +298,21 @@ export class EmployeeService {
         sheet.C1.v,
         sheet.D1.v,
         sheet.E1.v,
+        sheet.F1.v,
         sheet.G1.v,
         sheet.H1.v,
         sheet.I1.v,
         sheet.J1.v,
+        sheet.K1.v,
         sheet.L1.v,
+        sheet.M1.v,
+        sheet.N1.v,
+        sheet.O1.v,
       ].join('')
     )
+ 
       throw new HttpException(
-        'Planilha tem que conter as colunas MATRICULA, NOME e SETOR.',
+       ` Planilha tem que conter as colunas ${headers.join(', ')} respectivamente}`,
         HttpStatus.BAD_REQUEST,
       );
 
@@ -312,21 +326,21 @@ export class EmployeeService {
 
     for (const row of data) {
       const address = {
-        cep: row['CEP'].toString(),
-        neighborhood: row['BAIRRO'].toString(),
-        number: row['NUMERO'].toString(),
-        street: row['ENDEREÇO'].toString(),
+        cep: row['CEP'],
+        neighborhood: row['Bairro'],
+        number: row['Numero'],
+        street: row['Endereço'],
         city: 'MANAUS',
         state: 'AM',
-        complement: 'Complemento default',
+        complement: row['Complemento'],
       };
 
       const employee: CreateEmployeeFileDTO = {
-        name: row['NOME'].toString(),
-        registration: row['MATRICULA'].toString(),
-        role: row['SETOR'].toString(),
-        shift: row['TURNO'].toString(),
-        costCenter: row['C/C'].toString(),
+        name: row['Nome Colaborador'],
+        registration: row['Matricula'].toString(),
+        role: (row['Cargo']) ? row['Cargo'] : '' ,
+        shift: row['Turno'],
+        costCenter: row['Centro de Custo'].toString(),
         address: address,
         admission: new Date(),
         pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
@@ -342,7 +356,6 @@ export class EmployeeService {
 
     for await (const item of employees) {
       const error = false;
-
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
 

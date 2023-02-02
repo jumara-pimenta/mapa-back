@@ -89,7 +89,6 @@ export class RouteHistoryService {
       page,
       filters,
     );
-    console.log(routeHistory);
     if (routeHistory.total === 0) {
       throw new HttpException(
         'Não existe(m) histórico(s) de trajeto(s) para esta pesquisa!',
@@ -97,7 +96,6 @@ export class RouteHistoryService {
       );
     }
 
-    console.log(routeHistory.items);
     const items = await this.mapperMany(routeHistory.items);
 
     return {
@@ -244,7 +242,6 @@ export class RouteHistoryService {
 
     historic.map((paths) => {
       const data = new RouteHistoryByDate();
-      console.log(paths);
       data.date = paths.startedAt.toISOString().split('T')[0];
       data.totalPaths = 1;
       data.totalEmployess = paths.totalEmployees;

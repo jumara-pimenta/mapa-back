@@ -20,7 +20,7 @@ import { Employee } from '../entities/employee.entity';
 import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateEmployee,
   DeleteEmployee,
@@ -36,14 +36,29 @@ import { Roles } from 'src/decorators/roles.decorator';
 @ApiTags('Employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
-
-  @Post('upload')
+  @Post('/upload')
+  @Roles('import-employees')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos funcionários',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile()
     file: Express.Multer.File,
   ) {
+   
     return this.employeeService.parseExcelFile(file);
   }
 
