@@ -270,18 +270,21 @@ export class VehicleService {
 
       const vehicleInformationHeader = [
         [`VEÍCULOS EXPORTADOS: ${today}`, '', '', '', '', ''],
+      ];
+
+      const driverInformationSubHeader = [
         [`TOTAL DE VEÍCULOS EXPORTADOS: ${data.length}`],
       ];
 
       const vehicleInformationFooter = [
-        ['***********'],
-        ['*****************************'],
-        ['***************'],
-        ['***************'],
-        ['***************'],
-        ['****'],
-        ['***************'],
-        ['*****'],
+        ['**************'],
+        ['*********************************'],
+        ['**********************'],
+        ['****************'],
+        ['****************'],
+        ['**************'],
+        ['******************'],
+        ['********************'],
       ];
 
       const workBook = XLSX.utils.book_new();
@@ -289,6 +292,8 @@ export class VehicleService {
       const workSheetData = [
         ,
         vehicleInformationHeader,
+        ,
+        driverInformationSubHeader,
         ,
         vehicleInformationFooter,
         ,
@@ -298,6 +303,19 @@ export class VehicleService {
         vehicleInformationFooter,
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 11 },
+        { wch: 10 },
+        { wch: 9 },
+        { wch: 11 },
+        { wch: 15 },
+      ];
+
+      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
+
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);
