@@ -149,4 +149,21 @@ export class RouteController {
     });
     return await this.routeService.exportsRouteFile(page, filter.type);
   }
+
+  @Get('/export/route/:id')
+  @ApiCreatedResponse({
+    description: 'Export a Paths pf a route File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportPathToFile(
+    @Response({ passthrough: true }) res,
+    @Param('id') id: string,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Trajetos Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.routeService.exportsPathToFile(id);
+  }
 }
