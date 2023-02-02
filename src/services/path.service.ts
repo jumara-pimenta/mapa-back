@@ -72,6 +72,7 @@ export class PathService {
       itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
       for await (const employee of employeesPins.employees) {
         if (employee.confirmation === true) totalConfirmed++;
+
         if (employee.confirmation === true && employee.present === true) {
           employeeArray.push(employee.employeeId);
           if (path.type === ETypePath.ONE_WAY) {
@@ -88,6 +89,7 @@ export class PathService {
         'Nenhum colaborador confirmado foi pego no seu ponto de embarque.',
         HttpStatus.BAD_REQUEST,
       );
+
     const finishAt = {
       routeId: path.route.id,
       pathId: path.id,

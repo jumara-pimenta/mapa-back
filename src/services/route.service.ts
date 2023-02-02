@@ -50,6 +50,49 @@ export class RouteService {
     private readonly pathService: PathService,
   ) {}
 
+  async onModuleInit() {
+    const page = new Page();
+    const routes = await this.routeRepository.findAll(page);
+
+    if (routes.total === 0) {
+      const driver = await this.driverService.listAll(page);
+      const vehicle = await this.vehicleService.listAll(page);
+      const employee = await this.employeeService.listAll(page);
+
+      await this.create({
+        description: 'Rota de teste',
+        driverId: driver.items[0].id,
+        vehicleId: vehicle.items[0].id,
+        employeeIds: employee.items.map((e) => e.id),
+        type: ETypeRoute.CONVENTIONAL,
+        pathDetails: {
+          startsAt: '08:00',
+          duration: '00:30',
+          type: ETypePath.ROUND_TRIP,
+          isAutoRoute: true,
+        },
+      });
+
+      await this.create({
+        description: 'Rota de teste EXTRA',
+        driverId: driver.items[1].id,
+        vehicleId: vehicle.items[1].id,
+        employeeIds: employee.items.map((e) => e.id),
+        type: ETypeRoute.EXTRA,
+        pathDetails: {
+          startsAt: '06:00',
+          duration: '00:30',
+          type: ETypePath.ROUND_TRIP,
+          isAutoRoute: true,
+        },
+      });
+
+      // await this.update(route.id, {
+      //   status: EStatusRoute.FINISHED,
+      // });
+    }
+  }
+
   async create(payload: CreateRouteDTO): Promise<Route> {
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);

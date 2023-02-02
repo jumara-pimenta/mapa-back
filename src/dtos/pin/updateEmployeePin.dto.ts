@@ -17,10 +17,10 @@ export class UpdateEmployeePinDTO {
   })
   @IsEnum(ETypeEditionPin, {
     message:
-      '[typeCreation] O tipo de edição deve ser do tipo enum: NOVO | EXISTENTE.',
+      '[typeEdition] O tipo de edição deve ser do tipo enum: NOVO | EXISTENTE.',
   })
   @IsNotEmpty({
-    message: '[typeCreation] O tipo de edição deve ser preenchido.',
+    message: '[typeEdition] O tipo de edição deve ser preenchido.',
   })
   typeEdition: ETypeEditionPin;
 

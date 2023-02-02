@@ -47,25 +47,68 @@ export class PrismaService
       faker.locale = 'pt_BR';
       const employees: any[] = [];
 
-      const pins = [];
-
-      for (let i = 0; i < 12; i++) {
-        pins.push({
+      const pins = [
+        {
           id: uuid(),
-          title: faker.address.direction(),
-          local: faker.address.streetAddress(true),
-          details:
-            faker.address.streetAddress(true) +
-            ', ' +
-            faker.address.buildingNumber() +
-            ', ' +
-            'Manaus - AM ,' +
-            faker.address.zipCodeByState('AM'),
-          lat: faker.address.latitude(-2.9469, -3.1589, 6),
-          lng: faker.address.longitude(-59.8246, -60.1083, 6),
+          title: 'Iteam',
+          local:
+            'Av Gov. Danilo Matos Aerosa, 381 Bloco F - Fucapi - Distrito Industrial I, Manaus - AM, 69075-351 ',
+          details: 'Em frente a ITEAM',
+          lat: '-3.1368534098377596',
+          lng: '-59.98132250432473',
           createdAt: new Date(),
-        });
+        },
+        {
+          id: uuid(),
+          title: 'UBS Almir Pedreira',
+          local:
+            'UBS Almir Pedreira	 - R. Claudiano Moreira, s/n - Lagoa Verde, Manaus - AM, 69075-005',
+          details: 'Em frente a UBS Almir Pedreira',
+          lat: '-3.1379972441350534',
+          lng: '-59.984713639689815',
+          createdAt: new Date(),
+        },
+        {
+          id: uuid(),
+          title: 'Distrito da Bola',
+          local:
+            'Av. Gov. Danilo de Matos Areosa, 200 - Distrito Industrial I, Manaus - AM, 69075-351',
+          details: 'Em frente a Distrito da Bola',
+          lat: '-3.1356565487524675',
+          lng: '-59.98612092294195',
+          createdAt: new Date(),
+        },
+        {
+          id: uuid(),
+          title: 'Top Pousada',
+          local:
+            'Av. Buriti, 556 - Distrito Industrial I, Manaus - AM, 69075-510',
+          details: 'Em frente a Top Pousada',
+          lat: '-3.119582454197964',
+          lng: '-59.97671361130084',
+          createdAt: new Date(),
+        },
+        {
+          id: uuid(),
+          title: 'Patricia Bradock Fardas',
+          local: 'R. das Águias, 40 - São Lázaro, Manaus - AM, 69073-140',
+          details: 'Em frente a Patricia Bradock Fardas',
+          lat: '-3.138758531627776',
+          lng: '-59.98713727671988',
+          createdAt: new Date(),
+        },
+        {
+          id: uuid(),
+          title: 'Lagoa Verde',
+          local: 'Av. Rodrigo Otávio, 2 - São Lázaro, Manaus - AM, 69073-177',
+          details: 'Em frente a Lagoa Verde',
+          lat: '-3.1376438100682718',
+          lng: '-59.988923509861465',
+          createdAt: new Date(),
+        },
+      ];
 
+      for (let i = 0; i < 6; i++) {
         employees.push({
           name: faker.name.fullName(),
           address: JSON.stringify({
@@ -96,24 +139,19 @@ export class PrismaService
         data: employees,
       });
 
-      const employeesId = await this.employee.findMany({
-        select: {
-          id: true,
-        },
-      });
-
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 6; i++) {
         await this.employeesOnPin.create({
           data: {
+            employeeId: employees[i].id,
             pinId: pins[i].id,
-            employeeId: employeesId[i].id,
             type: ETypePin.CONVENTIONAL,
           },
         });
       }
+
       const driverId = [];
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 2; i++) {
         driverId.push({
           id: uuid(),
           name: faker.name.fullName(),
@@ -132,7 +170,7 @@ export class PrismaService
 
       const vehicleId = [];
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 2; i++) {
         vehicleId.push({
           id: uuid(),
           capacity: +faker.random.numeric(2),
@@ -152,71 +190,6 @@ export class PrismaService
       await this.vehicle.createMany({
         data: vehicleId,
       });
-
-      const routeId = [];
-
-      for (let i = 0; i < 2; i++) {
-        routeId.push({
-          id: uuid() + i,
-          description: 'Rota ' + `${i + 1}`,
-          createdAt: new Date(),
-          driverId: driverId[i].id,
-          vehicleId: vehicleId[i].id,
-          distance: 'PENDENTE',
-          status: EStatusRoute.PENDING,
-          type: i === 0 ? ETypeRoute.CONVENTIONAL : ETypeRoute.EXTRA,
-          path: {
-            createMany: {
-              data: [
-                {
-                  id: uuid(),
-                  duration: '00:01',
-                  startsAt: `0${6 + i}:00`,
-                  type: ETypePath.ONE_WAY,
-                  status: EStatusPath.PENDING,
-                  createdAt: new Date(),
-                },
-                {
-                  id: uuid(),
-                  duration: '00:01',
-                  startsAt: `${19 + i}:00`,
-                  type: ETypePath.RETURN,
-                  status: EStatusPath.PENDING,
-                  createdAt: new Date(),
-                },
-              ],
-            },
-          },
-        });
-
-        for await (const route of routeId) {
-          if (routeId.length === 2) {
-            await this.route.create({
-              data: route,
-            });
-          }
-        }
-
-        paths = await this.path.findMany();
-
-        for await (const path of paths) {
-          let incremetable = 0;
-          for await (const employee of employeesId) {
-            await this.employeesOnPath.create({
-              data: {
-                pathId: path.id,
-                employeeId: employee.id,
-                confirmation: true,
-                createdAt: new Date(),
-                description: 'test',
-                position: incremetable++,
-                boardingAt: null,
-                id: uuid(),
-              },
-            });
-          }
-        }
-      }
     }
 
     await this.pin.upsert({
