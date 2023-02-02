@@ -1,7 +1,6 @@
-import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
+import { FiltersSinisterDTO } from '../../dtos/sinister/filtersSinister.dto';
 import { FiltersDriverDTO } from '../../dtos/driver/filtersDriver.dto';
 import { IQueryDriver } from '../../dtos/driver/queryDriver.dto';
-import { FiltersEmployeeDTO } from '../../dtos/employee/filtersEmployee.dto';
 import { IQueryEmployee } from '../../dtos/employee/queryEmployee.dto';
 import { FiltersEmployeesOnPathDTO } from '../../dtos/employeesOnPath/filtersEmployeesOnPath.dto';
 import { IQueryEmployeesOnPath } from '../../dtos/employeesOnPath/queryEmployeesOnPath.dto';

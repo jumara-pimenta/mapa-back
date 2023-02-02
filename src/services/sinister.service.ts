@@ -1,5 +1,5 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { Sinister } from 'src/entities/sinister.entity';
+import { Page, PageResponse } from '../configs/database/page.model';
+import { Sinister } from '../entities/sinister.entity';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateSinisterDTO } from 'src/dtos/sinister/createSinister.dto';
 import { UpdateSinisterDTO } from 'src/dtos/sinister/updateSinister.dto';

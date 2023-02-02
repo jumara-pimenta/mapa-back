@@ -21,10 +21,10 @@ import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { ValidationFileDTO } from 'src/dtos/validation/validation.dto';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
+import { json } from 'stream/consumers';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -433,6 +433,12 @@ export class EmployeeService {
       );
     }
 
+    if (employees.total === 0) {
+      throw new HttpException(
+        'Não existem colaboradores para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const exportedEmployeeToXLSX = async (
       employees,
       headers,
@@ -440,14 +446,15 @@ export class EmployeeService {
       filePath,
     ) => {
       const data = employees.map((employee) => {
+        const address = JSON.parse(employee.address);
         return [
           employee.registration,
           employee.name,
-          employee.address.neighborhood,
-          employee.address.street,
-          employee.address.number,
-          employee.address.complement,
-          employee.address.cep,
+          address.neighborhood,
+          address.street,
+          address.number,
+          address.complement,
+          address.cep,
           employee.costCenter,
           employee.role,
           employee.shift,
@@ -456,22 +463,25 @@ export class EmployeeService {
       });
 
       const employeeInformationHeader = [
-        [`COLABORADORES EXPORTADOS: ${today}`],
+        [`COLABORADORES EXPORTADOS EM: ${today}`],
+      ];
+
+      const employeeInformationSubHeader = [
         [`TOTAL DE COLABORADORES EXPORTADOS: ${data.length}`],
       ];
 
       const employeeInformationFooter = [
-        ['**********************************************'],
-        ['***********************************************'],
+        ['*************'],
+        ['******************************************'],
         ['************************'],
         ['*************************************'],
         ['**********'],
-        ['************************************************************'],
+        ['******************************************'],
         ['**********'],
         ['*******'],
-        ['***************************************************************'],
+        ['**************************'],
         ['*********************'],
-        ['************'],
+        ['**********'],
       ];
 
       const workBook = XLSX.utils.book_new();
@@ -479,14 +489,32 @@ export class EmployeeService {
         '',
         employeeInformationHeader,
         '',
+        employeeInformationSubHeader,
+        '',
         employeeInformationFooter,
         '',
         headers,
         ...data,
         '',
-        employeeInformationFooter,
       ];
+
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 15 },
+        { wch: 30 },
+        { wch: 20 },
+        { wch: 30 },
+        { wch: 9 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 15 },
+      ];
+
+      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
+
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);

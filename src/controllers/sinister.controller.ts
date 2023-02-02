@@ -1,4 +1,4 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
+import { Page, PageResponse } from '../configs/database/page.model';
 import {
   Body,
   Controller,
@@ -13,19 +13,19 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { CreateSinisterDTO } from 'src/dtos/sinister/createSinister.dto';
-import { UpdateSinisterDTO } from 'src/dtos/sinister/updateSinister.dto';
-import { Sinister } from 'src/entities/sinister.entity';
-import { SinisterService } from 'src/services/sinister.service';
+import { Roles } from '../decorators/roles.decorator';
+import { CreateSinisterDTO } from '../dtos/sinister/createSinister.dto';
+import { UpdateSinisterDTO } from '../dtos/sinister/updateSinister.dto';
+import { Sinister } from '../entities/sinister.entity';
+import { SinisterService } from '../services/sinister.service';
 import {
   CreateSinister,
   GetAllSinister,
   GetSinisterById,
   UpdateSinister,
-} from 'src/utils/examples.swagger';
-import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
-import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
+} from '../utils/examples.swagger';
+import { FiltersSinisterDTO } from '../dtos/sinister/filtersSinister.dto';
+import { MappedSinisterDTO } from '../dtos/sinister/mappedSinister.dto';
 
 @Controller('/api/sinister')
 @ApiTags('Sinister')

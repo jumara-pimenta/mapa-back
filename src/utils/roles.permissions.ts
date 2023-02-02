@@ -12,6 +12,7 @@ export const setPermissions = (roles: ERoles) => {
       'edit-employee',
       'delete-employee',
       'list-employee',
+      'export-employees',
       'list-driver',
       'create-driver',
       'edit-driver',
