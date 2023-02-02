@@ -351,7 +351,6 @@ export class EmployeeService {
     const totalToCreate = employees.length;
     let aa;
 
-    console.log(plainToClass(CreateEmployeeFileDTO, employees[0].employee))
     for await (const item of employees) {
       const error = false;
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
