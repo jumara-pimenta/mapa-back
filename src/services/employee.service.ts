@@ -422,7 +422,6 @@ export class EmployeeService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    console.log(employees);
     const exportedEmployeeToXLSX = async (
       employees,
       headers,
@@ -447,22 +446,25 @@ export class EmployeeService {
       });
 
       const employeeInformationHeader = [
-        [`COLABORADORES EXPORTADOS: ${today}`],
+        [`COLABORADORES EXPORTADOS EM: ${today}`],
+      ];
+
+      const employeeInformationSubHeader = [
         [`TOTAL DE COLABORADORES EXPORTADOS: ${data.length}`],
       ];
 
       const employeeInformationFooter = [
-        ['**********************************************'],
-        ['***********************************************'],
+        ['*************'],
+        ['******************************************'],
         ['************************'],
         ['*************************************'],
         ['**********'],
-        ['************************************************************'],
+        ['******************************************'],
         ['**********'],
         ['*******'],
-        ['***************************************************************'],
+        ['**************************'],
         ['*********************'],
-        ['************'],
+        ['**********'],
       ];
 
       const workBook = XLSX.utils.book_new();
@@ -470,27 +472,32 @@ export class EmployeeService {
         '',
         employeeInformationHeader,
         '',
+        employeeInformationSubHeader,
+        '',
         employeeInformationFooter,
         '',
         headers,
         ...data,
         '',
-        employeeInformationFooter,
       ];
+
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
+        { wch: 15 },
         { wch: 30 },
+        { wch: 20 },
         { wch: 30 },
+        { wch: 9 },
         { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
-        { wch: 30 },
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 15 },
       ];
+
+      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
+
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);
