@@ -37,6 +37,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
 import { Path } from 'src/entities/path.entity';
+import { mapboxApi } from 'src/configs/database/mapbox.api';
 
 @Injectable()
 export class RouteService {
@@ -147,7 +148,29 @@ export class RouteService {
       details: { ...payload.pathDetails },
     });
 
-    return route;
+    const routeForUpdate = await this.routeRepository.findById(route.id);
+
+    const distanceLngLat = [];
+
+    routeForUpdate.path[0].employeesOnPath.map((e: EmployeesOnPath) => {
+      const lng = +e.employee.pins.at(0).pin.lng;
+      const lat = +e.employee.pins.at(0).pin.lat;
+      distanceLngLat.push([lng, lat]);
+    });
+
+    const resDistance = await mapboxApi.get(
+      `${distanceLngLat.join(';')}?geometries=geojson&access_token=${
+        process.env.MAPS_BOX_API_KEY
+      }`,
+    );
+
+    const distance = resDistance.data.routes[0].distance / 1000;
+
+    const newRoute = await this.update(route.id, {
+      distance: distance.toFixed(2) + ' KM',
+    });
+
+    return newRoute;
   }
 
   async delete(id: string): Promise<Route> {
@@ -900,11 +923,7 @@ export class RouteService {
     return exportedRouteToXLSX(route.items, headers, workSheetName, filePath);
   }
 
-
-
-  async exportsPathToFile(id : string): Promise<any> {
-   
-    
+  async exportsPathToFile(id: string): Promise<any> {
     const today = new Date().toLocaleDateString('pt-BR');
     const filePath = './routes.xlsx';
     const workSheetName = 'Rotas';
@@ -913,8 +932,8 @@ export class RouteService {
     // const employees = await this.listAll(page, filters);
     const route = await this.routeRepository.findById(id);
 
-    if(!route )
-    throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
+    if (!route)
+      throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
 
     const paths: Path[] = [];
 
@@ -924,7 +943,7 @@ export class RouteService {
       workSheetPath,
       filePath,
     ) => {
-     /*  const data1 = routes.map((route) => {
+      /*  const data1 = routes.map((route) => {
         return [
           route.description,
           route.distance,
@@ -936,44 +955,54 @@ export class RouteService {
         ];
       });
  */
-      const data =[
-          [ route.description],
-          [`Motorista: ${route.driver.name}`, `Tipo da Rota: ${route.type}`, `Veículo: ${route.vehicle.plate}`, `Quantidade de Colaboradores: ${route.path[0].employeesOnPath.length}`],
-         
-        ];
+      const data = [
+        [route.description],
+        [
+          `Motorista: ${route.driver.name}`,
+          `Tipo da Rota: ${route.type}`,
+          `Veículo: ${route.vehicle.plate}`,
+          `Quantidade de Colaboradores: ${route.path[0].employeesOnPath.length}`,
+        ],
+      ];
       for await (const path of route.path) {
-        data.push([''])
-        data.push([''])
+        data.push(['']);
+        data.push(['']);
         data.push(['', `Trajeto de ${path.type}`, '']);
-        data.push(['Posição', 'Colaborador', 'Endereço'])
-        for await (const employee of path.employeesOnPath) {        
-          data.push([employee.position.toString(), employee.employee.name, employee.employee.pins[0].pin.details]);
+        data.push(['Posição', 'Colaborador', 'Endereço']);
+        for await (const employee of path.employeesOnPath) {
+          data.push([
+            employee.position.toString(),
+            employee.employee.name,
+            employee.employee.pins[0].pin.details,
+          ]);
         }
       }
 
-
-
       const workBook = XLSX.utils.book_new();
-      const workSheetData = [
-       
-        
-        ...data,
+      const workSheetData = [...data];
+      const sheetOptions = [
+        { wch: 20 },
+        { wch: 40 },
+        { wch: 60 },
+        { wch: 40 },
+        { wch: 40 },
+        { wch: 40 },
+        { wch: 40 },
       ];
-      const sheetOptions = [{wch: 20}, {wch: 40}, {wch: 60}, {wch: 40},{wch: 40},{wch: 40},{wch: 40},];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
-      workSheet['!cols']= sheetOptions;
+      workSheet['!cols'] = sheetOptions;
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetPath);
 
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);
-      
+
       const exportedKanbans = fs.createReadStream(pathFile);
-      
+
       return new StreamableFile(exportedKanbans);
     };
 
-    return exportedPathToXLSX(route, workSheetName,workSheetPath, filePath);
+    return exportedPathToXLSX(route, workSheetName, workSheetPath, filePath);
   }
 }
 
