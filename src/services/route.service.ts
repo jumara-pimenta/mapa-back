@@ -170,7 +170,7 @@ export class RouteService {
       distance: distance.toFixed(2) + ' KM',
     });
 
-    return newRoute;
+    return route;
   }
 
   async delete(id: string): Promise<Route> {

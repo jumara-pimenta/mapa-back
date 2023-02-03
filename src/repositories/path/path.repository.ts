@@ -214,6 +214,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           driver: {
             id: driverId,
           },
+          deletedAt: null,
         },
       },
       select: {
@@ -269,6 +270,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           some: {
             employeeId: employeeId,
           },
+        },
+        route: {
+          deletedAt: null,
         },
       },
       select: {
@@ -393,6 +397,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           some: {
             id: employeeOnPathId,
           },
+        },
+        route: {
+          deletedAt: null,
         },
       },
       select: {
