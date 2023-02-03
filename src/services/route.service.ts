@@ -37,7 +37,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
 import { Path } from 'src/entities/path.entity';
-import { mapboxApi } from 'src/configs/database/mapbox.api';
+import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 
 @Injectable()
 export class RouteService {
@@ -49,6 +49,8 @@ export class RouteService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
+    @Inject('IMapBoxServiceIntegration')
+    private readonly mapBoxServiceIntegration: IMapBoxServiceIntegration,
   ) {}
 
   async onModuleInit() {
@@ -87,14 +89,18 @@ export class RouteService {
           isAutoRoute: true,
         },
       });
-
-      // await this.update(route.id, {
-      //   status: EStatusRoute.FINISHED,
-      // });
+      ('');
     }
   }
 
   async create(payload: CreateRouteDTO): Promise<Route> {
+    if (payload.employeeIds.length <= 1) {
+      throw new HttpException(
+        'É necessário selecionar pelo menos 2 colaboradores',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
@@ -158,19 +164,19 @@ export class RouteService {
       distanceLngLat.push([lng, lat]);
     });
 
-    const resDistance = await mapboxApi.get(
+    let resDistance = await this.mapBoxServiceIntegration.getDistance(
       `${distanceLngLat.join(';')}?geometries=geojson&access_token=${
         process.env.MAPS_BOX_API_KEY
       }`,
     );
 
-    const distance = resDistance.data.routes[0].distance / 1000;
+    const distance = resDistance.routes[0].distance / 1000;
 
     const newRoute = await this.update(route.id, {
       distance: distance.toFixed(2) + ' KM',
     });
 
-    return route;
+    return newRoute;
   }
 
   async delete(id: string): Promise<Route> {
