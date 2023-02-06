@@ -6,8 +6,8 @@ import IEmployeesOnPinRepository from '../repositories/employeesOnPin/employeesO
 import { EmployeeService } from './employee.service';
 import { ETypePin } from '../utils/ETypes';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
-import { Employee } from 'src/entities/employee.entity';
-import { Pin } from 'src/entities/pin.entity';
+import { Employee } from '../entities/employee.entity';
+import { Pin } from '../entities/pin.entity';
 
 @Injectable()
 export class EmployeesOnPinService {
