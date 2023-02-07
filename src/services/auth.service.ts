@@ -199,7 +199,7 @@ export class AuthService {
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { updatedAt, createdAt, password, ...result } = employee;
+    const { updatedAt, deletedAt, createdAt, password, ...result } = employee;
 
     result.address = JSON.parse(result.address);
 

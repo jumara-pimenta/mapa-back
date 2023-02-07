@@ -9,6 +9,7 @@ export default interface IRouteHistoryRepository {
   create(data: RouteHistory): Promise<RouteHistory | null>;
   delete(id: string): Promise<RouteHistory | null>;
   findById(id: string): Promise<RouteHistory | null>;
+  findByPathId(id: string): Promise<any>;
   findAll(
     page: Page,
     filters: FiltersRouteHistoryDTO,

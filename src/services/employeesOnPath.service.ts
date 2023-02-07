@@ -14,6 +14,7 @@ import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employee
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
 import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { ETypePath } from 'src/utils/ETypes';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -227,6 +228,21 @@ export class EmployeesOnPathService {
       );
 
     return data;
+  }
+
+  async clearEmployeesOnPath(pathId: string): Promise<void> {
+    const path = await this.pathService.listById(pathId);
+
+    const employeesOnPath = await this.employeesOnPathRepository.findByPath(
+      pathId,
+    );
+    if (path.type === ETypePath.ONE_WAY) {
+      await this.employeesOnPathRepository.updateMany(employeesOnPath, true);
+    }
+
+    if (path.type === ETypePath.RETURN) {
+      await this.employeesOnPathRepository.updateMany(employeesOnPath, false);
+    }
   }
 
   private mappedOne(

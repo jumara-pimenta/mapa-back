@@ -19,6 +19,7 @@ export class Employee {
   employeeOnPath?: EmployeesOnPath;
   createdAt: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
 
   constructor(
     props: Omit<

@@ -322,4 +322,24 @@ export class EmployeesOnPathRepository
       },
     });
   }
+
+  updateMany(
+    data: EmployeesOnPath[],
+    confirmation: boolean,
+  ): Promise<EmployeesOnPath[]> {
+    const promises = data.map((item) =>
+      this.repository.employeesOnPath.update({
+        data: {
+          confirmation: confirmation,
+          description: null,
+          present: null,
+          disembarkAt: null,
+          boardingAt: null,
+          updatedAt: null,
+        },
+        where: { id: item.id },
+      }),
+    );
+    return Promise.all(promises);
+  }
 }

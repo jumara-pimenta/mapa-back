@@ -7,6 +7,8 @@ import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { createMock } from '@golevelup/ts-jest';
 import { ETypeCreationPin } from '../utils/ETypes';
+import { Employee } from '../entities/employee.entity';
+import * as bcrypt from 'bcrypt';
 
 const createEmployee: CreateEmployeeDTO = {
   name: 'Teste',
@@ -74,12 +76,41 @@ describe('EmployeeService', () => {
 
   describe('Create a new Employee ', () => {
     it('should create a new employee', async () => {
-      // jest
-      //   .spyOn(EmployeeRepositoryMock, 'create')
-      //   .mockResolvedValueOnce(newEmployee);
+      jest
+        .spyOn(EmployeeRepositoryMock, 'findByRegistration')
+        .mockResolvedValueOnce(undefined);
+      jest.spyOn(EmployeeRepositoryMock, 'create').mockResolvedValueOnce(
+        new Employee({
+          ...createEmployee,
+          password: bcrypt.hashSync(createEmployee.registration, 10),
+          address: JSON.stringify(createEmployee.address),
+        }),
+      );
 
-      const result = await service.create(createEmployee);
+      const result = await service.create({
+        ...createEmployee,
+        registration: 'teste2',
+      });
       expect(result.name).toEqual(createEmployee.name);
+    });
+    it('should not create a new employee', async () => {
+      jest
+        .spyOn(EmployeeRepositoryMock, 'findByRegistration')
+        .mockResolvedValueOnce(
+          new Employee({
+            ...createEmployee,
+            password: bcrypt.hashSync(createEmployee.registration, 10),
+            address: JSON.stringify(createEmployee.address),
+          }),
+        );
+
+      try {
+        await service.create(createEmployee);
+      } catch (error) {
+        expect(error.message).toEqual(
+          'Matrícula já cadastrada para outro(a) colaborador(a)!',
+        );
+      }
     });
   });
 });

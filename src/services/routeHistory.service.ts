@@ -81,6 +81,11 @@ export class RouteHistoryService {
     return routeHistory;
   }
 
+  async listByPathId(id: string): Promise<any> {
+    const routeHistory = await this.routeHistoryRepository.findByPathId(id);
+    return routeHistory;
+  }
+
   async listAll(
     page: Page,
     filters?: FiltersRouteHistoryDTO,

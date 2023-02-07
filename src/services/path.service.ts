@@ -122,17 +122,28 @@ export class PathService {
 
     if (path.status === EStatusPath.FINISHED) {
       await this.routeHistoryService.create(props);
+      // clear employeesOnPath
+      await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
 
     return await this.routeService.updateWebsocket(finishAt);
   }
   async startPath(id: string): Promise<any> {
     const path = await this.listById(id);
-    if (path.finishedAt !== null)
+    /* if (path.finishedAt !== null)
       throw new HttpException(
         'Não é possível alterar uma rota que já foi finalizada!',
         HttpStatus.CONFLICT,
+      ); */
+    const hasHistoric = await this.routeHistoryService.listByPathId(id);
+    console.log(hasHistoric);
+
+    if (hasHistoric.length > 0)
+      throw new HttpException(
+        'Não é possível iniciar uma rota que já foi iniciada hoje!',
+        HttpStatus.CONFLICT,
       );
+
     let confirmationCount = 0;
     path.employeesOnPath.forEach((employee) => {
       if (employee.confirmation == true) confirmationCount++;
@@ -185,7 +196,7 @@ export class PathService {
   }
 
   async generate(props: CreatePathDTO): Promise<void> {
-    const { type, duration, startsAt } = props.details;
+    const { type, duration, startsAt, startsReturnAt } = props.details;
 
     const route = await this.routeService.listById(props.routeId);
 
@@ -224,7 +235,7 @@ export class PathService {
         new Path(
           {
             duration: duration,
-            startsAt: startsAt,
+            startsAt: startsReturnAt ?? startsAt,
             type: ETypePath.RETURN,
             status: EStatusPath.PENDING,
           },
@@ -315,7 +326,7 @@ export class PathService {
     // return this.mapperOne(path);
   }
 
-  async listById(id: string): Promise<any> {
+  async listById(id: string): Promise<MappedPathDTO> {
     const path = await this.pathRepository.findById(id);
     if (!path)
       throw new HttpException(

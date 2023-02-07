@@ -4,6 +4,7 @@ import {
   IsDefined,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   Matches,
 } from 'class-validator';
 import { ETypePath } from '../../utils/ETypes';
@@ -44,6 +45,19 @@ export class PathDetailsDTO {
       '[startsAt] A hora de início do trajeto deve ser do formato: HH:MM',
   })
   startsAt: string;
+
+  @ApiProperty({
+    default: '08:30',
+    example: '08:30',
+    description: 'Hora de início da volta do trajeto',
+    required: false,
+  })
+  @Matches(durationPathRgx, {
+    message:
+      '[startsReturnAt] A hora de início do retorno do trajeto deve ser do formato: HH:MM',
+  })
+  @IsOptional()
+  startsReturnAt?: string;
 
   @ApiProperty({
     default: true,
