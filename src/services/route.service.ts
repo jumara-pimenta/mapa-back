@@ -550,6 +550,9 @@ export class RouteService {
                 location: {
                   lat: pins.at(0).pin.lat,
                   lng: pins.at(0).pin.lng,
+                  title: pins.at(0).pin.title,
+                  details: pins.at(0).pin.details,
+                  local: pins.at(0).pin.local,
                 },
               },
             };

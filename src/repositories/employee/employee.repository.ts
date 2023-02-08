@@ -19,8 +19,11 @@ export class EmployeeRepository
   }
 
   delete(id: string): Promise<Employee> {
-    return this.repository.employee.delete({
+    return this.repository.employee.update({
       where: { id },
+      data: {
+        deletedAt: getDateInLocaleTime(new Date()),
+      },
     });
   }
 
@@ -88,8 +91,11 @@ export class EmployeeRepository
   }
 
   findByRegistration(registration: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { registration },
+    return this.repository.employee.findFirst({
+      where: {
+        registration: registration,
+        deletedAt: null,
+      },
     });
   }
 
@@ -102,7 +108,7 @@ export class EmployeeRepository
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: condition,
+          where: { ...condition, deletedAt: null },
           include: {
             pins: {
               select: {
@@ -126,6 +132,9 @@ export class EmployeeRepository
         })
       : await this.repository.employee.findMany({
           ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+          },
           include: {
             pins: {
               select: {
@@ -152,9 +161,14 @@ export class EmployeeRepository
       ? await this.repository.employee.findMany({
           where: {
             ...condition,
+            deletedAt: null,
           },
         })
-      : await this.repository.employee.count();
+      : await this.repository.employee.count({
+          where: {
+            deletedAt: null,
+          },
+        });
 
     return this.buildPageResponse(
       items,
@@ -204,6 +218,7 @@ export class EmployeeRepository
         id: {
           in: ids,
         },
+        deletedAt: null,
       },
       select: {
         id: true,

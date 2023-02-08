@@ -257,8 +257,11 @@ export class EmployeeService {
   }
 
   async parseExcelFile(file: any) {
-    if(!file)
-    throw new HttpException('Arquivo não encontrado.', HttpStatus.BAD_REQUEST);
+    if (!file)
+      throw new HttpException(
+        'Arquivo não encontrado.',
+        HttpStatus.BAD_REQUEST,
+      );
 
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
@@ -310,9 +313,10 @@ export class EmployeeService {
         sheet.O1.v,
       ].join('')
     )
- 
       throw new HttpException(
-       ` Planilha tem que conter as colunas ${headers.join(', ')} respectivamente}`,
+        ` Planilha tem que conter as colunas ${headers.join(
+          ', ',
+        )} respectivamente}`,
         HttpStatus.BAD_REQUEST,
       );
 
@@ -338,7 +342,7 @@ export class EmployeeService {
       const employee: CreateEmployeeFileDTO = {
         name: row['Nome Colaborador'],
         registration: row['Matricula'].toString(),
-        role: (row['Cargo']) ? row['Cargo'] : '' ,
+        role: row['Cargo'] ? row['Cargo'] : '',
         shift: row['Turno'],
         costCenter: (row['Centro de Custo']) ? row['Centro de Custo'] : '',
         address: address,

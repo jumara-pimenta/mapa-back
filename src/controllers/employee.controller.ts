@@ -20,17 +20,22 @@ import { Employee } from '../entities/employee.entity';
 import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateEmployee,
   DeleteEmployee,
   GetAllEmployee,
   GetEmployee,
   UpdateEmployee,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -58,7 +63,6 @@ export class EmployeeController {
     @UploadedFile()
     file: Express.Multer.File,
   ) {
-   
     return this.employeeService.parseExcelFile(file);
   }
 

@@ -20,6 +20,7 @@ model Driver {
   route        Route[]
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
   updatedAt    DateTime?      @db.DateTimeOffset
+  deletedAt    DateTime?      @db.DateTimeOffset
   RouteHistory RouteHistory[]
 }
 
@@ -124,6 +125,7 @@ model Employee {
   employeeOnPath EmployeesOnPath[]
   createdAt      DateTime          @default(now()) @db.DateTimeOffset
   updatedAt      DateTime?         @db.DateTimeOffset
+  deletedAt      DateTime?         @db.DateTimeOffset
 }
 
 model Pin {

@@ -39,6 +39,7 @@ export class IEmployeesOnPathDTO {
   position: number;
   @ApiProperty()
   details: IEmployee;
+  present: boolean;
 }
 
 export class MappedPathDTO {
