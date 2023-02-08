@@ -330,21 +330,21 @@ export class EmployeeService {
 
     for (const row of data) {
       const address = {
-        cep: row['CEP'],
-        neighborhood: row['Bairro'],
-        number: row['Numero']? row['Numero'] : '',
-        street: row['Endereço'],
+        cep: row['CEP']?? '',
+        neighborhood: row['Bairro']?? '',
+        number: row['Numero']?? '',
+        street: row['Endereço']??'',
         city: 'MANAUS',
         state: 'AM',
-        complement: row['Complemento']? row['Complemento'] : '',
+        complement: row['Complemento']??'',
       };
 
       const employee: CreateEmployeeFileDTO = {
-        name: row['Nome Colaborador'],
-        registration: row['Matricula'].toString(),
-        role: row['Cargo'] ? row['Cargo'] : '',
-        shift: row['Turno'],
-        costCenter: (row['Centro de Custo']) ? row['Centro de Custo'] : '',
+        name: row['Nome Colaborador']??'',
+        registration: row['Matricula'].toString()??'',
+        role: row['Cargo']??'',
+        shift: row['Turno']??'' ,
+        costCenter: row['Centro de Custo'] ?? '',
         address: address,
         admission: new Date(),
         pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
@@ -491,17 +491,17 @@ export class EmployeeService {
       ];
 
       const employeeInformationFooter = [
+        ['*****'],
+        ['**************'],
+        ['********'],
         ['*************'],
-        ['******************************************'],
-        ['************************'],
-        ['*************************************'],
-        ['**********'],
-        ['******************************************'],
+        ['****'],
+        ['**************'],
+        ['****'],
+        ['***'],
         ['**********'],
         ['*******'],
-        ['**************************'],
-        ['*********************'],
-        ['**********'],
+        ['****'],
       ];
 
       const workBook = XLSX.utils.book_new();
