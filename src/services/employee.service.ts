@@ -359,15 +359,12 @@ export class EmployeeService {
     let aa;
     let result = [];
     for await (const item of employees) {
-      const error = false;
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
 
       const errorsTest = await validateAsync(employeeSchema);
-      console.log(errorsTest)
       const [teste] = errorsTest;
-      const cont = 0;
-if(errorsTest.length>0){
+      if(errorsTest.length>0){
       messagesErrors.push({
         line: lineE,
         // field: errorsTest,
