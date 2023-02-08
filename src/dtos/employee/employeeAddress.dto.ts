@@ -41,7 +41,6 @@ export class EmployeeAddressDTO {
     description: 'Número do endereço do colaborador',
   })
   @IsString({ message: '[number] O número deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[number] O número deve ser preenchido.' })
   number: string;
 
   @ApiProperty({
