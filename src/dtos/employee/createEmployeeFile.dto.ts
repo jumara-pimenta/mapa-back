@@ -47,9 +47,6 @@ export class CreateEmployeeFileDTO {
       bannedDigits: ['0', '5', '6', '7', '8', '9'],
     })}`,
   })
-  @IsString({ message: '[shift] O turno deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[shift] O turno deve ser preenchido.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   shift: string;
 
   
@@ -58,10 +55,6 @@ export class CreateEmployeeFileDTO {
   @IsString({
     message: '[costCenter] O centro de custo deve ser do tipo string.',
   })
-  @IsNotEmpty({
-    message: '[costCenter] O centro de custo deve ser preenchido.',
-  })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter: string;
 
   @ApiProperty()

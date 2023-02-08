@@ -191,7 +191,7 @@ export class EmployeeService {
       if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
         if (!data.pin.id)
           throw new HttpException(
-            'O do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+            'O ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
             HttpStatus.BAD_REQUEST,
           );
 
@@ -328,11 +328,11 @@ export class EmployeeService {
       const address = {
         cep: row['CEP'],
         neighborhood: row['Bairro'],
-        number: row['Numero'],
+        number: row['Numero']? row['Numero'] : '',
         street: row['Endereço'],
         city: 'MANAUS',
         state: 'AM',
-        complement: row['Complemento'],
+        complement: row['Complemento']? row['Complemento'] : '',
       };
 
       const employee: CreateEmployeeFileDTO = {
@@ -340,7 +340,7 @@ export class EmployeeService {
         registration: row['Matricula'].toString(),
         role: (row['Cargo']) ? row['Cargo'] : '' ,
         shift: row['Turno'],
-        costCenter: row['Centro de Custo'].toString(),
+        costCenter: (row['Centro de Custo']) ? row['Centro de Custo'] : '',
         address: address,
         admission: new Date(),
         pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
@@ -353,17 +353,17 @@ export class EmployeeService {
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
     let aa;
-
+    let result = [];
     for await (const item of employees) {
       const error = false;
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
 
       const errorsTest = await validateAsync(employeeSchema);
-
+      console.log(errorsTest)
       const [teste] = errorsTest;
       const cont = 0;
-
+if(errorsTest.length>0){
       messagesErrors.push({
         line: lineE,
         // field: errorsTest,
@@ -373,12 +373,17 @@ export class EmployeeService {
         return i.meesage;
       });
 
-      aa = testew.map((i) => [
+      aa = testew.map((i) => 
+      [
+        
         {
           field: i?.property,
           message: i?.constraints,
         },
-      ]);
+      ]
+      );
+
+       result = aa}
 
       if (!errorsTest.length) {
         const existsRegistration =
@@ -411,9 +416,10 @@ export class EmployeeService {
       newEmployeesCreated: totalCreated,
       employeesAlreadyExistent: alreadyExisted,
       quantityEmployeesOnSheet: totalToCreate,
-      errors: aa,
+      errors: result,
     };
 
+    
     return errors;
   }
 
