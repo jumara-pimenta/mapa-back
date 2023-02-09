@@ -312,8 +312,8 @@ export class PathService {
           registration: 'DENSO',
           location: {
             id: process.env.DENSO_ID,
-            lat: '-3.1112953',
-            lng: '-59.9643917',
+            lat: '-3.111024790307586',
+            lng: '-59.96232450142952',
           },
         },
       };
