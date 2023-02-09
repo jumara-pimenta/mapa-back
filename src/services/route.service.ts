@@ -147,7 +147,7 @@ export class RouteService {
     );
 
     const route = await this.routeRepository.create(props);
-
+      console.log(payload)
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,
@@ -303,7 +303,8 @@ export class RouteService {
         employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
-          startsAt: route.paths[0].startsAt,
+          startsAt: data.startsAt ?? route.paths[0].startsAt,
+          startsReturnAt: data.startsReturnAt ?? route.paths[0].startsAt,
           duration: route.paths[0].duration,
           isAutoRoute: true,
         },

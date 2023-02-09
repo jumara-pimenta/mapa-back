@@ -47,4 +47,20 @@ export class UpdateRouteDTO {
   })
   @IsOptional()
   employeeIds?: string[];
+
+  @ApiProperty({ description: 'Horário da ida.' })
+  @IsString({
+    each: true,
+    message: '[startsAt] O horário da ida tem que ser do tipo string.',
+  })
+  @IsOptional()
+  startsAt? : string
+
+  @ApiProperty({ description: 'Horário da volta' })
+  @IsString({
+    each: true,
+    message: '[startsReturnAt] O horário da volta tem que ser do tipo string.',
+  })
+  @IsOptional()
+  startsReturnAt? : string
 }
