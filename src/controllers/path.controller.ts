@@ -96,6 +96,7 @@ export class PathController {
   async getManyByEmployee(
     @Param('employeeId') employeeId: string,
   ): Promise<MappedPathDTO[]> {
+    console.log(employeeId);
     return await this.pathService.listManyByEmployee(employeeId);
   }
 

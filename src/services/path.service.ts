@@ -197,7 +197,6 @@ export class PathService {
 
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt, startsReturnAt } = props.details;
-
     const route = await this.routeService.listById(props.routeId);
 
     if (type === ETypePath.ONE_WAY || type === ETypePath.RETURN) {
@@ -230,7 +229,7 @@ export class PathService {
           route,
         ),
       );
-
+      console.log(props.details)
       const pathReturn = await this.pathRepository.create(
         new Path(
           {
@@ -459,13 +458,13 @@ export class PathService {
 
   async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByEmployee(employeeId);
-
+    console.log(path)
     if (!path.length)
       throw new HttpException(
         'Não foram encontrados trajetos para este colaborador!',
         HttpStatus.NOT_FOUND,
       );
-
+        console.log('mapeando')
     return this.mapperMany(path);
   }
 
@@ -590,10 +589,11 @@ export class PathService {
   private mapperMany(paths: Path[]): MappedPathDTO[] {
     return paths.map((path) => {
       const { employeesOnPath } = path;
-
+      console.log(path.route);
       return {
         id: path.id,
         routeDescription: path?.route.description,
+        routeType: path?.route.type,
         duration: path.duration,
         finishedAt: path.finishedAt,
         startedAt: path.startedAt,
