@@ -202,8 +202,8 @@ export class PrismaService
         local: 'Denso LTDA ',
         details:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
-        lat: '-3.1112953',
-        lng: '-59.9643917',
+        lat: '-3.111024790307586',
+        lng: '-59.96232450142952',
         createdAt: new Date(),
       },
       update: {
@@ -212,8 +212,8 @@ export class PrismaService
         local: 'Denso LTDA ',
         details:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
-        lat: '-3.1112953',
-        lng: '-59.9643917',
+        lat: '-3.111024790307586',
+        lng: '-59.96232450142952',
         createdAt: new Date(),
       },
     });
