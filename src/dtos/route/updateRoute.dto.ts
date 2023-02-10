@@ -21,6 +21,11 @@ export class UpdateRouteDTO {
   @IsOptional()
   type?: ETypeRoute;
 
+  @ApiProperty({ description: 'Duração da rota' })
+  @IsString({ message: '[duration] Duração da rota tem que ser do tipo string.' })
+  @IsOptional()
+  duration?: string;
+
   @ApiProperty({ description: 'Status da Rota: Pendente ou Em Andamento' })
   @IsEnum(EStatusRoute, {
     message: '[status] O status deve ser do tipo enum: PENDENTE | EM ANDAMENTO',
