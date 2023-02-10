@@ -20,6 +20,7 @@ import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import {
+  EStatusPath,
   EStatusRoute,
   ETypePath,
   ETypeRoute,
@@ -38,6 +39,7 @@ import * as fs from 'fs';
 import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
 import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
+import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 
 @Injectable()
 export class RouteService {
@@ -260,11 +262,9 @@ export class RouteService {
 
     return route;
   }
-
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
-
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
@@ -310,6 +310,30 @@ export class RouteService {
         },
       });
     }
+    if(!data.employeeIds && (data.startsAt || data.startsReturnAt || data.duration)){
+      if(route.paths.length === 2){
+
+        for await (const path of route.paths) {
+          if(path.type === ETypePath.ONE_WAY){
+          await this.pathService.update(path.id, {
+            startsAt: data.startsAt ?? path.startsAt,
+            duration: data.duration ?? path.duration,
+          })}
+          if(path.type === ETypePath.RETURN){
+            await this.pathService.update(path.id, {
+              startsAt: data.startsReturnAt ?? path.startsAt,
+              duration: data.duration ?? path.duration,
+            })}
+      }
+      }
+      if(route.paths.length === 1){
+        await this.pathService.update(route.paths[0].id, {
+          startsAt: data.startsAt ?? route.paths[0].startsAt,
+          duration: data.duration ?? route.paths[0].duration,
+        })
+    }
+  }
+  
 
     let driver = routeEntity.driver;
     let vehicle = routeEntity.vehicle;
