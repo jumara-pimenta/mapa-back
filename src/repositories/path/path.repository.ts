@@ -179,6 +179,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             boardingAt: true,
             confirmation: true,
             disembarkAt: true,
+            present: true,
             position: true,
             description: true,
             employee: {
@@ -264,7 +265,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     });
   }
   findByEmployee(employeeId: string): Promise<Path[]> {
-    console.log('procurando:', employeeId)
+    console.log('procurando:', employeeId);
     return this.repository.path.findMany({
       where: {
         finishedAt: null,
@@ -343,7 +344,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         createdAt: true,
         route: {
           select: {
-            type:true,
+            type: true,
             description: true,
           },
         },
