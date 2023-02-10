@@ -229,7 +229,7 @@ export class PathService {
           route,
         ),
       );
-      console.log(props.details)
+      console.log(props.details);
       const pathReturn = await this.pathRepository.create(
         new Path(
           {
@@ -287,8 +287,8 @@ export class PathService {
           registration: 'DENSO',
           location: {
             id: process.env.DENSO_ID,
-            lat: '-3.1112953',
-            lng: '-59.9643917',
+            lat: '-3.111024790307586',
+            lng: '-59.96232450142952',
           },
         },
       };
@@ -312,8 +312,8 @@ export class PathService {
           registration: 'DENSO',
           location: {
             id: process.env.DENSO_ID,
-            lat: '-3.1112953',
-            lng: '-59.9643917',
+            lat: '-3.111024790307586',
+            lng: '-59.96232450142952',
           },
         },
       };
@@ -458,13 +458,13 @@ export class PathService {
 
   async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByEmployee(employeeId);
-    console.log(path)
+    console.log(path);
     if (!path.length)
       throw new HttpException(
         'Não foram encontrados trajetos para este colaborador!',
         HttpStatus.NOT_FOUND,
       );
-        console.log('mapeando')
+    console.log('mapeando');
     return this.mapperMany(path);
   }
 
