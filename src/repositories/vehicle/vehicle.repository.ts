@@ -59,6 +59,9 @@ export class VehicleRepository
       ? await this.repository.vehicle.findMany({
           ...this.buildPage(page),
           where: condition,
+          orderBy: {
+            createdAt: 'desc',
+          },
         })
       : await this.repository.vehicle.findMany({
           ...this.buildPage(page),
@@ -68,6 +71,9 @@ export class VehicleRepository
       ? await this.repository.vehicle.findMany({
           where: {
             ...condition,
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
         })
       : await this.repository.vehicle.count();

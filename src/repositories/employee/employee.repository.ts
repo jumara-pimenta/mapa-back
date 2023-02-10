@@ -109,6 +109,9 @@ export class EmployeeRepository
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
           where: { ...condition, deletedAt: null },
+          orderBy: {
+            createdAt: 'desc',
+          },
           include: {
             pins: {
               select: {
@@ -134,6 +137,9 @@ export class EmployeeRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
           include: {
             pins: {
