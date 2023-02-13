@@ -149,7 +149,6 @@ export class RouteService {
     );
 
     const route = await this.routeRepository.create(props);
-    console.log(payload);
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,

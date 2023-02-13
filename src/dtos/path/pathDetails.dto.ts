@@ -8,7 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 import { ETypePath } from '../../utils/ETypes';
-import { durationPathRgx } from '../../utils/Regex';
+import { durationPathRgx, StartsAtRgx } from '../../utils/Regex';
 
 export class PathDetailsDTO {
   @ApiProperty({
@@ -40,7 +40,7 @@ export class PathDetailsDTO {
     description: 'Hora de início do trajeto',
   })
   @IsDefined()
-  @Matches(durationPathRgx, {
+  @Matches(StartsAtRgx, {
     message:
       '[startsAt] A hora de início do trajeto deve ser do formato: HH:MM',
   })
