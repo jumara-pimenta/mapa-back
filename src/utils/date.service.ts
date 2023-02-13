@@ -102,3 +102,14 @@ export function convertTimeToDate(hour: string): Date {
     0,
   );
 }
+
+ export function convertToDate(date : string) : Date | null{
+    const data = new Date('12/30/1899')
+    //how to add days to date
+    
+    data.setDate(data.getDate() + Number(date))
+    console.log(data)
+    return data
+    
+
+ }
