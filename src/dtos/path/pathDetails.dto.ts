@@ -41,8 +41,7 @@ export class PathDetailsDTO {
   })
   @IsDefined()
   @Matches(StartsAtRgx, {
-    message:
-      '[startsAt] A hora de início do trajeto deve ser do formato: HH:MM',
+    message: '[startsAt] A hora de início tem que estar entre 00:00 e 23:59',
   })
   startsAt: string;
 
