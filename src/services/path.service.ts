@@ -286,6 +286,8 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
+            details:
+              'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
             id: process.env.DENSO_ID,
             lat: '-3.111024790307586',
             lng: '-59.96232450142952',
@@ -304,6 +306,7 @@ export class PathService {
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
+        present: true,
         position: 0,
         details: {
           name: 'DENSO',
@@ -311,6 +314,8 @@ export class PathService {
           shift: 'DENSO',
           registration: 'DENSO',
           location: {
+            details:
+              'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
             id: process.env.DENSO_ID,
             lat: '-3.111024790307586',
             lng: '-59.96232450142952',
@@ -576,6 +581,7 @@ export class PathService {
             shift: employee.shift,
             registration: employee.registration,
             location: {
+              details: pins.at(0).pin.details,
               id: pins.at(0).pin.id || 'n deu',
               lat: pins.at(0).pin.lat,
               lng: pins.at(0).pin.lng,

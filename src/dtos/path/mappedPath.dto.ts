@@ -4,6 +4,8 @@ import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
 
 class IPin {
   @ApiProperty()
+  details?: string;
+  @ApiProperty()
   id: string;
   @ApiProperty()
   lat: string;

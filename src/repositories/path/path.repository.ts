@@ -179,6 +179,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             boardingAt: true,
             confirmation: true,
             disembarkAt: true,
+            present: true,
             position: true,
             description: true,
             employee: {
@@ -192,6 +193,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     type: true,
                     pin: {
                       select: {
+                        details: true,
                         id: true,
                         lat: true,
                         lng: true,
@@ -264,7 +266,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     });
   }
   findByEmployee(employeeId: string): Promise<Path[]> {
-    console.log('procurando:', employeeId)
+    console.log('procurando:', employeeId);
     return this.repository.path.findMany({
       where: {
         finishedAt: null,
@@ -343,7 +345,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         createdAt: true,
         route: {
           select: {
-            type:true,
+            type: true,
             description: true,
           },
         },
@@ -408,6 +410,55 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
       },
       select: {
         id: true,
+      },
+    });
+  }
+
+  async findAll(filter?: any): Promise<Path[]> {
+    return await this.repository.path.findMany({
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        route: {
+          select: {
+            type: true,
+            description: true,
+          },
+        },
+        employeesOnPath: {
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }

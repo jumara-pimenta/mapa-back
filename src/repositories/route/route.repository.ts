@@ -227,7 +227,7 @@ export class RouteRepository
                         type: true,
                         pin: {
                           select: {
-                            details:true,
+                            details: true,
                             lat: true,
                             lng: true,
                           },
@@ -264,7 +264,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -285,6 +285,9 @@ export class RouteRepository
                   },
                 },
               },
+              orderBy: {
+                createdAt: 'desc',
+              },
             },
             vehicle: true,
           },
@@ -300,7 +303,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -320,6 +323,9 @@ export class RouteRepository
                     },
                   },
                 },
+              },
+              orderBy: {
+                createdAt: 'desc',
               },
             },
             vehicle: true,
@@ -421,7 +427,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -442,6 +448,9 @@ export class RouteRepository
                   },
                 },
               },
+              orderBy: {
+                createdAt: 'desc',
+              },
             },
             vehicle: true,
           },
@@ -458,7 +467,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -478,6 +487,9 @@ export class RouteRepository
                     },
                   },
                 },
+              },
+              orderBy: {
+                createdAt: 'desc',
               },
             },
             vehicle: true,

@@ -149,7 +149,6 @@ export class RouteService {
     );
 
     const route = await this.routeRepository.create(props);
-      console.log(payload)
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,
@@ -310,30 +309,33 @@ export class RouteService {
         },
       });
     }
-    if(!data.employeeIds && (data.startsAt || data.startsReturnAt || data.duration)){
-      if(route.paths.length === 2){
-
+    if (
+      !data.employeeIds &&
+      (data.startsAt || data.startsReturnAt || data.duration)
+    ) {
+      if (route.paths.length === 2) {
         for await (const path of route.paths) {
-          if(path.type === ETypePath.ONE_WAY){
-          await this.pathService.update(path.id, {
-            startsAt: data.startsAt ?? path.startsAt,
-            duration: data.duration ?? path.duration,
-          })}
-          if(path.type === ETypePath.RETURN){
+          if (path.type === ETypePath.ONE_WAY) {
+            await this.pathService.update(path.id, {
+              startsAt: data.startsAt ?? path.startsAt,
+              duration: data.duration ?? path.duration,
+            });
+          }
+          if (path.type === ETypePath.RETURN) {
             await this.pathService.update(path.id, {
               startsAt: data.startsReturnAt ?? path.startsAt,
               duration: data.duration ?? path.duration,
-            })}
+            });
+          }
+        }
       }
-      }
-      if(route.paths.length === 1){
+      if (route.paths.length === 1) {
         await this.pathService.update(route.paths[0].id, {
           startsAt: data.startsAt ?? route.paths[0].startsAt,
           duration: data.duration ?? route.paths[0].duration,
-        })
+        });
+      }
     }
-  }
-  
 
     let driver = routeEntity.driver;
     let vehicle = routeEntity.vehicle;
@@ -389,15 +391,13 @@ export class RouteService {
       path: dataFilter.path,
     };
 
-    const path = await this.pathService.listEmployeesByPathAndPin(
-      payload.pathId,
-    );
+    const path = await this.pathService.listByIdMobile(payload.pathId);
 
     return {
       vehicle: dataFilterWebsocket.vehicle,
       driver: dataFilterWebsocket.driver,
       ...path,
-    } as MappedPathPinsDTO;
+    };
   }
 
   async softDelete(id: string): Promise<Route> {

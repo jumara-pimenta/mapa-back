@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CreateEmployeeDTO } from 'src/dtos/employee/createEmployee.dto';
 import { Employee } from 'src/entities/employee.entity';
+import { getDateInLocaleTime } from 'src/utils/Date';
 import {
   EStatusPath,
   EStatusRoute,
@@ -33,7 +34,7 @@ export class PrismaService
         password: await bcrypt.hash('Denso', 10),
         name: 'Admin',
         role: 'ADMIN',
-        createdAt: new Date(),
+        createdAt: getDateInLocaleTime(new Date()),
       },
       update: {
         email: 'admin@rotas.com.br',
@@ -56,7 +57,7 @@ export class PrismaService
           details: 'Em frente a ITEAM',
           lat: '-3.1368534098377596',
           lng: '-59.98132250432473',
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         },
         {
           id: uuid(),
@@ -66,7 +67,7 @@ export class PrismaService
           details: 'Em frente a UBS Almir Pedreira',
           lat: '-3.1379972441350534',
           lng: '-59.984713639689815',
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         },
         {
           id: uuid(),
@@ -76,7 +77,7 @@ export class PrismaService
           details: 'Em frente a Distrito da Bola',
           lat: '-3.1356565487524675',
           lng: '-59.98612092294195',
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         },
         {
           id: uuid(),
@@ -86,7 +87,7 @@ export class PrismaService
           details: 'Em frente a Top Pousada',
           lat: '-3.119582454197964',
           lng: '-59.97671361130084',
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         },
         {
           id: uuid(),
@@ -95,7 +96,7 @@ export class PrismaService
           details: 'Em frente a Patricia Bradock Fardas',
           lat: '-3.138758531627776',
           lng: '-59.98713727671988',
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         },
         {
           id: uuid(),
@@ -104,7 +105,7 @@ export class PrismaService
           details: 'Em frente a Lagoa Verde',
           lat: '-3.1376438100682718',
           lng: '-59.988923509861465',
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         },
       ];
 
@@ -127,7 +128,7 @@ export class PrismaService
           role: faker.company.name(),
           shift: faker.random.numeric(1).toString(),
           id: uuid(),
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         });
       }
 
@@ -157,7 +158,8 @@ export class PrismaService
           name: faker.name.fullName(),
           category: 'D',
           cnh: faker.random.numeric(11).toString(),
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
+
           cpf: faker.random.numeric(11).toString(),
           password: await bcrypt.hash('Denso', 10),
           validation: faker.date.future(),
@@ -183,7 +185,7 @@ export class PrismaService
           type: faker.vehicle.type(),
           isAccessibility: true,
           company: faker.company.name(),
-          createdAt: new Date(),
+          createdAt: getDateInLocaleTime(new Date()),
         });
       }
 
@@ -202,9 +204,9 @@ export class PrismaService
         local: 'Denso LTDA ',
         details:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
-        lat: '-3.1112953',
-        lng: '-59.9643917',
-        createdAt: new Date(),
+        lat: '-3.111024790307586',
+        lng: '-59.96232450142952',
+        createdAt: getDateInLocaleTime(new Date()),
       },
       update: {
         id: process.env.DENSO_ID,
@@ -212,9 +214,9 @@ export class PrismaService
         local: 'Denso LTDA ',
         details:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
-        lat: '-3.1112953',
-        lng: '-59.9643917',
-        createdAt: new Date(),
+        lat: '-3.111024790307586',
+        lng: '-59.96232450142952',
+        createdAt: getDateInLocaleTime(new Date()),
       },
     });
   }

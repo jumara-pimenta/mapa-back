@@ -66,9 +66,15 @@ export class DriverRepository
       ? await this.repository.driver.findMany({
           ...this.buildPage(page),
           where: condition,
+          orderBy: {
+            createdAt: 'desc',
+          },
         })
       : await this.repository.driver.findMany({
           ...this.buildPage(page),
+          orderBy: {
+            createdAt: 'desc',
+          },
         });
 
     const total = condition
