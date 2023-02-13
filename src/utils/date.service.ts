@@ -108,7 +108,6 @@ export function convertTimeToDate(hour: string): Date {
     //how to add days to date
     
     data.setDate(data.getDate() + Number(date))
-    console.log(data)
     return data
     
 
