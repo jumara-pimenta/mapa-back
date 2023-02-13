@@ -25,6 +25,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 import { json } from 'stream/consumers';
+import { convertToDate } from 'src/utils/date.service';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -321,6 +322,7 @@ export class EmployeeService {
       );
 
     const data: any = XLSX.utils.sheet_to_json(sheet);
+   
     const employees: abc[] = [];
 
     const pinDenso = await this.pinService.listByLocal('Denso LTDA ');
@@ -330,23 +332,23 @@ export class EmployeeService {
 
     for (const row of data) {
       const address = {
-        cep: row['CEP']?? '',
-        neighborhood: row['Bairro']?? '',
+        cep: row['CEP'].toString()?? '',
+        neighborhood: row['Bairro'].toString()?? '',
         number: row['Numero']?? '',
-        street: row['Endereço']??'',
+        street: row['Endereço'].toString()??'',
         city: 'MANAUS',
         state: 'AM',
         complement: row['Complemento']??'',
       };
 
       const employee: CreateEmployeeFileDTO = {
-        name: row['Nome Colaborador']??'',
+        name: row['Nome Colaborador'].toString()??'',
         registration: row['Matricula'].toString()??'',
-        role: row['Cargo']??'',
-        shift: row['Turno']??'' ,
-        costCenter: row['Centro de Custo'] ?? '',
+        role: row['Cargo'].toString()??'',
+        shift: row['Turno'].toString()??'' ,
+        costCenter: row['Centro de Custo'].toString() ?? '',
         address: address,
-        admission: new Date(),
+        admission: convertToDate(row['Admissão'].toString()) ??  new Date(),
         pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
 
