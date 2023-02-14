@@ -26,6 +26,7 @@ import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 import { json } from 'stream/consumers';
 import { convertToDate } from 'src/utils/date.service';
+import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -48,7 +49,15 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
+    @Inject('IGoogleApiServiceIntegration')
+    private readonly googleApiServiceIntegration: GoogleApiServiceIntegration
   ) {}
+
+    async getLocation(address: string): Promise<any> {
+    const response = await this.googleApiServiceIntegration.getLocation(address);
+
+    return response;
+  }
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
@@ -326,33 +335,38 @@ export class EmployeeService {
     const employees: abc[] = [];
 
     const pinDenso = await this.pinService.listByLocal('Denso LTDA ');
-
+    
     let line = 0;
     const messagesErrors = [];
 
     for (const row of data) {
       const address = {
-        cep: row['CEP'].toString()?? '',
-        neighborhood: row['Bairro'].toString()?? '',
-        number: row['Numero']?? '',
-        street: row['Endereço'].toString()??'',
+        cep: row['CEP'] ? row['CEP'].toString() : '',
+        neighborhood: row['Bairro'] ? row['Bairro'].toString() : '',
+        number: row['Numero'] ? row['Numero'].toString() : '',
+        street: row['Endereço'] ? row['Endereço'].toString() : '',
         city: 'MANAUS',
         state: 'AM',
-        complement: row['Complemento']??'',
+        complement: row['Complemento'] ? row['Complemento'].toString() : '',
       };
 
+      const pin =  row['PONTO DE COLETA'] ? await this.getLocation(row['PONTO DE COLETA']) : null
+      console.log(pin)
       const employee: CreateEmployeeFileDTO = {
-        name: row['Nome Colaborador'].toString()??'',
-        registration: row['Matricula'].toString()??'',
-        role: row['Cargo'].toString()??'',
-        shift: row['Turno'].toString()??'' ,
-        costCenter: row['Centro de Custo'].toString() ?? '',
+        name: row['Nome Colaborador']? row['Nome Colaborador'].toString() : '',
+        registration: row['Matricula'] ? row['Matricula'].toString() : '',
+        role: row['Cargo'] ? row['Cargo'].toString() : '',
+        shift: row['Turno'] ? row['Turno'].toString() : '',
+        costCenter: row['Centro de Custo'] ? row['Centro de Custo'].toString() : '',
         address: address,
-        admission: convertToDate(row['Admissão'].toString()) ??  new Date(),
-        pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
+        admission:  row['Admissão'] ? convertToDate(row['Admissão'].toString())  : new Date(),
+        pin: pin ?
+        {lat : pin.lat.toString(), lng: pin.lng.toString(), title: row['PONTO DE COLETA'] ? row['PONTO DE COLETA'].toString() : '', local: row['PONTO DE COLETA'] ? row['PONTO DE COLETA'].toString() : '', details: row['Referencia'] ? row['Referencia'].toString() : '', typeCreation: ETypeCreationPin.IS_NEW}
+        : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
 
       line++;
+      console.log(line)
       employees.push({ line, employee });
     }
     let totalCreated = 0;
@@ -363,38 +377,48 @@ export class EmployeeService {
     for await (const item of employees) {
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
-
+      console.log(lineE)
       const errorsTest = await validateAsync(employeeSchema);
       const [teste] = errorsTest;
       if(errorsTest.length>0){
+        console.log(errorsTest)
       messagesErrors.push({
         line: lineE,
         // field: errorsTest,
         meesage: teste,
       });
       const testew = messagesErrors.map((i) => {
-        return i.meesage;
+        return{property: i.meesage, line : i.line};
       });
 
       aa = testew.map((i) => 
       [
         
         {
-          field: i?.property,
-          message: i?.constraints,
+          field: i?.property.property,
+          message: i?.property.constraints,
+          linha : i.line+1
         },
       ]
       );
 
-       result = aa}
-
+       result = aa
+      }
+      
       if (!errorsTest.length) {
         const existsRegistration =
           await this.employeeRepository.findByRegistration(
             item.employee.registration,
           );
-
+          
         if (!existsRegistration) {
+          const pin = item.employee.pin.title != 'Denso' ? await this.pinService.create({
+            title: item.employee.pin.title,
+            local: item.employee.pin.local,
+            details: item.employee.pin.details,
+            lat: item.employee.pin.lat.toString(),
+            lng: item.employee.pin.lng.toString(),
+          }) : null;
           await this.employeeRepository.create(
             new Employee(
               {
@@ -407,7 +431,7 @@ export class EmployeeService {
                 role: item.employee.role,
                 shift: item.employee.shift,
               },
-              pinDenso,
+              pin ?? pinDenso
             ),
           );
           totalCreated++;

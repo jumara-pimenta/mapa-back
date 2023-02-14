@@ -12,7 +12,7 @@ import { VehicleModule } from './vehicle.module';
   imports: [
     DriverModule,
     VehicleModule,
-    EmployeeModule,
+    forwardRef(() => EmployeeModule),
     forwardRef(() => PathModule),
   ],
   controllers: [RouteController],

@@ -24,7 +24,7 @@ export class Employee {
   constructor(
     props: Omit<
       Employee,
-      'id' | 'createdAt' | 'pins' | 'pin' | 'employeeOnPath'
+      'pin' | 'id' | 'createdAt' | 'pins'  | 'employeeOnPath'
     >,
     pin?: Pin,
     id?: string,
