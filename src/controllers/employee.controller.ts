@@ -163,10 +163,4 @@ export class EmployeeController {
 
 
 
-  @Get('/location/procuraai')
-  async getLocation(@Query('address') address: string) {
-    console.log(address)
-    return await this.employeeService.getLocation(address);
-  }
-
 }
