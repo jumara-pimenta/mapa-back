@@ -221,7 +221,6 @@ export class DriverService {
         category: row['Categoria'] ? row['Categoria'].toString() : '',
       };
       line++;
-      console.log(driver);
       drivers.push({ line, driver });
     }
 
@@ -232,7 +231,6 @@ export class DriverService {
     let result = [];
 
     for await (const item of drivers) {
-      console.log(item);
       const driver = plainToClass(CreateDriverFileDTO, item.driver);
       const lineE = item.line;
       const errorsTest = await validateAsync(driver);

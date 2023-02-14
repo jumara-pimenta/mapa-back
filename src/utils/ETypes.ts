@@ -57,3 +57,8 @@ export enum ETypeCategoryDrivers {
   C = 'C',
   D = 'D',
 }
+
+/* export enum ETypeAcessibilityVehicles {
+  Sim = 'true',
+  Não = 'false',
+} */
