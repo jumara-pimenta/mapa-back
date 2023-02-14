@@ -11,6 +11,8 @@ import {
   Query,
   Response,
   StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
@@ -19,7 +21,12 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateDriver,
   DeleteDriver,
@@ -28,6 +35,7 @@ import {
   UpdateDriver,
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -128,5 +136,30 @@ export class DriverController {
     });
 
     return await this.driverService.exportDriverFile(page, filters);
+  }
+
+  @Post('/upload')
+  @Roles('import-drivers')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos motoristas',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.driverService.parseExcelFile(file);
   }
 }
