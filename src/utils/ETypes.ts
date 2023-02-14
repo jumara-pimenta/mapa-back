@@ -52,3 +52,8 @@ export enum ETypePeriodHistory {
   BIWEEKLY = 'QUINZENAL',
   MONTHLY = 'MENSAL',
 }
+
+export enum ETypeCategoryDrivers {
+  C = 'C',
+  D = 'D',
+}
