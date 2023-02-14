@@ -258,6 +258,9 @@ export class RouteRepository
             ...condition,
             deletedAt: null,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
           include: {
             driver: true,
             path: {
@@ -285,9 +288,6 @@ export class RouteRepository
                   },
                 },
               },
-              orderBy: {
-                createdAt: 'desc',
-              },
             },
             vehicle: true,
           },
@@ -296,6 +296,9 @@ export class RouteRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
           include: {
             driver: true,
@@ -334,12 +337,18 @@ export class RouteRepository
 
     const total = condition
       ? await this.repository.route.findMany({
+          orderBy: {
+            createdAt: 'desc',
+          },
           where: {
             ...condition,
             deletedAt: null,
           },
         })
       : await this.repository.route.count({
+          orderBy: {
+            createdAt: 'desc',
+          },
           where: {
             deletedAt: null,
           },
