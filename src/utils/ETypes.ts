@@ -52,3 +52,9 @@ export enum ETypePeriodHistory {
   BIWEEKLY = 'QUINZENAL',
   MONTHLY = 'MENSAL',
 }
+
+export enum ETypeShiftRotue {
+  FIRST = 'PRIMEIRO',
+  SECOND = 'SEGUNDO',
+  THIRD = 'TERCEIRO',
+}

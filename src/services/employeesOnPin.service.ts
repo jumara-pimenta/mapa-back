@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { AssociateEmployeeOnPinDTO } from '../dtos/employeesOnPin/associateEmployeeOnPin.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPin } from '../entities/employeesOnPin.entity';
@@ -6,8 +12,8 @@ import IEmployeesOnPinRepository from '../repositories/employeesOnPin/employeesO
 import { EmployeeService } from './employee.service';
 import { ETypePin } from '../utils/ETypes';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
-import { Employee } from '../entities/employee.entity';
-import { Pin } from '../entities/pin.entity';
+import { Employee } from 'src/entities/employee.entity';
+import { Pin } from 'src/entities/pin.entity';
 
 @Injectable()
 export class EmployeesOnPinService {
@@ -54,19 +60,20 @@ export class EmployeesOnPinService {
     employee: Employee,
   ): Promise<EmployeesOnPin> {
     const pin = await this.pinService.listById(pinId);
-    const { pins } = employee;
-    let pinAlreadyAssociated: any;
-
-    const employeeOnPin = await this.employeesOnPinRepository.find(
-      employee.id,
-      pinId,
-    );
-    if (employeeOnPin)
-      await this.employeesOnPinRepository.delete(employee.id, pinId);
-
-    return await this.employeesOnPinRepository.create(
-      new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),
-    );
+    if (pin.id !== employee.pins[0]?.id) {
+      const { pins } = employee;
+      let pinAlreadyAssociated: any;
+      if (pins.length > 0) {
+        pins.filter(async (_pin: Pin) => {
+          if (_pin.id !== pin.id) {
+            await this.employeesOnPinRepository.delete(employee.id, _pin.id);
+          }
+        });
+      }
+      return await this.employeesOnPinRepository.create(
+        new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),
+      );
+    }
   }
 
   async delete(employeeId: string, pinId: string): Promise<void> {

@@ -25,9 +25,10 @@ import {
   ETypePath,
   ETypeRoute,
   ETypeRouteExport,
+  ETypeShiftRotue,
 } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate } from '../utils/date.service';
+import { convertTimeToDate, getStartAtAndFinishAt } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
@@ -70,6 +71,7 @@ export class RouteService {
         vehicleId: vehicle.items[0].id,
         employeeIds: employee.items.map((e) => e.id),
         type: ETypeRoute.CONVENTIONAL,
+        shift: ETypeShiftRotue.FIRST,
         pathDetails: {
           startsAt: '08:00',
           duration: '00:30',
@@ -84,6 +86,8 @@ export class RouteService {
         vehicleId: vehicle.items[1].id,
         employeeIds: employee.items.map((e) => e.id),
         type: ETypeRoute.EXTRA,
+        shift: ETypeShiftRotue.SECOND,
+
         pathDetails: {
           startsAt: '06:00',
           duration: '00:30',
@@ -102,9 +106,9 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
-    const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
-    const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
+    const startAndReturnAt = getStartAtAndFinishAt(payload.shift)
+    const initRouteDate = convertTimeToDate(startAndReturnAt.startAt);
+    const endRouteDate = convertTimeToDate(startAndReturnAt.finishAt);
 
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
@@ -152,7 +156,7 @@ export class RouteService {
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,
-      details: { ...payload.pathDetails },
+      details: { ...payload.pathDetails, startsAt: initRouteDate.toDateString(), startsReturnAt: endRouteDate.toDateString() },
     });
 
     const routeForUpdate = await this.routeRepository.findById(route.id);

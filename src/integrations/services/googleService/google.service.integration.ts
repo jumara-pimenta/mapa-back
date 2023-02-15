@@ -13,7 +13,6 @@ export class GoogleApiServiceIntegration implements IGoogleServiceIntegration {
         
       return data.results[0]?.geometry?.location;
     } catch (e) {
-      console.log(e)
       new Logger('googleApi service integration').error('get location', e);
     }
   }
