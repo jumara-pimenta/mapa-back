@@ -6,4 +6,5 @@ export class RouteHistoryByDate {
   totalEmployessConfirmed: number;
   totalEmployess: number;
   totalEmployessPresent: number;
+  totalSinister: number;
 }

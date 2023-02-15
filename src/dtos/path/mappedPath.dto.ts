@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Sinister } from '@prisma/client';
 import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
 
 class IPin {
+  @ApiProperty()
+  details?: string;
   @ApiProperty()
   id: string;
   @ApiProperty()
@@ -38,6 +41,7 @@ export class IEmployeesOnPathDTO {
   position: number;
   @ApiProperty()
   details: IEmployee;
+  present: boolean;
 }
 
 export class MappedPathDTO {

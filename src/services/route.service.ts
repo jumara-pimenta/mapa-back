@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  StreamableFile,
 } from '@nestjs/common';
 import { Route } from '../entities/route.entity';
 import IRouteRepository from '../repositories/route/route.repository.contract';
@@ -18,14 +19,27 @@ import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
-import { EStatusRoute, ETypePath, ETypeRoute } from '../utils/ETypes';
+import {
+  EStatusPath,
+  EStatusRoute,
+  ETypePath,
+  ETypeRoute,
+  ETypeRouteExport,
+} from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
 import { convertTimeToDate } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
-import { MappedPathPinsDTO } from '../dtos/path/mappedPath.dto';
+import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
 import * as turf from '@turf/turf';
+import * as XLSX from 'xlsx';
+import * as path from 'path';
+import * as fs from 'fs';
+import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
+import { Path } from 'src/entities/path.entity';
+import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
+import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 
 @Injectable()
 export class RouteService {
@@ -37,9 +51,58 @@ export class RouteService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
+    @Inject('IMapBoxServiceIntegration')
+    private readonly mapBoxServiceIntegration: IMapBoxServiceIntegration,
   ) {}
 
+  async onModuleInit() {
+    const page = new Page();
+    const routes = await this.routeRepository.findAll(page);
+
+    if (routes.total === 0) {
+      const driver = await this.driverService.listAll(page);
+      const vehicle = await this.vehicleService.listAll(page);
+      const employee = await this.employeeService.listAll(page);
+
+      await this.create({
+        description: 'Rota de teste',
+        driverId: driver.items[0].id,
+        vehicleId: vehicle.items[0].id,
+        employeeIds: employee.items.map((e) => e.id),
+        type: ETypeRoute.CONVENTIONAL,
+        pathDetails: {
+          startsAt: '08:00',
+          duration: '00:30',
+          type: ETypePath.ROUND_TRIP,
+          isAutoRoute: true,
+        },
+      });
+
+      await this.create({
+        description: 'Rota de teste EXTRA',
+        driverId: driver.items[1].id,
+        vehicleId: vehicle.items[1].id,
+        employeeIds: employee.items.map((e) => e.id),
+        type: ETypeRoute.EXTRA,
+        pathDetails: {
+          startsAt: '06:00',
+          duration: '00:30',
+          type: ETypePath.ROUND_TRIP,
+          isAutoRoute: true,
+        },
+      });
+      ('');
+    }
+  }
+
   async create(payload: CreateRouteDTO): Promise<Route> {
+    if (payload.employeeIds.length <= 1) {
+      throw new HttpException(
+        'É necessário selecionar pelo menos 2 colaboradores',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
     const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
 
@@ -51,7 +114,6 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-
     const emplopyeeOrdened = orderPins(employeesPins);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
@@ -87,14 +149,35 @@ export class RouteService {
     );
 
     const route = await this.routeRepository.create(props);
-
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,
       details: { ...payload.pathDetails },
     });
 
-    return route;
+    const routeForUpdate = await this.routeRepository.findById(route.id);
+
+    const distanceLngLat = [];
+
+    routeForUpdate.path[0].employeesOnPath.map((e: EmployeesOnPath) => {
+      const lng = +e.employee.pins.at(0).pin.lng;
+      const lat = +e.employee.pins.at(0).pin.lat;
+      distanceLngLat.push([lng, lat]);
+    });
+
+    let resDistance = await this.mapBoxServiceIntegration.getDistance(
+      `${distanceLngLat.join(';')}?geometries=geojson&access_token=${
+        process.env.MAPS_BOX_API_KEY
+      }`,
+    );
+
+    const distance = resDistance.routes[0].distance / 1000;
+
+    const newRoute = await this.update(route.id, {
+      distance: distance.toFixed(2) + ' KM',
+    });
+
+    return newRoute;
   }
 
   async delete(id: string): Promise<Route> {
@@ -112,17 +195,6 @@ export class RouteService {
       );
 
     return this.mapperOne(route);
-  }
-
-  async getById(id: string): Promise<Route> {
-    const route = await this.routeRepository.findById(id);
-    if (!route)
-      throw new HttpException(
-        'Não foi encontrada está rota!',
-        HttpStatus.NOT_FOUND,
-      );
-
-    return route;
   }
 
   async listByDriverId(
@@ -179,10 +251,19 @@ export class RouteService {
     };
   }
 
+  async getById(id: string): Promise<Route> {
+    const route = await this.routeRepository.findById(id);
+    if (!route)
+      throw new HttpException(
+        'Não foi encontrada esta rota!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return route;
+  }
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
-
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
@@ -221,11 +302,39 @@ export class RouteService {
         employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
-          startsAt: route.paths[0].startsAt,
+          startsAt: data.startsAt ?? route.paths[0].startsAt,
+          startsReturnAt: data.startsReturnAt ?? route.paths[0].startsAt,
           duration: route.paths[0].duration,
           isAutoRoute: true,
         },
       });
+    }
+    if (
+      !data.employeeIds &&
+      (data.startsAt || data.startsReturnAt || data.duration)
+    ) {
+      if (route.paths.length === 2) {
+        for await (const path of route.paths) {
+          if (path.type === ETypePath.ONE_WAY) {
+            await this.pathService.update(path.id, {
+              startsAt: data.startsAt ?? path.startsAt,
+              duration: data.duration ?? path.duration,
+            });
+          }
+          if (path.type === ETypePath.RETURN) {
+            await this.pathService.update(path.id, {
+              startsAt: data.startsReturnAt ?? path.startsAt,
+              duration: data.duration ?? path.duration,
+            });
+          }
+        }
+      }
+      if (route.paths.length === 1) {
+        await this.pathService.update(route.paths[0].id, {
+          startsAt: data.startsAt ?? route.paths[0].startsAt,
+          duration: data.duration ?? route.paths[0].duration,
+        });
+      }
     }
 
     let driver = routeEntity.driver;
@@ -238,7 +347,7 @@ export class RouteService {
     if (data.vehicleId) {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
-    const { path, ...rest } = routeEntity;
+    const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
       Object.assign(rest, data),
@@ -252,7 +361,6 @@ export class RouteService {
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
     if (payload.path.startedAt) {
-      const routeData = await this.listByIdWebsocket(payload.routeId);
       const Pathdata = await this.pathService.listById(payload.pathId);
 
       if (Pathdata.employeesOnPath.length === 0) {
@@ -283,15 +391,13 @@ export class RouteService {
       path: dataFilter.path,
     };
 
-    const path = await this.pathService.listEmployeesByPathAndPin(
-      payload.pathId,
-    );
+    const path = await this.pathService.listByIdMobile(payload.pathId);
 
     return {
       vehicle: dataFilterWebsocket.vehicle,
       driver: dataFilterWebsocket.driver,
       ...path,
-    } as MappedPathPinsDTO;
+    };
   }
 
   async softDelete(id: string): Promise<Route> {
@@ -469,6 +575,9 @@ export class RouteService {
                 location: {
                   lat: pins.at(0).pin.lat,
                   lng: pins.at(0).pin.lng,
+                  title: pins.at(0).pin.title,
+                  details: pins.at(0).pin.details,
+                  local: pins.at(0).pin.local,
                 },
               },
             };
@@ -764,6 +873,170 @@ export class RouteService {
       throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
     }
     return path;
+  }
+  async exportsRouteFile(page: Page, type: ETypeRouteExport): Promise<any> {
+    const headers = [
+      'DESCRIÇÃO',
+      'DISTÂNCIA',
+      'MOTORISTA',
+      'ESTADO',
+      'TIPO DA ROTA',
+      'VEÍCULO',
+      'QUANTIDADE DE COLABORADORES',
+    ];
+    const today = new Date().toLocaleDateString('pt-BR');
+
+    const filePath = './routes.xlsx';
+    const workSheetName = 'Rotas';
+
+    // const employees = await this.listAll(page, filters);
+    const route = await this.routeRepository.findAllToExport(page, type);
+    if (route.total === 0) {
+      throw new HttpException(
+        'Não existem rotas para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const exportedRouteToXLSX = async (
+      routes: Route[],
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = routes.map((route) => {
+        return [
+          route.description,
+          route.distance,
+          route.driver.name,
+          route.status,
+          route.type,
+          route.vehicle.plate,
+          route.path[0].employeesOnPath.length,
+        ];
+      });
+
+      const routeInformationHeader = [
+        [`ROTAS EXPORTADOS: ${today}`],
+        [`TOTAL DE ROTAS EXPORTADAS: ${data.length}`],
+      ];
+
+      const routeInformationFooter = [
+        ['**********************************************'],
+        ['***********************************************'],
+        ['************************'],
+        ['*************************************'],
+        ['**********'],
+        ['************************************************************'],
+        ['**********'],
+        ['*******'],
+      ];
+
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [
+        '',
+        routeInformationHeader,
+        '',
+        routeInformationFooter,
+        '',
+        headers,
+        ...data,
+        '',
+        routeInformationFooter,
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedRouteToXLSX(route.items, headers, workSheetName, filePath);
+  }
+
+  async exportsPathToFile(id: string): Promise<any> {
+    const today = new Date().toLocaleDateString('pt-BR');
+    const filePath = './routes.xlsx';
+    const workSheetName = 'Rotas';
+    const workSheetPath = 'Trajetos';
+
+    // const employees = await this.listAll(page, filters);
+    const route = await this.routeRepository.findById(id);
+
+    if (!route)
+      throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
+
+    const paths: Path[] = [];
+
+    const exportedPathToXLSX = async (
+      routes: Route,
+      workSheetName,
+      workSheetPath,
+      filePath,
+    ) => {
+      /*  const data1 = routes.map((route) => {
+        return [
+          route.description,
+          route.distance,
+          route.driver.name,
+          route.status,
+          route.type,
+          route.vehicle.plate,
+          route.path[0].employeesOnPath.length,
+        ];
+      });
+ */
+      const data = [
+        [route.description],
+        [
+          `Motorista: ${route.driver.name}`,
+          `Tipo da Rota: ${route.type}`,
+          `Veículo: ${route.vehicle.plate}`,
+          `Quantidade de Colaboradores: ${route.path[0].employeesOnPath.length}`,
+        ],
+      ];
+      for await (const path of route.path) {
+        data.push(['']);
+        data.push(['']);
+        data.push(['', `Trajeto de ${path.type}`, '']);
+        data.push(['Posição', 'Colaborador', 'Endereço']);
+        for await (const employee of path.employeesOnPath) {
+          data.push([
+            employee.position.toString(),
+            employee.employee.name,
+            employee.employee.pins[0].pin.details,
+          ]);
+        }
+      }
+
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [...data];
+      const sheetOptions = [
+        { wch: 20 },
+        { wch: 40 },
+        { wch: 60 },
+        { wch: 40 },
+        { wch: 40 },
+        { wch: 40 },
+        { wch: 40 },
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = sheetOptions;
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetPath);
+
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedPathToXLSX(route, workSheetName, workSheetPath, filePath);
   }
 }
 

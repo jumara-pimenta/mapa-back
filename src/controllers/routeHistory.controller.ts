@@ -1,3 +1,4 @@
+import { Page, PageResponse } from 'src/configs/database/page.model';
 import {
   Controller,
   Get,
@@ -7,22 +8,27 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  GetRouteHistories,
-  GetRouteHistoriesByDate,
-  GetRouteHistoriesByQuantity,
-} from '../utils/examples.swagger';
-import { RouteHistory } from '../entities/routeHistory.entity';
-import { RouteHistoryService } from '../services/routeHistory.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { DateFilterDTO } from 'src/dtos/routeHistory/dateFilter.dto';
+import {
+  GetRouteHistories,
+  ListRouteHistories,
+  GetRouteHistoriesByDate,
+  GetRouteHistoriesByQuantity,
+} from 'src/utils/examples.swagger';
+import { RouteHistory } from '../entities/routeHistory.entity';
+import { RouteHistoryService } from '../services/routeHistory.service';
+import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
+import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
+import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
+import * as moment from 'moment';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')
 export class RouteHistoryController {
   constructor(private readonly RouteHistoryService: RouteHistoryService) {}
 
-  @Get('/:id')
+  @Get('/getByid/:id')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Route History by id.',
@@ -51,7 +57,7 @@ export class RouteHistoryController {
     return await this.RouteHistoryService.getHistoric();
   }
 
-  @Get('/historic/date')
+  @Get('/period/date')
   @Roles('list-historic')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -62,10 +68,40 @@ export class RouteHistoryController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async getHistoricByDate(@Query() dates: DateFilterDTO): Promise<any> {
-    return await this.RouteHistoryService.getHistoricByDate(
-      dates.dateInit,
-      dates.dateFinal,
-    );
+  async getHistoricByDate(@Query() type: DateFilterDTO): Promise<any> {
+    return await this.RouteHistoryService.getHistoricByDate(type.period);
+  }
+
+  @Get('/all')
+  @Roles('list-historic')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'List all route histories.',
+    schema: {
+      type: 'object',
+      example: ListRouteHistories,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAll(
+    @Query() page: Page,
+    @Query() filters: FiltersRouteHistoryDTO,
+  ): Promise<PageResponse<MappedRouteHistoryDTO>> {
+    return await this.RouteHistoryService.listAll(page, filters);
+  }
+
+  @Get('/pathId/id')
+  @Roles('list-historic')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get the path history of an employee.',
+    schema: {
+      type: 'object',
+      example: ListRouteHistories,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getEmployess(@Query() data: EmployeeHistoryDTO): Promise<any> {
+    return await this.RouteHistoryService.listAllEmployess(data.id);
   }
 }

@@ -9,6 +9,9 @@ import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
+import { Console } from 'console';
+import { Path } from 'src/entities/path.entity';
+import { ETypeRouteExport } from 'src/utils/ETypes';
 
 @Injectable()
 export class RouteRepository
@@ -224,6 +227,7 @@ export class RouteRepository
                         type: true,
                         pin: {
                           select: {
+                            details: true,
                             lat: true,
                             lng: true,
                           },
@@ -254,13 +258,16 @@ export class RouteRepository
             ...condition,
             deletedAt: null,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
           include: {
             driver: true,
             path: {
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -290,13 +297,16 @@ export class RouteRepository
           where: {
             deletedAt: null,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
           include: {
             driver: true,
             path: {
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -317,6 +327,9 @@ export class RouteRepository
                   },
                 },
               },
+              orderBy: {
+                createdAt: 'desc',
+              },
             },
             vehicle: true,
           },
@@ -324,12 +337,18 @@ export class RouteRepository
 
     const total = condition
       ? await this.repository.route.findMany({
+          orderBy: {
+            createdAt: 'desc',
+          },
           where: {
             ...condition,
             deletedAt: null,
           },
         })
       : await this.repository.route.count({
+          orderBy: {
+            createdAt: 'desc',
+          },
           where: {
             deletedAt: null,
           },
@@ -340,6 +359,62 @@ export class RouteRepository
       Array.isArray(total) ? total.length : total,
     );
   }
+
+  async findAllToExport(
+    page: Page,
+    type: ETypeRouteExport,
+  ): Promise<PageResponse<Route>> {
+    const items = await this.repository.route.findMany({
+      ...this.buildPage(page),
+      where: {
+        type: type,
+        deletedAt: null,
+      },
+      include: {
+        driver: true,
+        path: {
+          include: {
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              include: {
+                employee: {
+                  select: {
+                    name: true,
+                    pins: {
+                      include: {
+                        pin: {
+                          select: {
+                            lat: true,
+                            lng: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        vehicle: true,
+      },
+    });
+
+    const total = await this.repository.route.findMany({
+      where: {
+        type: type,
+        deletedAt: null,
+      },
+    });
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+  }
+
   async listByDriverId(
     driverId: string,
     page: Page,
@@ -361,7 +436,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -382,6 +457,9 @@ export class RouteRepository
                   },
                 },
               },
+              orderBy: {
+                createdAt: 'desc',
+              },
             },
             vehicle: true,
           },
@@ -398,7 +476,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'asc',
+                    position: 'desc',
                   },
                   include: {
                     employee: {
@@ -418,6 +496,9 @@ export class RouteRepository
                     },
                   },
                 },
+              },
+              orderBy: {
+                createdAt: 'desc',
               },
             },
             vehicle: true,

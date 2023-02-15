@@ -21,9 +21,12 @@ import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
+import { json } from 'stream/consumers';
+import { convertToDate } from 'src/utils/date.service';
+import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -46,7 +49,15 @@ export class EmployeeService {
     private readonly employeeOnPinService: EmployeesOnPinService,
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
+    @Inject('IGoogleApiServiceIntegration')
+    private readonly googleApiServiceIntegration: GoogleApiServiceIntegration
   ) {}
+
+    async getLocation(address: string): Promise<any> {
+    const response = await this.googleApiServiceIntegration.getLocation(address);
+
+    return response;
+  }
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
@@ -190,9 +201,14 @@ export class EmployeeService {
       if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
         if (!data.pin.id)
           throw new HttpException(
-            'O do ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+            'O ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
             HttpStatus.BAD_REQUEST,
           );
+
+        await this.employeeOnPinService.delete(
+          employee.id,
+          employee.pins[0].id,
+        );
 
         await this.employeeOnPinService.associateEmployeeByService(
           data.pin.id,
@@ -215,6 +231,10 @@ export class EmployeeService {
           lat,
           lng,
         });
+        await this.employeeOnPinService.delete(
+          employee.id,
+          employee.pins[0].id,
+        );
         await this.employeeOnPinService.associateEmployeeByService(
           pin.id,
           employee,
@@ -229,13 +249,13 @@ export class EmployeeService {
     const updatedEmployee = await this.employeeRepository.update(
       Object.assign(employee, {
         ...employee,
-        address: employeeDataUpdated.address,
-        admission: employeeDataUpdated.admission,
-        costCenter: employeeDataUpdated.costCenter,
-        name: employeeDataUpdated.name,
-        registration: employeeDataUpdated.registration,
-        role: employeeDataUpdated.role,
-        shift: employeeDataUpdated.shift,
+        address: employeeDataUpdated?.address,
+        admission: employeeDataUpdated?.admission,
+        costCenter: employeeDataUpdated?.costCenter,
+        name: employeeDataUpdated?.name,
+        registration: employeeDataUpdated?.registration,
+        role: employeeDataUpdated?.role,
+        shift: employeeDataUpdated?.shift,
       }),
     );
 
@@ -247,6 +267,12 @@ export class EmployeeService {
   }
 
   async parseExcelFile(file: any) {
+    if (!file)
+      throw new HttpException(
+        'Arquivo não encontrado.',
+        HttpStatus.BAD_REQUEST,
+      );
+
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
     const type = 'LISTA DE COLABORADORES';
@@ -260,16 +286,21 @@ export class EmployeeService {
     const sheet = workbook.Sheets[type];
 
     const headers = [
-      'MATRICULA',
-      'NOME',
-      'BAIRRO',
-      'ENDEREÇO',
-      'NUMERO',
+      'Matricula',
+      'Nome Colaborador',
+      'Admissão',
+      'Cargo',
+      'Turno',
+      'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
       'CEP',
-      'C/C',
-      'SETOR',
-      'TURNO',
-      'ADMISSAO',
+      'Cidade',
+      'UF',
+      'PONTO DE COLETA',
+      'Referencia',
     ];
 
     if (
@@ -280,90 +311,114 @@ export class EmployeeService {
         sheet.C1.v,
         sheet.D1.v,
         sheet.E1.v,
+        sheet.F1.v,
         sheet.G1.v,
         sheet.H1.v,
         sheet.I1.v,
         sheet.J1.v,
+        sheet.K1.v,
         sheet.L1.v,
+        sheet.M1.v,
+        sheet.N1.v,
+        sheet.O1.v,
       ].join('')
     )
       throw new HttpException(
-        'Planilha tem que conter as colunas MATRICULA, NOME e SETOR.',
+        ` Planilha tem que conter as colunas ${headers.join(
+          ', ',
+        )} respectivamente}`,
         HttpStatus.BAD_REQUEST,
       );
 
     const data: any = XLSX.utils.sheet_to_json(sheet);
+   
     const employees: abc[] = [];
 
-    const pinDenso = await this.pinService.listByLocal(
-      'Denso Industrial da Amazônia',
-    );
-
+    const pinDenso = await this.pinService.listByLocal('Denso LTDA ');
+    
     let line = 0;
     const messagesErrors = [];
 
     for (const row of data) {
       const address = {
-        cep: row['CEP'].toString(),
-        neighborhood: row['BAIRRO'].toString(),
-        number: row['NUMERO'].toString(),
-        street: row['ENDEREÇO'].toString(),
+        cep: row['CEP'] ? row['CEP'].toString() : '',
+        neighborhood: row['Bairro'] ? row['Bairro'].toString() : '',
+        number: row['Numero'] ? row['Numero'].toString() : '',
+        street: row['Endereço'] ? row['Endereço'].toString() : '',
         city: 'MANAUS',
         state: 'AM',
-        complement: 'Complemento default',
+        complement: row['Complemento'] ? row['Complemento'].toString() : '',
       };
 
+      const pin =  row['PONTO DE COLETA'] ? await this.getLocation(row['PONTO DE COLETA']) : null
+      console.log(pin)
       const employee: CreateEmployeeFileDTO = {
-        name: row['NOME'].toString(),
-        registration: row['MATRICULA'].toString(),
-        role: row['SETOR'].toString(),
-        shift: row['TURNO'].toString(),
-        costCenter: row['C/C'].toString(),
+        name: row['Nome Colaborador']? row['Nome Colaborador'].toString() : '',
+        registration: row['Matricula'] ? row['Matricula'].toString() : '',
+        role: row['Cargo'] ? row['Cargo'].toString() : '',
+        shift: row['Turno'] ? row['Turno'].toString() : '',
+        costCenter: row['Centro de Custo'] ? row['Centro de Custo'].toString() : '',
         address: address,
-        admission: new Date(),
-        pin: { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
+        admission:  row['Admissão'] ? convertToDate(row['Admissão'].toString())  : new Date(),
+        pin: pin ?
+        {lat : pin.lat.toString(), lng: pin.lng.toString(), title: row['PONTO DE COLETA'] ? row['PONTO DE COLETA'].toString() : '', local: row['PONTO DE COLETA'] ? row['PONTO DE COLETA'].toString() : '', details: row['Referencia'] ? row['Referencia'].toString() : '', typeCreation: ETypeCreationPin.IS_NEW}
+        : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
 
       line++;
+      console.log(line)
       employees.push({ line, employee });
     }
     let totalCreated = 0;
     let alreadyExisted = 0;
     const totalToCreate = employees.length;
-    let aa
-
+    let aa;
+    let result = [];
     for await (const item of employees) {
-
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
-
+      console.log(lineE)
       const errorsTest = await validateAsync(employeeSchema);
-
       const [teste] = errorsTest;
-
+      if(errorsTest.length>0){
+        console.log(errorsTest)
       messagesErrors.push({
         line: lineE,
         // field: errorsTest,
         meesage: teste,
       });
       const testew = messagesErrors.map((i) => {
-        return i.meesage;
+        return{property: i.meesage, line : i.line};
       });
 
-      aa = testew.map((i) => [
+      aa = testew.map((i) => 
+      [
+        
         {
-          field: i?.property,
-          message: i?.constraints,
+          field: i?.property.property,
+          message: i?.property.constraints,
+          linha : i.line+1
         },
-      ]);
+      ]
+      );
 
+       result = aa
+      }
+      
       if (!errorsTest.length) {
         const existsRegistration =
           await this.employeeRepository.findByRegistration(
             item.employee.registration,
           );
-
+          
         if (!existsRegistration) {
+          const pin = item.employee.pin.title != 'Denso' ? await this.pinService.create({
+            title: item.employee.pin.title,
+            local: item.employee.pin.local,
+            details: item.employee.pin.details,
+            lat: item.employee.pin.lat.toString(),
+            lng: item.employee.pin.lng.toString(),
+          }) : null;
           await this.employeeRepository.create(
             new Employee(
               {
@@ -376,7 +431,7 @@ export class EmployeeService {
                 role: item.employee.role,
                 shift: item.employee.shift,
               },
-              pinDenso,
+              pin ?? pinDenso
             ),
           );
           totalCreated++;
@@ -388,9 +443,10 @@ export class EmployeeService {
       newEmployeesCreated: totalCreated,
       employeesAlreadyExistent: alreadyExisted,
       quantityEmployeesOnSheet: totalToCreate,
-      errors: aa,
+      errors: result,
     };
 
+    
     return errors;
   }
 
@@ -413,8 +469,22 @@ export class EmployeeService {
     const filePath = './employee.xlsx';
     const workSheetName = 'Colaboradores';
 
-    const employees = await this.listAll(page, filters);
+    // const employees = await this.listAll(page, filters);
+    const employees = await this.employeeRepository.findAll(page, filters);
 
+    if (employees.total === 0) {
+      throw new HttpException(
+        'Não existem colaboradores para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (employees.total === 0) {
+      throw new HttpException(
+        'Não existem colaboradores para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const exportedEmployeeToXLSX = async (
       employees,
       headers,
@@ -422,14 +492,15 @@ export class EmployeeService {
       filePath,
     ) => {
       const data = employees.map((employee) => {
+        const address = JSON.parse(employee.address);
         return [
           employee.registration,
           employee.name,
-          employee.address.neighborhood,
-          employee.address.street,
-          employee.address.number,
-          employee.address.complement,
-          employee.address.cep,
+          address.neighborhood,
+          address.street,
+          address.number,
+          address.complement,
+          address.cep,
           employee.costCenter,
           employee.role,
           employee.shift,
@@ -438,22 +509,25 @@ export class EmployeeService {
       });
 
       const employeeInformationHeader = [
-        [`COLABORADORES EXPORTADOS: ${today}`],
+        [`COLABORADORES EXPORTADOS EM: ${today}`],
+      ];
+
+      const employeeInformationSubHeader = [
         [`TOTAL DE COLABORADORES EXPORTADOS: ${data.length}`],
       ];
 
       const employeeInformationFooter = [
-        ['**********************************************'],
-        ['***********************************************'],
-        ['************************'],
-        ['*************************************'],
-        ['**********'],
-        ['************************************************************'],
+        ['*****'],
+        ['**************'],
+        ['********'],
+        ['*************'],
+        ['****'],
+        ['**************'],
+        ['****'],
+        ['***'],
         ['**********'],
         ['*******'],
-        ['***************************************************************'],
-        ['*********************'],
-        ['************'],
+        ['****'],
       ];
 
       const workBook = XLSX.utils.book_new();
@@ -461,14 +535,32 @@ export class EmployeeService {
         '',
         employeeInformationHeader,
         '',
+        employeeInformationSubHeader,
+        '',
         employeeInformationFooter,
         '',
         headers,
         ...data,
         '',
-        employeeInformationFooter,
       ];
+
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 15 },
+        { wch: 30 },
+        { wch: 20 },
+        { wch: 30 },
+        { wch: 9 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 15 },
+      ];
+
+      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
+
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
       XLSX.writeFile(workBook, pathFile);

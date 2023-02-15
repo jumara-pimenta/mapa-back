@@ -4,7 +4,7 @@ import { getDateStartToEndOfDay } from './Date';
 export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
   const fields = {
     registration: () => ({
-      registration: filters.registration,
+      registration: {contains : filters.registration},
     }),
     admission: () => {
       const { start, end } = getDateStartToEndOfDay(filters.admission);

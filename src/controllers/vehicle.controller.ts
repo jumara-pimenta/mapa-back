@@ -11,6 +11,8 @@ import {
   Query,
   Response,
   StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FiltersVehicleDTO } from '../dtos/vehicle/filtersVehicle.dto';
 import { MappedVehicleDTO } from '../dtos/vehicle/mappedVehicle.dto';
@@ -19,15 +21,21 @@ import { Vehicle } from '../entities/vehicle.entity';
 import { VehicleService } from '../services/vehicle.service';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateVehicle,
   DeleteVehicle,
   GetAllVehicle,
   GetVehicle,
   UpdateVehicle,
-} from '../utils/examples.swagger';
-import { Roles } from '../decorators/roles.decorator';
+} from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')
@@ -130,5 +138,30 @@ export class VehicleController {
     });
 
     return await this.vehicleService.exportVehicleFile(page, filters);
+  }
+
+  @Post('/upload')
+  @Roles('import-vehicles')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos veículos',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.vehicleService.parseExcelFile(file);
   }
 }

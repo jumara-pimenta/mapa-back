@@ -20,10 +20,12 @@ import { Employee } from '../entities/employee.entity';
 import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
-import { Roles } from 'src/decorators/roles.decorator';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateEmployee,
   DeleteEmployee,
@@ -31,13 +33,30 @@ import {
   GetEmployee,
   UpdateEmployee,
 } from '../utils/examples.swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
-
-  @Post('upload')
+  @Post('/upload')
+  @Roles('import-employees')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos funcionários',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
@@ -141,4 +160,7 @@ export class EmployeeController {
     });
     return await this.employeeService.exportsEmployeeFile(page, filters);
   }
+
+
+
 }

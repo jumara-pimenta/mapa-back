@@ -12,6 +12,8 @@ export const setPermissions = (roles: ERoles) => {
       'edit-employee',
       'delete-employee',
       'list-employee',
+      'export-employees',
+      'import-employees',
       'list-driver',
       'create-driver',
       'edit-driver',
@@ -37,6 +39,7 @@ export const setPermissions = (roles: ERoles) => {
       'create-sinister',
       'list-sinister',
       'edit-sinister',
+      'list-historic',
     ];
 
   if (roles === ERoles.ROLE_EMPLOYEE)

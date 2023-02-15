@@ -5,6 +5,8 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsNumberString,
+  IsInt,
+  IsOptional,
 } from 'class-validator';
 import { faker } from '@faker-js/faker';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
@@ -13,25 +15,26 @@ import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 faker.locale = 'pt_BR';
 
 export class CreateEmployeeFileDTO {
-  @ApiProperty({ default: `${faker.random.numeric(6)}` })
-  @IsNumberString(
-    {},
-    { message: '[registration] A matrícula deve ser do tipo string.' },
-  )
-  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  registration: string;
+
 
   @IsNotEmpty({
     message: '[admission] A data de admissão deve ser preenchida.',
   })
   admission: Date;
 
-  @ApiProperty({ default: `${faker.name.jobTitle()}` })
-  @IsString({ message: '[role] O cargo deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[role] O cargo deve ser preenchido.' })
+  @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  role: string;
+  @IsNumberString(
+    {},
+    { message: '[registration] A matrícula deve ser do tipo string.' },
+  ) 
+  @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
+  registration: string;
+
+  @ApiProperty({ default: `${faker.name.jobTitle()}` })
+  @IsOptional()
+  @IsString({ message: '[role] O cargo deve ser do tipo string.' })
+  role?: string;
 
   @ApiProperty({ default: `${faker.name.fullName()}` })
   @IsString({ message: '[name] O nome deve ser do tipo string.' })
@@ -44,19 +47,14 @@ export class CreateEmployeeFileDTO {
       bannedDigits: ['0', '5', '6', '7', '8', '9'],
     })}`,
   })
-  @IsString({ message: '[shift] O turno deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[shift] O turno deve ser preenchido.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   shift: string;
+
+  
 
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({
     message: '[costCenter] O centro de custo deve ser do tipo string.',
   })
-  @IsNotEmpty({
-    message: '[costCenter] O centro de custo deve ser preenchido.',
-  })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   costCenter: string;
 
   @ApiProperty()

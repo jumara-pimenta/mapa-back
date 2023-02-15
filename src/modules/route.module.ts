@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { MapBoxServiceIntegration } from 'src/integrations/services/mapBoxService/mapbox.service.integration';
 import { RouteController } from '../controllers/route.controller';
 import { RouteRepository } from '../repositories/route/route.repository';
 import { RouteService } from '../services/route.service';
@@ -11,7 +12,7 @@ import { VehicleModule } from './vehicle.module';
   imports: [
     DriverModule,
     VehicleModule,
-    EmployeeModule,
+    forwardRef(() => EmployeeModule),
     forwardRef(() => PathModule),
   ],
   controllers: [RouteController],
@@ -20,6 +21,10 @@ import { VehicleModule } from './vehicle.module';
     {
       provide: 'IRouteRepository',
       useClass: RouteRepository,
+    },
+    {
+      provide: 'IMapBoxServiceIntegration',
+      useClass: MapBoxServiceIntegration,
     },
   ],
   exports: [RouteService],

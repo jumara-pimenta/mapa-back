@@ -1,8 +1,12 @@
+import { Page, PageResponse } from 'src/configs/database/page.model';
+import { FiltersRouteHistoryDTO } from './../../dtos/routeHistory/filtersRouteHistory.dto';
 import { Injectable } from '@nestjs/common';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IRouteHistoryRepository from './routeHistory.repository.contract';
 import { RouteHistory } from '../../entities/routeHistory.entity';
+import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
+import { getDateInLocaleTime, getDateStartToEndOfDay } from 'src/utils/Date';
 
 @Injectable()
 export class RouteHistoryRepository
@@ -13,16 +17,93 @@ export class RouteHistoryRepository
     super();
   }
 
-  delete(id: string): Promise<RouteHistory> {
+  delete(id: string): Promise<RouteHistory | null> {
     return this.repository.routeHistory.delete({
       where: { id },
     });
   }
 
-  findById(id: string): Promise<RouteHistory> {
+  findById(id: string): Promise<any> {
     return this.repository.routeHistory.findUnique({
-      where: { id },
+      where: { id: id },
+      select: {
+        id: true,
+        typeRoute: true,
+        nameRoute: true,
+        path: true,
+        employeeIds: true,
+        totalEmployees: true,
+        totalConfirmed: true,
+        sinister: true,
+        driver: {
+          select: {
+            name: true,
+          },
+        },
+        vehicle: {
+          select: {
+            plate: true,
+          },
+        },
+        itinerary: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+      },
     });
+  }
+
+  async findByPathId(id: string): Promise<any> {
+    const date = getDateStartToEndOfDay(
+      getDateInLocaleTime(new Date()).toISOString(),
+    );
+    const routeHistory = await this.repository.routeHistory.findMany({
+      where: {
+        path: {
+          id: id,
+        },
+        createdAt: {
+          gte: date.start,
+          lte: date.end,
+        },
+      },
+    });
+
+    return routeHistory;
+  }
+  async findAll(
+    page: Page,
+    filters: FiltersRouteHistoryDTO,
+  ): Promise<PageResponse<RouteHistory>> {
+    const items = await this.repository.routeHistory.findMany({
+      ...this.buildPage(page),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        typeRoute: true,
+        nameRoute: true,
+        path: true,
+        employeeIds: true,
+        totalEmployees: true,
+        sinister: true,
+        totalConfirmed: true,
+        driver: true,
+        vehicle: true,
+        itinerary: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+      },
+    });
+
+    const total = await this.repository.routeHistory.count();
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
   }
 
   async create(data: RouteHistory): Promise<RouteHistory> {
@@ -67,7 +148,21 @@ export class RouteHistoryRepository
           lte: dateFinal,
         },
       },
+      include: {
+        sinister: true,
+      },
     });
     return paths;
+  }
+
+  async getEmployeeById(id: string): Promise<EmployeeHistoryDTO> {
+    return await this.repository.employee.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        costCenter: true,
+        registration: true,
+      },
+    });
   }
 }

@@ -28,4 +28,18 @@ export class CreateSinisterDTO {
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
+
+  @ApiProperty({
+    default: 'Id do trajeto que ocorreu o sinistro',
+    example: 'Id do trajeto que ocorreu o sinistro',
+    description: 'Id do trajeto que ocorreu o sinistro',
+  })
+  @IsString({
+    message: '[pathId] O campo PATHID deve ser do tipo string.',
+  })
+  @IsNotEmpty({
+    message: '[pathId] O campo PATHID deve ser preenchido.',
+  })
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  pathId: string;
 }

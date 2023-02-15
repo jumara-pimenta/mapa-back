@@ -25,8 +25,8 @@ import {
   GetPathByPins,
   GetPathByRoutes,
   UpdatePathById,
-} from '../utils/examples.swagger';
-import { Roles } from '../decorators/roles.decorator';
+} from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('/api/routes')
 @ApiTags('Paths')
@@ -45,7 +45,7 @@ export class PathController {
   })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Path> {
-    return await this.pathService.listById(id);
+    return await this.pathService.listByIdMobile(id);
   }
 
   @Get('/:routeId/paths')
@@ -96,6 +96,7 @@ export class PathController {
   async getManyByEmployee(
     @Param('employeeId') employeeId: string,
   ): Promise<MappedPathDTO[]> {
+    console.log(employeeId);
     return await this.pathService.listManyByEmployee(employeeId);
   }
 
@@ -113,7 +114,7 @@ export class PathController {
   async getOneByStatus(
     @Param('driverId') driverId: string,
     @Param('status') status: EStatusPath,
-  ): Promise<Path> {
+  ): Promise<any> {
     return await this.pathService.listOneByDriverAndStatus(driverId, status);
   }
 

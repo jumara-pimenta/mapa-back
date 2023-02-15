@@ -9,6 +9,11 @@ export enum ETypeRoute {
   EXTRA = 'EXTRA',
 }
 
+export enum ETypeRouteExport {
+  CONVENTIONAL = 'CONVENCIONAL',
+  EXTRA = 'EXTRA',
+}
+
 export enum EStatusRoute {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
@@ -41,3 +46,19 @@ export enum ERoles {
   ROLE_EMPLOYEE = 'EMPLOYEE',
   ROLE_DRIVER = 'DRIVER',
 }
+
+export enum ETypePeriodHistory {
+  WEEKLY = 'SEMANAL',
+  BIWEEKLY = 'QUINZENAL',
+  MONTHLY = 'MENSAL',
+}
+
+export enum ETypeCategoryDrivers {
+  C = 'C',
+  D = 'D',
+}
+
+/* export enum ETypeAcessibilityVehicles {
+  Sim = 'true',
+  Não = 'false',
+} */

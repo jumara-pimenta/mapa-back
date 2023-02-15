@@ -4,10 +4,11 @@ import {
   IsDefined,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   Matches,
 } from 'class-validator';
 import { ETypePath } from '../../utils/ETypes';
-import { durationPathRgx } from '../../utils/Regex';
+import { durationPathRgx, StartsAtRgx } from '../../utils/Regex';
 
 export class PathDetailsDTO {
   @ApiProperty({
@@ -39,11 +40,23 @@ export class PathDetailsDTO {
     description: 'Hora de início do trajeto',
   })
   @IsDefined()
-  @Matches(durationPathRgx, {
-    message:
-      '[startsAt] A hora de início do trajeto deve ser do formato: HH:MM',
+  @Matches(StartsAtRgx, {
+    message: '[startsAt] A hora de início tem que estar entre 00:00 e 23:59',
   })
   startsAt: string;
+
+  @ApiProperty({
+    default: '08:30',
+    example: '08:30',
+    description: 'Hora de início da volta do trajeto',
+    required: false,
+  })
+  @Matches(durationPathRgx, {
+    message:
+      '[startsReturnAt] A hora de início do retorno do trajeto deve ser do formato: HH:MM',
+  })
+  @IsOptional()
+  startsReturnAt?: string;
 
   @ApiProperty({
     default: true,

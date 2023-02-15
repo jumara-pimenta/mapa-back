@@ -6,6 +6,12 @@ class IPin {
   lat: string;
   @ApiProperty()
   lng: string;
+  @ApiProperty()
+  details?: string;
+  @ApiProperty()
+  title?: string;
+  @ApiProperty()
+  local?: string;
 }
 
 class IEmployee {
