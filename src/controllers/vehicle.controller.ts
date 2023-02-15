@@ -33,6 +33,7 @@ import {
   GetAllVehicle,
   GetVehicle,
   UpdateVehicle,
+  UploadFileVehicles,
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -143,11 +144,12 @@ export class VehicleController {
   @Post('/upload')
   @Roles('import-vehicles')
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
+  @ApiCreatedResponse({
     description:
       'Rota para fazer o upload de um arquivo excel com os dados dos veículos',
     schema: {
       type: 'object',
+      example: UploadFileVehicles,
       properties: {
         file: {
           type: 'file',

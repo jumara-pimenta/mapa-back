@@ -33,6 +33,7 @@ import {
   GetAllDriver,
   GetDriver,
   UpdateDriver,
+  UploadFileDrivers,
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -141,11 +142,12 @@ export class DriverController {
   @Post('/upload')
   @Roles('import-drivers')
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
+  @ApiCreatedResponse({
     description:
       'Rota para fazer o upload de um arquivo excel com os dados dos motoristas',
     schema: {
       type: 'object',
+      example: UploadFileDrivers,
       properties: {
         file: {
           type: 'file',
