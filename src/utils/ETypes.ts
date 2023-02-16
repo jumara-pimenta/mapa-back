@@ -5,7 +5,6 @@ export enum ETypePin {
 
 export enum ETypeRoute {
   CONVENTIONAL = 'CONVENCIONAL',
-  ESPECIAL = 'ESPECIAL',
   EXTRA = 'EXTRA',
 }
 
@@ -53,12 +52,12 @@ export enum ETypePeriodHistory {
   MONTHLY = 'MENSAL',
 }
 
+export enum ETypeShiftRotue {
+  FIRST = 'PRIMEIRO',
+  SECOND = 'SEGUNDO',
+  THIRD = 'TERCEIRO',
+}
 export enum ETypeCategoryDrivers {
   C = 'C',
   D = 'D',
 }
-
-/* export enum ETypeAcessibilityVehicles {
-  Sim = 'true',
-  Não = 'false',
-} */

@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
-import { IsString, IsNotEmpty, ValidateNested, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, ValidateNested, IsEnum, IsDefined } from 'class-validator';
 import { PathDetailsDTO } from '../path/pathDetails.dto';
-import { ETypeRoute } from '../../utils/ETypes';
+import { ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
 
 export class CreateRouteDTO {
   @ApiProperty({
@@ -17,8 +17,8 @@ export class CreateRouteDTO {
 
   @ApiProperty({
     default: ETypeRoute.CONVENTIONAL,
-    enum: [ETypeRoute.CONVENTIONAL, ETypeRoute.ESPECIAL, ETypeRoute.EXTRA],
-    description: 'Tipo da Rota: Convencional, Especial ou Extra',
+    enum: [ETypeRoute.CONVENTIONAL, ETypeRoute.EXTRA],
+    description: 'Tipo da Rota: Convencional ou Extra',
   })
   @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.' })
   @IsNotEmpty({ message: '[Type] não pode receber um valor vazio.' })
@@ -67,4 +67,17 @@ export class CreateRouteDTO {
     message: '[pathDetails] Os detalhes do trajeto devem ser preenchidos.',
   })
   pathDetails: PathDetailsDTO;
+
+  @ApiProperty({
+    description: 'Turno da rota',
+    default: 'PRIMEIRO',
+    enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO'],
+  })
+  @IsEnum(ETypeShiftRotue, {
+    message: '[shift] Turno não está definido como enum.'
+  })
+  @IsNotEmpty({ message: '[shift] Turno não pode receber um valor vazio.' })
+  @IsDefined ({ message: '[shift] Turno não pode ser indefinido.' })
+  shift? : ETypeShiftRotue;
+
 }

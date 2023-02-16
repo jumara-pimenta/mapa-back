@@ -351,7 +351,6 @@ export class EmployeeService {
       };
 
       const pin =  row['PONTO DE COLETA'] ? await this.getLocation(row['PONTO DE COLETA']) : null
-      console.log(pin)
       const employee: CreateEmployeeFileDTO = {
         name: row['Nome Colaborador']? row['Nome Colaborador'].toString() : '',
         registration: row['Matricula'] ? row['Matricula'].toString() : '',
@@ -366,7 +365,6 @@ export class EmployeeService {
       };
 
       line++;
-      console.log(line)
       employees.push({ line, employee });
     }
     let totalCreated = 0;
@@ -377,11 +375,9 @@ export class EmployeeService {
     for await (const item of employees) {
       const employeeSchema = plainToClass(CreateEmployeeFileDTO, item.employee);
       const lineE = item.line;
-      console.log(lineE)
       const errorsTest = await validateAsync(employeeSchema);
       const [teste] = errorsTest;
       if(errorsTest.length>0){
-        console.log(errorsTest)
       messagesErrors.push({
         line: lineE,
         // field: errorsTest,

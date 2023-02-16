@@ -2,15 +2,9 @@ import { faker } from '@faker-js/faker';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { CreateEmployeeDTO } from 'src/dtos/employee/createEmployee.dto';
-import { Employee } from 'src/entities/employee.entity';
 import { getDateInLocaleTime } from 'src/utils/Date';
 import {
-  EStatusPath,
-  EStatusRoute,
-  ETypePath,
   ETypePin,
-  ETypeRoute,
 } from 'src/utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
@@ -22,7 +16,7 @@ export class PrismaService
   async onModuleInit() {
     await this.$connect();
 
-    let paths = await this.path.findMany();
+    const paths = await this.path.findMany();
 
     await this.backOfficeUser.upsert({
       where: {

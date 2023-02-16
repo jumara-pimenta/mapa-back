@@ -25,9 +25,10 @@ import {
   ETypePath,
   ETypeRoute,
   ETypeRouteExport,
+  ETypeShiftRotue,
 } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate } from '../utils/date.service';
+import { convertTimeToDate, getStartAtAndFinishAt } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
@@ -70,6 +71,7 @@ export class RouteService {
         vehicleId: vehicle.items[0].id,
         employeeIds: employee.items.map((e) => e.id),
         type: ETypeRoute.CONVENTIONAL,
+        shift: ETypeShiftRotue.FIRST,
         pathDetails: {
           startsAt: '08:00',
           duration: '00:30',
@@ -84,6 +86,8 @@ export class RouteService {
         vehicleId: vehicle.items[1].id,
         employeeIds: employee.items.map((e) => e.id),
         type: ETypeRoute.EXTRA,
+        shift: ETypeShiftRotue.SECOND,
+
         pathDetails: {
           startsAt: '06:00',
           duration: '00:30',
@@ -102,9 +106,9 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
-    const initRouteDate = convertTimeToDate(payload.pathDetails.startsAt);
-    const endRouteDate = convertTimeToDate(payload.pathDetails.duration);
+    const startAndReturnAt = getStartAtAndFinishAt(payload.shift)
+    const initRouteDate = startAndReturnAt.startAt
+    const endRouteDate = startAndReturnAt.finishAt
 
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
@@ -152,7 +156,7 @@ export class RouteService {
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,
-      details: { ...payload.pathDetails },
+      details: { ...payload.pathDetails, startsAt: initRouteDate, startsReturnAt: endRouteDate },
     });
 
     const routeForUpdate = await this.routeRepository.findById(route.id);
@@ -302,8 +306,8 @@ export class RouteService {
         employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
-          startsAt: data.startsAt ?? route.paths[0].startsAt,
-          startsReturnAt: data.startsReturnAt ?? route.paths[0].startsAt,
+          startsAt: data.shift ? getStartAtAndFinishAt(data.shift).startAt :route.paths[0].startsAt,
+          startsReturnAt: data.shift ? getStartAtAndFinishAt(data.shift).finishAt :route.paths[0].startsAt,
           duration: route.paths[0].duration,
           isAutoRoute: true,
         },
@@ -315,18 +319,17 @@ export class RouteService {
     ) {
       if (route.paths.length === 2) {
         for await (const path of route.paths) {
-          if (path.type === ETypePath.ONE_WAY) {
-            await this.pathService.update(path.id, {
-              startsAt: data.startsAt ?? path.startsAt,
-              duration: data.duration ?? path.duration,
-            });
-          }
-          if (path.type === ETypePath.RETURN) {
-            await this.pathService.update(path.id, {
-              startsAt: data.startsReturnAt ?? path.startsAt,
-              duration: data.duration ?? path.duration,
-            });
-          }
+          const isOneWay = path.type === ETypePath.ONE_WAY;
+          const isReturn = path.type === ETypePath.RETURN;
+          const newData = {
+            duration: data.duration ?? path.duration,
+            startsAt: isOneWay
+              ? data.shift ? getStartAtAndFinishAt(data.shift).startAt : data.startsAt
+              : isReturn
+                ? data.shift ? getStartAtAndFinishAt(data.shift).finishAt : data.startsReturnAt
+                : path.startsAt,
+          };
+          await this.pathService.update(path.id, newData);
         }
       }
       if (route.paths.length === 1) {
@@ -588,7 +591,7 @@ export class RouteService {
     };
   }
 
-  async driversInRoute(route: Route[], init: Date, end: Date): Promise<void> {
+  async driversInRoute(route: Route[], init: string, end: string): Promise<void> {
     route.forEach((route) => {
       route.path.forEach((path) => {
         const startedAtDate = convertTimeToDate(path.startsAt);
@@ -599,13 +602,13 @@ export class RouteService {
           durationTime.getHours(),
         );
 
-        if (init >= startedAtDate && init <= finishedAtTime) {
+        if (convertTimeToDate(init) >= startedAtDate &&convertTimeToDate(init) <= finishedAtTime) {
           throw new HttpException(
             'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
-        if (end >= startedAtDate && end <= finishedAtTime) {
+        if (convertTimeToDate(end) >= startedAtDate && convertTimeToDate(end) <= finishedAtTime) {
           throw new HttpException(
             'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
@@ -731,7 +734,7 @@ export class RouteService {
     }
   }
 
-  async vehiclesInRoute(route: Route[], init: Date, end: Date): Promise<void> {
+  async vehiclesInRoute(route: Route[], init: string, end: string): Promise<void> {
     route.forEach((route) => {
       route.path.forEach((path) => {
         const startedAtDate = convertTimeToDate(path.startsAt);
@@ -742,13 +745,13 @@ export class RouteService {
           durationTime.getHours(),
         );
 
-        if (init >= startedAtDate && init <= finishedAtTime) {
+        if (convertTimeToDate(init) >= startedAtDate && convertTimeToDate(init) <= finishedAtTime) {
           throw new HttpException(
             'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
-        if (end >= startedAtDate && end <= finishedAtTime) {
+        if (convertTimeToDate(end) >= startedAtDate && convertTimeToDate(end) <= finishedAtTime) {
           throw new HttpException(
             'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,

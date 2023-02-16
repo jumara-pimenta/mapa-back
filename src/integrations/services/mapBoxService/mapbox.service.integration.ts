@@ -9,10 +9,8 @@ export class MapBoxServiceIntegration implements IMapBoxServiceIntegration {
   async getDistance(payload: any): Promise<GetDistanceResponse> {
     try {
       const { data }: AxiosResponse<GetDistanceResponse> =
-        await mapboxApi().get(
-          `address${payload}?key=${process.env.MAPS_BOX_API_KEY}`,
-        );
-      return data;
+      await mapboxApi().get(payload);
+            return data;
     } catch (e) {
       new Logger('mapbox service integration').error('get distance', e);
       this.error('[mapbox service integration] get distance');

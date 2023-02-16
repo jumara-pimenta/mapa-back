@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { EStatusRoute, ETypeRoute } from '../../utils/ETypes';
+import { EStatusRoute, ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
 
 export class UpdateRouteDTO {
   @ApiProperty({ description: 'Descrição da rota' })
@@ -68,4 +68,11 @@ export class UpdateRouteDTO {
   })
   @IsOptional()
   startsReturnAt? : string
+
+  @ApiProperty({ description: 'Horário da volta' })
+  @IsEnum(ETypeShiftRotue, {
+    message: '[shift] O turno deve ser do tipo enum: PRIMEIRO ou SEGUNDO ou TERCEIRO',})
+  @IsOptional()
+  shift? : ETypeShiftRotue
+  
 }

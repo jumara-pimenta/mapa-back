@@ -23,8 +23,8 @@ export class EmployeesOnPinRepository
     });
   }
 
-  create(data: EmployeesOnPin): Promise<EmployeesOnPin> {
-    return this.repository.employeesOnPin.upsert({
+  async create(data: EmployeesOnPin): Promise<EmployeesOnPin> {
+    return await this.repository.employeesOnPin.upsert({
       where: {
         employeeId_pinId: {
           employeeId: data.employee.id,
