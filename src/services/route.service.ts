@@ -329,7 +329,7 @@ export class RouteService {
                 ? data.shift ? getStartAtAndFinishAt(data.shift).finishAt : data.startsReturnAt
                 : path.startsAt,
           };
-          await this.pathService.update(path.id, newData);j
+          await this.pathService.update(path.id, newData);
         }
       }
       if (route.paths.length === 1) {
