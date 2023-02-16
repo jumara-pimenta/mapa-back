@@ -28,6 +28,7 @@ import {
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { FilterRouteExport } from 'src/dtos/route/filterRouteExport';
+import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
@@ -165,5 +166,13 @@ export class RouteController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
     return await this.routeService.exportsPathToFile(id);
+  }
+
+  @Post('/replace/drivers')
+  @HttpCode(HttpStatus.OK)
+  async replaceDrivers(
+    @Body() payload: RouteReplacementDriverDTO,
+  ): Promise<any> {
+    return await this.routeService.routeReplacementDriver(payload);
   }
 }
