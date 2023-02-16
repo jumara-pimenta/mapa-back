@@ -57,3 +57,7 @@ export enum ETypeShiftRotue {
   SECOND = 'SEGUNDO',
   THIRD = 'TERCEIRO',
 }
+export enum ETypeCategoryDrivers {
+  C = 'C',
+  D = 'D',
+}

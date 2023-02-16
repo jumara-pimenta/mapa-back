@@ -1,58 +1,81 @@
 export const ListRoutes = {
-  total: 2,
+  total: 1,
   items: [
     {
-      id: '68b6ba41-4503-425e-85e6-7c5b8915fb15',
-      name: 'Abraham Davis',
-      address: 'Rua das Sorvas, 56. Coroado. Manaus - AM. 69082-476',
-      admission: '2023-01-03T14:34:39.362Z',
-      costCenter: 'Almoxarife',
-      registration: '32-452074-657714-3',
-      role: 'auxiliar de produção',
-      shift: '1º Turno',
-      createdAt: '2023-01-03T10:34:39.463Z',
-      pins: [
-        {
-          id: '8ce47810-4106-429c-9e5d-17e110f852fa',
-          title: 'RUA LUZAKA12',
-          local: 'OPAPA',
-          details: ' ali perto',
-          lat: '0.0000000',
-          lng: '0.000000',
-          type: 'CONVENCIONAL',
-        },
-      ],
-    },
-    {
-      id: '9551bda9-25e9-4db3-92a9-fe5ae7208e59',
-      name: 'Marcus Vinicius',
-      address: {
-        cep: '66166155',
-        city: 'Beatriz do Norte',
-        complement: 'Moraes Rua',
-        neighborhood: 'Arthur Avenida',
-        number: '1282',
-        state: 'Pará',
-        street: 'Reis Rodovia',
+      id: '35f83321-8892-4637-bb43-b395d0d817ea',
+      description: 'Rota de teste',
+      distance: '7.33 KM',
+      status: 'PENDENTE',
+      type: 'CONVENCIONAL',
+      createdAt: '2023-02-13T19:56:11.276Z',
+      driver: {
+        id: 'bf869eb5-ca41-4e65-a36b-4f6fb2760dad',
+        name: 'Tertuliano Nogueira',
+        cpf: '76762928642',
+        cnh: '62018760199',
+        validation: '2023-09-07T06:05:33.791Z',
+        category: 'D',
+        createdAt: '2023-02-13T15:56:11.089Z',
+        updatedAt: null,
       },
-      admission: '2023-01-03T14:01:20.498Z',
-      costCenter: 'Almoxarife',
-      registration: '123456789',
-      role: 'Auxiliar de produção',
-      shift: '1º Turno',
-      createdAt: '2023-01-03T10:06:02.132Z',
-      pins: [
+      vehicle: {
+        id: '5e238a90-4b10-431f-bcaa-25a4a660507a',
+        plate: 'XN20NVK',
+        company: 'Souza, Reis e Melo',
+        type: 'Convertible',
+        lastSurvey: '2022-06-22T21:49:30.485Z',
+        expiration: '2023-07-13T20:37:44.103Z',
+        capacity: 75,
+        renavam: '58069698571',
+        lastMaintenance: '2022-07-20T21:34:11.289Z',
+        note: 'Sit aliquam pariatur totam minus atque doloribus earum illo blanditiis.',
+        isAccessibility: true,
+        createdAt: '2023-02-13T15:56:11.140Z',
+        updatedAt: null,
+      },
+      paths: [
         {
-          id: 'c30b1f44-be06-4209-abc3-e2359d5f0709',
-          title: 'Título do local',
-          local:
-            'Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-200, Brasil',
-          details: 'Detalhes do local',
-          lat: '-3.10719',
-          lng: '-60.0261',
-          type: 'CONVENCIONAL',
+          id: '8a431e2a-255b-4ff1-ba69-e52ccdf34342',
+          duration: '00:30',
+          finishedAt: null,
+          startedAt: null,
+          startsAt: '08:00',
+          status: 'PENDENTE',
+          type: 'VOLTA',
+          createdAt: '2023-02-13T19:56:11.294Z',
+          employeesOnPath: [
+            {
+              id: '3b15b633-a2b2-4ec4-9c6b-41ca422934b9',
+              boardingAt: null,
+              confirmation: false,
+              disembarkAt: null,
+              position: 6,
+              details: {
+                name: 'Ana Clara Carvalho',
+                location: {
+                  lat: '-3.1376438100682718',
+                  lng: '-59.988923509861465',
+                },
+              },
+            },
+            {
+              id: '16d4c0c3-a731-4587-bdaa-ea38bac594e6',
+              boardingAt: null,
+              confirmation: false,
+              disembarkAt: null,
+              position: 5,
+              details: {
+                name: 'Meire Xavier',
+                location: {
+                  lat: '-3.138758531627776',
+                  lng: '-59.98713727671988',
+                },
+              },
+            },
+          ],
         },
       ],
+      quantityEmployees: 2,
     },
   ],
 };
@@ -178,8 +201,34 @@ export const DeleteDriver = { ...UpdateDriver };
 export const GetDriver = { ...UpdateDriver };
 
 export const GetAllDriver = {
-  total: 1,
-  items: [{ ...UpdateDriver }],
+  total: 2,
+  items: [
+    {
+      id: '3c14a5c6-66ba-4a01-aa09-863b2b80d9be',
+      category: 'D',
+      cnh: '35221688894',
+      cpf: '27993014341',
+      name: 'Enzo Gabriel Martins',
+      validation: '2023-11-25T23:09:49.675Z',
+      createdAt: '2023-02-13T19:38:21.491Z',
+    },
+    {
+      id: '9784533d-f61a-46f5-88ab-2619d858d18e',
+      category: 'D',
+      cnh: '77944574042',
+      cpf: '39289492053',
+      name: 'Sophia Macedo',
+      validation: '2023-03-12T11:33:10.218Z',
+      createdAt: '2023-02-13T19:38:21.534Z',
+    },
+  ],
+};
+
+export const UploadFileDrivers = {
+  newDriversCreated: 0,
+  driversAlreadyExistent: 17,
+  quantityDriversOnSheet: 17,
+  errors: [],
 };
 
 export const CreateVehicle = {
@@ -207,9 +256,45 @@ export const DeleteVehicle = { ...UpdateVehicle };
 
 export const GetVehicle = { ...UpdateVehicle };
 
+export const UploadFileVehicles = {
+  newVehiclesCreated: 0,
+  vehiclesAlreadyExistent: 2,
+  quantityVehiclesOnSheet: 2,
+  errors: [],
+};
+
 export const GetAllVehicle = {
-  total: 1,
-  items: [{ ...UpdateVehicle }],
+  total: 2,
+  items: [
+    {
+      id: '1f969985-97b7-4877-a53c-76f538b6f523',
+      capacity: 78,
+      company: 'Silva EIRELI',
+      expiration: '2023-05-19T12:18:29.431Z',
+      isAccessibility: true,
+      lastMaintenance: '2022-11-12T04:00:43.086Z',
+      lastSurvey: '2022-09-29T21:05:07.691Z',
+      note: 'Neque et ducimus reiciendis velit rerum neque quasi.',
+      plate: 'XL34AKW',
+      renavam: '44071565184',
+      type: 'SUV',
+      createdAt: '2023-02-13T19:38:21.582Z',
+    },
+    {
+      id: '49a658e4-bc26-4ae9-a04a-703235f66a7b',
+      capacity: 91,
+      company: 'Albuquerque, Oliveira e Moreira',
+      expiration: '2024-01-06T00:24:00.154Z',
+      isAccessibility: true,
+      lastMaintenance: '2023-01-23T16:00:25.146Z',
+      lastSurvey: '2022-03-24T01:28:57.301Z',
+      note: 'Optio fugiat magnam beatae.',
+      plate: 'UL10FAO',
+      renavam: '58092831672',
+      type: 'SUV',
+      createdAt: '2023-02-13T19:38:21.582Z',
+    },
+  ],
 };
 
 export const CreatePin = {
@@ -266,8 +351,69 @@ export const DeleteEmployee = { ...UpdateEmployee };
 export const GetEmployee = { ...UpdateEmployee };
 
 export const GetAllEmployee = {
-  total: 1,
-  items: [{ ...UpdateEmployee }],
+  total: 2,
+  items: [
+    {
+      id: 'b826ec65-7fa2-4b46-a0be-83393b315c39',
+      name: 'Maitê Franco Jr.',
+      address: {
+        cep: '27178488',
+        city: 'Vitória de Nossa Senhora',
+        complement: '',
+        neighborhood: 'Quadra 64',
+        number: '34504794',
+        state: 'AM',
+        street: '6040 Moreira Rua Quadra 35',
+      },
+      admission: '2022-06-18T13:33:25.784Z',
+      costCenter: '256236',
+      registration: '180621',
+      role: 'Costa, Batista e Pereira',
+      shift: '7',
+      createdAt: '2023-02-13T10:03:17.333Z',
+      pins: [
+        {
+          id: '6e767055-2003-4cbf-8926-3a711629be82',
+          title: 'Lagoa Verde',
+          local: 'Av. Rodrigo Otávio, 2 - São Lázaro, Manaus - AM, 69073-177',
+          details: 'Em frente a Lagoa Verde',
+          lat: '-3.1376438100682718',
+          lng: '-59.988923509861465',
+          type: 'CONVENCIONAL',
+        },
+      ],
+    },
+    {
+      id: 'af1ad7dc-0023-430c-b25e-cae51db70361',
+      name: 'Yango Barros',
+      address: {
+        cep: '31811537',
+        city: 'undefined Ladislau',
+        complement: '',
+        neighborhood: 'Quadra 91',
+        number: '14304413',
+        state: 'AM',
+        street: '20508 Moreira Travessa Sobrado 91',
+      },
+      admission: '2022-08-24T01:46:38.677Z',
+      costCenter: '241447',
+      registration: '105115',
+      role: 'Oliveira, Moreira e Melo',
+      shift: '8',
+      createdAt: '2023-02-13T10:03:17.290Z',
+      pins: [
+        {
+          id: '8ff7615e-4b7d-49b8-8f94-897ee9be4ea3',
+          title: 'Patricia Bradock Fardas',
+          local: 'R. das Águias, 40 - São Lázaro, Manaus - AM, 69073-140',
+          details: 'Em frente a Patricia Bradock Fardas',
+          lat: '-3.138758531627776',
+          lng: '-59.98713727671988',
+          type: 'CONVENCIONAL',
+        },
+      ],
+    },
+  ],
 };
 
 export const CreateEmployeesOnPin = {

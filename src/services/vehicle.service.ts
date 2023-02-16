@@ -17,6 +17,21 @@ import { FiltersVehicleDTO } from '../dtos/vehicle/filtersVehicle.dto';
 import { MappedVehicleDTO } from '../dtos/vehicle/mappedVehicle.dto';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
+import { CreateVehicleFileDTO } from 'src/dtos/vehicle/createVehicleFile.dto';
+import { convertToDate } from 'src/utils/date.service';
+
+const validateAsync = (schema: any): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    validate(schema, { validationError: { target: false } })
+      .then((response) => resolve(response.map((i) => i)))
+      .catch((error: any) => reject(error));
+  });
+};
+
+interface vehicleDTO {
+  line: number;
+  vehicle: CreateVehicleFileDTO;
+}
 
 @Injectable()
 export class VehicleService {
@@ -148,7 +163,7 @@ export class VehicleService {
   async parseExcelFile(file: any) {
     const workbook = XLSX.read(file.buffer);
     const sheetName = workbook.SheetNames;
-    const type = 'LISTA DE VEÍCULOS';
+    const type = 'Veículos';
     if (!Object.values(sheetName).includes(type))
       throw new HttpException(
         `Planilha tem que conter a aba de ${type}`,
@@ -158,12 +173,14 @@ export class VehicleService {
     const headers = [
       'Placa',
       'Empresa',
-      'Tipo do carro',
+      'Tipo',
       'Última vistoria',
       'Vencimento',
       'Capacidade',
-      'Acessibilidade',
+      'Renavam',
       'Última manutenção',
+      'Observação',
+      'Acessibilidade',
     ];
     if (
       headers.join('') !==
@@ -176,60 +193,123 @@ export class VehicleService {
         sheet.F1.v,
         sheet.G1.v,
         sheet.H1.v,
+        sheet.I1.v,
+        sheet.J1.v,
       ].join('')
     )
       throw new HttpException(
-        'Planilha tem que conter as colunas Placa, Empresa, Tipo do carro, Última vistoria, Vencimento, Capacidade, Acessibilidade, Última manutenção',
+        'Planilha tem que conter as colunas Placa, Empresa, Tipo, Última vistoria, Vencimento, Capacidade, Renavam, Última manutenção, Observação, Acessibilidade',
         HttpStatus.BAD_REQUEST,
       );
+
+    const vehicles: vehicleDTO[] = [];
+
+    let line = 0;
+    const messagesErrors = [];
+
     const data: any = XLSX.utils.sheet_to_json(sheet);
-    const vehicles: CreateVehicleDTO[] = [];
     for (const row of data) {
-      const driver: CreateVehicleDTO = {
-        plate: row['PLACA'].toString(),
-        company: row['EMPRESA'].toString(),
-        type: row['TIPO DO CARRO'].toString(),
-        lastSurvey: row['ÚLTIMA VISTORIA'].toString(),
-        expiration: row['VENCIMENTO'].toString(),
-        capacity: row['CAPACIDADE'].toString(),
-        isAccessibility: row['ACESSIBILIDADE'].toString(),
-        lastMaintenance: row['ÚLTIMA MANUTENÇÃO'].toString(),
-        renavam: row['RENAVAM'].toString(),
-        note: row['OBSERVAÇÃO'].toString(),
+      const vehicle: CreateVehicleFileDTO = {
+        plate: row['Placa'] ? row['Placa'].toString() : '',
+        company: row['Empresa'] ? row['Empresa'].toString() : '',
+        type: row['Tipo'] ? row['Tipo'].toString() : '',
+        lastSurvey: row['Última vistoria']
+          ? convertToDate(row['Última vistoria'].toString())
+          : new Date(),
+        expiration: row['Vencimento']
+          ? convertToDate(row['Vencimento'].toString())
+          : new Date(),
+        capacity: row['Capacidade'] ? row['Capacidade'] : '',
+        renavam: row['Renavam'] ? row['Renavam'].toString() : '',
+        lastMaintenance: row['Última manutenção']
+          ? convertToDate(row['Última manutenção'].toString())
+          : new Date(),
+        note: row['Observação'] ? row['Observação'].toString() : '',
+        isAccessibility: row['Acessibilidade']
+          ? row['Acessibilidade'].toString() === 'SIM'
+            ? true
+            : false
+          : null,
       };
-      vehicles.push(driver);
+      line++;
+      vehicles.push({ line, vehicle });
     }
-    const totalCreated = 0;
-    let dataError = 0;
+    let totalCreated = 0;
+    let alreadyExisted = 0;
     const totalToCreate = vehicles.length;
+    let aa;
+    let result = [];
 
     for await (const item of vehicles) {
-      const driver = plainToClass(CreateVehicleDTO, item);
-      let error = false;
-      validate(driver, { validationError: { target: false } }).then(
-        async (errors) => {
-          if (errors.length > 0) {
-            dataError++;
-            error = true;
-          }
-        },
-      );
+      const vehicle = plainToClass(CreateVehicleFileDTO, item.vehicle);
+      const lineE = item.line;
+      const errorsTest = await validateAsync(vehicle);
+      const [teste] = errorsTest;
+      if (errorsTest.length > 0) {
+        messagesErrors.push({
+          line: lineE,
+          // field: errorsTest,
+          message: teste,
+        });
+        const testew = messagesErrors.map((i) => {
+          return { property: i.message, line: i.line };
+        });
+
+        aa = testew.map((i) => [
+          {
+            field: i?.property.property,
+            message: i?.property.constraints,
+            linha: i.line + 1,
+          },
+        ]);
+
+        result = aa;
+      }
+
+      if (!errorsTest.length) {
+        const existsPlate = await this.vehicleRepository.findByPlate(
+          item.vehicle.plate,
+        );
+
+        const existsRenavam = await this.vehicleRepository.findByRenavam(
+          item.vehicle.renavam,
+        );
+
+        if (!existsPlate && !existsRenavam) {
+          await this.vehicleRepository.create(
+            new Vehicle({
+              plate: JSON.stringify(item.vehicle.plate),
+              company: item.vehicle.company,
+              type: item.vehicle.type,
+              lastSurvey: item.vehicle.lastSurvey,
+              expiration: item.vehicle.expiration,
+              capacity: item.vehicle.capacity,
+              renavam: item.vehicle.renavam,
+              lastMaintenance: item.vehicle.lastMaintenance,
+              note: item.vehicle.note,
+              isAccessibility: item.vehicle.isAccessibility,
+            }),
+          );
+          totalCreated++;
+        } else alreadyExisted++;
+      }
     }
 
-    return {
-      message: [
-        `Cadastrado com sucesso: ${totalCreated}`,
-        `Veículos com dados inválidos: ${dataError}`,
-        `Quantidade total de veículos na planilha: ${totalToCreate}`,
-      ],
+    const errors: any = {
+      newVehiclesCreated: totalCreated,
+      vehiclesAlreadyExistent: alreadyExisted,
+      quantityVehiclesOnSheet: totalToCreate,
+      errors: result,
     };
+
+    return errors;
   }
 
   async exportVehicleFile(page: Page, filters?: FiltersVehicleDTO) {
     const headers = [
       'Placa',
       'Empresa',
-      'Tipo do carro',
+      'Tipo',
       'Última vistoria',
       'Vencimento',
       'Capacidade',
