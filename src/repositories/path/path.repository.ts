@@ -146,6 +146,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startsAt: data.startsAt,
         status: data.status,
         type: data.type,
+        substituteId: data.substituteId,
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
@@ -164,6 +165,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startedAt: true,
         finishedAt: true,
         createdAt: true,
+        substituteId: true,
         route: {
           select: {
             id: true,
@@ -212,12 +214,23 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   findByDriver(driverId: string): Promise<Path[]> {
     return this.repository.path.findMany({
       where: {
-        route: {
-          driver: {
-            id: driverId,
+        // find by driver id in route or substitute in path
+        OR: [
+          {
+            route: {
+              driver: {
+                id: driverId,
+              },
+              deletedAt: null,
+            },
+            substituteId: {
+              equals: null,
+            },
           },
-          deletedAt: null,
-        },
+          {
+            substituteId: driverId,
+          },
+        ],
       },
       select: {
         id: true,
@@ -427,9 +440,45 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         route: {
           select: {
             type: true,
+            id: true,
             description: true,
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                cpf: true,
+                cnh: true,
+                createdAt: true,
+                validation: true,
+                updatedAt: false,
+                category: true,
+                deletedAt: false,
+                password: false,
+                RouteHistory: false,
+              },
+            },
+            vehicle: {
+              select: {
+                plate: true,
+                id: true,
+                capacity: true,
+                company: true,
+                createdAt: true,
+                expiration: true,
+                updatedAt: false,
+                isAccessibility: true,
+                lastMaintenance: true,
+                lastSurvey: true,
+                note: true,
+                renavam: true,
+                RouteHistory: false,
+                routes: false,
+                type: true,
+              },
+            },
           },
         },
+
         employeesOnPath: {
           select: {
             id: true,
