@@ -315,20 +315,26 @@ export class RouteService {
         employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
-          startsAt: data.shift
-            ? getStartAtAndFinishAt(data.shift).startAt
-            : route.paths[0].startsAt,
-          startsReturnAt: data.shift
-            ? getStartAtAndFinishAt(data.shift).finishAt
-            : route.paths[0].startsAt,
-          duration: route.paths[0].duration,
+          startsAt:
+            route.type === ETypeRoute.CONVENTIONAL
+              ? data.shift
+                ? getStartAtAndFinishAt(data.shift).startAt
+                : route.paths[0].startsAt
+              : data.startsAt ?? route.paths[0].startsAt,
+          startsReturnAt:
+            route.type === ETypeRoute.CONVENTIONAL
+              ? data.shift
+                ? getStartAtAndFinishAt(data.shift).finishAt
+                : route.paths[0].startsAt
+              : data.startsReturnAt ?? route.paths[0].startsAt,
+          duration: data.duration ?? route.paths[0].duration,
           isAutoRoute: true,
         },
       });
     }
     if (
       !data.employeeIds &&
-      (data.startsAt || data.startsReturnAt || data.duration)
+      (data.startsAt || data.startsReturnAt || data.duration || data.shift)
     ) {
       if (route.paths.length === 2) {
         for await (const path of route.paths) {
@@ -346,6 +352,7 @@ export class RouteService {
                 : data.startsReturnAt
               : path.startsAt,
           };
+          console.log(newData);
           await this.pathService.update(path.id, newData);
         }
       }
