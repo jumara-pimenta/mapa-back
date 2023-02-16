@@ -17,8 +17,8 @@ export class CreateRouteDTO {
 
   @ApiProperty({
     default: ETypeRoute.CONVENTIONAL,
-    enum: [ETypeRoute.CONVENTIONAL, ETypeRoute.ESPECIAL, ETypeRoute.EXTRA],
-    description: 'Tipo da Rota: Convencional, Especial ou Extra',
+    enum: [ETypeRoute.CONVENTIONAL, ETypeRoute.EXTRA],
+    description: 'Tipo da Rota: Convencional ou Extra',
   })
   @IsEnum(ETypeRoute, { message: '[Type] não está definida como enum.' })
   @IsNotEmpty({ message: '[Type] não pode receber um valor vazio.' })

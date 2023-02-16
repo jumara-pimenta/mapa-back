@@ -381,6 +381,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   }
 
   create(data: Path): Promise<Path> {
+    console.log(data)
     return this.repository.path.create({
       data: {
         id: data.id,
