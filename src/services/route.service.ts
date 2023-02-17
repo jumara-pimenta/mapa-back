@@ -168,7 +168,7 @@ export class RouteService {
           : payload.pathDetails.startsReturnAt
           ? payload.pathDetails.startsReturnAt
           : '';
-        console.log(initRouteDate, endRouteDate);
+
         const driver = await this.driverService.listById(payload.driverId);
         const vehicle = await this.vehicleService.listById(payload.vehicleId);
 
