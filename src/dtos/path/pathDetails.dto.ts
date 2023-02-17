@@ -39,11 +39,11 @@ export class PathDetailsDTO {
     example: '08:30',
     description: 'Hora de início do trajeto',
   })
-  @IsDefined()
+  @IsOptional()
   @Matches(StartsAtRgx, {
     message: '[startsAt] A hora de início tem que estar entre 00:00 e 23:59',
   })
-  startsAt: string;
+  startsAt?: string;
 
   @ApiProperty({
     default: '08:30',

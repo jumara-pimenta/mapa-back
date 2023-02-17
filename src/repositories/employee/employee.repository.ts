@@ -28,16 +28,20 @@ export class EmployeeRepository
   }
 
   update(data: Employee): Promise<any> {
+    const dataAdmission = data.admission
+      ? getDateInLocaleTime(new Date(data.admission))
+      : undefined;
+    console.log(dataAdmission);
     return this.repository.employee.update({
       data: {
-        id: data.id,
-        address: data.address,
-        admission: getDateInLocaleTime(new Date(data.admission)),
-        costCenter: data.costCenter,
-        name: data.name,
-        registration: data.registration,
-        role: data.role,
-        shift: data.shift,
+        id: data.id!,
+        address: data.address!,
+        admission: dataAdmission!,
+        costCenter: data.costCenter!,
+        name: data.name!,
+        registration: data.registration!,
+        role: data.role!,
+        shift: data.shift!,
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
