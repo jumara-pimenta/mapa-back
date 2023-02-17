@@ -315,19 +315,13 @@ export class RouteService {
         employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
-          startsAt:
-            route.type === ETypeRoute.CONVENTIONAL
-              ? data.shift
-                ? getStartAtAndFinishAt(data.shift).startAt
-                : route.paths[0].startsAt
-              : data.startsAt ?? route.paths[0].startsAt,
-          startsReturnAt:
-            route.type === ETypeRoute.CONVENTIONAL
-              ? data.shift
-                ? getStartAtAndFinishAt(data.shift).finishAt
-                : route.paths[0].startsAt
-              : data.startsReturnAt ?? route.paths[0].startsAt,
-          duration: data.duration ?? route.paths[0].duration,
+          startsAt: route.type === ETypeRoute.CONVENTIONAL
+           ? data.shift ? getStartAtAndFinishAt(data.shift).startAt : route.paths[0].startsAt
+           : data.startsAt ?? route.paths[0].startsAt,
+          startsReturnAt: route.type === ETypeRoute.CONVENTIONAL
+          ? data.shift ? getStartAtAndFinishAt(data.shift).finishAt : route.paths[0].startsAt
+          : data.startsReturnAt ?? route.paths[0].startsAt, 
+           duration: data.duration ?? route.paths[0].duration,
           isAutoRoute: true,
         },
       });
@@ -352,7 +346,7 @@ export class RouteService {
                 : data.startsReturnAt
               : path.startsAt,
           };
-          console.log(newData);
+          console.log(newData)
           await this.pathService.update(path.id, newData);
         }
       }
