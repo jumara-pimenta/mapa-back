@@ -160,7 +160,7 @@ export class DriverController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile()
-    file: Express.Multer.File,
+    file: any,
   ) {
     return this.driverService.parseExcelFile(file);
   }

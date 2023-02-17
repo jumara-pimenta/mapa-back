@@ -16,6 +16,7 @@ export class Path {
   route?: Partial<Route>;
   createdAt: Date;
   updatedAt?: Date;
+  substituteId?: string;
 
   constructor(
     props: Omit<Path, 'id' | 'createdAt' | 'employeesOnPath' | 'route'>,

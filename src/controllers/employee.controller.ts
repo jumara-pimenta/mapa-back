@@ -34,7 +34,6 @@ import {
   UpdateEmployee,
 } from '../utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
 import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/employees')
@@ -61,7 +60,7 @@ export class EmployeeController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile()
-    file: Express.Multer.File,
+    file: any,
   ) {
     return this.employeeService.parseExcelFile(file);
   }
@@ -160,7 +159,4 @@ export class EmployeeController {
     });
     return await this.employeeService.exportsEmployeeFile(page, filters);
   }
-
-
-
 }
