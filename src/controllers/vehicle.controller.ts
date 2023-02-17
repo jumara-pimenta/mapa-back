@@ -162,7 +162,7 @@ export class VehicleController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile()
-    file: Express.Multer.File,
+    file: any,
   ) {
     return this.vehicleService.parseExcelFile(file);
   }
