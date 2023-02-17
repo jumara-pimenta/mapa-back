@@ -197,4 +197,19 @@ export class PathController {
   async finishPath(@Param('id') id: string): Promise<Path> {
     return await this.pathService.finishPath(id);
   }
+
+  @Get('/paths/get/all')
+  @Roles('list-path')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get all Paths.',
+    schema: {
+      type: 'object',
+      // example: GetPathByRoutes,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAll(): Promise<any[]> {
+    return await this.pathService.listAll();
+  }
 }

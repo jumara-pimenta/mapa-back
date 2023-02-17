@@ -28,7 +28,10 @@ import {
   ETypeShiftRotue,
 } from '../utils/ETypes';
 import { addHours, addMinutes } from 'date-fns';
-import { convertTimeToDate, getStartAtAndFinishAt } from '../utils/date.service';
+import {
+  convertTimeToDate,
+  getStartAtAndFinishAt,
+} from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
@@ -41,6 +44,7 @@ import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
 import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
+import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
 
 @Injectable()
 export class RouteService {
@@ -106,9 +110,9 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const startAndReturnAt = getStartAtAndFinishAt(payload.shift)
-    const initRouteDate = startAndReturnAt.startAt
-    const endRouteDate = startAndReturnAt.finishAt
+    const startAndReturnAt = getStartAtAndFinishAt(payload.shift);
+    const initRouteDate = startAndReturnAt.startAt;
+    const endRouteDate = startAndReturnAt.finishAt;
 
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
@@ -156,7 +160,11 @@ export class RouteService {
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened,
-      details: { ...payload.pathDetails, startsAt: initRouteDate, startsReturnAt: endRouteDate },
+      details: {
+        ...payload.pathDetails,
+        startsAt: initRouteDate,
+        startsReturnAt: endRouteDate,
+      },
     });
 
     const routeForUpdate = await this.routeRepository.findById(route.id);
@@ -265,6 +273,7 @@ export class RouteService {
 
     return route;
   }
+
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
@@ -328,10 +337,14 @@ export class RouteService {
           const newData = {
             duration: data.duration ?? path.duration,
             startsAt: isOneWay
-              ? data.shift ? getStartAtAndFinishAt(data.shift).startAt : data.startsAt
+              ? data.shift
+                ? getStartAtAndFinishAt(data.shift).startAt
+                : data.startsAt
               : isReturn
-                ? data.shift ? getStartAtAndFinishAt(data.shift).finishAt : data.startsReturnAt
-                : path.startsAt,
+              ? data.shift
+                ? getStartAtAndFinishAt(data.shift).finishAt
+                : data.startsReturnAt
+              : path.startsAt,
           };
           console.log(newData)
           await this.pathService.update(path.id, newData);
@@ -365,6 +378,15 @@ export class RouteService {
     );
 
     return await this.routeRepository.update(UpdateRoute);
+  }
+
+  async routeReplacementDriver(data: RouteReplacementDriverDTO): Promise<void> {
+    const route1 = await this.listById(data.routeId1);
+    const route2 = await this.listById(data.routeId2);
+
+    await this.update(route1.id, { driverId: route2.driver.id });
+
+    await this.update(route2.id, { driverId: route1.driver.id });
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
@@ -596,7 +618,11 @@ export class RouteService {
     };
   }
 
-  async driversInRoute(route: Route[], init: string, end: string): Promise<void> {
+  async driversInRoute(
+    route: Route[],
+    init: string,
+    end: string,
+  ): Promise<void> {
     route.forEach((route) => {
       route.path.forEach((path) => {
         const startedAtDate = convertTimeToDate(path.startsAt);
@@ -607,13 +633,19 @@ export class RouteService {
           durationTime.getHours(),
         );
 
-        if (convertTimeToDate(init) >= startedAtDate &&convertTimeToDate(init) <= finishedAtTime) {
+        if (
+          convertTimeToDate(init) >= startedAtDate &&
+          convertTimeToDate(init) <= finishedAtTime
+        ) {
           throw new HttpException(
             'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
-        if (convertTimeToDate(end) >= startedAtDate && convertTimeToDate(end) <= finishedAtTime) {
+        if (
+          convertTimeToDate(end) >= startedAtDate &&
+          convertTimeToDate(end) <= finishedAtTime
+        ) {
           throw new HttpException(
             'O motorista já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
@@ -739,7 +771,11 @@ export class RouteService {
     }
   }
 
-  async vehiclesInRoute(route: Route[], init: string, end: string): Promise<void> {
+  async vehiclesInRoute(
+    route: Route[],
+    init: string,
+    end: string,
+  ): Promise<void> {
     route.forEach((route) => {
       route.path.forEach((path) => {
         const startedAtDate = convertTimeToDate(path.startsAt);
@@ -750,13 +786,19 @@ export class RouteService {
           durationTime.getHours(),
         );
 
-        if (convertTimeToDate(init) >= startedAtDate && convertTimeToDate(init) <= finishedAtTime) {
+        if (
+          convertTimeToDate(init) >= startedAtDate &&
+          convertTimeToDate(init) <= finishedAtTime
+        ) {
           throw new HttpException(
             'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,
           );
         }
-        if (convertTimeToDate(end) >= startedAtDate && convertTimeToDate(end) <= finishedAtTime) {
+        if (
+          convertTimeToDate(end) >= startedAtDate &&
+          convertTimeToDate(end) <= finishedAtTime
+        ) {
           throw new HttpException(
             'O veículo já está em uma rota neste horário!',
             HttpStatus.CONFLICT,

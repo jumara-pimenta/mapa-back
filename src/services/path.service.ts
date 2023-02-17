@@ -47,7 +47,11 @@ export class PathService {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
     const vehicle = await this.vehicleService.listById(route.vehicle);
-    const driver = await this.driverService.listById(route.driver);
+    let driverId = path.substituteId;
+    const driver = await this.driverService.listById(
+      driverId ? driverId : route.driver,
+    );
+
     const sinister = await this.sinisterService.listByPathId(path.id);
     if (path.finishedAt !== null)
       throw new HttpException(
@@ -98,7 +102,8 @@ export class PathService {
       },
       path: {
         finishedAt: getDateInLocaleTime(new Date()),
-        status: EStatusPath.FINISHED,
+        status: EStatusPath.PENDING,
+        substituteId: null,
       },
     };
     path.status = EStatusPath.FINISHED;
@@ -350,6 +355,33 @@ export class PathService {
     return path;
   }
 
+  async listAll(): Promise<any[]> {
+    const paths = await this.pathRepository.findAll();
+
+    // const manyPath = await this.mapperMany(paths);
+    // add driver name and plate of vehicle
+    return paths.map((path: Path) => {
+      const { driver, vehicle } = path.route;
+      const { name, id } = driver;
+      const { plate } = vehicle;
+      let path1 = this.mapperOne(path);
+
+      return {
+        ...path1,
+        driver: {
+          id,
+          name,
+          plate,
+        },
+        route: {
+          id: path.route.id,
+          name: path.route.description,
+          type: path.route.type,
+        },
+      };
+    });
+  }
+
   async listEmployeesByPathAndPin(pathId: string): Promise<MappedPathPinsDTO> {
     const path = await this.listById(pathId);
     const routeId = await this.routeService.routeIdByPathId(pathId);
@@ -541,6 +573,20 @@ export class PathService {
       );
 
     return this.mapperOne(path);
+  }
+
+  async addSubstituteDriver(driverId: string, pathId: string): Promise<Path> {
+    const path = await this.listById(pathId);
+
+    const driver = await this.driverService.listById(driverId);
+
+    if (path.status === EStatusPath.IN_PROGRESS)
+      throw new HttpException(
+        'Não é possível adicionar um motorista substituto para um trajeto que já está em andamento!',
+        HttpStatus.METHOD_NOT_ALLOWED,
+      );
+
+    return await this.update(pathId, { substituteId: driverId });
   }
 
   private mapperOne(path: Path): MappedPathDTO {
