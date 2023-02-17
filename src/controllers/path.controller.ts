@@ -27,6 +27,7 @@ import {
   UpdatePathById,
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
+import { RouteMobile } from 'src/utils/Utils';
 
 @Controller('/api/routes')
 @ApiTags('Paths')
@@ -211,5 +212,20 @@ export class PathController {
   @HttpCode(HttpStatus.OK)
   async getAll(): Promise<any[]> {
     return await this.pathService.listAll();
+  }
+
+  @Get('mobile/:pathId')
+  @Roles('list-path')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get a Paths by id.',
+    schema: {
+      type: 'object',
+      // example: GetPathById,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getByIdMobile(@Param('pathId') pathId: string): Promise<RouteMobile> {
+    return await this.pathService.getRouteMobileById(pathId);
   }
 }

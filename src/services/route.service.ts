@@ -45,6 +45,7 @@ import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
+import { RouteMobile } from 'src/utils/Utils';
 
 @Injectable()
 export class RouteService {
@@ -1087,6 +1088,49 @@ export class RouteService {
     };
 
     return exportedPathToXLSX(route, workSheetName, workSheetPath, filePath);
+  }
+
+  async listAllMobile(
+    page: Page,
+    filters?: FiltersRouteDTO,
+    driverId?: string,
+  ): Promise<RouteMobile[]> {
+    const res = await this.listAll(page, filters);
+
+    const routes = res.items.map((route) => {
+      // check if path is Return, One Way or Round Trip
+      const pathType =
+        route.paths.length === 1 ? route.paths[0].type : 'Ida e Volta';
+
+      const time = () => {
+        if (pathType === 'Ida e Volta') {
+          if (route.paths[0].type === 'VOLTA')
+            return `${route.paths[1].startsAt} - ${route.paths[0].startsAt}`;
+          return `${route.paths[0].startsAt} - ${route.paths[1].startsAt}`;
+        }
+        return `${route.paths[0].startsAt}`;
+      };
+
+      return {
+        id: route.id,
+        description: route.description,
+        distance: route.distance,
+        driver: route.driver.name,
+        driverId: route.driver.id,
+        vehicle: route.vehicle.plate,
+        status: route.status,
+        pathType,
+        type: route.type,
+        time: time(),
+        duration: route.paths[0].duration,
+      };
+    });
+
+    // return routes without driver
+    if (driverId) {
+      return routes.filter((route) => route.driverId !== driverId);
+    }
+    return routes;
   }
 }
 
