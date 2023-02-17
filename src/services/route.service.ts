@@ -116,6 +116,9 @@ export class RouteService {
         'É necessário selecionar o turno da rota ao criar uma rota convencional.',
         HttpStatus.BAD_REQUEST,
       );
+    const startAndReturnAt = payload.shift
+      ? getStartAtAndFinishAt(payload.shift)
+      : null;
 
     if (payload.type === ETypeRoute.EXTRA) {
       if (
@@ -411,7 +414,6 @@ export class RouteService {
                 : data.startsReturnAt
               : path.startsAt,
           };
-          console.log(newData);
           await this.pathService.update(path.id, newData);
         }
       }
