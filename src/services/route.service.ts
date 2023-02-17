@@ -110,10 +110,32 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const startAndReturnAt = getStartAtAndFinishAt(payload.shift);
-    const initRouteDate = startAndReturnAt.startAt;
-    const endRouteDate = startAndReturnAt.finishAt;
+    if(payload.type === ETypeRoute.CONVENTIONAL && !payload.shift)
+    throw new HttpException(
+      'É necessário selecionar o turno da rota ao criar uma rota convencional.',
+      HttpStatus.BAD_REQUEST,
+    );
+   
+    if(payload.type === ETypeRoute.EXTRA )
+    { 
+      if(payload.pathDetails.type === ETypePath.ROUND_TRIP && (!payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt))
+      throw new HttpException(
+        'É necessário selecionar o horário de ida e volta da rota extra.',
+        HttpStatus.BAD_REQUEST,
+      );
+      if(payload.pathDetails.type === ETypePath.ONE_WAY && !payload.pathDetails.startsAt)
+      throw new HttpException(
+        'É necessário selecionar o horário de ida da rota extra.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const startAndReturnAt = payload.shift ? getStartAtAndFinishAt(payload.shift) : null
 
+
+    const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
+    const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
+    : payload.pathDetails.startsReturnAt ? payload.pathDetails.startsReturnAt : ''
+    console.log(initRouteDate, endRouteDate)
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
 
