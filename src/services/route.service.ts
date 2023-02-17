@@ -126,9 +126,6 @@ export class RouteService {
           'É necessário selecionar o turno da rota ao criar uma rota convencional.',
           HttpStatus.BAD_REQUEST,
         );
-      const startAndReturnAt = payload.shift
-        ? getStartAtAndFinishAt(payload.shift)
-        : null;
 
       if (payload.type === ETypeRoute.EXTRA) {
         if (
@@ -136,106 +133,121 @@ export class RouteService {
           (!payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt)
         )
           throw new HttpException(
-            'É necessário selecionar o horário de ida e volta da rota extra.',
+            'É necessário selecionar o turno da rota ao criar uma rota convencional.',
             HttpStatus.BAD_REQUEST,
           );
-        if (
-          payload.pathDetails.type === ETypePath.ONE_WAY &&
-          !payload.pathDetails.startsAt
-        )
-          throw new HttpException(
-            'É necessário selecionar o horário de ida da rota extra.',
-            HttpStatus.BAD_REQUEST,
-          );
+        const startAndReturnAt = payload.shift
+          ? getStartAtAndFinishAt(payload.shift)
+          : null;
+
+        if (payload.type === ETypeRoute.EXTRA) {
+          if (
+            payload.pathDetails.type === ETypePath.ROUND_TRIP &&
+            (!payload.pathDetails.startsAt ||
+              !payload.pathDetails.startsReturnAt)
+          )
+            throw new HttpException(
+              'É necessário selecionar o horário de ida e volta da rota extra.',
+              HttpStatus.BAD_REQUEST,
+            );
+          if (
+            payload.pathDetails.type === ETypePath.ONE_WAY &&
+            !payload.pathDetails.startsAt
+          )
+            throw new HttpException(
+              'É necessário selecionar o horário de ida da rota extra.',
+              HttpStatus.BAD_REQUEST,
+            );
+        }
+        ('');
+        const initRouteDate = startAndReturnAt
+          ? startAndReturnAt.startAt
+          : payload.pathDetails.startsAt;
+        const endRouteDate = startAndReturnAt
+          ? startAndReturnAt.finishAt
+          : payload.pathDetails.startsReturnAt
+          ? payload.pathDetails.startsReturnAt
+          : '';
+        console.log(initRouteDate, endRouteDate);
+        const driver = await this.driverService.listById(payload.driverId);
+        const vehicle = await this.vehicleService.listById(payload.vehicleId);
+
+        const employeesPins = await this.employeeService.listAllEmployeesPins(
+          payload.employeeIds,
+        );
+
+        await this.employeesInPins(employeesPins, payload.type);
+        const emplopyeeOrdened = orderPins(employeesPins);
+
+        const driverInRoute = await this.routeRepository.findByDriverId(
+          driver.id,
+        );
+
+        const employeeInRoute = await this.routeRepository.findByEmployeeIds(
+          payload.employeeIds,
+        );
+
+        const vehicleInRoute = await this.routeRepository.findByVehicleId(
+          vehicle.id,
+        );
+
+        await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
+
+        await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
+
+        await this.employeesInRoute(
+          employeeInRoute,
+          payload.type,
+          emplopyeeOrdened,
+          payload.pathDetails.type,
+        );
+
+        const props = new Route(
+          {
+            description: payload.description,
+            distance: 'EM PROCESSAMENTO',
+            status: EStatusRoute.PENDING,
+            type: payload.type,
+          },
+          driver,
+          vehicle,
+        );
+
+        const route = await this.routeRepository.create(props);
+        await this.pathService.generate({
+          routeId: route.id,
+          employeeIds: emplopyeeOrdened,
+          details: {
+            ...payload.pathDetails,
+            startsAt: initRouteDate,
+            startsReturnAt: endRouteDate,
+          },
+        });
+
+        const routeForUpdate = await this.routeRepository.findById(route.id);
+
+        const distanceLngLat = [];
+
+        routeForUpdate.path[0].employeesOnPath.map((e: EmployeesOnPath) => {
+          const lng = +e.employee.pins.at(0).pin.lng;
+          const lat = +e.employee.pins.at(0).pin.lat;
+          distanceLngLat.push([lng, lat]);
+        });
+
+        let resDistance = await this.mapBoxServiceIntegration.getDistance(
+          `${distanceLngLat.join(';')}?geometries=geojson&access_token=${
+            process.env.MAPS_BOX_API_KEY
+          }`,
+        );
+
+        const distance = resDistance.routes[0].distance / 1000;
+
+        const newRoute = await this.update(route.id, {
+          distance: distance.toFixed(2) + ' KM',
+        });
+
+        return newRoute;
       }
-      ('');
-      const initRouteDate = startAndReturnAt
-        ? startAndReturnAt.startAt
-        : payload.pathDetails.startsAt;
-      const endRouteDate = startAndReturnAt
-        ? startAndReturnAt.finishAt
-        : payload.pathDetails.startsReturnAt
-        ? payload.pathDetails.startsReturnAt
-        : '';
-      console.log(initRouteDate, endRouteDate);
-      const driver = await this.driverService.listById(payload.driverId);
-      const vehicle = await this.vehicleService.listById(payload.vehicleId);
-
-      const employeesPins = await this.employeeService.listAllEmployeesPins(
-        payload.employeeIds,
-      );
-
-      await this.employeesInPins(employeesPins, payload.type);
-      const emplopyeeOrdened = orderPins(employeesPins);
-
-      const driverInRoute = await this.routeRepository.findByDriverId(
-        driver.id,
-      );
-
-      const employeeInRoute = await this.routeRepository.findByEmployeeIds(
-        payload.employeeIds,
-      );
-
-      const vehicleInRoute = await this.routeRepository.findByVehicleId(
-        vehicle.id,
-      );
-
-      await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
-
-      await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
-
-      await this.employeesInRoute(
-        employeeInRoute,
-        payload.type,
-        emplopyeeOrdened,
-        payload.pathDetails.type,
-      );
-
-      const props = new Route(
-        {
-          description: payload.description,
-          distance: 'EM PROCESSAMENTO',
-          status: EStatusRoute.PENDING,
-          type: payload.type,
-        },
-        driver,
-        vehicle,
-      );
-
-      const route = await this.routeRepository.create(props);
-      await this.pathService.generate({
-        routeId: route.id,
-        employeeIds: emplopyeeOrdened,
-        details: {
-          ...payload.pathDetails,
-          startsAt: initRouteDate,
-          startsReturnAt: endRouteDate,
-        },
-      });
-
-      const routeForUpdate = await this.routeRepository.findById(route.id);
-
-      const distanceLngLat = [];
-
-      routeForUpdate.path[0].employeesOnPath.map((e: EmployeesOnPath) => {
-        const lng = +e.employee.pins.at(0).pin.lng;
-        const lat = +e.employee.pins.at(0).pin.lat;
-        distanceLngLat.push([lng, lat]);
-      });
-
-      let resDistance = await this.mapBoxServiceIntegration.getDistance(
-        `${distanceLngLat.join(';')}?geometries=geojson&access_token=${
-          process.env.MAPS_BOX_API_KEY
-        }`,
-      );
-
-      const distance = resDistance.routes[0].distance / 1000;
-
-      const newRoute = await this.update(route.id, {
-        distance: distance.toFixed(2) + ' KM',
-      });
-
-      return newRoute;
     }
   }
 
