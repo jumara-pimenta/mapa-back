@@ -100,7 +100,6 @@ export class RouteService {
           isAutoRoute: true,
         },
       });
-      ('');
     }
   }
 
