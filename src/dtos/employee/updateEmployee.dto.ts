@@ -31,7 +31,7 @@ export class UpdateEmployeeDTO {
   })
   @IsDateString(
     {},
-    { message: '[admission] A data de admissão deve ser do tipo date.' },
+    { message: '[admission] A data de admissão deve ser do tipo data.' },
   )
   @IsOptional()
   admission?: Date;
