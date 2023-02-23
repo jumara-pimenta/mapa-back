@@ -211,10 +211,7 @@ export class EmployeeService {
             HttpStatus.BAD_REQUEST,
           );
 
-        await this.employeeOnPinService.delete(
-          employee.id,
-          employee.pins[0].id,
-        );
+       
 
         await this.employeeOnPinService.associateEmployeeByService(
           data.pin.id,
@@ -225,7 +222,7 @@ export class EmployeeService {
 
         if (!title || !local || !details || !lat || !lng) {
           throw new HttpException(
-            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
+            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: título, local e detalhes.',
             HttpStatus.BAD_REQUEST,
           );
         }
