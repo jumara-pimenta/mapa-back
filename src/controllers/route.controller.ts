@@ -29,6 +29,7 @@ import {
 import { Roles } from 'src/decorators/roles.decorator';
 import { FilterRouteExport } from 'src/dtos/route/filterRouteExport';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
+import { RouteMobile } from 'src/utils/Utils';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
@@ -97,6 +98,25 @@ export class RouteController {
     @Query() filters: FiltersRouteDTO,
   ): Promise<PageResponse<MappedRouteDTO>> {
     return await this.routeService.listAll(page, filters);
+  }
+
+  @Get('mobile/:driverId/short')
+  @Roles('list-route')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List all routes.',
+    schema: {
+      type: 'object',
+      // example: ListRoutes,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAllMobile(
+    @Query() page: Page,
+    @Query() filters: FiltersRouteDTO,
+    @Param('driverId') driverId?: string,
+  ): Promise<RouteMobile[]> {
+    return await this.routeService.listAllMobile(page, filters, driverId);
   }
 
   @Get('/:id')

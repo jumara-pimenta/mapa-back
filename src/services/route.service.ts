@@ -45,6 +45,7 @@ import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
+import { RouteMobile } from 'src/utils/Utils';
 
 @Injectable()
 export class RouteService {
@@ -79,6 +80,7 @@ export class RouteService {
         pathDetails: {
           startsAt: '08:00',
           duration: '00:30',
+          startsReturnAt: '18:00',
           type: ETypePath.ROUND_TRIP,
           isAutoRoute: true,
         },
@@ -91,15 +93,14 @@ export class RouteService {
         employeeIds: employee.items.map((e) => e.id),
         type: ETypeRoute.EXTRA,
         shift: ETypeShiftRotue.SECOND,
-
         pathDetails: {
           startsAt: '06:00',
           duration: '00:30',
+          startsReturnAt: '18:00',
           type: ETypePath.ROUND_TRIP,
           isAutoRoute: true,
         },
       });
-      ('');
     }
   }
 
@@ -110,27 +111,45 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    if(payload.type === ETypeRoute.CONVENTIONAL && !payload.shift)
-    throw new HttpException(
-      'É necessário selecionar o turno da rota ao criar uma rota convencional.',
-      HttpStatus.BAD_REQUEST,
-    );
-   
-    if(payload.type === ETypeRoute.EXTRA )
-    { 
-      if(payload.pathDetails.type === ETypePath.ROUND_TRIP && (!payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt))
+    if (payload.type === ETypeRoute.CONVENTIONAL && !payload.shift)
       throw new HttpException(
-        'É necessário selecionar o horário de ida e volta da rota extra.',
+        'É necessário selecionar o turno da rota ao criar uma rota convencional.',
         HttpStatus.BAD_REQUEST,
       );
-      if(payload.pathDetails.type === ETypePath.ONE_WAY && !payload.pathDetails.startsAt)
-      throw new HttpException(
-        'É necessário selecionar o horário de ida da rota extra.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const startAndReturnAt = payload.shift ? getStartAtAndFinishAt(payload.shift) : null
 
+    if (payload.type === ETypeRoute.EXTRA) {
+      if (
+        payload.pathDetails.type === ETypePath.ROUND_TRIP &&
+        (!payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt)
+      )
+        throw new HttpException(
+          'É necessário selecionar o horário de ida e volta da rota extra.',
+          HttpStatus.BAD_REQUEST,
+        );
+
+      if (
+        payload.pathDetails.type === ETypePath.ONE_WAY &&
+        !payload.pathDetails.startsAt
+      )
+        throw new HttpException(
+          'É necessário selecionar o horário de ida da rota extra.',
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    const startAndReturnAt = payload.shift
+      ? getStartAtAndFinishAt(payload.shift)
+      : null;
+
+    const initRouteDate = startAndReturnAt
+      ? startAndReturnAt.startAt
+      : payload.pathDetails.startsAt;
+
+    const endRouteDate = startAndReturnAt
+      ? startAndReturnAt.finishAt
+      : payload.pathDetails.startsReturnAt
+      ? payload.pathDetails.startsReturnAt
+      : '';
 
     const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
     const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
@@ -337,13 +356,19 @@ export class RouteService {
         employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
-          startsAt: route.type === ETypeRoute.CONVENTIONAL
-           ? data.shift ? getStartAtAndFinishAt(data.shift).startAt : route.paths[0].startsAt
-           : data.startsAt ?? route.paths[0].startsAt,
-          startsReturnAt: route.type === ETypeRoute.CONVENTIONAL
-          ? data.shift ? getStartAtAndFinishAt(data.shift).finishAt : route.paths[0].startsAt
-          : data.startsReturnAt ?? route.paths[0].startsAt, 
-           duration: data.duration ?? route.paths[0].duration,
+          startsAt:
+            route.type === ETypeRoute.CONVENTIONAL
+              ? data.shift
+                ? getStartAtAndFinishAt(data.shift).startAt
+                : route.paths[0].startsAt
+              : data.startsAt ?? route.paths[0].startsAt,
+          startsReturnAt:
+            route.type === ETypeRoute.CONVENTIONAL
+              ? data.shift
+                ? getStartAtAndFinishAt(data.shift).finishAt
+                : route.paths[0].startsAt
+              : data.startsReturnAt ?? route.paths[0].startsAt,
+          duration: data.duration ?? route.paths[0].duration,
           isAutoRoute: true,
         },
       });
@@ -368,7 +393,6 @@ export class RouteService {
                 : data.startsReturnAt
               : path.startsAt,
           };
-          console.log(newData)
           await this.pathService.update(path.id, newData);
         }
       }
@@ -1109,6 +1133,49 @@ export class RouteService {
     };
 
     return exportedPathToXLSX(route, workSheetName, workSheetPath, filePath);
+  }
+
+  async listAllMobile(
+    page: Page,
+    filters?: FiltersRouteDTO,
+    driverId?: string,
+  ): Promise<RouteMobile[]> {
+    const res = await this.listAll(page, filters);
+
+    const routes = res.items.map((route) => {
+      // check if path is Return, One Way or Round Trip
+      const pathType =
+        route.paths.length === 1 ? route.paths[0].type : 'Ida e Volta';
+
+      const time = () => {
+        if (pathType === 'Ida e Volta') {
+          if (route.paths[0].type === 'VOLTA')
+            return `${route.paths[1].startsAt} - ${route.paths[0].startsAt}`;
+          return `${route.paths[0].startsAt} - ${route.paths[1].startsAt}`;
+        }
+        return `${route.paths[0].startsAt}`;
+      };
+
+      return {
+        id: route.id,
+        description: route.description,
+        distance: route.distance,
+        driver: route.driver.name,
+        driverId: route.driver.id,
+        vehicle: route.vehicle.plate,
+        status: route.status,
+        pathType,
+        type: route.type,
+        time: time(),
+        duration: route.paths[0].duration,
+      };
+    });
+
+    // return routes without driver
+    if (driverId) {
+      return routes.filter((route) => route.driverId !== driverId);
+    }
+    return routes;
   }
 }
 
