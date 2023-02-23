@@ -8,8 +8,8 @@ export class AssociateEmployeeOnPinDTO {
     type: 'UUID',
     description: 'Id do colaborador',
   })
-  @IsUUID('4', { message: 'ID do empregado não está definida como UUID.' })
-  @IsNotEmpty({ message: 'ID do empregado não pode receber um valor vazio.' })
+  @IsUUID('4', { message: 'ID do colaborador não está definida como UUID.' })
+  @IsNotEmpty({ message: 'ID do colaborador não pode receber um valor vazio.' })
   employeeId: string;
 
   @ApiProperty({
