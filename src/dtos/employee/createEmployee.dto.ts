@@ -6,10 +6,12 @@ import {
   IsDateString,
   ValidateNested,
   IsNumberString,
+  IsEnum,
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
 import { faker } from '@faker-js/faker';
+import { ETypeShiftRotue } from 'src/utils/ETypes';
 
 faker.locale = 'pt_BR';
 
@@ -26,7 +28,7 @@ export class CreateEmployeeDTO {
   @ApiProperty({ default: `${faker.date.past().toISOString()}` })
   @IsDateString(
     {},
-    { message: '[admission] A data de admissão deve ser do tipo date.' },
+    { message: '[admission] A data de admissão deve ser do tipo data.' },
   )
   @IsNotEmpty({
     message: '[admission] A data de admissão deve ser preenchida.',
@@ -45,15 +47,14 @@ export class CreateEmployeeDTO {
   name: string;
 
   @ApiProperty({
-    default: `${faker.random.numeric(1, {
-      allowLeadingZeros: false,
-      bannedDigits: ['0', '5', '6', '7', '8', '9'],
-    })}`,
+    description: 'Turno da rota',
+    default: 'PRIMEIRO',
+    enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO'],
   })
-  @IsString({ message: '[shift] O turno deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[shift] O turno deve ser preenchido.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  shift: string;
+  @IsEnum(ETypeShiftRotue, {
+    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO ou TERCEIRO.',
+  })
+  shift: ETypeShiftRotue;
 
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({

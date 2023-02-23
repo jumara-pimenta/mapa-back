@@ -7,10 +7,12 @@ import {
   IsNumberString,
   IsInt,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
 import { faker } from '@faker-js/faker';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
+import { ETypeShiftRotue } from 'src/utils/ETypes';
 
 faker.locale = 'pt_BR';
 
@@ -27,7 +29,7 @@ export class CreateEmployeeFileDTO {
   @IsNumberString(
     {},
     { message: '[registration] A matrícula deve ser do tipo string.' },
-  ) 
+  )
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   registration: string;
 
@@ -42,14 +44,16 @@ export class CreateEmployeeFileDTO {
   name: string;
 
   @ApiProperty({
-    default: `${faker.random.numeric(1, {
-      allowLeadingZeros: false,
-      bannedDigits: ['0', '5', '6', '7', '8', '9'],
-    })}`,
+    description: 'Turno da rota',
+    default: 'PRIMEIRO',
+    enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO'],
   })
-  shift: string;
+  @IsEnum(ETypeShiftRotue, {
+    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO ou TERCEIRO.',
+  })
+  shift: ETypeShiftRotue;
 
-  
+
 
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({

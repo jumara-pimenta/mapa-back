@@ -25,7 +25,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 import { json } from 'stream/consumers';
-import { convertToDate } from 'src/utils/date.service';
+import { convertToDate, getStartAtAndFinishAt } from 'src/utils/date.service';
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 
 const validateAsync = (schema: any): Promise<any> => {
@@ -50,11 +50,13 @@ export class EmployeeService {
     @Inject(forwardRef(() => PinService))
     private readonly pinService: PinService,
     @Inject('IGoogleApiServiceIntegration')
-    private readonly googleApiServiceIntegration: GoogleApiServiceIntegration
+    private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
   ) {}
 
-    async getLocation(address: string): Promise<any> {
-    const response = await this.googleApiServiceIntegration.getLocation(address);
+  async getLocation(address: string): Promise<any> {
+    const response = await this.googleApiServiceIntegration.getLocation(
+      address,
+    );
 
     return response;
   }
@@ -100,9 +102,13 @@ export class EmployeeService {
 
     const dataPassword = bcrypt.hashSync(props.registration, 10);
 
+    const getShift = getStartAtAndFinishAt(props.shift);
+    const shiftSchedule = `${getShift.startAt} às ${getShift.finishAt}`;
+
     const employee = await this.employeeRepository.create(
       new Employee({
         ...props,
+        shift: shiftSchedule,
         password: dataPassword,
         address: JSON.stringify(props.address),
       }),
@@ -205,10 +211,7 @@ export class EmployeeService {
             HttpStatus.BAD_REQUEST,
           );
 
-        await this.employeeOnPinService.delete(
-          employee.id,
-          employee.pins[0].id,
-        );
+       
 
         await this.employeeOnPinService.associateEmployeeByService(
           data.pin.id,
@@ -219,7 +222,7 @@ export class EmployeeService {
 
         if (!title || !local || !details || !lat || !lng) {
           throw new HttpException(
-            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
+            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: título, local e detalhes.',
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -331,11 +334,11 @@ export class EmployeeService {
       );
 
     const data: any = XLSX.utils.sheet_to_json(sheet);
-   
+
     const employees: abc[] = [];
 
     const pinDenso = await this.pinService.listByLocal('Denso LTDA ');
-    
+
     let line = 0;
     const messagesErrors = [];
 
@@ -350,18 +353,35 @@ export class EmployeeService {
         complement: row['Complemento'] ? row['Complemento'].toString() : '',
       };
 
-      const pin =  row['PONTO DE COLETA'] ? await this.getLocation(row['PONTO DE COLETA']) : null
+      const pin = row['PONTO DE COLETA']
+        ? await this.getLocation(row['PONTO DE COLETA'])
+        : null;
       const employee: CreateEmployeeFileDTO = {
-        name: row['Nome Colaborador']? row['Nome Colaborador'].toString() : '',
+        name: row['Nome Colaborador'] ? row['Nome Colaborador'].toString() : '',
         registration: row['Matricula'] ? row['Matricula'].toString() : '',
         role: row['Cargo'] ? row['Cargo'].toString() : '',
         shift: row['Turno'] ? row['Turno'].toString() : '',
-        costCenter: row['Centro de Custo'] ? row['Centro de Custo'].toString() : '',
+        costCenter: row['Centro de Custo']
+          ? row['Centro de Custo'].toString()
+          : '',
         address: address,
-        admission:  row['Admissão'] ? convertToDate(row['Admissão'].toString())  : new Date(),
-        pin: pin ?
-        {lat : pin.lat.toString(), lng: pin.lng.toString(), title: row['PONTO DE COLETA'] ? row['PONTO DE COLETA'].toString() : '', local: row['PONTO DE COLETA'] ? row['PONTO DE COLETA'].toString() : '', details: row['Referencia'] ? row['Referencia'].toString() : '', typeCreation: ETypeCreationPin.IS_NEW}
-        : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
+        admission: row['Admissão']
+          ? convertToDate(row['Admissão'].toString())
+          : new Date(),
+        pin: pin
+          ? {
+              lat: pin.lat.toString(),
+              lng: pin.lng.toString(),
+              title: row['PONTO DE COLETA']
+                ? row['PONTO DE COLETA'].toString()
+                : '',
+              local: row['PONTO DE COLETA']
+                ? row['PONTO DE COLETA'].toString()
+                : '',
+              details: row['Referencia'] ? row['Referencia'].toString() : '',
+              typeCreation: ETypeCreationPin.IS_NEW,
+            }
+          : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
 
       line++;
@@ -377,44 +397,44 @@ export class EmployeeService {
       const lineE = item.line;
       const errorsTest = await validateAsync(employeeSchema);
       const [teste] = errorsTest;
-      if(errorsTest.length>0){
-      messagesErrors.push({
-        line: lineE,
-        // field: errorsTest,
-        meesage: teste,
-      });
-      const testew = messagesErrors.map((i) => {
-        return{property: i.meesage, line : i.line};
-      });
+      if (errorsTest.length > 0) {
+        messagesErrors.push({
+          line: lineE,
+          // field: errorsTest,
+          meesage: teste,
+        });
+        const testew = messagesErrors.map((i) => {
+          return { property: i.meesage, line: i.line };
+        });
 
-      aa = testew.map((i) => 
-      [
-        
-        {
-          field: i?.property.property,
-          message: i?.property.constraints,
-          linha : i.line+1
-        },
-      ]
-      );
+        aa = testew.map((i) => [
+          {
+            field: i?.property.property,
+            message: i?.property.constraints,
+            linha: i.line + 1,
+          },
+        ]);
 
-       result = aa
+        result = aa;
       }
-      
+
       if (!errorsTest.length) {
         const existsRegistration =
           await this.employeeRepository.findByRegistration(
             item.employee.registration,
           );
-          
+
         if (!existsRegistration) {
-          const pin = item.employee.pin.title != 'Denso' ? await this.pinService.create({
-            title: item.employee.pin.title,
-            local: item.employee.pin.local,
-            details: item.employee.pin.details,
-            lat: item.employee.pin.lat.toString(),
-            lng: item.employee.pin.lng.toString(),
-          }) : null;
+          const pin =
+            item.employee.pin.title != 'Denso'
+              ? await this.pinService.create({
+                  title: item.employee.pin.title,
+                  local: item.employee.pin.local,
+                  details: item.employee.pin.details,
+                  lat: item.employee.pin.lat.toString(),
+                  lng: item.employee.pin.lng.toString(),
+                })
+              : null;
           await this.employeeRepository.create(
             new Employee(
               {
@@ -427,7 +447,7 @@ export class EmployeeService {
                 role: item.employee.role,
                 shift: item.employee.shift,
               },
-              pin ?? pinDenso
+              pin ?? pinDenso,
             ),
           );
           totalCreated++;
@@ -442,7 +462,6 @@ export class EmployeeService {
       errors: result,
     };
 
-    
     return errors;
   }
 

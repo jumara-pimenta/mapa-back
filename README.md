@@ -334,7 +334,7 @@ node --version
 
 - Instalar Docker-compose versão 1.29.2 LTS (ou versão superior LTS)
 
-  - https://docs.docker.com/compose/install/ <br /><br />
+  - https://docs.docker.com/compoexamplese/install/ <br /><br />
 
 - Instalar Build Essentials versão GNU Make 4.2.1 LTS (ou versão superior LTS) para rodar os comandos Make.
   - sudo apt install build-essential <br /><br />

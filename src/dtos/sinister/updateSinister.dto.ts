@@ -9,9 +9,9 @@ export class UpdateSinisterDTO {
     description: 'Ocorrência de sinistro',
   })
   @IsString({
-    message: '[type] O campo TYPE deve ser do tipo string.',
+    message: '[type] O campo tipo deve ser do tipo string.',
   })
-  @IsNotEmpty({ message: '[type] O campo TYPE deve ser preenchido.' })
+  @IsNotEmpty({ message: '[type] O campo tipo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   type?: string;
 
@@ -21,10 +21,10 @@ export class UpdateSinisterDTO {
     description: 'Descrição de como ocorreu o sinistro',
   })
   @IsString({
-    message: '[description] O campo DESCRIPTION deve ser do tipo string.',
+    message: '[description] O campo descrição deve ser do tipo string.',
   })
   @IsNotEmpty({
-    message: '[description] O campo DESCRIPTION deve ser preenchido.',
+    message: '[description] O campo descrição deve ser preenchido.',
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description?: string;

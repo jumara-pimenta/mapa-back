@@ -48,6 +48,7 @@ CREATE TABLE [dbo].[Path] (
     [routeId] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIMEOFFSET NOT NULL CONSTRAINT [Path_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIMEOFFSET,
+    [substituteId] VARCHAR(255),
     CONSTRAINT [Path_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Path_id_key] UNIQUE NONCLUSTERED ([id])
 );

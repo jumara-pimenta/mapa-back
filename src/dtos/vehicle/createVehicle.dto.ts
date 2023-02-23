@@ -47,7 +47,7 @@ export class CreateVehicleDTO {
   })
   @IsDateString(
     {},
-    { message: '[lastSurvey] A última vistoria deve ser do tipo date.' },
+    { message: '[lastSurvey] A última vistoria deve ser do tipo data.' },
   )
   @IsNotEmpty({
     message: '[lastSurvey] A última vistoria deve ser preenchida.',
@@ -61,7 +61,7 @@ export class CreateVehicleDTO {
   })
   @IsDateString(
     {},
-    { message: '[expiration] A expiração deve ser do tipo date.' },
+    { message: '[expiration] A expiração deve ser do tipo data.' },
   )
   @IsNotEmpty({ message: '[expiration] A expiração deve ser preenchida.' })
   expiration: string;
@@ -69,7 +69,7 @@ export class CreateVehicleDTO {
   @ApiProperty({ default: 28, description: 'Capacidade do veículo' })
   @IsNumber(
     { allowInfinity: true },
-    { message: '[capacity] A capacidade deve ser do tipo number.' },
+    { message: '[capacity] A capacidade deve ser do tipo número.' },
   )
   @IsNotEmpty({ message: '[capacity] A capacidade deve ser preenchida.' })
   capacity: number;
@@ -91,7 +91,7 @@ export class CreateVehicleDTO {
   })
   @IsDateString(
     {},
-    { message: '[lastMaintenance] A última manutenção deve ser do tipo date.' },
+    { message: '[lastMaintenance] A última manutenção deve ser do tipo data.' },
   )
   @IsNotEmpty({
     message: '[lastMaintenance] A última manutenção deve ser preenchida.',
