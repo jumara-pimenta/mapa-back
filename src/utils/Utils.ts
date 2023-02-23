@@ -50,3 +50,16 @@ export const verifyReportDirectory = async (): Promise<void> => {
     }
   });
 };
+
+export type RouteMobile = {
+  id: string;
+  description: string;
+  distance: string;
+  driver: string;
+  vehicle: string;
+  status: string;
+  pathType: string;
+  type: string;
+  time: string;
+  duration: string;
+};

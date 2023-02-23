@@ -27,8 +27,8 @@
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "^9.2.1",
     "@nestjs/jwt": "^10.0.1",
-    "@nestjs/platform-socket.io": "^9.2.0",
     "@nestjs/platform-express": "9.2.1",
+    "@nestjs/platform-socket.io": "^9.2.0",
     "@nestjs/swagger": "^6.1.4",
     "@nestjs/websockets": "^9.2.0",
     "@prisma/client": "4.9.0",
@@ -52,7 +52,8 @@
     "rxjs": "7.8.0",
     "source-map-support": "^0.5.21",
     "uuid": "9.0.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@commitlint/cli": "17.4.2",
