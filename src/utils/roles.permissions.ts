@@ -27,7 +27,7 @@ export const setPermissions = (roles: ERoles) => {
       'create-vehicle',
       'edit-vehicle',
       'delete-vehicle',
-      'import-vehicle',
+      'import-vehicles',
       'create-route',
       'edit-route',
       'delete-route',
