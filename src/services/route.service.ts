@@ -151,6 +151,10 @@ export class RouteService {
       ? payload.pathDetails.startsReturnAt
       : '';
 
+    const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
+    const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
+    : payload.pathDetails.startsReturnAt ? payload.pathDetails.startsReturnAt : ''
+    console.log(initRouteDate, endRouteDate)
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
 
