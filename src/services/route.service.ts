@@ -141,16 +141,6 @@ export class RouteService {
       ? getStartAtAndFinishAt(payload.shift)
       : null;
 
-    const initRouteDate = startAndReturnAt
-      ? startAndReturnAt.startAt
-      : payload.pathDetails.startsAt;
-
-    const endRouteDate = startAndReturnAt
-      ? startAndReturnAt.finishAt
-      : payload.pathDetails.startsReturnAt
-      ? payload.pathDetails.startsReturnAt
-      : '';
-
     const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
     const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
     : payload.pathDetails.startsReturnAt ? payload.pathDetails.startsReturnAt : ''
