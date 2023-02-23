@@ -29,7 +29,7 @@ export class CreateEmployeeFileDTO {
   @IsNumberString(
     {},
     { message: '[registration] A matrícula deve ser do tipo string.' },
-  ) 
+  )
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   registration: string;
 
@@ -53,7 +53,7 @@ export class CreateEmployeeFileDTO {
   })
   shift: ETypeShiftRotue;
 
-  
+
 
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({

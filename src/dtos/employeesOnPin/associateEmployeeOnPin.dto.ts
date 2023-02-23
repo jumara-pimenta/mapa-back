@@ -8,8 +8,8 @@ export class AssociateEmployeeOnPinDTO {
     type: 'UUID',
     description: 'Id do colaborador',
   })
-  @IsUUID('4', { message: 'EmployeeId não está definida como UUID.' })
-  @IsNotEmpty({ message: 'EmployeeId não pode receber um valor vazio.' })
+  @IsUUID('4', { message: 'ID do empregado não está definida como UUID.' })
+  @IsNotEmpty({ message: 'ID do empregado não pode receber um valor vazio.' })
   employeeId: string;
 
   @ApiProperty({
@@ -17,8 +17,8 @@ export class AssociateEmployeeOnPinDTO {
     type: 'UUID',
     description: 'Id do ponto de embarque',
   })
-  @IsUUID('4', { message: '[pinId] o pinId deve ser um UUID.' })
-  @IsNotEmpty({ message: '[pinId] o pinId deve ser preenchido' })
+  @IsUUID('4', { message: '[pinId] o Id do ponto de embarque deve ser um UUID.' })
+  @IsNotEmpty({ message: '[pinId] o Id do ponto de embarque deve ser preenchido' })
   pinId: string;
 
   @ApiProperty({
