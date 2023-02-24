@@ -9,9 +9,9 @@ export class CreateDriverDTO {
     description: 'Nome do motorista',
   })
   @IsString({
-    message: '[name] O campo NAME deve ser do tipo string.',
+    message: '[name] O campo nome deve ser do tipo string.',
   })
-  @IsNotEmpty({ message: '[name] O campo NAME deve ser preenchido.' })
+  @IsNotEmpty({ message: '[name] O campo nome deve ser preenchido.' })
   @Length(10, 255, {
     message: '[name] O nome deve possuir no mínimo 10 caracteres.',
   })
@@ -47,7 +47,7 @@ export class CreateDriverDTO {
   @IsDateString(
     {},
     {
-      message: '[validation] A validade deve ser do tipo date.',
+      message: '[validation] A validade deve ser do tipo data.',
     },
   )
   @ApiProperty({ default: new Date(), example: new Date() })
@@ -61,8 +61,8 @@ export class CreateDriverDTO {
     example: 'AB',
     description: 'Categoria da CNH do motorista',
   })
-  @IsString({ message: '[category] O campo CATEGORY deve ser do tipo string.' })
-  @IsNotEmpty({ message: '[category] O campo CATEGORY deve ser preenchido.' })
+  @IsString({ message: '[category] O campo categoria deve ser do tipo string.' })
+  @IsNotEmpty({ message: '[category] O campo categoria deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @Length(1, 2)
   category: string;

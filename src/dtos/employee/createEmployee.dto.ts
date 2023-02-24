@@ -28,7 +28,7 @@ export class CreateEmployeeDTO {
   @ApiProperty({ default: `${faker.date.past().toISOString()}` })
   @IsDateString(
     {},
-    { message: '[admission] A data de admissão deve ser do tipo date.' },
+    { message: '[admission] A data de admissão deve ser do tipo data.' },
   )
   @IsNotEmpty({
     message: '[admission] A data de admissão deve ser preenchida.',

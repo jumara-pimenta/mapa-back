@@ -63,7 +63,7 @@ export class CreateVehicleFileDTO {
   @IsNotEmpty({ message: '[capacity] A capacidade deve ser preenchida.' })
   @IsNumber(
     { allowInfinity: true },
-    { message: '[capacity] A capacidade deve ser do tipo number.' },
+    { message: '[capacity] A capacidade deve ser do tipo número.' },
   )
   @Min(0, { message: '[capacity] A capacidade deve ser de no mínimo 0' })
   @Max(32, { message: '[capacity] A capacidade deve ser de no máximo 32' })

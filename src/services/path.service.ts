@@ -23,6 +23,7 @@ import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { SinisterService } from './sinister.service';
+import { RouteMobile } from 'src/utils/Utils';
 
 @Injectable()
 export class PathService {
@@ -586,6 +587,40 @@ export class PathService {
       );
 
     return await this.update(pathId, { substituteId: driverId });
+  }
+
+  async getRouteMobileById(pathId: string): Promise<RouteMobile> {
+    const path = await this.pathRepository.findById(pathId);
+
+    if (!path)
+      throw new HttpException('Trajeto não encontrado!', HttpStatus.NOT_FOUND);
+
+    const route = await this.routeService.listById(path.route.id);
+
+    const pathType =
+      route.paths.length === 1 ? route.paths[0].type : 'Ida e Volta';
+
+    const time = () => {
+      if (pathType === 'Ida e Volta') {
+        if (route.paths[0].type === 'VOLTA')
+          return `${route.paths[1].startsAt} - ${route.paths[0].startsAt}`;
+        return `${route.paths[0].startsAt} - ${route.paths[1].startsAt}`;
+      }
+      return `${route.paths[0].startsAt}`;
+    };
+
+    return {
+      id: route.id,
+      description: route.description,
+      distance: route.distance,
+      vehicle: route.vehicle.plate,
+      driver: route.driver.name,
+      status: route.status,
+      type: route.type,
+      pathType,
+      time: time(),
+      duration: path.duration,
+    };
   }
 
   private mapperOne(path: Path): MappedPathDTO {

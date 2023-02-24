@@ -31,7 +31,6 @@ export class EmployeeRepository
     const dataAdmission = data.admission
       ? getDateInLocaleTime(new Date(data.admission))
       : undefined;
-    console.log(dataAdmission);
     return this.repository.employee.update({
       data: {
         id: data.id!,

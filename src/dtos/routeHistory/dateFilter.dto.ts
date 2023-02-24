@@ -19,14 +19,14 @@ export class DateFilterDTO {
   })
   @IsEnum(ETypePeriodHistory, {
     message:
-      '[period] O PERIOD tem que ser do tipo: SEMANAL, QUINZENAL Ou MENSAL',
+      '[period] O período tem que ser do tipo: SEMANAL, QUINZENAL Ou MENSAL',
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty({
-    message: '[period] O PERIOD não pode ser vazio.',
+    message: '[period] O período não pode ser vazio.',
   })
   @IsDefined({
-    message: '[period] O PERIOD tem que ser definido.',
+    message: '[period] O período tem que ser definido.',
   })
   period: ETypePeriodHistory;
 }

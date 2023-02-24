@@ -63,3 +63,15 @@ export function getShift(shift : string) : ETypeShiftEmployee {
     if(shift === 'Sem Turno Estabelecido')
     return ETypeShiftEmployee.NOT_DEFINED
   }
+export type RouteMobile = {
+  id: string;
+  description: string;
+  distance: string;
+  driver: string;
+  vehicle: string;
+  status: string;
+  pathType: string;
+  type: string;
+  time: string;
+  duration: string;
+};

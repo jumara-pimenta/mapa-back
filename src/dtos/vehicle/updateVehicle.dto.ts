@@ -32,7 +32,7 @@ export class UpdateVehicleDTO {
   @ApiProperty({ description: 'Data da última vistoria do veículo' })
   @IsDateString(
     {},
-    { message: '[lastSurvey] A última vistoria deve ser do tipo date.' },
+    { message: '[lastSurvey] A última vistoria deve ser do tipo data.' },
   )
   @IsOptional()
   lastSurvey?: Date;
@@ -40,7 +40,7 @@ export class UpdateVehicleDTO {
   @ApiProperty({ description: 'Data de expiração da vistoria do veículo' })
   @IsDateString(
     {},
-    { message: '[expiration] A expiração deve ser do tipo date.' },
+    { message: '[expiration] A expiração deve ser do tipo data.' },
   )
   @IsOptional()
   expiration?: Date;
@@ -48,7 +48,7 @@ export class UpdateVehicleDTO {
   @ApiProperty({ description: 'Capacidade do veículo' })
   @IsNumber(
     { allowInfinity: true },
-    { message: '[capacity] A capacidade deve ser do tipo number.' },
+    { message: '[capacity] A capacidade deve ser do tipo número.' },
   )
   @IsOptional()
   capacity?: number;
@@ -65,7 +65,7 @@ export class UpdateVehicleDTO {
   @ApiProperty({ description: 'Data da última manutenção do veículo' })
   @IsDateString(
     {},
-    { message: '[lastMaintenance] A última manutenção deve ser do tipo date.' },
+    { message: '[lastMaintenance] A última manutenção deve ser do tipo data.' },
   )
   @IsOptional()
   lastMaintenance?: Date;

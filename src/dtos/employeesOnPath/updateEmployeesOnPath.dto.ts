@@ -12,7 +12,7 @@ export class UpdateEmployeesOnPathDTO {
   @ApiProperty({ description: 'Data/hora do embarque' })
   @IsDateString(
     {},
-    { message: '[boardingAt] A data/hora do embarque deve ser do tipo date.' },
+    { message: '[boardingAt] A data/hora do embarque deve ser do tipo data.' },
   )
   @IsOptional()
   boardingAt?: Date;
@@ -22,7 +22,7 @@ export class UpdateEmployeesOnPathDTO {
     {},
     {
       message:
-        '[disembarkAt] A data/hora do desembarque deve ser do tipo date.',
+        '[disembarkAt] A data/hora do desembarque deve ser do tipo data.',
     },
   )
   @IsOptional()

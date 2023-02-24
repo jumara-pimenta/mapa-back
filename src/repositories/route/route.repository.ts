@@ -9,8 +9,7 @@ import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
-import { Console } from 'console';
-import { Path } from 'src/entities/path.entity';
+
 import { ETypeRouteExport } from 'src/utils/ETypes';
 
 @Injectable()

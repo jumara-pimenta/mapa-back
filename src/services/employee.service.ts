@@ -218,21 +218,19 @@ export class EmployeeService {
             HttpStatus.BAD_REQUEST,
           );
 
-        await this.employeeOnPinService.delete(
-          employee.id,
-          employee.pins[0].id,
-        );
+       
 
         await this.employeeOnPinService.associateEmployeeByService(
           data.pin.id,
           employee,
         );
-      } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
+      } 
+     if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
         const { title, local, details, lat, lng } = data.pin;
 
         if (!title || !local || !details || !lat || !lng) {
           throw new HttpException(
-            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: title, local, details, lat, lng',
+            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: título, local e detalhes.',
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -244,10 +242,7 @@ export class EmployeeService {
           lat,
           lng,
         });
-        await this.employeeOnPinService.delete(
-          employee.id,
-          employee.pins[0].id,
-        );
+
         await this.employeeOnPinService.associateEmployeeByService(
           pin.id,
           employee,
