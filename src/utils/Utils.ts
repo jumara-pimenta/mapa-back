@@ -4,6 +4,7 @@ import { unlink } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
+import { ETypeShiftEmployee } from './ETypes';
 
 export const pipelineAsync = promisify(pipeline);
 const uploadDirectory = path.join(process.cwd(), 'tmp', 'reports');
@@ -50,3 +51,15 @@ export const verifyReportDirectory = async (): Promise<void> => {
     }
   });
 };
+
+
+export function getShift(shift : string) : ETypeShiftEmployee {
+  if(shift === '1')
+    return ETypeShiftEmployee.FIRST
+    if(shift === '2')
+    return ETypeShiftEmployee.SECOND
+    if(shift === '3')
+    return ETypeShiftEmployee.THIRD
+    if(shift === 'Sem Turno Estabelecido')
+    return ETypeShiftEmployee.NOT_DEFINED
+  }

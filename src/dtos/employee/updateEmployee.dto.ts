@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
 import {
   IsDateString,
+  IsEnum,
   IsOptional,
   IsString,
   ValidateNested,
@@ -9,6 +10,7 @@ import {
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
 import { faker } from '@faker-js/faker';
+import { ETypeShiftEmployee } from 'src/utils/ETypes';
 
 faker.locale = 'pt_BR';
 
@@ -66,10 +68,12 @@ export class UpdateEmployeeDTO {
     })}`,
     description: 'Turno de trabalho do colaborador',
   })
-  @IsString({ message: '[shift]  o turno deve ser do tipo string.' })
+  @IsEnum(ETypeShiftEmployee, {
+    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
+  })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  shift?: string;
+  shift?: ETypeShiftEmployee;
 
   @ApiProperty({
     required: false,

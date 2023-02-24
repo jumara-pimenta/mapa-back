@@ -11,7 +11,7 @@ import {
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
 import { faker } from '@faker-js/faker';
-import { ETypeShiftRotue } from 'src/utils/ETypes';
+import { ETypeShiftEmployee } from 'src/utils/ETypes';
 
 faker.locale = 'pt_BR';
 
@@ -49,12 +49,12 @@ export class CreateEmployeeDTO {
   @ApiProperty({
     description: 'Turno da rota',
     default: 'PRIMEIRO',
-    enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO'],
+    enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO', 'SEM TURNO ESTABELECIDO'],
   })
-  @IsEnum(ETypeShiftRotue, {
-    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO ou TERCEIRO.',
+  @IsEnum(ETypeShiftEmployee, {
+    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
   })
-  shift: ETypeShiftRotue;
+  shift: ETypeShiftEmployee;
 
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({
