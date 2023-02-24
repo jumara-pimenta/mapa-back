@@ -217,7 +217,8 @@ export class EmployeeService {
           data.pin.id,
           employee,
         );
-      } else if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
+      } 
+     if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
         const { title, local, details, lat, lng } = data.pin;
 
         if (!title || !local || !details || !lat || !lng) {
@@ -234,10 +235,7 @@ export class EmployeeService {
           lat,
           lng,
         });
-        await this.employeeOnPinService.delete(
-          employee.id,
-          employee.pins[0].id,
-        );
+
         await this.employeeOnPinService.associateEmployeeByService(
           pin.id,
           employee,

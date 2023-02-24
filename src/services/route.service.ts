@@ -144,7 +144,6 @@ export class RouteService {
     const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
     const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
     : payload.pathDetails.startsReturnAt ? payload.pathDetails.startsReturnAt : ''
-    console.log(initRouteDate, endRouteDate)
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
 
@@ -153,8 +152,11 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
+
+
     const emplopyeeOrdened = orderPins(employeesPins);
 
+  
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(
@@ -1204,7 +1206,6 @@ const orderPins = (arr: Employee[]): string[] => {
           newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lng.trim(),
         ).toFixed(5),
       );
-
       const fromPoint = turf.point([long, lat]);
       const fromPointAhead = turf.point([longPointAhead, latPointAhead]);
 
