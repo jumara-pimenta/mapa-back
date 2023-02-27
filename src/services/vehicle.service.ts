@@ -278,7 +278,7 @@ export class VehicleService {
         if (!existsPlate && !existsRenavam) {
           await this.vehicleRepository.create(
             new Vehicle({
-              plate: JSON.stringify(item.vehicle.plate),
+              plate: item.vehicle.plate,
               company: item.vehicle.company,
               type: item.vehicle.type,
               lastSurvey: item.vehicle.lastSurvey,
