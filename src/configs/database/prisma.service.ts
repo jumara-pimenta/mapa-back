@@ -120,7 +120,7 @@ export class PrismaService
           password: await bcrypt.hash('Denso', 10),
           admission: faker.date.past(),
           role: faker.company.name(),
-          shift: '7:30 às 17:30',
+          shift: '07:30 às 17:30',
           id: uuid(),
           createdAt: getDateInLocaleTime(new Date()),
         });
