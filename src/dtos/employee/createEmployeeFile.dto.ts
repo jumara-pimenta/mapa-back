@@ -12,7 +12,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
-import { ETypeShiftRotue } from 'src/utils/ETypes';
+import { ETypeShiftEmployee } from 'src/utils/ETypes';
 
 faker.locale = 'pt_BR';
 
@@ -48,10 +48,10 @@ export class CreateEmployeeFileDTO {
     default: 'PRIMEIRO',
     enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO'],
   })
-  @IsEnum(ETypeShiftRotue, {
-    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO ou TERCEIRO.',
+  @IsEnum(ETypeShiftEmployee, {
+    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
   })
-  shift: ETypeShiftRotue;
+  shift: ETypeShiftEmployee;
 
 
 

@@ -57,6 +57,13 @@ export enum ETypeShiftRotue {
   SECOND = 'SEGUNDO',
   THIRD = 'TERCEIRO',
 }
+
+export enum ETypeShiftEmployee {
+  FIRST = 'PRIMEIRO',
+  SECOND = 'SEGUNDO',
+  THIRD = 'TERCEIRO',
+  NOT_DEFINED = 'SEM TURNO ESTABELECIDO',
+}
 export enum ETypeCategoryDrivers {
   C = 'C',
   D = 'D',

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
-import { ETypeShiftRotue } from './ETypes';
+import { ETypeShiftEmployee, ETypeShiftRotue } from './ETypes';
 import {
   dateInFormatOneRgx,
   dateInFormatThreeRgx,
@@ -125,3 +125,17 @@ export function convertTimeToDate(hour: string): Date {
     if(type === ETypeShiftRotue.THIRD)
         return {startAt : '03:30', finishAt : '12:00'}
  }
+
+
+
+ export function getStartAtAndFinishEmployee(type : ETypeShiftEmployee) : startAndFinishAt | null {
+  if(type === ETypeShiftEmployee.FIRST)
+      return {startAt : '07:30', finishAt : '17:30'}
+  if(type === ETypeShiftEmployee.SECOND)
+      return {startAt : '17:30', finishAt : '02:30'}
+  if(type === ETypeShiftEmployee.THIRD)
+      return {startAt : '03:30', finishAt : '12:00'}
+  if(type === ETypeShiftEmployee.NOT_DEFINED)        
+      return  null
+}
+

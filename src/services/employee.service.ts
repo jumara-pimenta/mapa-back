@@ -16,7 +16,7 @@ import { CreateEmployeeFileDTO } from '../dtos/employee/createEmployeeFile.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
-import { ETypeCreationPin, ETypeEditionPin, ETypePin } from '../utils/ETypes';
+import { ETypeCreationPin, ETypeEditionPin, ETypePin, ETypeShiftEmployee } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
@@ -25,8 +25,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 import { json } from 'stream/consumers';
-import { convertToDate, getStartAtAndFinishAt } from 'src/utils/date.service';
+import { convertToDate, getStartAtAndFinishAt, getStartAtAndFinishEmployee } from 'src/utils/date.service';
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
+import { getShift } from 'src/utils/Utils';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -102,8 +103,14 @@ export class EmployeeService {
 
     const dataPassword = bcrypt.hashSync(props.registration, 10);
 
-    const getShift = getStartAtAndFinishAt(props.shift);
-    const shiftSchedule = `${getShift.startAt} às ${getShift.finishAt}`;
+    const getShift = getStartAtAndFinishEmployee(props.shift);
+
+      let shiftSchedule: string;
+      
+      if(!getShift) 
+        shiftSchedule  = `${ETypeShiftEmployee.NOT_DEFINED}`;
+      if(getShift) 
+       shiftSchedule =  `${getShift.startAt} às ${getShift.finishAt}`;
 
     const employee = await this.employeeRepository.create(
       new Employee({
@@ -240,8 +247,16 @@ export class EmployeeService {
           pin.id,
           employee,
         );
-      }
+      } 
     }
+
+    const getShiftUpdate = getStartAtAndFinishEmployee(data.shift);
+    let shiftScheduleUpdate: string;
+       
+      if(!getShiftUpdate) 
+      shiftScheduleUpdate  = `${ETypeShiftEmployee.NOT_DEFINED}`;
+      if(getShiftUpdate) 
+      shiftScheduleUpdate =  `${getShiftUpdate.startAt} às ${getShiftUpdate.finishAt}`;
 
     const address = JSON.stringify(data?.address);
 
@@ -256,13 +271,13 @@ export class EmployeeService {
         name: employeeDataUpdated?.name,
         registration: employeeDataUpdated?.registration,
         role: employeeDataUpdated?.role,
-        shift: employeeDataUpdated?.shift,
+        shift: shiftScheduleUpdate,
       }),
     );
-
+    
     return this.mapperOne(updatedEmployee);
   }
-
+   
   async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
     return await this.employeeRepository.findByIds(ids);
   }
@@ -358,7 +373,7 @@ export class EmployeeService {
         name: row['Nome Colaborador'] ? row['Nome Colaborador'].toString() : '',
         registration: row['Matricula'] ? row['Matricula'].toString() : '',
         role: row['Cargo'] ? row['Cargo'].toString() : '',
-        shift: row['Turno'] ? row['Turno'].toString() : '',
+         shift: row['Turno'] ? getShift(row['Turno'].toString() ) : ETypeShiftEmployee.NOT_DEFINED,
         costCenter: row['Centro de Custo']
           ? row['Centro de Custo'].toString()
           : '',
@@ -381,7 +396,7 @@ export class EmployeeService {
             }
           : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
-
+      
       line++;
       employees.push({ line, employee });
     }
@@ -433,6 +448,16 @@ export class EmployeeService {
                   lng: item.employee.pin.lng.toString(),
                 })
               : null;
+
+              const getShift = getStartAtAndFinishEmployee(item.employee.shift);
+          
+          
+                let shiftSchedule: string;
+                if(!getShift) 
+                  shiftSchedule  =`${ETypeShiftEmployee.NOT_DEFINED}`;
+                if(getShift) 
+                 shiftSchedule =  `${getShift.startAt} às ${getShift.finishAt}`;
+
           await this.employeeRepository.create(
             new Employee(
               {
@@ -443,7 +468,7 @@ export class EmployeeService {
                 registration: item.employee.registration,
                 password: bcrypt.hashSync(item.employee.registration, 10),
                 role: item.employee.role,
-                shift: item.employee.shift,
+                shift: shiftSchedule
               },
               pin ?? pinDenso,
             ),
