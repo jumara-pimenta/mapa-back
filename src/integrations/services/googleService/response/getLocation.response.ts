@@ -58,6 +58,7 @@
    export class RootObject {
         results: Result[];
         status: string;
+     routes: any;
     }
 
 

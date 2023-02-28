@@ -19,7 +19,6 @@ export class CreateVehicleFileDTO {
   @IsString({ message: '[plate] A placa deve ser do tipo string.' })
   @IsNotEmpty({ message: '[plate] A placa deve ser preenchida.' })
   @Length(7, 7, { message: '[plate] A placa deve possuir 7 caracteres.' })
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   plate: string;
 
   @ApiProperty({

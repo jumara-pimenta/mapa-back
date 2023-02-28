@@ -46,6 +46,8 @@ import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/m
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
 import { RouteMobile } from 'src/utils/Utils';
+import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
+import { Waypoints } from 'src/dtos/route/waypoints.dto';
 
 @Injectable()
 export class RouteService {
@@ -59,6 +61,8 @@ export class RouteService {
     private readonly pathService: PathService,
     @Inject('IMapBoxServiceIntegration')
     private readonly mapBoxServiceIntegration: IMapBoxServiceIntegration,
+    @Inject('IGoogleApiServiceIntegration')
+    private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
   ) {}
 
   async onModuleInit() {
@@ -153,10 +157,10 @@ export class RouteService {
 
     await this.employeesInPins(employeesPins, payload.type);
 
+      console.log(employeesPins)
+    const emplopyeeOrdened = this.getWaypoints(employeesPins);
 
-    const emplopyeeOrdened = orderPins(employeesPins);
-
-  
+   
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(
@@ -1169,7 +1173,30 @@ export class RouteService {
     }
     return routes;
   }
+
+  async getWaypoints(employees: Employee[]): Promise<any> {
+
+    const waypoints =  employees.map((employee) => {
+        return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
+      })
+    
+    const payload = {
+      origin: '-3.110944,-59.962604',
+      destination: '-3.110944,-59.962604',
+      waypoints: waypoints.join('|'),
+      travelMode : 'DRIVING'
+    }
+    const order = await this.googleApiServiceIntegration.getWaypoints(payload);
+    const response = order.map((item) => {
+      return employees[item]
+    })
+
+    return response;
+  }
+
 }
+
+
 
 const orderPins = (arr: Employee[]): string[] => {
   const latDenso = -3.110944;
