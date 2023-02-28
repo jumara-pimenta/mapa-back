@@ -268,7 +268,7 @@ export class DriverService {
         if (!existsCpf && !existsCnh) {
           await this.driverRepository.create(
             new Driver({
-              name: JSON.stringify(item.driver.name),
+              name: item.driver.name,
               cpf: item.driver.cpf,
               cnh: item.driver.cnh,
               validation: item.driver.validation,
