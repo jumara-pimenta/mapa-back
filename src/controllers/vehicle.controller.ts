@@ -37,6 +37,7 @@ import {
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { xlsxFileFilter } from 'src/middlewares/image.middleware';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')
@@ -159,8 +160,9 @@ export class VehicleController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: xlsxFileFilter,
+  }),)  async uploadFile(
     @UploadedFile()
     file: any,
   ) {

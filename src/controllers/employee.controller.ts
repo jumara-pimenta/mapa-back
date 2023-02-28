@@ -2,10 +2,13 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
@@ -35,6 +38,7 @@ import {
 } from '../utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from '../decorators/roles.decorator';
+import { xlsxFileFilter } from 'src/middlewares/image.middleware';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -57,9 +61,12 @@ export class EmployeeController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: xlsxFileFilter,
+  }),)
   async uploadFile(
-    @UploadedFile()
+    @UploadedFile(
+  )
     file: any,
   ) {
     return this.employeeService.parseExcelFile(file);
