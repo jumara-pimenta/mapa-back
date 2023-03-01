@@ -508,7 +508,7 @@ export class EmployeeService {
     const workSheetName = 'Colaboradores';
 
     // const employees = await this.listAll(page, filters);
-    const employees = await this.employeeRepository.findAll(page, filters);
+    const employees = await this.employeeRepository.findAllExport()
 
     if (employees.total === 0) {
       throw new HttpException(

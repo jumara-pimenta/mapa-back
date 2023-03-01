@@ -9,6 +9,7 @@ export default interface IEmployeeRepository {
     page: Page,
     filters?: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>>;
+  findAllExport() : Promise<PageResponse<Employee>>;
   findById(id: string): Promise<Employee>;
   findByRegistration(registration: string): Promise<Employee>;
   update(data: Employee): Promise<Employee>;

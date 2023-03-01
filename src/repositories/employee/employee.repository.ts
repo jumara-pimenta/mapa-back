@@ -185,6 +185,47 @@ export class EmployeeRepository
     );
   }
 
+  async findAllExport(): Promise<PageResponse<Employee>> {
+    
+    const items =  await this.repository.employee.findMany({
+          where: {deletedAt: null },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          include: {
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    id: true,
+                    details: true,
+                    lat: true,
+                    lng: true,
+                    local: true,
+                    title: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: 'desc',
+              },
+            },
+          },
+        })
+      
+    const total = await this.repository.employee.findMany({
+          where: {
+            deletedAt: null,
+          },
+        })
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+  }
+
   create(data: Employee): Promise<Employee> {
     return this.repository.employee.create({
       data: {
