@@ -9,6 +9,7 @@ export default interface IVehicleRepository {
     page: Page,
     filters?: FiltersVehicleDTO,
   ): Promise<PageResponse<Vehicle>>;
+  findAllExport(): Promise<PageResponse<Vehicle>>;
   findById(id: string): Promise<Vehicle>;
   findByPlate(plate: string): Promise<Vehicle>;
   findByRenavam(renavam: string): Promise<Vehicle>;

@@ -304,7 +304,7 @@ export class DriverService {
     const filePath = './driver.xlsx';
     const workSheetName = 'Motorista';
 
-    const drivers = await this.listAll(page, filters);
+    const drivers = await this.driverRepository.findAllExport()
 
     const exportedDriverToXLSX = async (
       drivers,

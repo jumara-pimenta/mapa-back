@@ -321,7 +321,7 @@ export class VehicleService {
     const filePath = './vehicle.xlsx';
     const workSheetName = 'Veículos';
 
-    const vehicles = await this.listAll(page, filters);
+    const vehicles = await this.vehicleRepository.findAllExport()
 
     const exportedDriverToXLSX = async (
       vehicles,

@@ -91,6 +91,23 @@ export class DriverRepository
     );
   }
 
+  async findAllExport(): Promise<PageResponse<Driver>> {
+    const items = await this.repository.driver.findMany({
+          orderBy: {
+            createdAt: 'desc',
+          },
+        })
+
+    const total = await this.repository.driver.findMany({
+        })
+     
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+    }
+
   findByDrivers(): Promise<Driver[]> {
     return this.repository.driver.findMany();
   }

@@ -49,6 +49,16 @@ export class VehicleRepository
     });
   }
 
+  async findAllExport(): Promise<PageResponse<Vehicle>> {
+    const items = await this.repository.vehicle.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return this.buildPageResponse(items, items.length);
+  }
+
   async findAll(
     page: Page,
     filters: FiltersVehicleDTO,
