@@ -71,3 +71,12 @@ export function getPeriod(period: ETypePeriodHistory): PeriodInDate {
     return { dateInitial, dateFinal: today };
   }
 }
+
+export function getDuration(duration : string){
+  if(duration === '01:00')
+    return 1.16 * 60 * 60
+  if(duration === '01:30')
+    return 1.66  * 60 * 60
+  if(duration === '02:00')
+    return 2.16  * 60 * 60
+}

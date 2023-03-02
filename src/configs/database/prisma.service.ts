@@ -20,7 +20,7 @@ export class PrismaService
 
     await this.employeesOnPath.updateMany({
       where: {
-        pathId : '55b40681-e268-482f-8ae8-4a4c4e4ace5e'
+        pathId : '4408bb4f-d457-40c6-a2f7-a171c502aa14'
       },
       data: {
         confirmation: true,

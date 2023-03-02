@@ -168,6 +168,7 @@ export class RouteRepository
   }
 
   async update(data: Route): Promise<Route> {
+
     return await this.repository.route.update({
       data: {
         id: data.id,

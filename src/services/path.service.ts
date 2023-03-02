@@ -49,7 +49,6 @@ export class PathService {
     const route = await this.listEmployeesByPathAndPin(id);
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const employeesOnPath = await this.employeesOnPathService.listByPath(path.id)
-    console.log(employeesOnPath)
     let driverId = path.substituteId;
     const driver = await this.driverService.listById(
       driverId ? driverId : route.driver,
@@ -104,8 +103,6 @@ export class PathService {
       }
     }
 
-    console.log(employeeArray)
-    console.log(itinerariesArray)
     path.type === ETypePath.RETURN ? itinerariesArray.unshift(['-3.110944,-59.962604']) : itinerariesArray.push(['-3.110944,-59.962604']);
 
     if (employeeArray.length === 0)

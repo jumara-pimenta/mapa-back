@@ -4,3 +4,8 @@ export class Waypoints  {
     waypoints : string;
     travelMode : string;
 }
+
+export class DetailsRoute {
+    employeesIds : string[];
+    distance : string;
+}

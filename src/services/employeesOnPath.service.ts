@@ -28,7 +28,6 @@ export class EmployeesOnPathService {
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
     let position = 1;
-    console.log('employee no path->',props.employeeIds);
     const path = await this.pathService.listById(props.pathId);
 
     for await (const id of props.employeeIds) {
@@ -41,7 +40,6 @@ export class EmployeesOnPathService {
           path,
         ),
       );
-      console.log('employee no path->',position,id);
       position++;
     }
 
