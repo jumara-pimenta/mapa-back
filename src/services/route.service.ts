@@ -143,7 +143,7 @@ export class RouteService {
         );
     }
 
-    const startAndReturnAt = payload.shift
+    const startAndReturnAt = (payload.shift && payload.type === ETypeRoute.CONVENTIONAL)
       ? getStartAtAndFinishAt(payload.shift)
       : null;
 

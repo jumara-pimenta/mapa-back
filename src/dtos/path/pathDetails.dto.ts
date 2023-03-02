@@ -53,7 +53,7 @@ export class PathDetailsDTO {
   })
   @Matches(durationPathRgx, {
     message:
-      '[startsReturnAt] A hora de início do retorno do trajeto deve ser do formato: HH:MM',
+      '[startsReturnAt] A hora de início do retorno do trajeto deve ser entre 00:00 e 23:59',
   })
   @IsOptional()
   startsReturnAt?: string;
