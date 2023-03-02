@@ -10,7 +10,7 @@ export class CreateDriverFileDTO {
     description: 'Nome do motorista',
   })
   @IsString({
-    message: '[name] O campo nome deve ser do tipo string.',
+    message: '[name] O campo nome deve ser tipo do texto.',
   })
   @IsNotEmpty({ message: '[name] O campo nome deve ser preenchido.' })
   @Length(10, 255, {
@@ -24,7 +24,7 @@ export class CreateDriverFileDTO {
     example: '96893908564',
     description: 'CPF do motorista',
   })
-  @IsString({ message: '[cpf] O campo CPF deve ser do tipo string.' })
+  @IsString({ message: '[cpf] O campo CPF deve ser alfanumérico.' })
   @IsNotEmpty({ message: '[cpf] O campo CPF deve ser preenchido.' })
   @Length(11, 11, { message: '[cpf] O campo CPF deve conter 11 caracteres.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -35,7 +35,7 @@ export class CreateDriverFileDTO {
     example: '123456789',
     description: 'CNH do motorista',
   })
-  @IsString({ message: '[cnh] O campo CNH deve ser do tipo string.' })
+  @IsString({ message: '[cnh] O campo CNH deve ser alfanumérico.' })
   @IsNotEmpty({ message: '[cnh] O campo CNH deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   cnh: string;

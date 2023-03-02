@@ -9,7 +9,7 @@ export class CreateSinisterDTO {
     description: 'Ocorrência de sinistro',
   })
   @IsString({
-    message: '[type] O campo tipo deve ser do tipo string.',
+    message: '[type] O campo tipo deve ser do tipo texto.',
   })
   @IsNotEmpty({ message: '[type] O campo tipo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -21,7 +21,7 @@ export class CreateSinisterDTO {
     description: 'Descrição de como ocorreu o sinistro',
   })
   @IsString({
-    message: '[description] O campo descrição deve ser do tipo string.',
+    message: '[description] O campo descrição deve ser do tipo texto.',
   })
   @IsNotEmpty({
     message: '[description] O campo descrição deve ser preenchido.',
@@ -35,7 +35,7 @@ export class CreateSinisterDTO {
     description: 'Id do trajeto que ocorreu o sinistro',
   })
   @IsString({
-    message: '[pathId] O campo Id do trajeto deve ser do tipo string.',
+    message: '[pathId] O campo Id do trajeto deve ser do tipo texto.',
   })
   @IsNotEmpty({
     message: '[pathId] O campo Id do trajeto deve ser preenchido.',

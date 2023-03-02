@@ -9,7 +9,7 @@ export class SignInEmployeeDTO {
     default: `${faker.random.numeric(6)}`,
     description: '[login] O login:matrícula para fazer o login',
   })
-  @IsString({ message: '[login] O login:matrícula deve ser do tipo string.' })
+  @IsString({ message: '[login] O login:matrícula deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[login] O login:matrícula deve ser preenchida.' })
   login: string;
 

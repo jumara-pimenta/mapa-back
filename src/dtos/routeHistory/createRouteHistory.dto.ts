@@ -12,7 +12,7 @@ export class CreateRouteHistoryDTO {
     example: 'Convencional',
     description: 'Tipo da rota',
   })
-  @IsString({ message: '[typeRoute] O tipo da rota deve ser do tipo string.' })
+  @IsString({ message: '[typeRoute] O tipo da rota deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[typeRoute] O tipo da rota deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   typeRoute: string;
@@ -22,7 +22,7 @@ export class CreateRouteHistoryDTO {
     example: 'Rota 1',
     description: 'Nome da rota',
   })
-  @IsString({ message: '[nameRoute] O nome da rota deve ser do tipo string.' })
+  @IsString({ message: '[nameRoute] O nome da rota deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[nameRoute] O nome da rota deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   nameRoute: string;
