@@ -1180,8 +1180,6 @@ export class RouteService {
 
   async getWaypoints(employees: Employee[], type : ETypePath): Promise<string[]> {
 
-    console.log('TAMANHO ->', employees.length)
-    console.log('employees->', employees)
  
     const denso = {lat : '-3.110944',
                    lng : '-59.962604'}
@@ -1196,21 +1194,17 @@ export class RouteService {
       farthestEmployee = employee;
     }
   }
-  console.log('farthestEmployee->', farthestEmployee)
-  const index = employees.indexOf(farthestEmployee);
-  if (index > -1) {
-    employees.splice(index, 1);
-  }
-   const waypoints =  employees.map((employee) => {
-        return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
-      })
+    const index = employees.indexOf(farthestEmployee);
+    if (index > -1) {
+      employees.splice(index, 1);
+    }
+    const waypoints =  employees.map((employee) => {
+          return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
+     })
     
   
-  const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`
-  const densoLatLng = `${denso.lat},${denso.lng}`
-
-
-
+    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`
+    const densoLatLng = `${denso.lat},${denso.lng}`
     const payload = {
       origin: type === ETypePath.RETURN ? densoLatLng : farthestEmployeeLatLng,
       destination: type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
@@ -1218,7 +1212,7 @@ export class RouteService {
       travelMode : 'DRIVING'
     }
     const response = await this.googleApiServiceIntegration.getWaypoints(payload);
-    /* const legs = response.routes[0].legs;
+    const legs = response.routes[0].legs;
     let totalDuration = 0;
     for (const leg of legs) {
       totalDuration += leg.duration.value;
@@ -1226,20 +1220,16 @@ export class RouteService {
     const maxDuration = 2 * 60 * 60; // 2 hours in seconds
     if (totalDuration > maxDuration) {
       throw new HttpException('Tempo da viagem é maior que 2 horas, favor diminuir a quantidade de colaboradores.', HttpStatus.BAD_REQUEST);
-    } */
+    }
 
     const waypointsOrder : number[]= response.routes[0]?.waypoint_order;
-    console.log(waypointsOrder)
     const order  = waypointsOrder.map((item) => {
       return employees[item]
     })
 
     
     type === ETypePath.RETURN ? order.push(farthestEmployee) : order.unshift(farthestEmployee)
-
-    //return employee array ordered by waypoints    
     
-    console.log(order)
     return order.map((employee) => {
       return employee.id;
   })
