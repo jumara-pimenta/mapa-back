@@ -73,6 +73,7 @@ export class EmployeesOnPathRepository
   findByIds(id: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: { employeeId: id },
+      
       select: {
         id: true,
         confirmation: true,
@@ -107,6 +108,9 @@ export class EmployeesOnPathRepository
       where: {
         pathId,
       },
+      orderBy: {
+        position: 'asc',
+      },
       select: {
         id: true,
         boardingAt: true,
@@ -117,6 +121,7 @@ export class EmployeesOnPathRepository
         present: true,
         employee: {
           select: {
+            id: true,
             name: true,
             address: true,
             shift: true,

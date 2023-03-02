@@ -28,7 +28,7 @@ export class EmployeesOnPathService {
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
     let position = 1;
-
+    console.log('employee no path->',props.employeeIds);
     const path = await this.pathService.listById(props.pathId);
 
     for await (const id of props.employeeIds) {
@@ -41,7 +41,7 @@ export class EmployeesOnPathService {
           path,
         ),
       );
-
+      console.log('employee no path->',position,id);
       position++;
     }
 
@@ -227,6 +227,17 @@ export class EmployeesOnPathService {
         HttpStatus.NOT_FOUND,
       );
 
+    return data;
+  }
+
+  async listByPath(pathId: string): Promise<EmployeesOnPath[]> {
+    const data = await this.employeesOnPathRepository.findByPath(pathId);
+
+    if (!data.length)
+      throw new HttpException(
+        `Não foi encontrado um colaborador no trajeto com este trajeto: ${pathId}`,
+        HttpStatus.NOT_FOUND,
+      );
     return data;
   }
 

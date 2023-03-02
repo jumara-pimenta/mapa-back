@@ -18,6 +18,15 @@ export class PrismaService
 
     const paths = await this.path.findMany();
 
+    await this.employeesOnPath.updateMany({
+      where: {
+        pathId : '55b40681-e268-482f-8ae8-4a4c4e4ace5e'
+      },
+      data: {
+        confirmation: true,
+        present: true,
+      }})
+
     await this.backOfficeUser.upsert({
       where: {
         email: 'admin@rotas.com.br',
@@ -37,7 +46,6 @@ export class PrismaService
         role: 'ADMIN',
       },
     });
-
     if (paths.length === 0) {
       faker.locale = 'pt_BR';
       const employees: any[] = [];

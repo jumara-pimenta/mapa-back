@@ -48,6 +48,8 @@ export class PathService {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
     const vehicle = await this.vehicleService.listById(route.vehicle);
+    const employeesOnPath = await this.employeesOnPathService.listByPath(path.id)
+    console.log(employeesOnPath)
     let driverId = path.substituteId;
     const driver = await this.driverService.listById(
       driverId ? driverId : route.driver,
@@ -73,7 +75,7 @@ export class PathService {
     const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
     let totalConfirmed = 0;
 
-    for await (const employeesPins of route.employeesOnPins) {
+   /*  for await (const employeesPins of route.employeesOnPins) {
       itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
       for await (const employee of employeesPins.employees) {
         if (employee.confirmation === true) totalConfirmed++;
@@ -87,7 +89,24 @@ export class PathService {
           }
         }
       }
+    } */
+
+    for await(const employee of employeesOnPath){
+      if (employee.confirmation === true) totalConfirmed++;
+      itinerariesArray.push([`${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`]);
+      if (employee.confirmation === true && employee.present === true) {
+        employeeArray.push(employee.employee.id);
+        if (path.type === ETypePath.ONE_WAY) {
+          await this.employeesOnPathService.update(employee.id, {
+            disembarkAt: getDateInLocaleTime(new Date()),
+          });
+        }
+      }
     }
+
+    console.log(employeeArray)
+    console.log(itinerariesArray)
+    path.type === ETypePath.RETURN ? itinerariesArray.unshift(['-3.110944,-59.962604']) : itinerariesArray.push(['-3.110944,-59.962604']);
 
     if (employeeArray.length === 0)
       throw new HttpException(
@@ -128,7 +147,6 @@ export class PathService {
 
     if (path.status === EStatusPath.FINISHED) {
       await this.routeHistoryService.create(props);
-      // clear employeesOnPath
       await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
 
@@ -451,10 +469,10 @@ export class PathService {
           present: employee.present,
         });
         if (path.type === ETypePath.ONE_WAY) {
-          employeesByPin.push(data);
+          employeesByPin.unshift(data);
         }
         if (path.type === ETypePath.RETURN) {
-          employeesByPin.unshift(data);
+          employeesByPin.push(data);
         }
       }
     }

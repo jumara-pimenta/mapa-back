@@ -21,10 +21,9 @@ export class GoogleApiServiceIntegration implements IGoogleServiceIntegration {
   async getWaypoints(payload: Waypoints): Promise<any> {
     try {
       const url = `/maps/api/directions/json?origin=${payload.origin}&destination=${payload.destination}&waypoints=optimize%3Atrue|${payload.waypoints}&travelMode=${payload.travelMode}&key=${process.env.API_KEY_GOOGLE}`
-      console.log(url)
       const { data }: AxiosResponse<RootObject> =
         await googleApi().get(url);
-      return data.routes[0]?.waypoint_order;
+      return data;
     } catch (e) {
       new Logger('googleApi service integration').error('get waypoints', e);
     }

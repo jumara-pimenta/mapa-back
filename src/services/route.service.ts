@@ -45,7 +45,7 @@ import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
-import { RouteMobile } from 'src/utils/Utils';
+import { distanceBetweenPoints, RouteMobile } from 'src/utils/Utils';
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { Waypoints } from 'src/dtos/route/waypoints.dto';
 
@@ -157,8 +157,7 @@ export class RouteService {
 
     await this.employeesInPins(employeesPins, payload.type);
 
-      console.log(employeesPins)
-    const emplopyeeOrdened = this.getWaypoints(employeesPins);
+    const emplopyeeOrdened = await this.getWaypoints(employeesPins, payload.pathDetails.type);
 
    
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
@@ -334,6 +333,10 @@ export class RouteService {
       }
       if (types.length === 1) {
         pathType = types[0];
+      }
+      
+      for await (const employee of data.employeeIds) {
+         await this.employeeService.listById(employee);
       }
       await this.employeesInRouteUpdate(
         employeeInRoute,
@@ -542,6 +545,7 @@ export class RouteService {
                 disembarkAt: item.disembarkAt,
                 position: item.position,
                 details: {
+                  id: employee?.id,
                   name: employee?.name,
                   address: employee?.address,
                   shift: employee?.shift,
@@ -1174,25 +1178,72 @@ export class RouteService {
     return routes;
   }
 
-  async getWaypoints(employees: Employee[]): Promise<any> {
+  async getWaypoints(employees: Employee[], type : ETypePath): Promise<string[]> {
 
-    const waypoints =  employees.map((employee) => {
+    console.log('TAMANHO ->', employees.length)
+    console.log('employees->', employees)
+ 
+    const denso = {lat : '-3.110944',
+                   lng : '-59.962604'}
+
+    let farthestEmployee: Employee = null;
+    let maxDistance = 0;
+    for (const employee of employees) {
+    const employeeLocation = { lat: employee.pins[0].pin.lat, lng: employee.pins[0].pin.lng };
+    const distance = distanceBetweenPoints(denso, employeeLocation);
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      farthestEmployee = employee;
+    }
+  }
+  console.log('farthestEmployee->', farthestEmployee)
+  const index = employees.indexOf(farthestEmployee);
+  if (index > -1) {
+    employees.splice(index, 1);
+  }
+   const waypoints =  employees.map((employee) => {
         return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
       })
     
+  
+  const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`
+  const densoLatLng = `${denso.lat},${denso.lng}`
+
+
+
     const payload = {
-      origin: '-3.110944,-59.962604',
-      destination: '-3.110944,-59.962604',
+      origin: type === ETypePath.RETURN ? densoLatLng : farthestEmployeeLatLng,
+      destination: type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
       waypoints: waypoints.join('|'),
       travelMode : 'DRIVING'
     }
-    const order = await this.googleApiServiceIntegration.getWaypoints(payload);
-    const response = order.map((item) => {
+    const response = await this.googleApiServiceIntegration.getWaypoints(payload);
+    /* const legs = response.routes[0].legs;
+    let totalDuration = 0;
+    for (const leg of legs) {
+      totalDuration += leg.duration.value;
+    }
+    const maxDuration = 2 * 60 * 60; // 2 hours in seconds
+    if (totalDuration > maxDuration) {
+      throw new HttpException('Tempo da viagem é maior que 2 horas, favor diminuir a quantidade de colaboradores.', HttpStatus.BAD_REQUEST);
+    } */
+
+    const waypointsOrder : number[]= response.routes[0]?.waypoint_order;
+    console.log(waypointsOrder)
+    const order  = waypointsOrder.map((item) => {
       return employees[item]
     })
 
-    return response;
-  }
+    
+    type === ETypePath.RETURN ? order.push(farthestEmployee) : order.unshift(farthestEmployee)
+
+    //return employee array ordered by waypoints    
+    
+    console.log(order)
+    return order.map((employee) => {
+      return employee.id;
+  })
+}
 
 }
 

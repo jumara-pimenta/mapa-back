@@ -272,6 +272,7 @@ export class RouteRepository
                     employee: {
                       select: {
                         name: true,
+                        id: true,
                         pins: {
                           include: {
                             pin: {
