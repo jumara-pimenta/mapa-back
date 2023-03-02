@@ -9,7 +9,7 @@ export class CreateDriverDTO {
     description: 'Nome do motorista',
   })
   @IsString({
-    message: '[name] O campo nome deve ser do tipo string.',
+    message: '[name] O campo nome deve ser do tipo texto.',
   })
   @IsNotEmpty({ message: '[name] O campo nome deve ser preenchido.' })
   @Length(10, 255, {
@@ -23,7 +23,7 @@ export class CreateDriverDTO {
     example: '96893908564',
     description: 'CPF do motorista',
   })
-  @IsString({ message: '[cpf] O campo CPF deve ser do tipo string.' })
+  @IsString({ message: '[cpf] O campo CPF deve ser alfanumérico.' })
   @IsNotEmpty({ message: '[cpf] O campo CPF deve ser preenchido.' })
   @Length(11, 11, { message: '[cpf] O campo CPF deve conter 11 caracteres.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -34,7 +34,7 @@ export class CreateDriverDTO {
     example: '123456789',
     description: 'CNH do motorista',
   })
-  @IsString({ message: '[cnh] O campo CNH deve ser do tipo string.' })
+  @IsString({ message: '[cnh] O campo CNH deve ser alfanumérico.' })
   @IsNotEmpty({ message: '[cnh] O campo CNH deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   cnh: string;
@@ -61,7 +61,7 @@ export class CreateDriverDTO {
     example: 'AB',
     description: 'Categoria da CNH do motorista',
   })
-  @IsString({ message: '[category] O campo categoria deve ser do tipo string.' })
+  @IsString({ message: '[category] O campo categoria deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[category] O campo categoria deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @Length(1, 2)

@@ -5,15 +5,15 @@ import { UpdateEmployeesOnPathDTO } from './updateEmployeesOnPath.dto';
 
 export class WebsocketUpdateEmployeesStatusOnPathDTO {
   @ApiProperty()
-  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo string.'})
+  @IsString({ message: '[pathId] O id do trajeto deve ser do tipo texto.' })
   pathId: string;
 
   @ApiProperty()
-  @IsString({ message: '[routeId] O id da rota deve ser do tipo string.'})
+  @IsString({ message: '[routeId] O id da rota deve ser do tipo texto.' })
   routeId: string;
 
   @ApiProperty()
-  @IsString({ message: '[employeeOnPathId] O id do colaborador no trajeto deve ser do tipo string.'})
+  @IsString({ message: '[employeeOnPathId] O id do colaborador no trajeto deve ser do tipo texto.' })
   employeeOnPathId: string;
 
   @ApiProperty()

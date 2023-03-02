@@ -16,7 +16,7 @@ export class CreateVehicleFileDTO {
     example: 'PHP1234',
     description: 'Placa do veículo',
   })
-  @IsString({ message: '[plate] A placa deve ser do tipo string.' })
+  @IsString({ message: '[plate] A placa deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[plate] A placa deve ser preenchida.' })
   @Length(7, 7, { message: '[plate] A placa deve possuir 7 caracteres.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -27,7 +27,7 @@ export class CreateVehicleFileDTO {
     example: 'Expresso',
     description: 'Nome da empresa responsável pelo veículo',
   })
-  @IsString({ message: '[company] O nome da empresa deve ser do tipo string.' })
+  @IsString({ message: '[company] O nome da empresa deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[company] O nome da empresa deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   company: string;
@@ -37,7 +37,7 @@ export class CreateVehicleFileDTO {
     example: 'ÔNIBUS',
     description: 'Tipo do veículo',
   })
-  @IsString({ message: '[type] O tipo deve ser do tipo string.' })
+  @IsString({ message: '[type] O tipo deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[type] O tipo deve ser preenchido.' })
   type: string;
 
@@ -73,7 +73,7 @@ export class CreateVehicleFileDTO {
     default: '12345678901',
     description: 'Código Renavam do Veículo',
   })
-  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo string.' })
+  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[renavam] O RENAVAM deve ser preenchido.' })
   @Length(11, 11, {
     message: '[renavam] O RENAVAM deve possuir 11 caracteres.',
@@ -91,7 +91,7 @@ export class CreateVehicleFileDTO {
 
   @ApiProperty({ default: 'Teste', description: 'Campo de observação' })
   @IsString({
-    message: '[note] O campo de observação deve ser do tipo string.',
+    message: '[note] O campo de observação deve ser do tipo texto.',
   })
   @IsNotEmpty({ message: '[note] O campo de observação deve ser preenchido.' })
   note: string;

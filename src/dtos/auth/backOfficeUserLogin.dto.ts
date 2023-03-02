@@ -9,7 +9,7 @@ export class BackOfficeUserDTO {
   email: string;
 
   @ApiProperty({ example: faker.internet.password() })
-  @IsString({ message: '[password] a senha deve ser uma string' })
+  @IsString({ message: '[password] a senha deve ser alfanumérico' })
   @IsNotEmpty({ message: '[password] a Senha é obrigatória' })
   password: string;
 }
@@ -21,17 +21,17 @@ export class BackOfficeUserCreateDTO {
   email: string;
 
   @ApiProperty({ example: faker.internet.password() })
-  @IsString({ message: '[password] a senha deve ser uma string' })
+  @IsString({ message: '[password] a senha deve ser alfanumérico' })
   @IsNotEmpty({ message: '[password] a Senha é obrigatória' })
   password: string;
 
   @ApiProperty({ example: faker.name.fullName() })
-  @IsString({ message: '[name] o nome deve ser uma string' })
+  @IsString({ message: '[name] o nome deve ser do tipo texto' })
   @IsNotEmpty({ message: '[name] o Nome é obrigatório' })
   name: string;
 
   @ApiProperty({ example: faker.name.jobTitle() })
-  @IsString({ message: '[role] a função deve ser uma string' })
+  @IsString({ message: '[role] a função deve ser do tipo texto' })
   @IsNotEmpty({ message: '[role] a Função é obrigatória' })
   role: string;
 }
@@ -44,11 +44,11 @@ export class BackOfficeUserUpdateDTO {
 
   @ApiProperty({ example: faker.name.fullName() })
   @IsOptional()
-  @IsString({ message: '[name] o nome deve ser uma string' })
+  @IsString({ message: '[name] o nome deve ser do tipo texto' })
   name?: string;
 
   @ApiProperty({ example: faker.name.jobTitle() })
   @IsOptional()
-  @IsString({ message: '[role] a função deve ser uma string' })
+  @IsString({ message: '[role] a função deve ser do tipo texto' })
   role?: string;
 }

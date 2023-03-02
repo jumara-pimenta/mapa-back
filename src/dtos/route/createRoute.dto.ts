@@ -11,7 +11,7 @@ export class CreateRouteDTO {
     example: 'Rota 1',
     description: 'Descrição da rota',
   })
-  @IsString({ message: '[description] A descrição deve ser do tipo string.' })
+  @IsString({ message: '[description] A descrição deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[description] A descrição deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
@@ -29,7 +29,7 @@ export class CreateRouteDTO {
     default: '05e7ce8b-b3e2-4295-b584-8e2caae2d809',
     description: 'Id do motorista',
   })
-  @IsString({ message: '[DriverId] não está definida como string.' })
+  @IsString({ message: '[DriverId] não está definida como texto.' })
   @IsNotEmpty({ message: '[DriverId] não pode receber um valor vazio.' })
   driverId: string;
 
@@ -37,7 +37,7 @@ export class CreateRouteDTO {
     default: '41b4eb3d-e18a-4c8e-a668-49824b21579c',
     description: 'Id do veículo',
   })
-  @IsString({ message: '[VehicleId] não está definida como string.' })
+  @IsString({ message: '[VehicleId] não está definida como texto.' })
   @IsNotEmpty({ message: '[VehicleId] não pode receber um valor vazio.' })
   vehicleId: string;
 
@@ -52,7 +52,7 @@ export class CreateRouteDTO {
   })
   @IsString({
     each: true,
-    message: '[employeeIds] O id do colaborador deve ser do tipo string.',
+    message: '[employeeIds] O id do colaborador deve ser do tipo texto.',
   })
   @IsNotEmpty({
     message: '[employeeIds] Os ids dos colaboradores devem ser preenchidos.',
@@ -68,7 +68,7 @@ export class CreateRouteDTO {
     message: '[pathDetails] Os detalhes do trajeto devem ser preenchidos.',
   })
   pathDetails: PathDetailsDTO;
-  
+
   @ApiProperty({
     description: 'Turno da rota',
     default: 'PRIMEIRO',
@@ -78,6 +78,6 @@ export class CreateRouteDTO {
   @IsEnum(ETypeShiftRotue, {
     message: '[shift] Turno não está definido como enum.'
   })
-  shift? : ETypeShiftRotue;
+  shift?: ETypeShiftRotue;
 
 }

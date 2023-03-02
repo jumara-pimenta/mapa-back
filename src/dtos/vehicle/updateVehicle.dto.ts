@@ -11,20 +11,20 @@ import {
 
 export class UpdateVehicleDTO {
   @ApiProperty({ description: 'Placa do veículo' })
-  @IsString({ message: '[plate] A placa deve ser do tipo string.' })
+  @IsString({ message: '[plate] A placa deve ser do tipo texto.' })
   @Length(7, 7, { message: '[plate] A placa deve possuir 7 caracteres.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsOptional()
   plate?: string;
 
   @ApiProperty({ description: 'Nome da empresa responsável pelo veículo' })
-  @IsString({ message: '[company] O nome da empresa deve ser do tipo string.' })
+  @IsString({ message: '[company] O nome da empresa deve ser do tipo texto.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   company?: string;
 
   @ApiProperty({ description: 'Tipo do veículo' })
-  @IsString({ message: '[type] O tipo deve ser do tipo string.' })
+  @IsString({ message: '[type] O tipo deve ser do tipo texto.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   type?: string;
@@ -54,7 +54,7 @@ export class UpdateVehicleDTO {
   capacity?: number;
 
   @ApiProperty({ description: 'Código Renavam do Veículo' })
-  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo string.' })
+  @IsString({ message: '[renavam] O RENAVAM deve ser do tipo texto.' })
   @Length(11, 11, {
     message: '[renavam] O RENAVAM deve possuir 11 caracteres.',
   })
@@ -72,7 +72,7 @@ export class UpdateVehicleDTO {
 
   @ApiProperty({ description: 'Campo de observação' })
   @IsString({
-    message: '[note] O campo de observação deve ser do tipo string.',
+    message: '[note] O campo de observação deve ser do tipo texto.',
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsOptional()

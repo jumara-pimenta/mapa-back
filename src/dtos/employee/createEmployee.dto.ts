@@ -19,7 +19,7 @@ export class CreateEmployeeDTO {
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsNumberString(
     {},
-    { message: '[registration] A matrícula deve ser do tipo string.' },
+    { message: '[registration] A matrícula deve ser do tipo texto.' },
   )
   @IsNotEmpty({ message: '[registration] A matrícula deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -36,13 +36,13 @@ export class CreateEmployeeDTO {
   admission: Date;
 
   @ApiProperty({ default: `${faker.name.jobTitle()}` })
-  @IsString({ message: '[role] O cargo deve ser do tipo string.' })
+  @IsString({ message: '[role] O cargo deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[role] O cargo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   role: string;
 
   @ApiProperty({ default: `${faker.name.fullName()}` })
-  @IsString({ message: '[name] O nome deve ser do tipo string.' })
+  @IsString({ message: '[name] O nome deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[role] O nome deve ser preenchido.' })
   name: string;
 
@@ -58,7 +58,7 @@ export class CreateEmployeeDTO {
 
   @ApiProperty({ default: `${faker.random.numeric(6)}` })
   @IsString({
-    message: '[costCenter] O centro de custo deve ser do tipo string.',
+    message: '[costCenter] O centro de custo deve ser do tipo texto.',
   })
   @IsNotEmpty({
     message: '[costCenter] O centro de custo deve ser preenchido.',

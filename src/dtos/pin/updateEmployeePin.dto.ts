@@ -29,7 +29,7 @@ export class UpdateEmployeePinDTO {
     examples: ['-3.10719', null],
     description: 'Latidude da localização',
   })
-  @IsString({ message: '[lat] A latitude deve ser do tipo string.' })
+  @IsString({ message: '[lat] A latitude deve ser do tipo texto.' })
   @IsOptional()
   lat?: string;
 
@@ -38,7 +38,7 @@ export class UpdateEmployeePinDTO {
     examples: ['-60.0261', null],
     description: 'Longitude da localização',
   })
-  @IsString({ message: '[lng] A longitude deve ser do tipo string.' })
+  @IsString({ message: '[lng] A longitude deve ser do tipo texto.' })
   @IsOptional()
   lng?: string;
 
@@ -51,7 +51,7 @@ export class UpdateEmployeePinDTO {
     ],
     description: 'Local do Ponto de Embarque',
   })
-  @IsString({ message: '[local] O local deve ser do tipo string.' })
+  @IsString({ message: '[local] O local deve ser do tipo texto.' })
   @IsOptional()
   local?: string;
 
@@ -60,7 +60,7 @@ export class UpdateEmployeePinDTO {
     examples: ['Detalhes do local', null],
     description: 'Detalhes sobre o ponto de embarque',
   })
-  @IsString({ message: '[details] O campo detalhes deve ser do tipo string.' })
+  @IsString({ message: '[details] O campo detalhes deve ser do tipo texto.' })
   @IsOptional()
   details?: string;
 
@@ -68,7 +68,7 @@ export class UpdateEmployeePinDTO {
     default: 'Título do local',
     description: 'Título do local',
   })
-  @IsString({ message: '[title] O título deve ser do tipo string.' })
+  @IsString({ message: '[title] O título deve ser do tipo texto.' })
   @IsOptional()
   title?: string;
 }
