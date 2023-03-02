@@ -62,6 +62,8 @@ export class EmployeeService {
     return response;
   }
 
+ 
+
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
 
@@ -249,15 +251,16 @@ export class EmployeeService {
         );
       } 
     }
-
+    
+    let shiftScheduleUpdate: string = null
+    if(data.shift){
     const getShiftUpdate = getStartAtAndFinishEmployee(data.shift);
-    let shiftScheduleUpdate: string;
        
       if(!getShiftUpdate) 
       shiftScheduleUpdate  = `${ETypeShiftEmployee.NOT_DEFINED}`;
       if(getShiftUpdate) 
       shiftScheduleUpdate =  `${getShiftUpdate.startAt} às ${getShiftUpdate.finishAt}`;
-
+}
     const address = JSON.stringify(data?.address);
 
     const employeeDataUpdated = { ...data, address };
@@ -271,7 +274,7 @@ export class EmployeeService {
         name: employeeDataUpdated?.name,
         registration: employeeDataUpdated?.registration,
         role: employeeDataUpdated?.role,
-        shift: shiftScheduleUpdate,
+        shift: shiftScheduleUpdate? shiftScheduleUpdate : employee.shift,
       }),
     );
     

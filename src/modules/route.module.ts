@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { MapBoxServiceIntegration } from 'src/integrations/services/mapBoxService/mapbox.service.integration';
 import { RouteController } from '../controllers/route.controller';
 import { RouteRepository } from '../repositories/route/route.repository';
@@ -25,6 +26,10 @@ import { VehicleModule } from './vehicle.module';
     {
       provide: 'IMapBoxServiceIntegration',
       useClass: MapBoxServiceIntegration,
+    },
+    {
+      provide: 'IGoogleApiServiceIntegration',
+      useClass: GoogleApiServiceIntegration,
     },
   ],
   exports: [RouteService],

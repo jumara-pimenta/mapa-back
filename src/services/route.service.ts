@@ -45,7 +45,11 @@ import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
-import { RouteMobile } from 'src/utils/Utils';
+import { distanceBetweenPoints, RouteMobile } from 'src/utils/Utils';
+import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
+import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
+import e from 'express';
+import { getDuration } from 'src/utils/Date';
 
 @Injectable()
 export class RouteService {
@@ -59,6 +63,8 @@ export class RouteService {
     private readonly pathService: PathService,
     @Inject('IMapBoxServiceIntegration')
     private readonly mapBoxServiceIntegration: IMapBoxServiceIntegration,
+    @Inject('IGoogleApiServiceIntegration')
+    private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
   ) {}
 
   async onModuleInit() {
@@ -153,10 +159,9 @@ export class RouteService {
 
     await this.employeesInPins(employeesPins, payload.type);
 
-
-    const emplopyeeOrdened = orderPins(employeesPins);
-
-  
+    const emplopyeeOrdened = await this.getWaypoints(employeesPins, payload.pathDetails.type, payload.pathDetails.duration);
+     // const emplopyeeOrdened = employeesPins.map((e) => e.id);
+   
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(
@@ -174,7 +179,7 @@ export class RouteService {
     await this.employeesInRoute(
       employeeInRoute,
       payload.type,
-      emplopyeeOrdened,
+      emplopyeeOrdened.employeesIds,
       payload.pathDetails.type,
     );
 
@@ -192,7 +197,7 @@ export class RouteService {
     const route = await this.routeRepository.create(props);
     await this.pathService.generate({
       routeId: route.id,
-      employeeIds: emplopyeeOrdened,
+      employeeIds: emplopyeeOrdened.employeesIds,
       details: {
         ...payload.pathDetails,
         startsAt: initRouteDate,
@@ -210,16 +215,10 @@ export class RouteService {
       distanceLngLat.push([lng, lat]);
     });
 
-    let resDistance = await this.mapBoxServiceIntegration.getDistance(
-      `${distanceLngLat.join(';')}?geometries=geojson&access_token=${
-        process.env.MAPS_BOX_API_KEY
-      }`,
-    );
-
-    const distance = resDistance.routes[0].distance / 1000;
+    
 
     const newRoute = await this.update(route.id, {
-      distance: distance.toFixed(2) + ' KM',
+      distance: emplopyeeOrdened.distance,
     });
 
     return newRoute;
@@ -310,6 +309,7 @@ export class RouteService {
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
+    let distance = '';
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
@@ -319,11 +319,12 @@ export class RouteService {
       );
       const type = data.type ?? route.type;
 
+      
       await this.employeesInPins(employeesPins, type);
       const types = route.paths.map((path) => {
         return path.type;
       });
-
+      
       let pathType;
       if (types.length === 2) {
         pathType = ETypePath.ROUND_TRIP;
@@ -331,11 +332,20 @@ export class RouteService {
       if (types.length === 1) {
         pathType = types[0];
       }
+
+      const duration = data.duration ?? route.paths[0].duration;
+      const emplopyeeOrdened = await this.getWaypoints(employeesPins,pathType,duration);
+     
+      distance = emplopyeeOrdened.distance
+
+      for await (const employee of data.employeeIds) {
+         await this.employeeService.listById(employee);
+      }
       await this.employeesInRouteUpdate(
         employeeInRoute,
         type,
         route,
-        data.employeeIds,
+        emplopyeeOrdened.employeesIds,
         pathType,
       );
 
@@ -345,7 +355,7 @@ export class RouteService {
 
       await this.pathService.generate({
         routeId: id,
-        employeeIds: data.employeeIds,
+        employeeIds: emplopyeeOrdened.employeesIds,
         details: {
           type: pathType as ETypePath,
           startsAt:
@@ -367,7 +377,7 @@ export class RouteService {
     }
     if (
       !data.employeeIds &&
-      (data.startsAt || data.startsReturnAt || data.duration || data.shift)
+      (data.startsAt || data.startsReturnAt || data.duration || data.shift )
     ) {
       if (route.paths.length === 2) {
         for await (const path of route.paths) {
@@ -406,6 +416,8 @@ export class RouteService {
     if (data.vehicleId) {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
+    
+    routeEntity.distance = distance === '' ? routeEntity.distance : distance
     const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
@@ -538,6 +550,7 @@ export class RouteService {
                 disembarkAt: item.disembarkAt,
                 position: item.position,
                 details: {
+                  id: employee?.id,
                   name: employee?.name,
                   address: employee?.address,
                   shift: employee?.shift,
@@ -693,7 +706,7 @@ export class RouteService {
     });
   }
 
-  async employeesInRoute(
+   async employeesInRoute(
     employeeRoute: Route[],
     type: string,
     ids: string[],
@@ -708,7 +721,7 @@ export class RouteService {
       if (route.type !== ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
           path.employeesOnPath.filter((item) => {
-            if (type === route.type) {
+            if (type === route.type && ids.includes(item.employee.id)) {
               employeeArray.push(item.employee);
             }
           });
@@ -782,7 +795,72 @@ export class RouteService {
       );
     }
   }
-
+ /* 
+  async  employeesInRoute(
+    employeeRoute: Route[],
+    type: string,
+    ids: string[],
+    pathType?: string,
+  ): Promise<void> {
+    const employeesOnRoute: string[] = [];
+    const employeesOnOneWay: string[] = [];
+    const employeesOnReturn: string[] = [];
+  
+    employeeRoute.forEach((route: Route) => {
+      if (route.type !== ETypeRoute.EXTRA) {
+        route.path.forEach((path) => {
+          path.employeesOnPath.forEach((item) => {
+            if (type === route.type) {
+              employeesOnRoute.push(item.employee.name);
+            }
+          });
+        });
+      }
+      if (route.type === ETypeRoute.EXTRA) {
+        route.path.forEach((path) => {
+          if (type === ETypeRoute.EXTRA) {
+            if (path.type === ETypePath.ONE_WAY && pathType !== ETypePath.RETURN) {
+              const employees = path.employeesOnPath.filter((item) => {
+                return ids.includes(item.employee.id);
+              }).map((item) => item.employee.name);
+              employeesOnOneWay.push(...employees);
+            }
+            if (path.type === ETypePath.RETURN && pathType !== ETypePath.ONE_WAY) {
+              const employees = path.employeesOnPath.filter((item) => {
+                return ids.includes(item.employee.id);
+              }).map((item) => item.employee.name);
+              employeesOnReturn.push(...employees);
+            }
+          }
+        });
+      }
+    });
+  
+    if (employeesOnRoute.length > 0) {
+      throw new HttpException(
+        `The following employee(s) ${employeesOnRoute.join(', ')} is/are already in a route of type ${type.toLowerCase()}!`,
+        HttpStatus.CONFLICT,
+      );
+    }
+  
+    if (employeesOnOneWay.length > 0 || employeesOnReturn.length > 0) {
+      const message = [];
+      if (employeesOnOneWay.length > 0) {
+        message.push(`The following employee(s) ${employeesOnOneWay.join(', ')} is/are already in an extra route of type ${ETypePath.ONE_WAY.toLowerCase()}!`);
+      }
+      if (employeesOnReturn.length > 0) {
+        message.push(`The following employee(s) ${employeesOnReturn.join(', ')} is/are already in an extra route of type ${ETypePath.RETURN.toLowerCase()}!`);
+      }
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          message,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+  */ 
   async employeesInPins(route: Employee[], type: string): Promise<void> {
     const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
@@ -1169,7 +1247,72 @@ export class RouteService {
     }
     return routes;
   }
+
+  async getWaypoints(employees: Employee[], type : ETypePath, duration : string): Promise<DetailsRoute> {
+
+ 
+    const denso = {lat : '-3.110944',
+                   lng : '-59.962604'}
+
+    let farthestEmployee: Employee = null;
+    let maxDistance = 0;
+    for (const employee of employees) {
+    const employeeLocation = { lat: employee.pins[0].pin.lat, lng: employee.pins[0].pin.lng };
+    const distance = distanceBetweenPoints(denso, employeeLocation);
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      farthestEmployee = employee;
+    }
+  }
+    const index = employees.indexOf(farthestEmployee);
+    if (index > -1) {
+      employees.splice(index, 1);
+    }
+    const waypoints =  employees.map((employee) => {
+          return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
+     })
+    
+  
+    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`
+    const densoLatLng = `${denso.lat},${denso.lng}`
+    const payload = {
+      origin: type === ETypePath.RETURN ? densoLatLng : farthestEmployeeLatLng,
+      destination: type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
+      waypoints: waypoints.join('|'),
+      travelMode : 'DRIVING'
+    }
+    const response = await this.googleApiServiceIntegration.getWaypoints(payload);
+    const legs = response.routes[0].legs;
+    let totalDistance = 0
+    let totalDuration = 0;
+    for (const leg of legs) {
+      totalDuration += leg.duration.value;
+      totalDistance += leg.distance.value;
+    }
+
+    const maxDuration = getDuration(duration)
+    if (totalDuration > maxDuration) {
+      throw new HttpException(`Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`, HttpStatus.BAD_REQUEST);
+    }
+
+    const waypointsOrder : number[]= response.routes[0]?.waypoint_order;
+    const order  = waypointsOrder.map((item) => {
+      return employees[item]
+    })
+
+    const distance = totalDistance / 1000 +'km'
+    
+    type === ETypePath.RETURN ? order.push(farthestEmployee) : order.unshift(farthestEmployee)
+    const employeesIds = order.map((employee) => {
+      return employee.id;
+    })
+
+    return {employeesIds,distance}
 }
+
+}
+
+
 
 const orderPins = (arr: Employee[]): string[] => {
   const latDenso = -3.110944;

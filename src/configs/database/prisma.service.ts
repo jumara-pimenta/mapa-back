@@ -37,7 +37,6 @@ export class PrismaService
         role: 'ADMIN',
       },
     });
-
     if (paths.length === 0) {
       faker.locale = 'pt_BR';
       const employees: any[] = [];

@@ -19,7 +19,7 @@ export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
       role: { contains: filters.role },
     }),
     shift: () => ({
-      shift: filters.shift,
+      shift: {contains :filters.shift},
     }),
     costCenter: () => ({
       costCenter: filters.costCenter,
