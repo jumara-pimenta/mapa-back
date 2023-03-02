@@ -18,15 +18,6 @@ export class PrismaService
 
     const paths = await this.path.findMany();
 
-    await this.employeesOnPath.updateMany({
-      where: {
-        pathId : '4408bb4f-d457-40c6-a2f7-a171c502aa14'
-      },
-      data: {
-        confirmation: true,
-        present: true,
-      }})
-
     await this.backOfficeUser.upsert({
       where: {
         email: 'admin@rotas.com.br',
