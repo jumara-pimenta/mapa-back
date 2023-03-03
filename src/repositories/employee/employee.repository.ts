@@ -102,6 +102,15 @@ export class EmployeeRepository
     });
   }
 
+  findByRegistrationByImport(registration: string): Promise<Employee> {
+    return this.repository.employee.findFirst({
+      where: {
+        registration: registration,
+        // deletedAt: null,
+      },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,
@@ -186,39 +195,38 @@ export class EmployeeRepository
   }
 
   async findAllExport(): Promise<PageResponse<Employee>> {
-    
-    const items =  await this.repository.employee.findMany({
-          where: {deletedAt: null },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          include: {
-            pins: {
+    const items = await this.repository.employee.findMany({
+      where: { deletedAt: null },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
               select: {
-                type: true,
-                pin: {
-                  select: {
-                    id: true,
-                    details: true,
-                    lat: true,
-                    lng: true,
-                    local: true,
-                    title: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: 'desc',
+                id: true,
+                details: true,
+                lat: true,
+                lng: true,
+                local: true,
+                title: true,
               },
             },
           },
-        })
-      
-    const total = await this.repository.employee.findMany({
-          where: {
-            deletedAt: null,
+          orderBy: {
+            createdAt: 'desc',
           },
-        })
+        },
+      },
+    });
+
+    const total = await this.repository.employee.findMany({
+      where: {
+        deletedAt: null,
+      },
+    });
 
     return this.buildPageResponse(
       items,

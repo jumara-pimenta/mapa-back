@@ -20,6 +20,7 @@ import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateDriverFileDTO } from 'src/dtos/driver/createDriverFile.dto';
 import { convertToDate } from 'src/utils/date.service';
+import { verifyDateFilter } from 'src/utils/Date';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -111,6 +112,7 @@ export class DriverService {
     page: Page,
     filters?: FiltersDriverDTO,
   ): Promise<PageResponse<MappedDriverDTO>> {
+    verifyDateFilter(filters.validation);
     const drivers = await this.driverRepository.findAll(page, filters);
 
     if (drivers.total === 0) {
@@ -304,7 +306,7 @@ export class DriverService {
     const filePath = './driver.xlsx';
     const workSheetName = 'Motorista';
 
-    const drivers = await this.driverRepository.findAllExport()
+    const drivers = await this.driverRepository.findAllExport();
 
     const exportedDriverToXLSX = async (
       drivers,

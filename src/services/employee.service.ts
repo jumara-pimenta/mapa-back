@@ -16,7 +16,12 @@ import { CreateEmployeeFileDTO } from '../dtos/employee/createEmployeeFile.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
-import { ETypeCreationPin, ETypeEditionPin, ETypePin, ETypeShiftEmployee } from '../utils/ETypes';
+import {
+  ETypeCreationPin,
+  ETypeEditionPin,
+  ETypePin,
+  ETypeShiftEmployee,
+} from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
 import { validate } from 'class-validator';
@@ -25,9 +30,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
 import { json } from 'stream/consumers';
-import { convertToDate, getStartAtAndFinishAt, getStartAtAndFinishEmployee } from 'src/utils/date.service';
+import {
+  convertToDate,
+  getStartAtAndFinishAt,
+  getStartAtAndFinishEmployee,
+} from 'src/utils/date.service';
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { getShift } from 'src/utils/Utils';
+import { verifyDateFilter } from 'src/utils/Date';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -61,8 +71,6 @@ export class EmployeeService {
 
     return response;
   }
-
- 
 
   async create(props: CreateEmployeeDTO): Promise<Employee> {
     let pin: Pin;
@@ -107,12 +115,10 @@ export class EmployeeService {
 
     const getShift = getStartAtAndFinishEmployee(props.shift);
 
-      let shiftSchedule: string;
-      
-      if(!getShift) 
-        shiftSchedule  = `${ETypeShiftEmployee.NOT_DEFINED}`;
-      if(getShift) 
-       shiftSchedule =  `${getShift.startAt} às ${getShift.finishAt}`;
+    let shiftSchedule: string;
+
+    if (!getShift) shiftSchedule = `${ETypeShiftEmployee.NOT_DEFINED}`;
+    if (getShift) shiftSchedule = `${getShift.startAt} às ${getShift.finishAt}`;
 
     const employee = await this.employeeRepository.create(
       new Employee({
@@ -174,6 +180,7 @@ export class EmployeeService {
     page: Page,
     filters?: FiltersEmployeeDTO,
   ): Promise<PageResponse<MappedEmployeeDTO>> {
+    verifyDateFilter(filters.admission);
     const employees = await this.employeeRepository.findAll(page, filters);
 
     if (employees.total === 0) {
@@ -220,14 +227,12 @@ export class EmployeeService {
             HttpStatus.BAD_REQUEST,
           );
 
-       
-
         await this.employeeOnPinService.associateEmployeeByService(
           data.pin.id,
           employee,
         );
-      } 
-     if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
+      }
+      if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
         const { title, local, details, lat, lng } = data.pin;
 
         if (!title || !local || !details || !lat || !lng) {
@@ -249,18 +254,18 @@ export class EmployeeService {
           pin.id,
           employee,
         );
-      } 
+      }
     }
-    
-    let shiftScheduleUpdate: string = null
-    if(data.shift){
-    const getShiftUpdate = getStartAtAndFinishEmployee(data.shift);
-       
-      if(!getShiftUpdate) 
-      shiftScheduleUpdate  = `${ETypeShiftEmployee.NOT_DEFINED}`;
-      if(getShiftUpdate) 
-      shiftScheduleUpdate =  `${getShiftUpdate.startAt} às ${getShiftUpdate.finishAt}`;
-}
+
+    let shiftScheduleUpdate: string = null;
+    if (data.shift) {
+      const getShiftUpdate = getStartAtAndFinishEmployee(data.shift);
+
+      if (!getShiftUpdate)
+        shiftScheduleUpdate = `${ETypeShiftEmployee.NOT_DEFINED}`;
+      if (getShiftUpdate)
+        shiftScheduleUpdate = `${getShiftUpdate.startAt} às ${getShiftUpdate.finishAt}`;
+    }
     const address = JSON.stringify(data?.address);
 
     const employeeDataUpdated = { ...data, address };
@@ -274,13 +279,13 @@ export class EmployeeService {
         name: employeeDataUpdated?.name,
         registration: employeeDataUpdated?.registration,
         role: employeeDataUpdated?.role,
-        shift: shiftScheduleUpdate? shiftScheduleUpdate : employee.shift,
+        shift: shiftScheduleUpdate ? shiftScheduleUpdate : employee.shift,
       }),
     );
-    
+
     return this.mapperOne(updatedEmployee);
   }
-   
+
   async listAllEmployeesPins(ids: string[]): Promise<Employee[]> {
     return await this.employeeRepository.findByIds(ids);
   }
@@ -376,7 +381,9 @@ export class EmployeeService {
         name: row['Nome Colaborador'] ? row['Nome Colaborador'].toString() : '',
         registration: row['Matricula'] ? row['Matricula'].toString() : '',
         role: row['Cargo'] ? row['Cargo'].toString() : '',
-         shift: row['Turno'] ? getShift(row['Turno'].toString() ) : ETypeShiftEmployee.NOT_DEFINED,
+        shift: row['Turno']
+          ? getShift(row['Turno'].toString())
+          : ETypeShiftEmployee.NOT_DEFINED,
         costCenter: row['Centro de Custo']
           ? row['Centro de Custo'].toString()
           : '',
@@ -399,7 +406,7 @@ export class EmployeeService {
             }
           : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
-      
+
       line++;
       employees.push({ line, employee });
     }
@@ -436,7 +443,7 @@ export class EmployeeService {
 
       if (!errorsTest.length) {
         const existsRegistration =
-          await this.employeeRepository.findByRegistration(
+          await this.employeeRepository.findByRegistrationByImport(
             item.employee.registration,
           );
 
@@ -452,14 +459,12 @@ export class EmployeeService {
                 })
               : null;
 
-              const getShift = getStartAtAndFinishEmployee(item.employee.shift);
-          
-          
-                let shiftSchedule: string;
-                if(!getShift) 
-                  shiftSchedule  =`${ETypeShiftEmployee.NOT_DEFINED}`;
-                if(getShift) 
-                 shiftSchedule =  `${getShift.startAt} às ${getShift.finishAt}`;
+          const getShift = getStartAtAndFinishEmployee(item.employee.shift);
+
+          let shiftSchedule: string;
+          if (!getShift) shiftSchedule = `${ETypeShiftEmployee.NOT_DEFINED}`;
+          if (getShift)
+            shiftSchedule = `${getShift.startAt} às ${getShift.finishAt}`;
 
           await this.employeeRepository.create(
             new Employee(
@@ -471,7 +476,7 @@ export class EmployeeService {
                 registration: item.employee.registration,
                 password: bcrypt.hashSync(item.employee.registration, 10),
                 role: item.employee.role,
-                shift: shiftSchedule
+                shift: shiftSchedule,
               },
               pin ?? pinDenso,
             ),
@@ -511,7 +516,7 @@ export class EmployeeService {
     const workSheetName = 'Colaboradores';
 
     // const employees = await this.listAll(page, filters);
-    const employees = await this.employeeRepository.findAllExport()
+    const employees = await this.employeeRepository.findAllExport();
 
     if (employees.total === 0) {
       throw new HttpException(

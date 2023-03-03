@@ -19,6 +19,7 @@ import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
 import { CreateVehicleFileDTO } from 'src/dtos/vehicle/createVehicleFile.dto';
 import { convertToDate } from 'src/utils/date.service';
+import { verifyDateFilter } from 'src/utils/Date';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -90,6 +91,10 @@ export class VehicleService {
     page: Page,
     filters?: FiltersVehicleDTO,
   ): Promise<PageResponse<MappedVehicleDTO>> {
+    verifyDateFilter(filters.lastMaintenance);
+    verifyDateFilter(filters.lastSurvey);
+    verifyDateFilter(filters.expiration);
+
     const vehicles = await this.vehicleRepository.findAll(page, filters);
 
     if (vehicles.total === 0) {
@@ -321,7 +326,7 @@ export class VehicleService {
     const filePath = './vehicle.xlsx';
     const workSheetName = 'Veículos';
 
-    const vehicles = await this.vehicleRepository.findAllExport()
+    const vehicles = await this.vehicleRepository.findAllExport();
 
     const exportedDriverToXLSX = async (
       vehicles,
@@ -337,8 +342,8 @@ export class VehicleService {
           vehicle.lastSurvey,
           vehicle.expiration,
           vehicle.capacity,
+          vehicle.isAccessibility === true ? 'SIM' : 'NÃO',
           vehicle.lastMaintenance,
-          vehicle.isAccessibility,
         ];
       });
 
