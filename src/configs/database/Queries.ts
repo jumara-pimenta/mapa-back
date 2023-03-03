@@ -286,7 +286,7 @@ export function generateQueryByFiltersForRoute(
 
     startsAt: () => ({
       path: {
-        every: {
+        some: {
           startsAt: {
             contains: filters.startsAt,
           },

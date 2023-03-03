@@ -1,3 +1,4 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { getDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import * as moment from 'moment';
@@ -37,7 +38,7 @@ export function getDateStartToEndOfDay(date: string): DateStartEnd {
     999,
   );
 
-  return { start: getDateInLocaleTime(start), end: getDateInLocaleTime(end) };
+  return { start, end };
 }
 
 export function compareDates(dateInit: Date, dateFinal: Date) {
@@ -72,11 +73,17 @@ export function getPeriod(period: ETypePeriodHistory): PeriodInDate {
   }
 }
 
-export function getDuration(duration : string){
-  if(duration === '01:00')
-    return 1.16 * 60 * 60
-  if(duration === '01:30')
-    return 1.66  * 60 * 60
-  if(duration === '02:00')
-    return 2.16  * 60 * 60
+export function getDuration(duration: string) {
+  if (duration === '01:00') return 1.16 * 60 * 60;
+  if (duration === '01:30') return 1.66 * 60 * 60;
+  if (duration === '02:00') return 2.16 * 60 * 60;
+}
+
+export function verifyDateFilter(date?: string) {
+  if (date) {
+    // verifica se a data em string é uma data válida
+    const dateData = new Date(date);
+    if (dateData.toString() === 'Invalid Date')
+      throw new HttpException('Data inválida', HttpStatus.BAD_REQUEST);
+  }
 }
