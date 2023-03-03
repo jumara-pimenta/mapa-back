@@ -112,7 +112,7 @@ export class DriverService {
     page: Page,
     filters?: FiltersDriverDTO,
   ): Promise<PageResponse<MappedDriverDTO>> {
-    verifyDateFilter(filters.validation);
+    verifyDateFilter(filters?.validation);
     const drivers = await this.driverRepository.findAll(page, filters);
 
     if (drivers.total === 0) {

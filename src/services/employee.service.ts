@@ -180,7 +180,7 @@ export class EmployeeService {
     page: Page,
     filters?: FiltersEmployeeDTO,
   ): Promise<PageResponse<MappedEmployeeDTO>> {
-    verifyDateFilter(filters.admission);
+    verifyDateFilter(filters?.admission);
     const employees = await this.employeeRepository.findAll(page, filters);
 
     if (employees.total === 0) {
