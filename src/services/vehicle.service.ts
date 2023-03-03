@@ -91,9 +91,9 @@ export class VehicleService {
     page: Page,
     filters?: FiltersVehicleDTO,
   ): Promise<PageResponse<MappedVehicleDTO>> {
-    verifyDateFilter(filters.lastMaintenance);
-    verifyDateFilter(filters.lastSurvey);
-    verifyDateFilter(filters.expiration);
+    verifyDateFilter(filters?.lastMaintenance);
+    verifyDateFilter(filters?.lastSurvey);
+    verifyDateFilter(filters?.expiration);
 
     const vehicles = await this.vehicleRepository.findAll(page, filters);
 
