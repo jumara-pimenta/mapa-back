@@ -37,6 +37,9 @@ export function getDateStartToEndOfDay(date: string): DateStartEnd {
     59,
     999,
   );
+  //  add 4 hours to get the correct date
+  start.setHours(start.getHours() + 20);
+  end.setHours(end.getHours() + 20);
 
   return { start, end };
 }
