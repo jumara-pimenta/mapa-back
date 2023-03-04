@@ -18,7 +18,8 @@ export function getDateInLocaleTime(date: Date): Date {
 
 export function getDateStartToEndOfDay(date: string): DateStartEnd {
   const newDate = new Date(date);
-
+  const year = newDate.getFullYear();
+  if(year < 2000 || year > 2100) throw new HttpException('Selecione uma data válida', HttpStatus.BAD_REQUEST);
   const start = new Date(
     newDate.getFullYear(),
     newDate.getMonth(),
@@ -40,7 +41,8 @@ export function getDateStartToEndOfDay(date: string): DateStartEnd {
   //  add 4 hours to get the correct date
   start.setHours(start.getHours() + 20);
   end.setHours(end.getHours() + 20);
-
+  
+  console.log(start,end);
   return { start, end };
 }
 
