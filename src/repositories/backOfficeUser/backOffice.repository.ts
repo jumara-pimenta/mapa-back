@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Page, PageResponse } from 'src/configs/database/page.model';
 import { Pageable } from 'src/configs/database/pageable.service';
-import { PrismaService } from 'src/database/prisma.service';
-import { BackOfficeUserCreateDTO } from 'src/dtos/auth/backOfficeUserLogin.dto';
+import { generateQueryByFiltersForUser } from 'src/configs/database/Queries';
+import { PrismaService } from '../../configs/database/prisma.service';
+import {
+  BackOfficeUserCreateDTO,
+  BackOfficeUserUpdateDTO,
+} from 'src/dtos/auth/backOfficeUserLogin.dto';
+import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
 import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
+import { generateQueryForEmployee } from 'src/utils/QueriesEmployee';
 import IBackOfficeUserRepository from './backOffice.repository.contract';
 
 @Injectable()
@@ -12,7 +18,8 @@ export class BackOfficeUserRepository
   implements IBackOfficeUserRepository
 {
   constructor(private readonly repository: PrismaService) {
-    super();}
+    super();
+  }
 
   async create(data: BackOfficeUser): Promise<BackOfficeUser> {
     return await this.repository.backOfficeUser.create({
@@ -36,10 +43,13 @@ export class BackOfficeUserRepository
     });
   }
 
-  async update(data: BackOfficeUser): Promise<BackOfficeUser> {
+  async update(
+    id: string,
+    data: BackOfficeUserUpdateDTO,
+  ): Promise<BackOfficeUser> {
     return await this.repository.backOfficeUser.update({
       where: {
-        id: data.id,
+        id,
       },
       data,
     });
@@ -61,5 +71,33 @@ export class BackOfficeUserRepository
     });
   }
 
+  async findAll(
+    page: Page,
+    filters?: FilterBackOfficeUserDTO,
+  ): Promise<PageResponse<BackOfficeUser>> {
+    const condition = generateQueryByFiltersForUser(filters);
+    const where = {
+      ...condition,
+    };
 
+    const items = condition
+      ? await this.repository.backOfficeUser.findMany({
+          ...this.buildPage(page),
+          where,
+        })
+      : await this.repository.backOfficeUser.findMany({
+          ...this.buildPage(page),
+        });
+
+    const total = condition
+      ? await this.repository.backOfficeUser.findMany({
+          where,
+        })
+      : await this.repository.backOfficeUser.count();
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+  }
 }

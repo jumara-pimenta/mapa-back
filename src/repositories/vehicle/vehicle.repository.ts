@@ -45,8 +45,18 @@ export class VehicleRepository
 
   findById(id: string): Promise<Vehicle> {
     return this.repository.vehicle.findUnique({
-      where: { id },
+      where: { id: id },
     });
+  }
+
+  async findAllExport(): Promise<PageResponse<Vehicle>> {
+    const items = await this.repository.vehicle.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return this.buildPageResponse(items, items.length);
   }
 
   async findAll(
@@ -59,9 +69,15 @@ export class VehicleRepository
       ? await this.repository.vehicle.findMany({
           ...this.buildPage(page),
           where: condition,
+          orderBy: {
+            createdAt: 'desc',
+          },
         })
       : await this.repository.vehicle.findMany({
           ...this.buildPage(page),
+          orderBy: {
+            createdAt: 'desc',
+          },
         });
 
     const total = condition

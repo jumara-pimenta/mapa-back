@@ -24,7 +24,7 @@ export class CreateEmployeePinDTO {
     description:
       'caso typeCreation seja EXISTENTE\n\r\nId do pin que será atualizado.',
   })
-  @IsString({ message: '[id] não está definido como string.' })
+  @IsString({ message: '[id] não está definido como texto.' })
   @IsOptional()
   id?: string;
 
@@ -33,7 +33,8 @@ export class CreateEmployeePinDTO {
     examples: ['-3.10719', null],
     description: 'Latidude da localização',
   })
-  @IsString({ message: '[lat] não está definido como string.' })
+  @ApiProperty({ default: '-3.10719', examples: ['-3.10719', null] })
+  @IsString({ message: '[lat] não está definido como texto.' })
   @IsOptional()
   lat?: string;
 
@@ -42,7 +43,8 @@ export class CreateEmployeePinDTO {
     examples: ['-60.0261', null],
     description: 'Longitude da localização',
   })
-  @IsString({ message: '[lng] não está definido como string.' })
+  @ApiProperty({ default: '-60.0261', examples: ['-60.0261', null] })
+  @IsString({ message: '[lng] não está definido como texto.' })
   @IsOptional()
   lng?: string;
 
@@ -55,7 +57,7 @@ export class CreateEmployeePinDTO {
     ],
     description: 'Local do Ponto de Embarque',
   })
-  @IsString({ message: '[local] não está definido como string.' })
+  @IsString({ message: '[local] não está definido como texto.' })
   @IsOptional()
   local?: string;
 
@@ -65,7 +67,7 @@ export class CreateEmployeePinDTO {
     description: 'Detalhes sobre o ponto de embarque',
   })
   @IsString({
-    message: '[details] O campo de detalhes deve ser do tipo string.',
+    message: '[details] O campo de detalhes deve ser do tipo texto.',
   })
   @IsOptional()
   details?: string;
@@ -74,7 +76,8 @@ export class CreateEmployeePinDTO {
     default: 'Título do local',
     description: 'Título do local',
   })
-  @IsString({ message: '[title] não está definido como string.' })
+  @ApiProperty({ default: 'Título do local' })
+  @IsString({ message: '[title] não está definido como texto.' })
   @IsOptional()
   title?: string;
 }

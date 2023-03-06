@@ -5,7 +5,11 @@ export enum ETypePin {
 
 export enum ETypeRoute {
   CONVENTIONAL = 'CONVENCIONAL',
-  ESPECIAL = 'ESPECIAL',
+  EXTRA = 'EXTRA',
+}
+
+export enum ETypeRouteExport {
+  CONVENTIONAL = 'CONVENCIONAL',
   EXTRA = 'EXTRA',
 }
 
@@ -40,4 +44,27 @@ export enum ERoles {
   ROLE_ADMIN = 'ADMIN',
   ROLE_EMPLOYEE = 'EMPLOYEE',
   ROLE_DRIVER = 'DRIVER',
+}
+
+export enum ETypePeriodHistory {
+  WEEKLY = 'SEMANAL',
+  BIWEEKLY = 'QUINZENAL',
+  MONTHLY = 'MENSAL',
+}
+
+export enum ETypeShiftRotue {
+  FIRST = 'PRIMEIRO',
+  SECOND = 'SEGUNDO',
+  THIRD = 'TERCEIRO',
+}
+
+export enum ETypeShiftEmployee {
+  FIRST = 'PRIMEIRO',
+  SECOND = 'SEGUNDO',
+  THIRD = 'TERCEIRO',
+  NOT_DEFINED = 'SEM TURNO ESTABELECIDO',
+}
+export enum ETypeCategoryDrivers {
+  C = 'C',
+  D = 'D',
 }

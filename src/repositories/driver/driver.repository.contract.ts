@@ -9,8 +9,10 @@ export default interface IDriverRepository {
     page: Page,
     filters?: FiltersDriverDTO,
   ): Promise<PageResponse<Driver>>;
+  findAllExport(): Promise<PageResponse<Driver>>;
   findById(id: string): Promise<Driver>;
   findByCpf(cpf: string): Promise<Driver>;
   findByCnh(cnh: string): Promise<Driver>;
   update(data: Driver): Promise<Driver>;
+  findByDrivers(): Promise<Driver[]>;
 }

@@ -9,6 +9,10 @@ import {
   Post,
   Put,
   Query,
+  Response,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
@@ -17,14 +21,23 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateDriver,
   DeleteDriver,
   GetAllDriver,
   GetDriver,
   UpdateDriver,
+  UploadFileDrivers,
 } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { xlsxFileFilter } from 'src/middlewares/image.middleware';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -32,6 +45,7 @@ export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
   @Post()
+  @Roles('create-driver')
   @ApiCreatedResponse({
     description: 'Creates a new Driver.',
     schema: {
@@ -45,6 +59,7 @@ export class DriverController {
   }
 
   @Delete('/:id')
+  @Roles('delete-driver')
   @ApiCreatedResponse({
     description: 'Delete a Driver.',
     schema: {
@@ -58,6 +73,7 @@ export class DriverController {
   }
 
   @Put('/:id')
+  @Roles('edit-driver')
   @ApiCreatedResponse({
     description: 'Update a Driver.',
     schema: {
@@ -74,6 +90,7 @@ export class DriverController {
   }
 
   @Get()
+  @Roles('list-driver')
   @ApiCreatedResponse({
     description: 'Get all Drivers.',
     schema: {
@@ -90,6 +107,7 @@ export class DriverController {
   }
 
   @Get('/:id')
+  @Roles('list-driver')
   @ApiCreatedResponse({
     description: 'Get a Driver by id.',
     schema: {
@@ -100,5 +118,52 @@ export class DriverController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Driver> {
     return await this.driverService.listById(id);
+  }
+
+  @Get('/exports/file')
+  @ApiCreatedResponse({
+    description: 'Export a Driver File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportDriverFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersDriverDTO,
+  ): Promise<StreamableFile> {
+    const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx';
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    return await this.driverService.exportDriverFile(page, filters);
+  }
+
+  @Post('/upload')
+  @Roles('import-drivers')
+  @ApiConsumes('multipart/form-data')
+  @ApiCreatedResponse({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos motoristas',
+    schema: {
+      type: 'object',
+      example: UploadFileDrivers,
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: xlsxFileFilter,
+  }),)  async uploadFile(
+    @UploadedFile()
+    file: any,
+  ) {
+    return this.driverService.parseExcelFile(file);
   }
 }

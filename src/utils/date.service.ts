@@ -1,11 +1,17 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
+import { ETypeShiftEmployee, ETypeShiftRotue } from './ETypes';
 import {
   dateInFormatOneRgx,
   dateInFormatThreeRgx,
   dateInFormatTwoRgx,
 } from './Regex';
+
+class startAndFinishAt {
+  startAt: string;
+  finishAt: string;
+}
 
 export function getDateInLocaleTime(date: Date): Date {
   const newDate = zonedTimeToUtc(date, 'UTC');
@@ -102,3 +108,34 @@ export function convertTimeToDate(hour: string): Date {
     0,
   );
 }
+
+ export function convertToDate(date : string) : Date | null{
+    const data = new Date('12/30/1899')
+    //how to add days to date
+    
+    data.setDate(data.getDate() + Number(date))
+    return data
+ }
+
+ export function getStartAtAndFinishAt(type : ETypeShiftRotue) : startAndFinishAt {
+    if(type === ETypeShiftRotue.FIRST)
+        return {startAt : '07:30', finishAt : '17:30'}
+    if(type === ETypeShiftRotue.SECOND)
+        return {startAt : '17:30', finishAt : '02:30'}
+    if(type === ETypeShiftRotue.THIRD)
+        return {startAt : '03:30', finishAt : '12:00'}
+ }
+
+
+
+ export function getStartAtAndFinishEmployee(type : ETypeShiftEmployee) : startAndFinishAt | null {
+  if(type === ETypeShiftEmployee.FIRST)
+      return {startAt : '07:30', finishAt : '17:30'}
+  if(type === ETypeShiftEmployee.SECOND)
+      return {startAt : '17:30', finishAt : '02:30'}
+  if(type === ETypeShiftEmployee.THIRD)
+      return {startAt : '03:30', finishAt : '12:00'}
+  if(type === ETypeShiftEmployee.NOT_DEFINED)        
+      return  null
+}
+

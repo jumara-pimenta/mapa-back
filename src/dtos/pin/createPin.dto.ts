@@ -8,7 +8,7 @@ export class CreatePinDTO {
     type: 'string',
     description: 'Título do Ponto de Embarque',
   })
-  @IsString({ message: '[title] O título deve ser do tipo string.' })
+  @IsString({ message: '[title] O título deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[title] O título deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   title: string;
@@ -18,7 +18,7 @@ export class CreatePinDTO {
       'Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-200, Brasil',
     description: 'Local do Ponto de Embarque',
   })
-  @IsString({ message: '[local] O local deve ser do tipo string.' })
+  @IsString({ message: '[local] O local deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[local] O local deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   local: string;
@@ -28,7 +28,7 @@ export class CreatePinDTO {
     description: 'Detalhes do local do Ponto de Embarque',
   })
   @IsString({
-    message: '[details] O campo de detalhes deve ser do tipo string.',
+    message: '[details] O campo de detalhes deve ser do tipo texto.',
   })
   @IsNotEmpty({ message: '[details] O campo de detalhes deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -38,7 +38,7 @@ export class CreatePinDTO {
     default: '-60.0261',
     description: 'Latitude do Ponto de Embarque',
   })
-  @IsLatitude({ message: '[lat] A latitude deve ser do tipo string.' })
+  @IsLatitude({ message: '[lat] A latitude deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[lat] A latitude deve ser preenchida.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   lat: string;

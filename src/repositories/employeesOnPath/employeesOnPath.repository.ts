@@ -73,6 +73,7 @@ export class EmployeesOnPathRepository
   findByIds(id: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: { employeeId: id },
+      
       select: {
         id: true,
         confirmation: true,
@@ -107,6 +108,9 @@ export class EmployeesOnPathRepository
       where: {
         pathId,
       },
+      orderBy: {
+        position: 'asc',
+      },
       select: {
         id: true,
         boardingAt: true,
@@ -117,6 +121,7 @@ export class EmployeesOnPathRepository
         present: true,
         employee: {
           select: {
+            id: true,
             name: true,
             address: true,
             shift: true,
@@ -321,5 +326,25 @@ export class EmployeesOnPathRepository
         },
       },
     });
+  }
+
+  updateMany(
+    data: EmployeesOnPath[],
+    confirmation: boolean,
+  ): Promise<EmployeesOnPath[]> {
+    const promises = data.map((item) =>
+      this.repository.employeesOnPath.update({
+        data: {
+          confirmation: confirmation,
+          description: null,
+          present: null,
+          disembarkAt: null,
+          boardingAt: null,
+          updatedAt: null,
+        },
+        where: { id: item.id },
+      }),
+    );
+    return Promise.all(promises);
   }
 }

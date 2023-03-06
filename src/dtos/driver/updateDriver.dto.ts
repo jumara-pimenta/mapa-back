@@ -7,7 +7,7 @@ export class UpdateDriverDTO {
     example: 'João da Silva',
     description: 'Nome do motorista',
   })
-  @IsString({ message: '[Name] não está definida como string.' })
+  @IsString({ message: '[Name] não está definida como texto.' })
   @IsOptional()
   name?: string;
 
@@ -16,7 +16,7 @@ export class UpdateDriverDTO {
     example: '96893908563',
     description: 'CPF do motorista',
   })
-  @IsString({ message: '[CPF] não está definida como string.' })
+  @IsString({ message: '[CPF] não está definida como alfanumérico.' })
   @IsOptional()
   cpf?: string;
 
@@ -25,7 +25,7 @@ export class UpdateDriverDTO {
     example: '123456789',
     description: 'CNH do motorista',
   })
-  @IsString({ message: '[CNH] não está definida como string.' })
+  @IsString({ message: '[CNH] não está definida como alfanumérico.' })
   @IsOptional()
   cnh?: string;
 
@@ -43,7 +43,7 @@ export class UpdateDriverDTO {
     example: 'AB',
     description: 'Categoria da CNH do motorista',
   })
-  @IsString({ message: '[Category] não está definida como string.' })
+  @IsString({ message: '[Category] não está definida como texto.' })
   @IsOptional()
   category?: string;
 }

@@ -7,6 +7,7 @@ import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
+import { ETypePin } from '../../utils/ETypes';
 
 @Injectable()
 export class EmployeeRepository
@@ -18,22 +19,28 @@ export class EmployeeRepository
   }
 
   delete(id: string): Promise<Employee> {
-    return this.repository.employee.delete({
+    return this.repository.employee.update({
       where: { id },
+      data: {
+        deletedAt: getDateInLocaleTime(new Date()),
+      },
     });
   }
 
   update(data: Employee): Promise<any> {
+    const dataAdmission = data.admission
+      ? getDateInLocaleTime(new Date(data.admission))
+      : undefined;
     return this.repository.employee.update({
       data: {
-        id: data.id,
-        address: data.address,
-        admission: getDateInLocaleTime(new Date(data.admission)),
-        costCenter: data.costCenter,
-        name: data.name,
-        registration: data.registration,
-        role: data.role,
-        shift: data.shift,
+        id: data.id!,
+        address: data.address!,
+        admission: dataAdmission!,
+        costCenter: data.costCenter!,
+        name: data.name!,
+        registration: data.registration!,
+        role: data.role!,
+        shift: data.shift!,
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
@@ -48,15 +55,15 @@ export class EmployeeRepository
                 lat: true,
                 lng: true,
                 local: true,
-                title: true
-              }
-            }
+                title: true,
+              },
+            },
           },
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: 'desc',
+          },
         },
-      }
+      },
     });
   }
 
@@ -74,21 +81,33 @@ export class EmployeeRepository
                 lat: true,
                 lng: true,
                 local: true,
-                title: true
-              }
-            }
+                title: true,
+              },
+            },
           },
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: 'desc',
+          },
         },
       },
     });
   }
 
   findByRegistration(registration: string): Promise<Employee> {
-    return this.repository.employee.findUnique({
-      where: { registration },
+    return this.repository.employee.findFirst({
+      where: {
+        registration: registration,
+        deletedAt: null,
+      },
+    });
+  }
+
+  findByRegistrationByImport(registration: string): Promise<Employee> {
+    return this.repository.employee.findFirst({
+      where: {
+        registration: registration,
+        // deletedAt: null,
+      },
     });
   }
 
@@ -101,7 +120,10 @@ export class EmployeeRepository
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: condition,
+          where: { ...condition, deletedAt: null },
+          orderBy: {
+            createdAt: 'desc',
+          },
           include: {
             pins: {
               select: {
@@ -113,18 +135,24 @@ export class EmployeeRepository
                     lat: true,
                     lng: true,
                     local: true,
-                    title: true
-                  }
-                }
+                    title: true,
+                  },
+                },
               },
               orderBy: {
-                createdAt: 'desc'
-              }
+                createdAt: 'desc',
+              },
             },
           },
         })
       : await this.repository.employee.findMany({
           ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
           include: {
             pins: {
               select: {
@@ -136,13 +164,13 @@ export class EmployeeRepository
                     lat: true,
                     lng: true,
                     local: true,
-                    title: true
-                  }
-                }
+                    title: true,
+                  },
+                },
               },
               orderBy: {
-                createdAt: 'desc'
-              }
+                createdAt: 'desc',
+              },
             },
           },
         });
@@ -151,9 +179,54 @@ export class EmployeeRepository
       ? await this.repository.employee.findMany({
           where: {
             ...condition,
+            deletedAt: null,
           },
         })
-      : await this.repository.employee.count();
+      : await this.repository.employee.count({
+          where: {
+            deletedAt: null,
+          },
+        });
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+  }
+
+  async findAllExport(): Promise<PageResponse<Employee>> {
+    const items = await this.repository.employee.findMany({
+      where: { deletedAt: null },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
+              select: {
+                id: true,
+                details: true,
+                lat: true,
+                lng: true,
+                local: true,
+                title: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+
+    const total = await this.repository.employee.findMany({
+      where: {
+        deletedAt: null,
+      },
+    });
 
     return this.buildPageResponse(
       items,
@@ -170,10 +243,30 @@ export class EmployeeRepository
         costCenter: data.costCenter,
         name: data.name,
         registration: data.registration,
+        password: data.password,
         role: data.role,
         shift: data.shift,
-        createdAt: data.createdAt
-      }
+        createdAt: data.createdAt,
+        pins: data.pin
+          ? {
+              connectOrCreate: {
+                create: {
+                  type: ETypePin.CONVENTIONAL,
+                  pinId: data.pin.id,
+                },
+                where: {
+                  employeeId_pinId: {
+                    pinId: data.pin.id,
+                    employeeId: data.id,
+                  },
+                },
+              },
+            }
+          : undefined,
+      },
+      include: {
+        pins: true,
+      },
     });
   }
 
@@ -183,6 +276,7 @@ export class EmployeeRepository
         id: {
           in: ids,
         },
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -195,8 +289,8 @@ export class EmployeeRepository
         },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 }

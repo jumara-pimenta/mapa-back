@@ -12,4 +12,8 @@ export default interface IEmployeesOnPathRepository {
   findManyByRoute(routeId: string): Promise<EmployeesOnPath[]>;
   update(data: EmployeesOnPath): Promise<EmployeesOnPath>;
   findByPathAndPin(pathId: string, pinId: string): Promise<EmployeesOnPath[]>;
+  updateMany(
+    data: EmployeesOnPath[],
+    confirmation: boolean,
+  ): Promise<EmployeesOnPath[]>;
 }

@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Response,
   Query,
 } from '@nestjs/common';
 import { FiltersRouteDTO } from '../dtos/route/filtersRoute.dto';
@@ -25,12 +26,17 @@ import {
   ListRoutes,
   UpdateRoute,
 } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { FilterRouteExport } from 'src/dtos/route/filterRouteExport';
+import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
+import { RouteMobile } from 'src/utils/Utils';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
   @Post()
+  @Roles('create-route')
   @ApiCreatedResponse({
     description: 'Creates a new Route.',
     schema: {
@@ -44,6 +50,7 @@ export class RouteController {
   }
 
   @Delete('/:id')
+  @Roles('delete-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Soft delete a route.',
@@ -58,6 +65,7 @@ export class RouteController {
   }
 
   @Put('/:id')
+  @Roles('edit-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Update a route.',
@@ -75,6 +83,7 @@ export class RouteController {
   }
 
   @Get()
+  @Roles('list-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List all routes.',
@@ -91,7 +100,27 @@ export class RouteController {
     return await this.routeService.listAll(page, filters);
   }
 
+  @Get('mobile/:driverId/short')
+  @Roles('list-route')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'List all routes.',
+    schema: {
+      type: 'object',
+      // example: ListRoutes,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAllMobile(
+    @Query() page: Page,
+    @Query() filters: FiltersRouteDTO,
+    @Param('driverId') driverId?: string,
+  ): Promise<RouteMobile[]> {
+    return await this.routeService.listAllMobile(page, filters, driverId);
+  }
+
   @Get('/:id')
+  @Roles('list-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List a route by id.',
@@ -106,6 +135,7 @@ export class RouteController {
   }
 
   @Get('/paths/driver/:id')
+  @Roles('list-route')
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'List a route by driver.',
@@ -121,5 +151,48 @@ export class RouteController {
     @Query() filters: FiltersRouteDTO,
   ): Promise<PageResponse<MappedRouteDTO>> {
     return await this.routeService.listByDriverId(id, page, filters);
+  }
+
+  @Get('/download/file')
+  @ApiCreatedResponse({
+    description: 'Export a Route File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportRouteToFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filter: FilterRouteExport,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Rotas Exportadas.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.routeService.exportsRouteFile(page, filter.type);
+  }
+
+  @Get('/export/route/:id')
+  @ApiCreatedResponse({
+    description: 'Export a Paths pf a route File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportPathToFile(
+    @Response({ passthrough: true }) res,
+    @Param('id') id: string,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Trajetos Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.routeService.exportsPathToFile(id);
+  }
+
+  @Post('/replace/drivers')
+  @HttpCode(HttpStatus.OK)
+  async replaceDrivers(
+    @Body() payload: RouteReplacementDriverDTO,
+  ): Promise<any> {
+    return await this.routeService.routeReplacementDriver(payload);
   }
 }

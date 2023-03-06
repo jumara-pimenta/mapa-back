@@ -8,23 +8,30 @@ export class Employee {
   id: string;
   name: string;
   registration: string;
+  password?: string;
   admission: Date;
   role: string;
   shift: string;
   costCenter: string;
   address: string;
   pins?: Partial<EmployeesOnPin>[];
+  pin?: Pin;
   employeeOnPath?: EmployeesOnPath;
   createdAt: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
 
   constructor(
-    props: Omit<Employee, 'id' | 'createdAt' | 'pins' | 'employeeOnPath'>,
+    props: Omit<
+      Employee,
+      'pin' | 'id' | 'createdAt' | 'pins'  | 'employeeOnPath'
+    >,
     pin?: Pin,
     id?: string,
   ) {
     Object.assign(this, props);
     this.createdAt = getDateInLocaleTime(new Date());
     this.id = id ?? uuid();
+    this.pin = pin;
   }
 }

@@ -13,7 +13,8 @@ import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
 import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employeesOnPath.repository.contract';
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
-import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
+import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { ETypePath } from 'src/utils/ETypes';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -27,7 +28,6 @@ export class EmployeesOnPathService {
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
     let position = 1;
-
     const path = await this.pathService.listById(props.pathId);
 
     for await (const id of props.employeeIds) {
@@ -40,7 +40,6 @@ export class EmployeesOnPathService {
           path,
         ),
       );
-
       position++;
     }
 
@@ -67,7 +66,6 @@ export class EmployeesOnPathService {
 
   async findById(id: string): Promise<EmployeesOnPath> {
     const employeesOnPath = await this.employeesOnPathRepository.findById(id);
-    console.log('employeesOnPath', employeesOnPath);
 
     if (!employeesOnPath)
       throw new HttpException(
@@ -228,6 +226,32 @@ export class EmployeesOnPathService {
       );
 
     return data;
+  }
+
+  async listByPath(pathId: string): Promise<EmployeesOnPath[]> {
+    const data = await this.employeesOnPathRepository.findByPath(pathId);
+
+    if (!data.length)
+      throw new HttpException(
+        `Não foi encontrado um colaborador no trajeto com este trajeto: ${pathId}`,
+        HttpStatus.NOT_FOUND,
+      );
+    return data;
+  }
+
+  async clearEmployeesOnPath(pathId: string): Promise<void> {
+    const path = await this.pathService.listById(pathId);
+
+    const employeesOnPath = await this.employeesOnPathRepository.findByPath(
+      pathId,
+    );
+    if (path.type === ETypePath.ONE_WAY) {
+      await this.employeesOnPathRepository.updateMany(employeesOnPath, true);
+    }
+
+    if (path.type === ETypePath.RETURN) {
+      await this.employeesOnPathRepository.updateMany(employeesOnPath, false);
+    }
   }
 
   private mappedOne(

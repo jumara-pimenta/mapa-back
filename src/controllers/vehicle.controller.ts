@@ -9,6 +9,10 @@ import {
   Post,
   Put,
   Query,
+  Response,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FiltersVehicleDTO } from '../dtos/vehicle/filtersVehicle.dto';
 import { MappedVehicleDTO } from '../dtos/vehicle/mappedVehicle.dto';
@@ -17,14 +21,23 @@ import { Vehicle } from '../entities/vehicle.entity';
 import { VehicleService } from '../services/vehicle.service';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateVehicle,
   DeleteVehicle,
   GetAllVehicle,
   GetVehicle,
   UpdateVehicle,
+  UploadFileVehicles,
 } from 'src/utils/examples.swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { xlsxFileFilter } from 'src/middlewares/image.middleware';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')
@@ -32,6 +45,7 @@ export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   @Post()
+  @Roles('create-vehicle')
   @ApiCreatedResponse({
     description: 'Creates a new Vehicle.',
     schema: {
@@ -45,6 +59,7 @@ export class VehicleController {
   }
 
   @Delete('/:id')
+  @Roles('delete-vehicle')
   @ApiCreatedResponse({
     description: 'Delete a Vehicle.',
     schema: {
@@ -58,6 +73,7 @@ export class VehicleController {
   }
 
   @Put('/:id')
+  @Roles('edit-vehicle')
   @ApiCreatedResponse({
     description: 'Update a Vehicle.',
     schema: {
@@ -74,6 +90,7 @@ export class VehicleController {
   }
 
   @Get()
+  @Roles('list-vehicle')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'List all Vehicle.',
@@ -91,6 +108,7 @@ export class VehicleController {
   }
 
   @Get('/:id')
+  @Roles('list-vehicle')
   @ApiCreatedResponse({
     status: HttpStatus.OK,
     description: 'Get a Vehicle by id.',
@@ -102,5 +120,52 @@ export class VehicleController {
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Vehicle> {
     return await this.vehicleService.listById(id);
+  }
+
+  @Get('/exports/file')
+  @ApiCreatedResponse({
+    description: 'Export a Vehicle File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportVehicleFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersVehicleDTO,
+  ): Promise<StreamableFile> {
+    const fileName = 'Sonar Rotas - Veículos Exportados.xlsx';
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    return await this.vehicleService.exportVehicleFile(page, filters);
+  }
+
+  @Post('/upload')
+  @Roles('import-vehicles')
+  @ApiConsumes('multipart/form-data')
+  @ApiCreatedResponse({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos veículos',
+    schema: {
+      type: 'object',
+      example: UploadFileVehicles,
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: xlsxFileFilter,
+  }),)  async uploadFile(
+    @UploadedFile()
+    file: any,
+  ) {
+    return this.vehicleService.parseExcelFile(file);
   }
 }

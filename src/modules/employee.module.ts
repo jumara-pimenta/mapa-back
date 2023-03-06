@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { EmployeeController } from '../controllers/employee.controller';
 import { EmployeeRepository } from '../repositories/employee/employee.repository';
 import { EmployeeService } from '../services/employee.service';
@@ -16,6 +17,10 @@ import { PinModule } from './pin.module';
     {
       provide: 'IEmployeeRepository',
       useClass: EmployeeRepository,
+    },
+    {
+      provide: 'IGoogleApiServiceIntegration',
+      useClass: GoogleApiServiceIntegration,
     },
   ],
   exports: [EmployeeService],

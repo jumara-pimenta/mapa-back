@@ -4,6 +4,7 @@ import { Pin } from './pin.entity';
 
 export class EmployeesOnPin {
   employee?: Employee;
+  id?: string;
   pin?: Partial<Pin>;
   pinId?: string;
   type: ETypePin | string;

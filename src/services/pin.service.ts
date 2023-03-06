@@ -24,6 +24,19 @@ export class PinService {
     return await this.pinRepository.delete(pin.id);
   }
 
+  async listByLocal(local: string) {
+    const pin = await this.pinRepository.findByLocal(local);
+
+    if (!pin) {
+      throw new HttpException(
+        'O ponto de embarque não foi encontrado!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return pin;
+  }
+
   async listAll(
     page: Page,
     filters?: FiltersPinDTO,

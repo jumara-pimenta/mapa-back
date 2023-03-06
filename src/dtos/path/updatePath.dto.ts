@@ -21,6 +21,14 @@ export class UpdatePathDTO {
   @IsOptional()
   startsAt?: string;
 
+  @ApiProperty({ description: 'Hora prevista para ida do trajeto' })
+  @Matches(StartsAtRgx, {
+    message:
+      '[startsReturnAt] A hora de ida do trajeto deve ser do formato esperado: 00h00',
+  })
+  @IsOptional()
+  startsReturnAt?: string;
+
   @ApiProperty({ description: 'Hora do início do trajeto' })
   @IsDateString()
   @IsOptional()
@@ -33,4 +41,12 @@ export class UpdatePathDTO {
   })
   @IsOptional()
   status?: EStatusPath;
+
+  @ApiProperty({
+    description: 'id do Motorista substituto',
+    required: false,
+    type: String,
+  })
+  @IsOptional()
+  substituteId?: string;
 }

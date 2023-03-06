@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  StreamableFile,
+} from '@nestjs/common';
 import { Driver } from '../entities/driver.entity';
 import IDriverRepository from '../repositories/driver/driver.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
@@ -6,6 +12,28 @@ import { FiltersDriverDTO } from '../dtos/driver/filtersDriver.dto';
 import { MappedDriverDTO } from '../dtos/driver/mappedDriver.dto';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
+import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as XLSX from 'xlsx';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
+import { CreateDriverFileDTO } from 'src/dtos/driver/createDriverFile.dto';
+import { convertToDate } from 'src/utils/date.service';
+import { verifyDateFilter } from 'src/utils/Date';
+
+const validateAsync = (schema: any): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    validate(schema, { validationError: { target: false } })
+      .then((response) => resolve(response.map((i) => i)))
+      .catch((error: any) => reject(error));
+  });
+};
+
+interface driverDTO {
+  line: number;
+  driver: CreateDriverFileDTO;
+}
 
 @Injectable()
 export class DriverService {
@@ -55,7 +83,10 @@ export class DriverService {
         HttpStatus.CONFLICT,
       );
     } else {
-      return await this.driverRepository.create(new Driver(payload));
+      const password = bcrypt.hashSync(payload.cpf, 10);
+      return await this.driverRepository.create(
+        new Driver({ ...payload, password }),
+      );
     }
   }
 
@@ -81,6 +112,7 @@ export class DriverService {
     page: Page,
     filters?: FiltersDriverDTO,
   ): Promise<PageResponse<MappedDriverDTO>> {
+    verifyDateFilter(filters?.validation);
     const drivers = await this.driverRepository.findAll(page, filters);
 
     if (drivers.total === 0) {
@@ -128,6 +160,18 @@ export class DriverService {
     );
   }
 
+  async getByCpf(cpf: string): Promise<Driver> {
+    const driver = await this.driverRepository.findByCpf(cpf);
+
+    if (!driver)
+      throw new HttpException(
+        `Não foi encontrado um motorista com o cpf: ${cpf}`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return driver;
+  }
+
   private toDTO(drivers: Driver[]): MappedDriverDTO[] {
     return drivers.map((driver) => {
       return {
@@ -140,5 +184,207 @@ export class DriverService {
         createdAt: driver.createdAt,
       };
     });
+  }
+
+  async parseExcelFile(file: any) {
+    const workbook = XLSX.read(file.buffer);
+    const sheetName = workbook.SheetNames;
+    const type = 'Motoristas';
+    if (!Object.values(sheetName).includes(type))
+      throw new HttpException(
+        `Planilha tem que conter a aba de ${type}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    const sheet = workbook.Sheets[type];
+    const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
+    if (
+      headers.join('') !==
+      [sheet.A1.v, sheet.B1.v, sheet.C1.v, sheet.D1.v, sheet.E1.v].join('')
+    )
+      throw new HttpException(
+        'Planilha tem que conter as colunas Nome, CPF, CNH, Validade, Categoria',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const drivers: driverDTO[] = [];
+
+    let line = 0;
+    const messagesErrors = [];
+
+    const data: any = XLSX.utils.sheet_to_json(sheet);
+    for (const row of data) {
+      const driver: CreateDriverFileDTO = {
+        name: row['Nome'] ? row['Nome'].toString() : '',
+        cpf: row['CPF'] ? row['CPF'].toString().replace(/[.-]/g, '') : '',
+        cnh: row['CNH'] ? row['CNH'].toString() : '',
+        validation: row['Validade']
+          ? convertToDate(row['Validade'].toString())
+          : new Date(),
+        category: row['Categoria'] ? row['Categoria'].toString() : '',
+      };
+      line++;
+      drivers.push({ line, driver });
+    }
+
+    let totalCreated = 0;
+    let alreadyExisted = 0;
+    const totalToCreate = drivers.length;
+    let aa;
+    let result = [];
+
+    for await (const item of drivers) {
+      const driver = plainToClass(CreateDriverFileDTO, item.driver);
+      const lineE = item.line;
+      const errorsTest = await validateAsync(driver);
+      const [teste] = errorsTest;
+      if (errorsTest.length > 0) {
+        messagesErrors.push({
+          line: lineE,
+          // field: errorsTest,
+          message: teste,
+        });
+        const testew = messagesErrors.map((i) => {
+          return { property: i.message, line: i.line };
+        });
+
+        aa = testew.map((i) => [
+          {
+            field: i?.property.property,
+            message: i?.property.constraints,
+            linha: i.line + 1,
+          },
+        ]);
+
+        result = aa;
+      }
+
+      if (!errorsTest.length) {
+        const existsCpf = await this.driverRepository.findByCpf(
+          item.driver.cpf,
+        );
+
+        const existsCnh = await this.driverRepository.findByCnh(
+          item.driver.cnh,
+        );
+
+        if (!existsCpf && !existsCnh) {
+          await this.driverRepository.create(
+            new Driver({
+              name: item.driver.name,
+              cpf: item.driver.cpf,
+              cnh: item.driver.cnh,
+              validation: item.driver.validation,
+              category: item.driver.category,
+              password: await bcrypt.hash('Denso', 10),
+            }),
+          );
+          totalCreated++;
+        } else alreadyExisted++;
+      }
+    }
+
+    const errors: any = {
+      newDriversCreated: totalCreated,
+      driversAlreadyExistent: alreadyExisted,
+      quantityDriversOnSheet: totalToCreate,
+      errors: result,
+    };
+
+    return errors;
+  }
+
+  async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
+    const headers = [
+      'Nome                          ',
+      'CPF',
+      'CNH',
+      'Validade',
+      'Categoria',
+    ];
+    const today = new Date().toLocaleDateString('pt-BR');
+
+    const filePath = './driver.xlsx';
+    const workSheetName = 'Motorista';
+
+    const drivers = await this.driverRepository.findAllExport();
+
+    const exportedDriverToXLSX = async (
+      drivers,
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = drivers.map((driver) => {
+        return [
+          driver.name,
+          driver.cpf,
+          driver.cnh,
+          driver.validation,
+          driver.category,
+        ];
+      });
+
+      if (!data.length)
+        throw new HttpException(
+          'Não foram encontrados motoristas para serem exportados',
+          HttpStatus.NOT_FOUND,
+        );
+
+      const driverInformationHeader = [
+        [`MOTORISTAS EXPORTADOS: ${today}`, '', '', '', '', ''],
+      ];
+
+      const driverInformationSubHeader = [
+        [`TOTAL DE MOTORISTAS EXPORTADOS: ${data.length}`],
+      ];
+
+      const driverInformationFooter = [
+        ['*************************************'],
+        ['***************'],
+        ['***************'],
+        ['***************'],
+        ['***********'],
+      ];
+
+      const workBook = XLSX.utils.book_new();
+      // eslint-disable-next-line no-sparse-arrays
+      const workSheetData = [
+        ,
+        driverInformationHeader,
+        ,
+        driverInformationSubHeader,
+        ,
+        driverInformationFooter,
+        ,
+        headers,
+        ...data,
+        ,
+        driverInformationFooter,
+      ];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 30 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 9 },
+      ];
+      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(
+      drivers.items,
+      headers,
+      workSheetName,
+      filePath,
+    );
   }
 }

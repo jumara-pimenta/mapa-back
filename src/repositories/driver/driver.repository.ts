@@ -66,9 +66,15 @@ export class DriverRepository
       ? await this.repository.driver.findMany({
           ...this.buildPage(page),
           where: condition,
+          orderBy: {
+            createdAt: 'desc',
+          },
         })
       : await this.repository.driver.findMany({
           ...this.buildPage(page),
+          orderBy: {
+            createdAt: 'desc',
+          },
         });
 
     const total = condition
@@ -85,15 +91,37 @@ export class DriverRepository
     );
   }
 
+  async findAllExport(): Promise<PageResponse<Driver>> {
+    const items = await this.repository.driver.findMany({
+          orderBy: {
+            createdAt: 'desc',
+          },
+        })
+
+    const total = await this.repository.driver.findMany({
+        })
+     
+
+    return this.buildPageResponse(
+      items,
+      Array.isArray(total) ? total.length : total,
+    );
+    }
+
+  findByDrivers(): Promise<Driver[]> {
+    return this.repository.driver.findMany();
+  }
+
   create(data: Driver): Promise<Driver> {
     return this.repository.driver.create({
       data: {
         id: data.id,
         category: data.category,
+        password: data.password,
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
-        validation: getDateInLocaleTime(new Date(data.validation)),
+        validation: new Date(data.validation),
       },
     });
   }

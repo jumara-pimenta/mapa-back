@@ -1,103 +1,460 @@
-# sonar-rotas-back
+# SONAR ROTAS BACK
 
-## Getting started
+![ROTAS](/uploads/e44c21637ef17a54a11b36ace6f005fb/ROTAS.png)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Este repositório contém as informações necessárias para facilitar deploy e instalação, do back-end do sistema SONAR - ROTAS no seu ambiente de desenvolvimento ou de produção.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+# Tabela de conteúdos
 
-## Add your files
+<!--ts-->
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- [Status do Projeto](#1-status-do-projeto)
+- [Estrutura de pastas](#2-estrutura-de-pastas)
+- [Pré-requisitos](#3-pré-requisitos)
+- [Clonando o repositório de back-end do projeto SONAR ROTAS](#4-clonando-o-repositório-de-back-end-do-projeto-sonar-rotas)
+- [Configurações](#5-configurações)
+- [Configuração de deploy back-end do projeto SONAR ROTAS usando o Docker](#6-configuração-de-deploy-back-end-do-projeto-sonar-rotas-usando-o-docker)
+- [Comandos básicos para utilização do SONAR ROTAS back-end no Docker](#comandos-básicos-para-utilização-do-sonar-rotas-back-end-no-docker)
+- [Configuração de deploy back-end do projeto SONAR ROTAS usando o Node.js](#7-configuração-de-deploy-back-end-do-projeto-sonar-rotas-usando-o-nodejs)
+- [Comandos básicos para utilização do SONAR ROTAS back-end no Node.Js](#comandos-básicos-para-utilização-do-sonar-rotas-back-end-no-nodejs)
+<!--te-->
+
+## 1. Status do Projeto
+
+Em andamento
+
+## 2. Estrutura de pastas
+
+```bash
+📦 SONAR-ROTAS-BACK
+📦prisma
+ ┣ 📂migrations
+ ┃ ┣ 📂20230127144500_1
+ ┃ ┃ ┗ 📜migration.sql
+ ┃ ┗ 📜migration_lock.toml
+ ┗ 📜schema.prisma
+ 📦src
+ ┣ 📂configs
+ ┃ ┣ 📂authentication
+ ┃ ┃ ┗ 📜auth.guard.ts
+ ┃ ┗ 📂database
+ ┃ ┃ ┣ 📜Queries.ts
+ ┃ ┃ ┣ 📜page.model.ts
+ ┃ ┃ ┣ 📜pageable.service.ts
+ ┃ ┃ ┗ 📜prisma.service.ts
+ ┣ 📂controllers
+ ┃ ┣ 📜api.controller.ts
+ ┃ ┣ 📜auth.controller.ts
+ ┃ ┣ 📜driver.controller.ts
+ ┃ ┣ 📜employee.controller.ts
+ ┃ ┣ 📜employeesOnPath.controller.ts
+ ┃ ┣ 📜employeesOnPin.controller.ts
+ ┃ ┣ 📜path.controller.ts
+ ┃ ┣ 📜pin.controller.ts
+ ┃ ┣ 📜route.controller.ts
+ ┃ ┣ 📜routeHistory.controller.ts
+ ┃ ┗ 📜vehicle.controller.ts
+ ┣ 📂database
+ ┃ ┣ 📂queries
+ ┃ ┃ ┗ 📜Queries.ts
+ ┃ ┣ 📜prisma.module.ts
+ ┃ ┗ 📜prisma.service.ts
+ ┣ 📂decorators
+ ┃ ┣ 📜private.decorator.ts
+ ┃ ┣ 📜public.decorator.ts
+ ┃ ┗ 📜roles.decorator.ts
+ ┣ 📂dtos
+ ┃ ┣ 📂auth
+ ┃ ┃ ┣ 📜CoreToken.dto.ts
+ ┃ ┃ ┣ 📜backOfficeUserLogin.dto.ts
+ ┃ ┃ ┣ 📜filterBackOfficeUser.dto.ts
+ ┃ ┃ ┣ 📜header.dto.ts
+ ┃ ┃ ┣ 📜mappedBackOfficeUser.dto.ts
+ ┃ ┃ ┣ 📜queryBackOfficeUser.dto.ts
+ ┃ ┃ ┗ 📜token.dto.ts
+ ┃ ┣ 📂driver
+ ┃ ┃ ┣ 📜createDriver.dto.ts
+ ┃ ┃ ┣ 📜filtersDriver.dto.ts
+ ┃ ┃ ┣ 📜mappedDriver.dto.ts
+ ┃ ┃ ┣ 📜queryDriver.dto.ts
+ ┃ ┃ ┣ 📜signInDriver.dto.ts
+ ┃ ┃ ┗ 📜updateDriver.dto.ts
+ ┃ ┣ 📂employee
+ ┃ ┃ ┣ 📜createEmployee.dto.ts
+ ┃ ┃ ┣ 📜createEmployeeFile.dto.ts
+ ┃ ┃ ┣ 📜employeeAddress.dto.ts
+ ┃ ┃ ┣ 📜filtersEmployee.dto.ts
+ ┃ ┃ ┣ 📜mappedEmployee.dto.ts
+ ┃ ┃ ┣ 📜queryEmployee.dto.ts
+ ┃ ┃ ┣ 📜signInEmployee.dto.ts
+ ┃ ┃ ┗ 📜updateEmployee.dto.ts
+ ┃ ┣ 📂employeesOnPath
+ ┃ ┃ ┣ 📜createEmployeesOnPath.dto.ts
+ ┃ ┃ ┣ 📜filtersEmployeesOnPath.dto.ts
+ ┃ ┃ ┣ 📜idUpdateWebsocket.ts
+ ┃ ┃ ┣ 📜mappedEmployeesOnPath.dto.ts
+ ┃ ┃ ┣ 📜queryEmployeesOnPath.dto.ts
+ ┃ ┃ ┣ 📜updateEmployeesOnPath.dto.ts
+ ┃ ┃ ┣ 📜updateEmployeesStatusOnPath.dto.ts
+ ┃ ┃ ┗ 📜websocketUpdateEmployeesOnPath.dto.ts
+ ┃ ┣ 📂employeesOnPin
+ ┃ ┃ ┗ 📜associateEmployeeOnPin.dto.ts
+ ┃ ┣ 📂path
+ ┃ ┃ ┣ 📜createPath.dto.ts
+ ┃ ┃ ┣ 📜filtersPath.dto.ts
+ ┃ ┃ ┣ 📜mappedPath.dto.ts
+ ┃ ┃ ┣ 📜pathDetails.dto.ts
+ ┃ ┃ ┣ 📜queryPath.dto.ts
+ ┃ ┃ ┗ 📜updatePath.dto.ts
+ ┃ ┣ 📂pin
+ ┃ ┃ ┣ 📜createEmployeePin.dto.ts
+ ┃ ┃ ┣ 📜createPin.dto.ts
+ ┃ ┃ ┣ 📜filtersPin.dto.ts
+ ┃ ┃ ┣ 📜mappedPin.dto.ts
+ ┃ ┃ ┣ 📜queryPin.dto.ts
+ ┃ ┃ ┣ 📜updateEmployeePin.dto.ts
+ ┃ ┃ ┗ 📜updatePin.dto.ts
+ ┃ ┣ 📂route
+ ┃ ┃ ┣ 📜createRoute.dto.ts
+ ┃ ┃ ┣ 📜filtersRoute.dto.ts
+ ┃ ┃ ┣ 📜mappedRoute.dto.ts
+ ┃ ┃ ┣ 📜queryRoute.dto.ts
+ ┃ ┃ ┗ 📜updateRoute.dto.ts
+ ┃ ┣ 📂routeHistory
+ ┃ ┃ ┣ 📜createRouteHistory.dto.ts
+ ┃ ┃ ┣ 📜dateFilter.dto.ts
+ ┃ ┃ ┣ 📜filtersRouteHistory.dto.ts
+ ┃ ┃ ┣ 📜mappedRouteHistory.dto.ts
+ ┃ ┃ ┣ 📜queryRouteHistory.dto.ts
+ ┃ ┃ ┣ 📜routeHistoryByDate.dto.ts
+ ┃ ┃ ┗ 📜updateRouteHistory.dto.ts
+ ┃ ┣ 📂validation
+ ┃ ┃ ┗ 📜validation.dto.ts
+ ┃ ┣ 📂vehicle
+ ┃ ┃ ┣ 📜createVehicle.dto.ts
+ ┃ ┃ ┣ 📜filtersVehicle.dto.ts
+ ┃ ┃ ┣ 📜mappedVehicle.dto.ts
+ ┃ ┃ ┣ 📜queryVehicle.dto.ts
+ ┃ ┃ ┗ 📜updateVehicle.dto.ts
+ ┃ ┗ 📂websocket
+ ┃ ┃ ┣ 📜StatusRoute.dto.ts
+ ┃ ┃ ┣ 📜currentLocal.dto.ts
+ ┃ ┃ ┗ 📜startRoute.dto.ts
+ ┣ 📂entities
+ ┃ ┣ 📜backOfficeUser.entity.ts
+ ┃ ┣ 📜driver.entity.ts
+ ┃ ┣ 📜employee.entity.ts
+ ┃ ┣ 📜employeesOnPath.entity.ts
+ ┃ ┣ 📜employeesOnPin.entity.ts
+ ┃ ┣ 📜path.entity.ts
+ ┃ ┣ 📜pin.entity.ts
+ ┃ ┣ 📜route.entity.ts
+ ┃ ┣ 📜routeHistory.entity.ts
+ ┃ ┣ 📜routeWebsocket.entity.ts
+ ┃ ┗ 📜vehicle.entity.ts
+ ┣ 📂exceptions
+ ┃ ┣ 📂handlers
+ ┃ ┃ ┣ 📜integrationException.handler.ts
+ ┃ ┃ ┗ 📜unknowErrorException.handler.ts
+ ┃ ┗ 📜integrationException.ts
+ ┣ 📂gateway
+ ┃ ┗ 📜websocket.gateway.ts
+ ┣ 📂integrations
+ ┃ ┣ 📂services
+ ┃ ┃ ┗ 📂coreService
+ ┃ ┃ ┃ ┣ 📂request
+ ┃ ┃ ┃ ┃ ┗ 📜logout.request.ts
+ ┃ ┃ ┃ ┣ 📂response
+ ┃ ┃ ┃ ┃ ┣ 📜getAllUsers.response.ts
+ ┃ ┃ ┃ ┃ ┗ 📜verifyToken.response.ts
+ ┃ ┃ ┃ ┣ 📜core.service.integration.contract.ts
+ ┃ ┃ ┃ ┗ 📜core.service.integration.ts
+ ┃ ┗ 📜api.ts
+ ┣ 📂modules
+ ┃ ┣ 📜api.module.ts
+ ┃ ┣ 📜app.module.ts
+ ┃ ┣ 📜auth.module.ts
+ ┃ ┣ 📜driver.module.ts
+ ┃ ┣ 📜employee.module.ts
+ ┃ ┣ 📜employeesOnPath.module.ts
+ ┃ ┣ 📜employeesOnPin.module.ts
+ ┃ ┣ 📜path.module.ts
+ ┃ ┣ 📜pin.module.ts
+ ┃ ┣ 📜repository.module.ts
+ ┃ ┣ 📜route.module.ts
+ ┃ ┣ 📜routeHistory.module.ts
+ ┃ ┣ 📜vehicle.module.ts
+ ┃ ┗ 📜websocket.module.ts
+ ┣ 📂repositories
+ ┃ ┣ 📂backOfficeUser
+ ┃ ┃ ┣ 📜backOffice.repository.contract.ts
+ ┃ ┃ ┗ 📜backOffice.repository.ts
+ ┃ ┣ 📂driver
+ ┃ ┃ ┣ 📜driver.repository.contract.ts
+ ┃ ┃ ┗ 📜driver.repository.ts
+ ┃ ┣ 📂employee
+ ┃ ┃ ┣ 📜employee.repository.contract.ts
+ ┃ ┃ ┗ 📜employee.repository.ts
+ ┃ ┣ 📂employeesOnPath
+ ┃ ┃ ┣ 📜employeesOnPath.repository.contract.ts
+ ┃ ┃ ┗ 📜employeesOnPath.repository.ts
+ ┃ ┣ 📂employeesOnPin
+ ┃ ┃ ┣ 📜employeesOnPin.repository.contract.ts
+ ┃ ┃ ┗ 📜employeesOnPin.repository.ts
+ ┃ ┣ 📂path
+ ┃ ┃ ┣ 📜path.repository.contract.ts
+ ┃ ┃ ┗ 📜path.repository.ts
+ ┃ ┣ 📂pin
+ ┃ ┃ ┣ 📜pin.repository.contract.ts
+ ┃ ┃ ┗ 📜pin.repository.ts
+ ┃ ┣ 📂route
+ ┃ ┃ ┣ 📜route.repository.contract.ts
+ ┃ ┃ ┗ 📜route.repository.ts
+ ┃ ┣ 📂routeHistory
+ ┃ ┃ ┣ 📜routeHistory.repository.contract.ts
+ ┃ ┃ ┗ 📜routeHistory.repository.ts
+ ┃ ┗ 📂vehicle
+ ┃ ┃ ┣ 📜vehicle.repository.contract.ts
+ ┃ ┃ ┗ 📜vehicle.repository.ts
+ ┣ 📂services
+ ┃ ┣ 📜auth.service.ts
+ ┃ ┣ 📜backOfficeUser.service.ts
+ ┃ ┣ 📜driver.service.ts
+ ┃ ┣ 📜employee.service.ts
+ ┃ ┣ 📜employeesOnPath.service.ts
+ ┃ ┣ 📜employeesOnPin.service.ts
+ ┃ ┣ 📜path.service.ts
+ ┃ ┣ 📜pin.service.ts
+ ┃ ┣ 📜route.service.ts
+ ┃ ┣ 📜routeHistory.service.ts
+ ┃ ┗ 📜vehicle.service.ts
+ ┣ 📂utils
+ ┃ ┣ 📜Date.ts
+ ┃ ┣ 📜ETypes.ts
+ ┃ ┣ 📜QueriesEmployee.ts
+ ┃ ┣ 📜QueriesPins.ts
+ ┃ ┣ 📜Regex.ts
+ ┃ ┣ 📜Utils.ts
+ ┃ ┣ 📜date.service.ts
+ ┃ ┣ 📜examples.swagger.ts
+ ┃ ┗ 📜roles.permissions.ts
+ ┗ 📜main.ts
+```
+
+## 3. Pré-requisitos
+
+- Sistema operacional Linux instalado - Ubuntu 20.04
+
+  - https://ubuntu.com/download/desktop <br/><br/>
+
+- Instalar VS CODE para visualizar os projetos
+
+  - https://code.visualstudio.com/Download <br/><br/>
+
+- Instalar Node versão 16.14.2 LTS (ou versão superior LTS)
+
+  - https://nodejs.org/en/download/ <br/><br/>
+
+    - Obs: Existe várias formas de instalação do node, uma delas é via package manager. Se optar por essa forma de instalação, é necessário da instalação do <b>CURL</b>.<br/><br/>
+      \*Para instalar o <b>CURL</b> acesse o link abaixo
+
+      ```sh
+      https://curl.se/
+      ```
+
+      ou instale via linha de comando no terminal de Ubuntu
+
+      ```sh
+      sudo snap install curl  # version 7.76.1
+      ```
+
+      ou
+
+      ```sh
+      sudo apt  install curl  # version 7.68.0-1ubuntu2.7
+      ```
+
+  - Verificar se o Node.js e NPM estão instalados.<br/>
+    Quando instalamos o Node.js o gerenciador de pacotes NPM também é instalado, para confirmar a instalação do Node.js e NPM abra o terminal de comando do Ubuntu e execute os comandos abaixo <br/><br/>
+    `sh
+node --version 
+`
+    ou
+
+                        ```sh
+                        npm --version
+                        ```
+
+                        se a instalação estiver correta a respostado terminal deve conter algo assim.
+
+                        ```sh
+                        $ node --version
+                        v16.14.2
+
+                            $ npm --version
+                            8.1.2
+
+                        ```
+
+                        ```
+
+                        ```
+
+- Instalar Yarn versão 1.22.18 LTS (ou versão superior LTS)
+
+  - https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable
+
+    ```sh
+    $ sudo npm install --global yarn
+    ```
+
+- Instalar a versão Git 2.25.1 LTS (ou superior LTS)
+
+  - https://git-scm.com/download/linux
+
+    ou instale via linha de comando no terminal de Ubuntu
+
+    ```sh
+    $ sudo apt-get install git-all
+    ```
+
+- Instalar o Banco de Dados do MSSQL Server 2019 LTS (ou superior LTS)
+
+  - https://www.microsoft.com/pt-br/sql-server/sql-server-downloadsbr><br><br/>
+
+  <b>Obs: Existe um repositório no GitLab da DENSO com um projeto chamado MSSQL que contém uma imagem do MSSQL no Docker, que pode facilitar a instalação e criação do banco de dados, porém para usar esse projeto e necessário finalizar os passos abaixo.</b><br><br/>
+
+<b>Para o deploy usando o Node.Js não é necessário instalar os pré-requisitos abaixo, siga para a etapa 7 deste manual, porém para o deploy usando o Docker e necessário finalizar a instalação dos pré-requisitos abaixo.</b>
+
+- Instalar Docker versão 20.10.11 LTS (ou versão superior LTS)
+
+  - https://docs.docker.com/engine/install/ubuntu/
+  - Dar privilégios para o Docker não pedir o “Sudo” durante a execução dos seus comandos.
+  - https://docs.docker.com/engine/install/linux-postinstall/ <br/><br />
+
+- Instalar Docker-compose versão 1.29.2 LTS (ou versão superior LTS)
+
+  - https://docs.docker.com/compoexamplese/install/ <br /><br />
+
+- Instalar Build Essentials versão GNU Make 4.2.1 LTS (ou versão superior LTS) para rodar os comandos Make.
+  - sudo apt install build-essential <br /><br />
+
+## 4. Clonando o repositório de back-end do projeto SONAR ROTAS
+
+- Clonar o repositório
+
+  - git clone -b develop <endereço-do-repositório>
+
+  - OBS: Por padrão o comando git clone clona a branch main do projeto, quando usamos a tag -b develop estamos clonando diretamente a branch develop.
+
+  - Abrir a pasta clonada
+    <br /><br />
+
+## 5. Configurações
+
+- Criar uma base de dados para o projeto SONAR - ROTAS.
+
+- Faça uma cópia do arquivo env.example
+
+- Renomeie a cópia para .env
+
+- Abra o arquivo. env que você acabou de criar e edite as variáveis de ambiente de acordo com as configurações do sistema onde o projeto vai ser instalado.
+
+  - DATABASE_URL=sqlserver://host:port;database=database;user=user;password=password;encrypt=true;trustServerCertificate=true
+  - PORT_BACKEND=porta-do-backend
+  - NODE_ENV=<'development' | 'production'>
+  - SECRET_KEY_ACCESS_TOKEN=secret-jwt
+
+  <br /><br />
+
+- Porta utilizada no back-end: 3051
+
+## 6. Configuração de deploy back-end do projeto SONAR ROTAS usando o Docker
+
+Abra o terminal de comando do Ubuntu e navegue até pasta do projeto e execute o comando make build, conforme exemplo abaixo:
+
+```sh
+$ cd <diretorio_do_seu_projeto>
+$ make build
+```
+
+## Comandos básicos para utilização do SONAR ROTAS back-end no Docker
+
+Para usar os comandos abaixo é necessário abrir o terminal de comando e navegar até a pasta do projeto SONAR - ROTAS back-end.
+
+Executar o comando para buildar e criar o contêiner e iniciar o projeto SONAR - ROTAS back-end.
+
+```sh
+make build
+```
+
+Parar o serviço do SONAR - ROTAS back-end
+
+```sh
+make down
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/denso2/core/sonar/sonar-rotas-web/sonar-rotas-back.git
-git branch -M main
-git push -uf origin main
+
+Iniciar o serviço do SONAR - ROTAS back-end
+
+```sh
+make up
 ```
 
-## Integrate with your tools
+Visualizar logs do SONAR - ROTAS back-end
 
-- [ ] [Set up project integrations](https://gitlab.com/denso2/core/sonar/sonar-rotas-web/sonar-rotas-back/-/settings/integrations)
+```sh
+make logs
+```
 
-## Collaborate with your team
+Baixar atualizações do SONAR - ROTAS back-end (fazer o git pull, criar uma nova build, iniciar o projeto com as novas atualizações)
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```sh
+make deploy
+```
 
-## Test and Deploy
+<br>
 
-Use the built-in continuous integration in GitLab.
+## 7. Configuração de deploy back-end do projeto SONAR ROTAS usando o Node.js
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Executar o comando para instalar as dependências (criar a pasta node_modules) e iniciar o projeto SONAR - ROTAS back-end.
 
----
+Abra a pasta do projeto com o terminal de comando e execute os comandos:
 
-# Editing this README
+```sh
+$ cd <this repository>
+$ yarn
+$ yarn start
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Comandos básicos para utilização do SONAR ROTAS back-end no Node.Js
 
-## Suggestions for a good README
+Para usar os comandos abaixo é necessário abrir o terminal de comando e navegar até a pasta do projeto SONAR - ROTAS back-end.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too lng and detailed, too lng is better than too short. If you think your README is too lng, consider utilizing another form of documentation rather than cutting out information.
+Abra a pasta do projeto com o terminal de comando
 
-## Name
+Executar o comando abaixo para instalar as dependências do projeto SONAR - ROTAS-BACKEND (criar a pasta node modules).
 
-Choose a self-explaining name for your project.
+```sh
+yarn
+```
 
-## Description
+Executar o comando abaixo para iniciar o projeto SONAR - ROTAS-BACKEND.
 
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```sh
+yarn start
+```
 
-## Badges
+Executar o comando abaixo para parar o projeto SONAR - ROTAS-BACKEND.
 
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```sh
+CTRL+C ou fechar o terminal
+```
 
-## Visuals
+Para baixar atualizações do SONAR - ROTAS back-end (fazer o git pull, iniciar o projeto com as novas atualizações)
 
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too lng to reasonably include in the README.
-
-## Support
-
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-
-Show your appreciation to those who have contributed to the project.
-
-## License
-
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```sh
+$ git pull
+$ yarn
+$ yarn start
+```

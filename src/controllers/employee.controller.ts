@@ -2,13 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
+  Response,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
@@ -18,39 +24,76 @@ import { EmployeeService } from '../services/employee.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import { UpdateEmployeeDTO } from '../dtos/employee/updateEmployee.dto';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateEmployee, DeleteEmployee, GetAllEmployee, GetEmployee, UpdateEmployee } from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+import {
+  CreateEmployee,
+  DeleteEmployee,
+  GetAllEmployee,
+  GetEmployee,
+  UpdateEmployee,
+} from '../utils/examples.swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from '../decorators/roles.decorator';
+import { xlsxFileFilter } from 'src/middlewares/image.middleware';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
+  @Post('/upload')
+  @Roles('import-employees')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description:
+      'Rota para fazer o upload de um arquivo excel com os dados dos funcionários',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'file',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: xlsxFileFilter,
+  }),)
+  async uploadFile(
+    @UploadedFile(
+  )
+    file: any,
+  ) {
+    return this.employeeService.parseExcelFile(file);
+  }
 
+  @Post()
+  @Roles('create-employee')
   @ApiCreatedResponse({
     description: 'Creates a new Employee.',
     schema: {
       type: 'object',
-      example: CreateEmployee
-    }
+      example: CreateEmployee,
+    },
   })
-  @Post()
-  @Roles('create-employee')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() payload: CreateEmployeeDTO): Promise<Employee> {
     return await this.employeeService.create(payload);
   }
 
   @Delete('/:id')
+  @Roles('delete-employee')
   @ApiCreatedResponse({
     description: 'Delete a Employees.',
     schema: {
       type: 'object',
-      example: DeleteEmployee
-    }
+      example: DeleteEmployee,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<Employee> {
@@ -58,12 +101,13 @@ export class EmployeeController {
   }
 
   @Put('/:id')
+  @Roles('edit-employee')
   @ApiCreatedResponse({
     description: 'Update a Employee.',
     schema: {
       type: 'object',
-      example: UpdateEmployee
-    }
+      example: UpdateEmployee,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async update(
@@ -73,15 +117,15 @@ export class EmployeeController {
     return await this.employeeService.update(id, data);
   }
 
-  @Get()  
+  @Get()
+  @Roles('list-employee')
   @ApiCreatedResponse({
     description: 'Get all Employees.',
     schema: {
       type: 'object',
-      example: GetAllEmployee
-    }
+      example: GetAllEmployee,
+    },
   })
-  @Roles('list-employee')
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Query() page: Page,
@@ -91,16 +135,37 @@ export class EmployeeController {
   }
 
   @Get('/:id')
+  @Roles('list-employee')
   @ApiCreatedResponse({
     description: 'Get a Employee by id.',
     schema: {
       type: 'object',
-      example: GetEmployee
-    }
+      example: GetEmployee,
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<Employee> {
     return await this.employeeService.listById(id);
   }
-  
+
+  @Get('download/file')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Export a Employee File to XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFile(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFile(page, filters);
+  }
+
+
 }

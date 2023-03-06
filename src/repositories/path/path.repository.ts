@@ -146,15 +146,16 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startsAt: data.startsAt,
         status: data.status,
         type: data.type,
+        substituteId: data.substituteId,
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
     });
   }
 
-  findById(id: string): Promise<Path> {
-    return this.repository.path.findUnique({
-      where: { id },
+  findById(id: string): Promise<Path | null> {
+    return this.repository.path.findFirst({
+      where: { id: id },
       select: {
         id: true,
         type: true,
@@ -164,9 +165,13 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startedAt: true,
         finishedAt: true,
         createdAt: true,
+        substituteId: true,
         route: {
           select: {
+            id: true,
             description: true,
+            vehicle: true,
+            driver: true,
           },
         },
         employeesOnPath: {
@@ -176,7 +181,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             boardingAt: true,
             confirmation: true,
             disembarkAt: true,
+            present: true,
             position: true,
+            description: true,
             employee: {
               select: {
                 name: true,
@@ -188,6 +195,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                     type: true,
                     pin: {
                       select: {
+                        details: true,
                         id: true,
                         lat: true,
                         lng: true,
@@ -206,11 +214,23 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   findByDriver(driverId: string): Promise<Path[]> {
     return this.repository.path.findMany({
       where: {
-        route: {
-          driver: {
-            id: driverId,
+        // find by driver id in route or substitute in path
+        OR: [
+          {
+            route: {
+              driver: {
+                id: driverId,
+              },
+              deletedAt: null,
+            },
+            substituteId: {
+              equals: null,
+            },
           },
-        },
+          {
+            substituteId: driverId,
+          },
+        ],
       },
       select: {
         id: true,
@@ -223,6 +243,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         createdAt: true,
         route: {
           select: {
+            type: true,
             description: true,
           },
         },
@@ -266,6 +287,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             employeeId: employeeId,
           },
         },
+        route: {
+          deletedAt: null,
+        },
       },
       select: {
         id: true,
@@ -278,6 +302,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         createdAt: true,
         route: {
           select: {
+            type: true,
             description: true,
           },
         },
@@ -332,6 +357,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         createdAt: true,
         route: {
           select: {
+            type: true,
             description: true,
           },
         },
@@ -390,9 +416,97 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             id: employeeOnPathId,
           },
         },
+        route: {
+          deletedAt: null,
+        },
       },
       select: {
         id: true,
+      },
+    });
+  }
+
+  async findAll(filter?: any): Promise<Path[]> {
+    return await this.repository.path.findMany({
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        route: {
+          select: {
+            type: true,
+            id: true,
+            description: true,
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                cpf: true,
+                cnh: true,
+                createdAt: true,
+                validation: true,
+                updatedAt: false,
+                category: true,
+                deletedAt: false,
+                password: false,
+                RouteHistory: false,
+              },
+            },
+            vehicle: {
+              select: {
+                plate: true,
+                id: true,
+                capacity: true,
+                company: true,
+                createdAt: true,
+                expiration: true,
+                updatedAt: false,
+                isAccessibility: true,
+                lastMaintenance: true,
+                lastSurvey: true,
+                note: true,
+                renavam: true,
+                RouteHistory: false,
+                routes: false,
+                type: true,
+              },
+            },
+          },
+        },
+
+        employeesOnPath: {
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
