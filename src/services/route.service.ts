@@ -68,45 +68,47 @@ export class RouteService {
   ) {}
 
   async onModuleInit() {
-    const page = new Page();
-    const routes = await this.routeRepository.findAll(page);
+    if (process.env.NODE_ENV !== 'production') {
+      const page = new Page();
+      const routes = await this.routeRepository.findAll(page);
 
-    if (routes.total === 0) {
-      const driver = await this.driverService.listAll(page);
-      const vehicle = await this.vehicleService.listAll(page);
-      const employee = await this.employeeService.listAll(page);
+      if (routes.total === 0) {
+        const driver = await this.driverService.listAll(page);
+        const vehicle = await this.vehicleService.listAll(page);
+        const employee = await this.employeeService.listAll(page);
 
-      await this.create({
-        description: 'Rota de teste',
-        driverId: driver.items[0].id,
-        vehicleId: vehicle.items[0].id,
-        employeeIds: employee.items.map((e) => e.id),
-        type: ETypeRoute.CONVENTIONAL,
-        shift: ETypeShiftRotue.FIRST,
-        pathDetails: {
-          startsAt: '08:00',
-          duration: '00:30',
-          startsReturnAt: '18:00',
-          type: ETypePath.ROUND_TRIP,
-          isAutoRoute: true,
-        },
-      });
+        await this.create({
+          description: 'Rota de teste',
+          driverId: driver.items[0].id,
+          vehicleId: vehicle.items[0].id,
+          employeeIds: employee.items.map((e) => e.id),
+          type: ETypeRoute.CONVENTIONAL,
+          shift: ETypeShiftRotue.FIRST,
+          pathDetails: {
+            startsAt: '08:00',
+            duration: '00:30',
+            startsReturnAt: '18:00',
+            type: ETypePath.ROUND_TRIP,
+            isAutoRoute: true,
+          },
+        });
 
-      await this.create({
-        description: 'Rota de teste EXTRA',
-        driverId: driver.items[1].id,
-        vehicleId: vehicle.items[1].id,
-        employeeIds: employee.items.map((e) => e.id),
-        type: ETypeRoute.EXTRA,
-        shift: ETypeShiftRotue.SECOND,
-        pathDetails: {
-          startsAt: '06:00',
-          duration: '00:30',
-          startsReturnAt: '18:00',
-          type: ETypePath.ROUND_TRIP,
-          isAutoRoute: true,
-        },
-      });
+        await this.create({
+          description: 'Rota de teste EXTRA',
+          driverId: driver.items[1].id,
+          vehicleId: vehicle.items[1].id,
+          employeeIds: employee.items.map((e) => e.id),
+          type: ETypeRoute.EXTRA,
+          shift: ETypeShiftRotue.SECOND,
+          pathDetails: {
+            startsAt: '06:00',
+            duration: '00:30',
+            startsReturnAt: '18:00',
+            type: ETypePath.ROUND_TRIP,
+            isAutoRoute: true,
+          },
+        });
+      }
     }
   }
 
@@ -143,13 +145,19 @@ export class RouteService {
         );
     }
 
-    const startAndReturnAt = (payload.shift && payload.type === ETypeRoute.CONVENTIONAL)
-      ? getStartAtAndFinishAt(payload.shift)
-      : null;
+    const startAndReturnAt =
+      payload.shift && payload.type === ETypeRoute.CONVENTIONAL
+        ? getStartAtAndFinishAt(payload.shift)
+        : null;
 
-    const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
-    const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
-    : payload.pathDetails.startsReturnAt ? payload.pathDetails.startsReturnAt : ''
+    const initRouteDate = startAndReturnAt
+      ? startAndReturnAt.startAt
+      : payload.pathDetails.startsAt;
+    const endRouteDate = startAndReturnAt
+      ? startAndReturnAt.finishAt
+      : payload.pathDetails.startsReturnAt
+      ? payload.pathDetails.startsReturnAt
+      : '';
     const driver = await this.driverService.listById(payload.driverId);
     const vehicle = await this.vehicleService.listById(payload.vehicleId);
 
@@ -159,9 +167,13 @@ export class RouteService {
 
     await this.employeesInPins(employeesPins, payload.type);
 
-    const emplopyeeOrdened = await this.getWaypoints(employeesPins, payload.pathDetails.type, payload.pathDetails.duration);
-     // const emplopyeeOrdened = employeesPins.map((e) => e.id);
-   
+    const emplopyeeOrdened = await this.getWaypoints(
+      employeesPins,
+      payload.pathDetails.type,
+      payload.pathDetails.duration,
+    );
+    // const emplopyeeOrdened = employeesPins.map((e) => e.id);
+
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(
@@ -214,8 +226,6 @@ export class RouteService {
       const lat = +e.employee.pins.at(0).pin.lat;
       distanceLngLat.push([lng, lat]);
     });
-
-    
 
     const newRoute = await this.update(route.id, {
       distance: emplopyeeOrdened.distance,
@@ -319,12 +329,11 @@ export class RouteService {
       );
       const type = data.type ?? route.type;
 
-      
       await this.employeesInPins(employeesPins, type);
       const types = route.paths.map((path) => {
         return path.type;
       });
-      
+
       let pathType;
       if (types.length === 2) {
         pathType = ETypePath.ROUND_TRIP;
@@ -334,12 +343,16 @@ export class RouteService {
       }
 
       const duration = data.duration ?? route.paths[0].duration;
-      const emplopyeeOrdened = await this.getWaypoints(employeesPins,pathType,duration);
-     
-      distance = emplopyeeOrdened.distance
+      const emplopyeeOrdened = await this.getWaypoints(
+        employeesPins,
+        pathType,
+        duration,
+      );
+
+      distance = emplopyeeOrdened.distance;
 
       for await (const employee of data.employeeIds) {
-         await this.employeeService.listById(employee);
+        await this.employeeService.listById(employee);
       }
       await this.employeesInRouteUpdate(
         employeeInRoute,
@@ -377,7 +390,7 @@ export class RouteService {
     }
     if (
       !data.employeeIds &&
-      (data.startsAt || data.startsReturnAt || data.duration || data.shift )
+      (data.startsAt || data.startsReturnAt || data.duration || data.shift)
     ) {
       if (route.paths.length === 2) {
         for await (const path of route.paths) {
@@ -416,8 +429,8 @@ export class RouteService {
     if (data.vehicleId) {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
-    
-    routeEntity.distance = distance === '' ? routeEntity.distance : distance
+
+    routeEntity.distance = distance === '' ? routeEntity.distance : distance;
     const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
@@ -706,7 +719,7 @@ export class RouteService {
     });
   }
 
-   async employeesInRoute(
+  async employeesInRoute(
     employeeRoute: Route[],
     type: string,
     ids: string[],
@@ -795,7 +808,7 @@ export class RouteService {
       );
     }
   }
- /* 
+  /* 
   async  employeesInRoute(
     employeeRoute: Route[],
     type: string,
@@ -860,7 +873,7 @@ export class RouteService {
       );
     }
   }
-  */ 
+  */
   async employeesInPins(route: Employee[], type: string): Promise<void> {
     const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
@@ -1248,71 +1261,79 @@ export class RouteService {
     return routes;
   }
 
-  async getWaypoints(employees: Employee[], type : ETypePath, duration : string): Promise<DetailsRoute> {
-
- 
-    const denso = {lat : '-3.110944',
-                   lng : '-59.962604'}
+  async getWaypoints(
+    employees: Employee[],
+    type: ETypePath,
+    duration: string,
+  ): Promise<DetailsRoute> {
+    const denso = { lat: '-3.110944', lng: '-59.962604' };
 
     let farthestEmployee: Employee = null;
     let maxDistance = 0;
     for (const employee of employees) {
-    const employeeLocation = { lat: employee.pins[0].pin.lat, lng: employee.pins[0].pin.lng };
-    const distance = distanceBetweenPoints(denso, employeeLocation);
-    if (distance > maxDistance) {
-      maxDistance = distance;
-      farthestEmployee = employee;
+      const employeeLocation = {
+        lat: employee.pins[0].pin.lat,
+        lng: employee.pins[0].pin.lng,
+      };
+      const distance = distanceBetweenPoints(denso, employeeLocation);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        farthestEmployee = employee;
+      }
     }
-  }
     const index = employees.indexOf(farthestEmployee);
     if (index > -1) {
       employees.splice(index, 1);
     }
-    const waypoints =  employees.map((employee) => {
-          return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
-     })
-    
-  
-    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`
-    const densoLatLng = `${denso.lat},${denso.lng}`
+    const waypoints = employees.map((employee) => {
+      return `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`;
+    });
+
+    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`;
+    const densoLatLng = `${denso.lat},${denso.lng}`;
     const payload = {
       origin: type === ETypePath.RETURN ? densoLatLng : farthestEmployeeLatLng,
-      destination: type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
+      destination:
+        type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
       waypoints: waypoints.join('|'),
-      travelMode : 'DRIVING'
-    }
-    const response = await this.googleApiServiceIntegration.getWaypoints(payload);
+      travelMode: 'DRIVING',
+    };
+    const response = await this.googleApiServiceIntegration.getWaypoints(
+      payload,
+    );
     const legs = response.routes[0].legs;
-    let totalDistance = 0
+    let totalDistance = 0;
     let totalDuration = 0;
     for (const leg of legs) {
       totalDuration += leg.duration.value;
       totalDistance += leg.distance.value;
     }
 
-    const maxDuration = getDuration(duration)
+    const maxDuration = getDuration(duration);
     if (totalDuration > maxDuration) {
-      throw new HttpException(`Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    const waypointsOrder : number[]= response.routes[0]?.waypoint_order;
-    const order  = waypointsOrder.map((item) => {
-      return employees[item]
-    })
+    const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+    const order = waypointsOrder.map((item) => {
+      return employees[item];
+    });
 
-    const distance = totalDistance / 1000 +'km'
-    
-    type === ETypePath.RETURN ? order.push(farthestEmployee) : order.unshift(farthestEmployee)
+    const distance = totalDistance / 1000 + 'km';
+
+    type === ETypePath.RETURN
+      ? order.push(farthestEmployee)
+      : order.unshift(farthestEmployee);
     const employeesIds = order.map((employee) => {
       return employee.id;
-    })
+    });
 
-    return {employeesIds,distance}
+    return { employeesIds, distance };
+  }
 }
-
-}
-
-
 
 const orderPins = (arr: Employee[]): string[] => {
   const latDenso = -3.110944;
