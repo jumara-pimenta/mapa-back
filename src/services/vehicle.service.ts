@@ -39,7 +39,7 @@ export class VehicleService {
   constructor(
     @Inject('IVehicleRepository')
     private readonly vehicleRepository: IVehicleRepository,
-  ) {}
+  ) { }
 
   async create(payload: CreateVehicleDTO): Promise<Vehicle> {
     const plateExists = await this.vehicleRepository.findByPlate(payload.plate);
@@ -318,8 +318,10 @@ export class VehicleService {
       'Última vistoria',
       'Vencimento',
       'Capacidade',
-      'Acessibilidade',
+      'Renavam',
       'Última manutenção',
+      'Observação',
+      'Acessibilidade',
     ];
     const today = new Date().toLocaleDateString('pt-BR');
 
@@ -342,8 +344,10 @@ export class VehicleService {
           vehicle.lastSurvey,
           vehicle.expiration,
           vehicle.capacity,
-          vehicle.isAccessibility === true ? 'SIM' : 'NÃO',
+          vehicle.renavam,
           vehicle.lastMaintenance,
+          vehicle.note,
+          vehicle.isAccessibility === true ? 'SIM' : 'NÃO'
         ];
       });
 
@@ -356,47 +360,40 @@ export class VehicleService {
       const vehicleInformationHeader = [
         [`VEÍCULOS EXPORTADOS: ${today}`, '', '', '', '', ''],
       ];
-
       const driverInformationSubHeader = [
         [`TOTAL DE VEÍCULOS EXPORTADOS: ${data.length}`],
       ];
 
       const vehicleInformationFooter = [
-        ['**************'],
-        ['*********************************'],
-        ['**********************'],
-        ['****************'],
-        ['****************'],
-        ['**************'],
-        ['******************'],
-        ['********************'],
+        ['*************'],
+        ['********************************'],
       ];
 
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
       const workSheetData = [
-        ,
+        '', '',
+        headers,
+        ...data,
+       '' ,'' ,
+        vehicleInformationFooter,
         vehicleInformationHeader,
         ,
         driverInformationSubHeader,
-        ,
-        vehicleInformationFooter,
-        ,
-        headers,
-        ...data,
-        ,
-        vehicleInformationFooter,
+        vehicleInformationFooter
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
         { wch: 10 },
         { wch: 25 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
         { wch: 15 },
-        { wch: 11 },
-        { wch: 10 },
-        { wch: 9 },
-        { wch: 11 },
-        { wch: 15 },
+        { wch: 17 },
+        { wch: 25 },
+        { wch: 12 },
       ];
 
       workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
