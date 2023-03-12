@@ -40,7 +40,7 @@ export class DriverService {
   constructor(
     @Inject('IDriverRepository')
     private readonly driverRepository: IDriverRepository,
-  ) {}
+  ) { }
 
   async create(payload: CreateDriverDTO): Promise<Driver> {
     const cpfAlredyExist = await this.driverRepository.findByCpf(payload.cpf);
@@ -339,31 +339,25 @@ export class DriverService {
       ];
 
       const driverInformationFooter = [
-        ['*************************************'],
-        ['***************'],
-        ['***************'],
-        ['***************'],
-        ['***********'],
+        ['********************************************'],
       ];
 
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
       const workSheetData = [
-        ,
+        '', '',
+        headers,
+        ...data,
+        '', '',
+        driverInformationFooter,
         driverInformationHeader,
         ,
         driverInformationSubHeader,
-        ,
-        driverInformationFooter,
-        ,
-        headers,
-        ...data,
-        ,
-        driverInformationFooter,
+        driverInformationFooter
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
-        { wch: 30 },
+        { wch: 35 },
         { wch: 12 },
         { wch: 12 },
         { wch: 12 },

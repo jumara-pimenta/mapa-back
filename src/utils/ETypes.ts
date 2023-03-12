@@ -68,3 +68,10 @@ export enum ETypeCategoryDrivers {
   C = 'C',
   D = 'D',
 }
+
+export enum ETypeShiftEmployeeExports {
+  FIRST = '07:30 às 17:30',
+  SECOND = '17:30 às 02:30',
+  THIRD = '03:30 às 12:00',
+  NOT_DEFINED = 'SEM TURNO ESTABELECIDO',
+}
