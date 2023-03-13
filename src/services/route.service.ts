@@ -327,6 +327,8 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (data.employeeIds)
+      this.employeeService.ListAllEmployeesDeleted(data.employeeIds);
 
     let distance = '';
     if (data.employeeIds) {

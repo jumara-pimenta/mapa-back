@@ -151,7 +151,7 @@ export class EmployeeService {
       throw new HttpException(
         `O(s) colaborador(es) ${employees.map(
           (employee) => employee.name,
-        )} está(am) exluido(s) do sistema!`,
+        )} está(ão) exluido(s) do sistema!`,
         HttpStatus.NOT_FOUND,
       );
   }
