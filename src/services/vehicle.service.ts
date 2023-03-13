@@ -357,30 +357,13 @@ export class VehicleService {
           HttpStatus.NOT_FOUND,
         );
 
-      const vehicleInformationHeader = [
-        [`VEÍCULOS EXPORTADOS: ${today}`, '', '', '', '', ''],
-      ];
-      const driverInformationSubHeader = [
-        [`TOTAL DE VEÍCULOS EXPORTADOS: ${data.length}`],
-      ];
-
-      const vehicleInformationFooter = [
-        ['*************'],
-        ['********************************'],
-      ];
+ 
 
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
       const workSheetData = [
-        '', '',
         headers,
         ...data,
-       '' ,'' ,
-        vehicleInformationFooter,
-        vehicleInformationHeader,
-        ,
-        driverInformationSubHeader,
-        vehicleInformationFooter
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
@@ -395,8 +378,6 @@ export class VehicleService {
         { wch: 25 },
         { wch: 12 },
       ];
-
-      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
 
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
