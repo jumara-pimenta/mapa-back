@@ -144,6 +144,7 @@ export class RouteService {
           HttpStatus.BAD_REQUEST,
         );
     }
+    await this.employeeService.ListAllEmployeesDeleted(payload.employeeIds);
 
     const startAndReturnAt =
       payload.shift && payload.type === ETypeRoute.CONVENTIONAL
@@ -319,6 +320,14 @@ export class RouteService {
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
+
+    if (data.employeeIds.length <= 1) {
+      throw new HttpException(
+        'É necessário selecionar pelo menos 2 colaboradores',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     let distance = '';
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
