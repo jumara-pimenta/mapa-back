@@ -576,31 +576,10 @@ export class EmployeeService {
       ];
     });
 
-   
-    const employeeInformationHeader = [
-      [`COLABORADORES EXPORTADOS EM: ${today}`],
-    ];
-
-    const employeeInformationSubHeader = [
-      [`TOTAL DE COLABORADORES EXPORTADOS: ${data.length}`],
-    ];
-
-    const employeeInformationFooter = [
-      ['*************'],
-      ['**************************************************']
-    ];
-
     const workBook = XLSX.utils.book_new();
     const workSheetData = [
-      '', '',
       headers,
       ...data,
-      '', '',
-      employeeInformationFooter,
-      employeeInformationHeader,
-      '',
-      employeeInformationSubHeader,
-      employeeInformationFooter,
     ];
 
     const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
@@ -617,8 +596,6 @@ export class EmployeeService {
       { wch: 30 },
       { wch: 10 },
     ];
-
-    workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
 
     XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
     const pathFile = path.resolve(filePath);

@@ -295,7 +295,7 @@ export class DriverService {
 
   async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
     const headers = [
-      'Nome                          ',
+      'Nome',
       'CPF',
       'CNH',
       'Validade',
@@ -304,10 +304,9 @@ export class DriverService {
     const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './driver.xlsx';
-    const workSheetName = 'Motorista';
+    const workSheetName = 'Motoristas';
 
     const drivers = await this.driverRepository.findAllExport();
-
     const exportedDriverToXLSX = async (
       drivers,
       headers,
@@ -323,37 +322,19 @@ export class DriverService {
           driver.category,
         ];
       });
-
       if (!data.length)
         throw new HttpException(
           'Não foram encontrados motoristas para serem exportados',
           HttpStatus.NOT_FOUND,
         );
 
-      const driverInformationHeader = [
-        [`MOTORISTAS EXPORTADOS: ${today}`, '', '', '', '', ''],
-      ];
 
-      const driverInformationSubHeader = [
-        [`TOTAL DE MOTORISTAS EXPORTADOS: ${data.length}`],
-      ];
-
-      const driverInformationFooter = [
-        ['********************************************'],
-      ];
-
+      
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
       const workSheetData = [
-        '', '',
         headers,
         ...data,
-        '', '',
-        driverInformationFooter,
-        driverInformationHeader,
-        ,
-        driverInformationSubHeader,
-        driverInformationFooter
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
@@ -363,7 +344,6 @@ export class DriverService {
         { wch: 12 },
         { wch: 9 },
       ];
-      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
 
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
