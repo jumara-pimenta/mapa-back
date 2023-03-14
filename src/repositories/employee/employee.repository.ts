@@ -194,7 +194,7 @@ export class EmployeeRepository
     );
   }
 
-  async findAllExport(): Promise<PageResponse<Employee>> {
+  async findAllExport(): Promise<Employee[]> {
     const items = await this.repository.employee.findMany({
       where: { deletedAt: null },
       orderBy: {
@@ -206,10 +206,7 @@ export class EmployeeRepository
             type: true,
             pin: {
               select: {
-                id: true,
                 details: true,
-                lat: true,
-                lng: true,
                 local: true,
                 title: true,
               },
@@ -222,16 +219,7 @@ export class EmployeeRepository
       },
     });
 
-    const total = await this.repository.employee.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
-
-    return this.buildPageResponse(
-      items,
-      Array.isArray(total) ? total.length : total,
-    );
+    return items
   }
 
   create(data: Employee): Promise<Employee> {

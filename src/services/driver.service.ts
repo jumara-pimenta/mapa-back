@@ -338,9 +338,9 @@ export class DriverService {
       ];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
-        { wch: 35 },
-        { wch: 12 },
-        { wch: 12 },
+        { wch: 30 },
+        { wch: 15 },
+        { wch: 15 },
         { wch: 12 },
         { wch: 9 },
       ];

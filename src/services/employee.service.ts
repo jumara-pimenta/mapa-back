@@ -21,6 +21,7 @@ import {
   ETypeEditionPin,
   ETypePin,
   ETypeShiftEmployee,
+  ETypeShiftEmployeeExports,
 } from '../utils/ETypes';
 import { Pin } from '../entities/pin.entity';
 import * as XLSX from 'xlsx';
@@ -182,7 +183,6 @@ export class EmployeeService {
   ): Promise<PageResponse<MappedEmployeeDTO>> {
     verifyDateFilter(filters?.admission);
     const employees = await this.employeeRepository.findAll(page, filters);
-
     if (employees.total === 0) {
       throw new HttpException(
         'Não existe colaborador(a) para esta pesquisa!',
@@ -190,8 +190,8 @@ export class EmployeeService {
       );
     }
 
-    const items = this.mapperMany(employees.items);
-
+    const items = this.mapperMany(employees.items);    
+      
     return {
       total: employees.total,
       items,
@@ -504,13 +504,6 @@ export class EmployeeService {
       'Cargo',
       'Turno',
       'Centro de Custo',
-      'Endereço',
-      'Numero',
-      'Complemento',
-      'Bairro',
-      'CEP',
-      'Cidade',
-      'UF',
       'PONTO DE COLETA',
       'Referencia',
     ];
@@ -519,17 +512,9 @@ export class EmployeeService {
     const filePath = './employee.xlsx';
     const workSheetName = 'Colaboradores';
 
-    // const employees = await this.listAll(page, filters);
     const employees = await this.employeeRepository.findAllExport();
-
-    if (employees.total === 0) {
-      throw new HttpException(
-        'Não existem colaboradores para serem exportados!',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (employees.total === 0) {
+ 
+    if (employees.length === 0) {
       throw new HttpException(
         'Não existem colaboradores para serem exportados!',
         HttpStatus.BAD_REQUEST,
@@ -542,9 +527,9 @@ export class EmployeeService {
       workSheetName,
       filePath,
     ) => {
-      const data = employees.map((employee) => {
-        const address = JSON.parse(employee.address);
-        const convertShift = getShiftStartAtAndExports(employee.shift);
+
+      const data = employees.map((employee : Employee) => {
+        const convertShift = getShiftStartAtAndExports(employee.shift as ETypeShiftEmployeeExports);
         return [
           employee.registration,
           employee.name,
@@ -552,16 +537,11 @@ export class EmployeeService {
           employee.role,
           employee.shift = convertShift,
           employee.costCenter,
-          address.street,
-          address.number,
-          address.complement,
-          address.neighborhood,
-          address.cep,
-          address.city,
-          address.state,
-      ];
+          employee.pins[0].pin.local,
+          employee.pins[0].pin.details,
+        ]
     });
-
+      
     const workBook = XLSX.utils.book_new();
     const workSheetData = [
       headers,
@@ -576,11 +556,8 @@ export class EmployeeService {
       { wch: 30 },
       { wch: 9 },
       { wch: 15 },
-      { wch: 30 },
-      { wch: 10 },
-      { wch: 30 },
-      { wch: 30 },
-      { wch: 10 },
+      { wch: 70 },
+      { wch: 50 },
     ];
 
     XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
@@ -593,7 +570,7 @@ export class EmployeeService {
   };
 
     return exportedEmployeeToXLSX(
-    employees.items,
+    employees,
     headers,
     workSheetName,
     filePath,
