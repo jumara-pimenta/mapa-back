@@ -101,7 +101,7 @@ export class DriverService {
 
     if (!driver)
       throw new HttpException(
-        `Não foi encontrado um driver com o id: ${id}`,
+        `Não foi encontrado um motorista com essa identificação: ${id}`,
         HttpStatus.NOT_FOUND,
       );
 
