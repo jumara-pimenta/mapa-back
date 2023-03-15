@@ -64,6 +64,6 @@ export class CreateDriverDTO {
   @IsString({ message: '[category] O campo categoria deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[category] O campo categoria deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  @Length(1, 2)
+  @Length(1, 2, {message: 'A categoria deve ser as opções C, D ou E'})
   category: string;
 }
