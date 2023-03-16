@@ -278,6 +278,13 @@ export class PathService {
 
   async delete(id: string): Promise<Path> {
     const path = await this.listById(id);
+  
+    return await this.pathRepository.delete(path.id);
+  }
+
+
+  async deleteExtra(id: string): Promise<Path> {
+    const path = await this.listById(id);
 
     return await this.pathRepository.delete(path.id);
   }
