@@ -54,6 +54,7 @@ model Path {
   createdAt       DateTime          @default(now()) @db.DateTimeOffset
   updatedAt       DateTime?         @db.DateTimeOffset
   substituteId    String?           @db.VarChar(255)
+  deletedAt       DateTime?         @db.DateTimeOffset
   RouteHistory    RouteHistory[]
 }
 

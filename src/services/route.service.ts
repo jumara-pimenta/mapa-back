@@ -321,7 +321,7 @@ export class RouteService {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
 
-    if (data.employeeIds.length <= 1) {
+    if (data.employeeIds?.length <= 1) {
       throw new HttpException(
         'É necessário selecionar pelo menos 2 colaboradores',
         HttpStatus.BAD_REQUEST,

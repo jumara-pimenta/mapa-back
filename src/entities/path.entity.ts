@@ -16,6 +16,7 @@ export class Path {
   route?: Partial<Route>;
   createdAt: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
   substituteId?: string;
 
   constructor(
