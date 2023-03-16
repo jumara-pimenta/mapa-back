@@ -273,6 +273,8 @@ export class AuthService {
     if (!user)
       throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
 
+    if (data?.password) data.password = bcrypt.hashSync(data.password, 10);
+
     const updatedUser = await this.backOfficeUserRepository.update(id, data);
 
     return this.mapper(updatedUser);
