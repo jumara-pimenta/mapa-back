@@ -111,6 +111,17 @@ export class EmployeeRepository
     });
   }
 
+  listAllEmployeesDeleted(ids: string[]): Promise<Employee[]> {
+    return this.repository.employee.findMany({
+      where: {
+        deletedAt: { not: null },
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,

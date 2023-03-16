@@ -15,4 +15,5 @@ export default interface IEmployeeRepository {
   findByRegistrationByImport(registration: string): Promise<Employee>;
   update(data: Employee): Promise<Employee>;
   findByIds(ids: string[]): Promise<Employee[]>;
+  listAllEmployeesDeleted(ids: string[]): Promise<Employee[]>;
 }

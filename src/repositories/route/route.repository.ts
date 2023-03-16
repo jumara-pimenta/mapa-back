@@ -49,6 +49,11 @@ export class RouteRepository
               orderBy: {
                 position: 'asc',
               },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
+              },
               select: {
                 id: true,
                 boardingAt: true,
@@ -168,7 +173,6 @@ export class RouteRepository
   }
 
   async update(data: Route): Promise<Route> {
-
     return await this.repository.route.update({
       data: {
         id: data.id,
@@ -208,6 +212,11 @@ export class RouteRepository
             employeesOnPath: {
               orderBy: {
                 position: 'asc',
+              },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
               },
               select: {
                 id: true,
@@ -254,6 +263,8 @@ export class RouteRepository
     const items = condition
       ? await this.repository.route.findMany({
           ...this.buildPage(page),
+          // not show where employe is deletedAt: null
+
           where: {
             ...condition,
             deletedAt: null,
@@ -261,6 +272,7 @@ export class RouteRepository
           orderBy: {
             createdAt: 'desc',
           },
+
           include: {
             driver: true,
             path: {
@@ -268,6 +280,11 @@ export class RouteRepository
                 employeesOnPath: {
                   orderBy: {
                     position: 'desc',
+                  },
+                  where: {
+                    employee: {
+                      deletedAt: null,
+                    },
                   },
                   include: {
                     employee: {
@@ -378,6 +395,11 @@ export class RouteRepository
             employeesOnPath: {
               orderBy: {
                 position: 'asc',
+              },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
               },
               include: {
                 employee: {

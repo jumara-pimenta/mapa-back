@@ -175,6 +175,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
         employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
           select: {
             employeeId: true,
             id: true,
@@ -480,6 +485,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         },
 
         employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
           select: {
             id: true,
             boardingAt: true,

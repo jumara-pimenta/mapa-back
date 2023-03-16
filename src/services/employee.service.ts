@@ -143,6 +143,20 @@ export class EmployeeService {
     return { ...data, address: JSON.parse(data.address) };
   }
 
+  async ListAllEmployeesDeleted(ids: string[]): Promise<any> {
+    const employees = await this.employeeRepository.listAllEmployeesDeleted(
+      ids,
+    );
+
+    if (employees.length >= 1)
+      throw new HttpException(
+        `O(s) colaborador(es) ${employees.map(
+          (employee) => employee.name,
+        )} está(ão) exluido(s) do sistema!`,
+        HttpStatus.NOT_FOUND,
+      );
+  }
+
   async findByRegistration(registration: string): Promise<Employee> {
     const employee = await this.employeeRepository.findByRegistration(
       registration,
