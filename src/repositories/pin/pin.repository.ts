@@ -13,10 +13,10 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
   constructor(private readonly repository: PrismaService) {
     super();
   }
-  findByLocal(local: string): Promise<Pin> {
+  findByLocal(details: string): Promise<Pin> {
     return this.repository.pin.findFirst({
       where: {
-        local,
+        details,
       },
     });
   }

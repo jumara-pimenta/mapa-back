@@ -16,4 +16,5 @@ export default interface IPathRepository {
   ): Promise<Path>;
   findByEmployeeOnPath(employeeId: string): Promise<Partial<Path>>;
   findAll(filter?: any): Promise<Path[]>;
+  softDelete(id: string): Promise<Path>;
 }

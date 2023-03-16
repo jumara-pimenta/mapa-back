@@ -84,8 +84,14 @@ export class BackOfficeUserRepository
       ? await this.repository.backOfficeUser.findMany({
           ...this.buildPage(page),
           where,
+          orderBy: {
+            createdAt: 'asc',
+          },
         })
       : await this.repository.backOfficeUser.findMany({
+          orderBy: {
+            createdAt: 'asc',
+          },
           ...this.buildPage(page),
         });
 
