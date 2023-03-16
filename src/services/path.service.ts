@@ -16,7 +16,12 @@ import {
 import { CreatePathDTO } from '../dtos/path/createPath.dto';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
-import { EStatusPath, EStatusRoute, ETypePath } from '../utils/ETypes';
+import {
+  EStatusPath,
+  EStatusRoute,
+  ETypePath,
+  ETypeRoute,
+} from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
 import { getDateInLocaleTime } from '../utils/date.service';
 import { RouteHistory } from '../entities/routeHistory.entity';
@@ -47,8 +52,12 @@ export class PathService {
   async finishPath(id: string): Promise<any> {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
+    console.log(route);
+
     const vehicle = await this.vehicleService.listById(route.vehicle);
-    const employeesOnPath = await this.employeesOnPathService.listByPath(path.id)
+    const employeesOnPath = await this.employeesOnPathService.listByPath(
+      path.id,
+    );
     let driverId = path.substituteId;
     const driver = await this.driverService.listById(
       driverId ? driverId : route.driver,
@@ -74,7 +83,7 @@ export class PathService {
     const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
     let totalConfirmed = 0;
 
-   /*  for await (const employeesPins of route.employeesOnPins) {
+    /*  for await (const employeesPins of route.employeesOnPins) {
       itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
       for await (const employee of employeesPins.employees) {
         if (employee.confirmation === true) totalConfirmed++;
@@ -90,9 +99,11 @@ export class PathService {
       }
     } */
 
-    for await(const employee of employeesOnPath){
+    for await (const employee of employeesOnPath) {
       if (employee.confirmation === true) totalConfirmed++;
-      itinerariesArray.push([`${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`]);
+      itinerariesArray.push([
+        `${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`,
+      ]);
       if (employee.confirmation === true && employee.present === true) {
         employeeArray.push(employee.employee.id);
         if (path.type === ETypePath.ONE_WAY) {
@@ -103,7 +114,9 @@ export class PathService {
       }
     }
 
-    path.type === ETypePath.RETURN ? itinerariesArray.unshift(['-3.110944,-59.962604']) : itinerariesArray.push(['-3.110944,-59.962604']);
+    path.type === ETypePath.RETURN
+      ? itinerariesArray.unshift(['-3.110944,-59.962604'])
+      : itinerariesArray.push(['-3.110944,-59.962604']);
 
     if (employeeArray.length === 0)
       throw new HttpException(
@@ -146,6 +159,11 @@ export class PathService {
       await this.routeHistoryService.create(props);
       await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
+
+    // get type of route
+
+    if (route.routeType === ETypeRoute.EXTRA || route.routeType === 'EXTRA')
+      await this.softDelete(path.id);
 
     return await this.routeService.updateWebsocket(finishAt);
   }
@@ -282,6 +300,13 @@ export class PathService {
     return await this.pathRepository.delete(path.id);
   }
 
+  async softDelete(id: string): Promise<Path> {
+    await this.listById(id);
+
+    const deleted = await this.pathRepository.softDelete(id);
+    return deleted;
+  }
+
   async listByIdMobile(id: string): Promise<any> {
     const path = await this.pathRepository.findById(id);
     if (!path)
@@ -400,6 +425,7 @@ export class PathService {
   async listEmployeesByPathAndPin(pathId: string): Promise<MappedPathPinsDTO> {
     const path = await this.listById(pathId);
     const routeId = await this.routeService.routeIdByPathId(pathId);
+    const route = await this.routeService.listById(routeId);
 
     const { employeesOnPath, ...data } = path;
 
@@ -478,7 +504,12 @@ export class PathService {
       employeeByPin.position = index + 1;
     });
 
-    return { ...data, routeId: routeId, employeesOnPins: employeesByPin };
+    return {
+      ...data,
+      routeId: routeId,
+      employeesOnPins: employeesByPin,
+      routeType: route.type,
+    };
   }
 
   async listManyByRoute(routeId: string): Promise<MappedPathDTO[]> {

@@ -36,6 +36,9 @@ export class RouteRepository
         type: true,
         createdAt: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             id: true,
             duration: true,
@@ -105,6 +108,9 @@ export class RouteRepository
         type: true,
         createdAt: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             id: true,
             duration: true,
@@ -200,6 +206,9 @@ export class RouteRepository
         type: true,
         createdAt: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             id: true,
             duration: true,
@@ -268,6 +277,12 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
+
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -276,6 +291,9 @@ export class RouteRepository
           include: {
             driver: true,
             path: {
+              where: {
+                deletedAt: null,
+              },
               include: {
                 employeesOnPath: {
                   orderBy: {
@@ -321,10 +339,18 @@ export class RouteRepository
           include: {
             driver: true,
             path: {
+              where: {
+                deletedAt: null,
+              },
               include: {
                 employeesOnPath: {
                   orderBy: {
                     position: 'desc',
+                  },
+                  where: {
+                    employee: {
+                      deletedAt: null,
+                    },
                   },
                   include: {
                     employee: {
@@ -361,6 +387,11 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         })
       : await this.repository.route.count({
@@ -369,6 +400,11 @@ export class RouteRepository
           },
           where: {
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         });
 
@@ -456,6 +492,9 @@ export class RouteRepository
           include: {
             driver: true,
             path: {
+              where: {
+                deletedAt: null,
+              },
               include: {
                 employeesOnPath: {
                   orderBy: {
@@ -572,12 +611,19 @@ export class RouteRepository
           every: {
             finishedAt: null,
           },
+          some: {
+            deletedAt: null,
+          },
         },
       },
+
       select: {
         id: true,
         status: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             startedAt: true,
             finishedAt: true,
@@ -599,6 +645,7 @@ export class RouteRepository
             finishedAt: null,
           },
           some: {
+            deletedAt: null,
             employeesOnPath: {
               some: {
                 employeeId: {
@@ -614,6 +661,9 @@ export class RouteRepository
         type: true,
         description: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             employeesOnPath: {
               select: {
@@ -653,11 +703,14 @@ export class RouteRepository
         path: {
           some: {
             id: pathid,
+            deletedAt: null,
           },
+          // if all paths are deleted, the route is deleted
         },
       },
       select: {
         id: true,
+        type: true,
       },
     });
 
@@ -670,6 +723,7 @@ export class RouteRepository
         path: {
           some: {
             id: pathId,
+            deletedAt: null,
           },
         },
       },
