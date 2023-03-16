@@ -57,7 +57,7 @@ export class CreateDriverFileDTO {
     description: 'Categoria da CNH do motorista',
   })
   @IsEnum(ETypeCategoryDrivers, {
-    message: '[category] O campo categoria deve ser do tipo enum (C ou D).',
+    message: '[category] O campo categoria deve ser do tipo C, D ou E.',
   })
   @IsNotEmpty({ message: '[category] O campo categoria deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
