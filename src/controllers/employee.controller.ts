@@ -151,7 +151,7 @@ export class EmployeeController {
   @Get('download/file')
   @Roles('export-employees')
   @ApiCreatedResponse({
-    description: 'Export a Employee File to XLSX.',
+    description: 'Colaboradores Exportados XLSX.',
   })
   @HttpCode(HttpStatus.OK)
   async exportsEmployeeFile(
