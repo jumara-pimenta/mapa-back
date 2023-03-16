@@ -30,6 +30,7 @@ import {
 import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
+  getDateInLocaleTime,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -50,6 +51,9 @@ import { GoogleApiServiceIntegration } from 'src/integrations/services/googleSer
 import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
 import e from 'express';
 import { getDuration } from 'src/utils/Date';
+import { RouteHistoryService } from './routeHistory.service';
+import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class RouteService {
@@ -59,6 +63,7 @@ export class RouteService {
     private readonly driverService: DriverService,
     private readonly vehicleService: VehicleService,
     private readonly employeeService: EmployeeService,
+    private readonly routeHistoryService: RouteHistoryService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
     @Inject('IMapBoxServiceIntegration')
@@ -93,7 +98,7 @@ export class RouteService {
           },
         });
 
-        await this.create({
+       const route1=  await this.create({
           description: 'Rota de teste EXTRA',
           driverId: driver.items[1].id,
           vehicleId: vehicle.items[1].id,
@@ -108,7 +113,46 @@ export class RouteService {
             isAutoRoute: true,
           },
         });
+
+        const allPaths = await this.pathService.listAll();
+        const path = await this.pathService.listById(allPaths[0].id);
+        const pathObj = await this.pathService.getPathById(allPaths[0].id);
+
+        const vehicleHistoric = await this.vehicleService.listById(path.vehicle);
+    const driverHistoric = await this.driverService.listById(
+     path.driver
+    );
+        const today = new Date();
+        //remove 1 day
+       
+        //create a for to create a route for 4 days
+        for (let i = 0; i < 40; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+        const props = new RouteHistory(
+          {
+            typeRoute: path.type,
+            nameRoute: path.routeDescription,
+            employeeIds: path.employeesOnPath.map(e => e.id).join(','),
+            itinerary: '-3.4441,-60.025',
+            totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+            totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+            startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+            finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
+          },
+          pathObj,
+           driverHistoric,
+           vehicleHistoric,
+          [],
+          date
+        );
+        await this.routeHistoryService.create(props);
+        }
+
+        
       }
+
+     
     }
   }
 
@@ -321,7 +365,7 @@ export class RouteService {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
 
-    if (data.employeeIds.length <= 1) {
+    if (data.employeeIds?.length <= 1) {
       throw new HttpException(
         'É necessário selecionar pelo menos 2 colaboradores',
         HttpStatus.BAD_REQUEST,

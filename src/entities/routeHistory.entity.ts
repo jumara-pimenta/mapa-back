@@ -31,6 +31,7 @@ export class RouteHistory {
     driver: Driver,
     vehicle: Vehicle,
     sinister: Sinister[],
+    createdAt? : Date,
     id?: string,
   ) {
     Object.assign(this, props);
@@ -39,5 +40,6 @@ export class RouteHistory {
     this.driver = driver;
     this.vehicle = vehicle;
     this.sinister = sinister;
+    this.createdAt = createdAt ?? new Date();
   }
 }

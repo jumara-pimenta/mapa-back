@@ -89,6 +89,7 @@ export class RouteHistoryController {
   ): Promise<PageResponse<MappedRouteHistoryDTO>> {
     return await this.RouteHistoryService.listAll(page, filters);
   }
+  
 
   @Get('/pathId/id')
   @Roles('list-historic')

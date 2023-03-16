@@ -29,6 +29,8 @@ export class RouteHistoryService {
     private readonly sinisterService: SinisterService,
   ) {}
 
+ 
+
   async create(props: RouteHistory): Promise<RouteHistory> {
     const newRouteHistory = new RouteHistory(
       {
@@ -38,13 +40,14 @@ export class RouteHistoryService {
         totalEmployees: props.totalEmployees,
         totalConfirmed: props.totalConfirmed,
         itinerary: props.itinerary,
-        startedAt: props.path.startedAt,
+        startedAt: props.path.startedAt ?? new Date(),
         finishedAt: new Date(),
       },
       props.path,
       props.driver,
       props.vehicle,
       props.sinister,
+      props.createdAt
     );
     const routeHistory = await this.routeHistoryRepository.create(
       newRouteHistory,
@@ -238,6 +241,7 @@ export class RouteHistoryService {
 
   async getHistoricByDate(period: ETypePeriodHistory): Promise<any> {
     const dates = getPeriod(period);
+    console.log(dates);
     const historic = await this.routeHistoryRepository.getHistoricByDate(
       dates.dateInitial,
       dates.dateFinal,
@@ -246,7 +250,7 @@ export class RouteHistoryService {
 
     historic.map((paths) => {
       const data = new RouteHistoryByDate();
-      data.date = paths.startedAt.toISOString().split('T')[0];
+      data.date = paths.createdAt.toISOString().split('T')[0];
       data.totalPaths = 1;
       data.totalEmployess = paths.totalEmployees;
       data.totalEmployessConfirmed = paths.totalConfirmed;
