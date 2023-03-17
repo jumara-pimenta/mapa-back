@@ -17,7 +17,6 @@ export function getDateInLocaleTime(date: Date): Date {
 }
 
 export function getDateStartToEndOfDay(date: string): DateStartEnd {
-  console.log(date);
   const newDate = new Date(date);
   const year = newDate.getFullYear();
   if (year < 2000 || year > 2100)
@@ -68,6 +67,10 @@ export function getPeriod(period: ETypePeriodHistory): PeriodInDate {
     59,
     999,
   );
+  if (period === ETypePeriodHistory.DAILY) {
+    const dateInitial = moment().subtract(1, 'days').toDate();
+    return { dateInitial, dateFinal: today };
+  }
   if (period === ETypePeriodHistory.WEEKLY) {
     const dateInitial = moment().subtract(7, 'days').toDate();
     return { dateInitial, dateFinal: today };

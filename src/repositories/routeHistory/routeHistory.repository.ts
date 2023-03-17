@@ -146,6 +146,7 @@ export class RouteHistoryRepository
         vehicleId: data.vehicle.id,
         driverId: data.driver.id,
         itinerary: data.itinerary,
+        shift: data.path.startsAt,
         startedAt: data.startedAt,
         finishedAt: data.finishedAt,
         createdAt: data.createdAt,
@@ -177,7 +178,14 @@ export class RouteHistoryRepository
       },
       include: {
         sinister: true,
+        path :{
+         select: {
+          startsAt: true,
+          finishedAt: true,
+          type: true,
+        }
       },
+    },
       orderBy: {
         createdAt: 'asc',
       },

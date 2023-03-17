@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
-import { ETypeShiftEmployee, ETypeShiftEmployeeExports, ETypeShiftRotue } from './ETypes';
+import { ETypePath, ETypeRoute, ETypeShiftEmployee, ETypeShiftEmployeeExports, ETypeShiftRotue } from './ETypes';
 import {
   dateInFormatOneRgx,
   dateInFormatThreeRgx,
@@ -125,6 +125,20 @@ export function convertTimeToDate(hour: string): Date {
     if(type === ETypeShiftRotue.THIRD)
         return {startAt : '03:30', finishAt : '12:00'}
  }
+
+ export function getShiftToGraphic(starstAt : string, type : string) : string {
+  if(starstAt === '07:30')
+      return 'Turno 1'
+  if(starstAt === '17:30')
+      return type === 'IDA' ? 'Turno 2' : 'Turno 1'
+  if(starstAt === '02:30')
+      return 'Turno 2'
+  if(starstAt === '03:30' || starstAt === '12:00')
+      return 'Turno 3'
+  return 'Extra'    
+      
+  
+}
 
 
 

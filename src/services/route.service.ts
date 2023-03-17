@@ -106,9 +106,9 @@ export class RouteService {
           type: ETypeRoute.EXTRA,
           shift: ETypeShiftRotue.SECOND,
           pathDetails: {
-            startsAt: '06:00',
+            startsAt: '07:30',
             duration: '00:30',
-            startsReturnAt: '18:00',
+            startsReturnAt: '17:30',
             type: ETypePath.ROUND_TRIP,
             isAutoRoute: true,
           },
@@ -118,6 +118,8 @@ export class RouteService {
         const path = await this.pathService.listById(allPaths[0].id);
         const pathObj = await this.pathService.getPathById(allPaths[0].id);
 
+        const path1 = await this.pathService.listById(allPaths[1].id);
+        const pathObj1 = await this.pathService.getPathById(allPaths[1].id);
         const vehicleHistoric = await this.vehicleService.listById(path.vehicle);
     const driverHistoric = await this.driverService.listById(
      path.driver
@@ -126,13 +128,13 @@ export class RouteService {
         //remove 1 day
        
         //create a for to create a route for 4 days
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 20; i++) {
           const date = new Date(today);
           date.setDate(date.getDate() - i);
         const props = new RouteHistory(
           {
             typeRoute: path.type,
-            nameRoute: path.routeDescription,
+            nameRoute: faker.name.jobTitle(),
             employeeIds: path.employeesOnPath.map(e => e.id).join(','),
             itinerary: '-3.4441,-60.025',
             totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
@@ -146,7 +148,26 @@ export class RouteService {
           [],
           date
         );
+
+        const props2 = new RouteHistory(
+          {
+            typeRoute: path1.type,
+            nameRoute: faker.name.jobTitle(),
+            employeeIds: path1.employeesOnPath.map(e => e.id).join(','),
+            itinerary: '-3.4441,-60.025',
+            totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+            totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+            startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+            finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+          },
+          pathObj1,
+           driverHistoric,
+           vehicleHistoric,
+          [],
+          date
+        );
         await this.routeHistoryService.create(props);
+        await this.routeHistoryService.create(props2);
         }
 
         

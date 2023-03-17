@@ -69,7 +69,7 @@ export class SinisterService {
   async vinculatePath(
     sinister: Sinister,
     routeHistoryId: string,
-    pathId: Path,
+    pathId: Partial<Path>,
   ) {
     return await this.sinisterRepository.vinculatePath(
       sinister,

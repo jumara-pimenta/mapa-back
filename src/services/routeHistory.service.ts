@@ -14,11 +14,12 @@ import {
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { compareDates, getPeriod } from 'src/utils/Date';
-import { RouteHistoryByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
+import { compareDates, getDateStartToEndOfDay, getPeriod } from 'src/utils/Date';
+import { RouteByDateAndShift, RouteHistoryByDate, RouteSeparated, Shifts, ShiftsByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dto';
 import { SinisterService } from './sinister.service';
 import { ETypePeriodHistory } from 'src/utils/ETypes';
+import { getShiftToGraphic, getStartAtAndFinishAt } from 'src/utils/date.service';
 
 @Injectable()
 export class RouteHistoryService {
@@ -252,14 +253,6 @@ export class RouteHistoryService {
       const data = new RouteHistoryByDate();
       data.date = paths.createdAt.toISOString().split('T')[0];
       data.totalPaths = 1;
-      data.totalEmployess = paths.totalEmployees;
-      data.totalEmployessConfirmed = paths.totalConfirmed;
-      data.totalEmployessNotConfirmed =
-        data.totalEmployess - data.totalEmployessConfirmed;
-      data.totalEmployessPresent = paths.employeeIds.split(',').length;
-      data.totalEmployessConfirmedButNotPresent =
-        data.totalEmployessConfirmed - data.totalEmployessPresent;
-      data.totalSinister = paths.sinister.length;
       response.push(data);
     });
 
@@ -268,24 +261,71 @@ export class RouteHistoryService {
       const index = acc.findIndex((d) => d.date === date);
 
       if (index == -1) {
-        acc.push(curr);
+         acc.push(curr);
       }
-
-      if (index >= 0) {
-        acc[index].totalEmployess += curr.totalEmployess;
-        acc[index].totalEmployessConfirmed += curr.totalEmployessConfirmed;
-        acc[index].totalEmployessConfirmedButNotPresent +=
-          curr.totalEmployessConfirmedButNotPresent;
-        acc[index].totalEmployessNotConfirmed +=
-          curr.totalEmployessNotConfirmed;
-        acc[index].totalEmployessPresent += curr.totalEmployessPresent;
-        acc[index].totalPaths += curr.totalPaths;
-        acc[index].totalSinister += curr.totalSinister;
+      
+      if (index >= 0) {       
+        acc[index].totalPaths += 1;
       }
 
       return acc;
     }, []);
 
     return reponseReduce;
+  }
+
+  async getShiftsByDate(date : string): Promise<any> {
+    const data = getDateStartToEndOfDay(date)
+    const historic = await this.routeHistoryRepository.getHistoricByDate(
+      data.start,
+      data.end,
+    );
+
+    const response : ShiftsByDate = {date : date, shifts : []}
+    response.shifts.push({shift : 'Turno 1', totalPaths : 0})
+    response.shifts.push({shift : 'Turno 2', totalPaths : 0})
+    response.shifts.push({shift : 'Turno 3', totalPaths : 0})
+    response.shifts.push({shift : 'Extra', totalPaths : 0})
+
+      historic.map((paths) => {
+        const shift = getShiftToGraphic(paths.path.startsAt,paths.typeRoute)
+        const index = response.shifts.findIndex((d) => d.shift === shift);
+        response.shifts[index].totalPaths += 1
+      })
+
+      return response
+  }
+
+  async getRoutesByDateAndShift(date : string, shift : string): Promise<any> {
+    const data = getDateStartToEndOfDay(date)
+    const historic = await this.routeHistoryRepository.getHistoricByDate(
+      data.start,
+      data.end,
+    );
+
+    console.log({historic});
+    
+    const response : RouteByDateAndShift = {date : date, shift : shift, totalPaths : 0,routes : []}
+
+    historic.map((paths) => {
+      const shiftGraphic = getShiftToGraphic(paths.path.startsAt,paths.typeRoute)
+      if(shiftGraphic === shift){
+        const route = new RouteSeparated()
+        route.date = paths.nameRoute;
+        route.totalEmployess = paths.totalEmployees;
+        route.totalEmployessConfirmed = paths.totalConfirmed;
+        route.totalEmployessNotConfirmed = route.totalEmployess - route.totalEmployessConfirmed;
+        route.totalEmployessPresent = paths.employeeIds.split(',').length;
+        route.totalEmployessConfirmedButNotPresent = route.totalEmployessConfirmed - route.totalEmployessPresent;
+        route.totalSinister = paths.sinister.length;
+        response.totalPaths += 1
+        response.routes.push(route)
+      }
+    })
+
+
+
+
+    return response
   }
 }
