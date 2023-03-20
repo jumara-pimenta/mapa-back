@@ -523,6 +523,15 @@ export class RouteService {
     const route1 = await this.listById(data.routeId1);
     const route2 = await this.listById(data.routeId2);
 
+    if (
+      route1.status === EStatusRoute.IN_PROGRESS ||
+      route2.status === EStatusRoute.IN_PROGRESS
+    )
+      throw new HttpException(
+        'Não é possível trocar o motorista de uma rota em andamento!',
+        HttpStatus.CONFLICT,
+      );
+
     await this.update(route1.id, { driverId: route2.driver.id });
 
     await this.update(route2.id, { driverId: route1.driver.id });
