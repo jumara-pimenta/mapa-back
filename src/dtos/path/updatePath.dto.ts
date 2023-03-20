@@ -49,4 +49,9 @@ export class UpdatePathDTO {
   })
   @IsOptional()
   substituteId?: string;
+
+  @ApiProperty({ description: 'Data de exclusão do trajeto' })
+  @IsDateString()
+  @IsOptional()
+  deletedAt?: Date;
 }

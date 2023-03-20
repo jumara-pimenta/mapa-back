@@ -43,8 +43,8 @@ export class PrismaService
       create: {
         id: process.env.DENSO_ID,
         title: 'Denso',
-        local: 'Denso LTDA ',
-        details:
+        details: 'Denso LTDA ',
+        local:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
@@ -53,8 +53,8 @@ export class PrismaService
       update: {
         id: process.env.DENSO_ID,
         title: 'Denso',
-        local: 'Denso LTDA ',
-        details:
+        details: 'Denso LTDA ',
+        local:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
@@ -211,7 +211,11 @@ export class PrismaService
         await this.vehicle.createMany({
           data: vehicleId,
         });
+
       }
+       
+
+   
     }
   }
   async onModuleDestroy() {

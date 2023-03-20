@@ -7,6 +7,7 @@ import IRouteHistoryRepository from './routeHistory.repository.contract';
 import { RouteHistory } from '../../entities/routeHistory.entity';
 import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 import { getDateInLocaleTime, getDateStartToEndOfDay } from 'src/utils/Date';
+import { generateQueryByFiltersForRouteHistory } from 'src/configs/database/Queries';
 
 @Injectable()
 export class RouteHistoryRepository
@@ -75,7 +76,31 @@ export class RouteHistoryRepository
     page: Page,
     filters: FiltersRouteHistoryDTO,
   ): Promise<PageResponse<RouteHistory>> {
-    const items = await this.repository.routeHistory.findMany({
+    const condition = generateQueryByFiltersForRouteHistory(filters);
+    
+    const items = condition ? await this.repository.routeHistory.findMany({
+      ...this.buildPage(page),
+      where:{...condition},
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        typeRoute: true,
+        nameRoute: true,
+        path: true,
+        employeeIds: true,
+        totalEmployees: true,
+        sinister: true,
+        totalConfirmed: true,
+        driver: true,
+        vehicle: true,
+        itinerary: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+      },
+    }) : await this.repository.routeHistory.findMany({
       ...this.buildPage(page),
       orderBy: {
         createdAt: 'desc',
@@ -98,7 +123,9 @@ export class RouteHistoryRepository
       },
     });
 
-    const total = await this.repository.routeHistory.count();
+    const total = condition ? await this.repository.routeHistory.count({ 
+      where: {...condition},
+    }): await this.repository.routeHistory.count({});
 
     return this.buildPageResponse(
       items,
@@ -119,6 +146,7 @@ export class RouteHistoryRepository
         vehicleId: data.vehicle.id,
         driverId: data.driver.id,
         itinerary: data.itinerary,
+        shift: data.path.startsAt,
         startedAt: data.startedAt,
         finishedAt: data.finishedAt,
         createdAt: data.createdAt,
@@ -140,16 +168,26 @@ export class RouteHistoryRepository
     return routes;
   }
 
-  getHistoricByDate(dateInit: Date, dateFinal: Date): Promise<RouteHistory[]> {
-    const paths = this.repository.routeHistory.findMany({
+  async getHistoricByDate(dateInitial: Date, dateFinal: Date): Promise<RouteHistory[]> {
+    const paths = await this.repository.routeHistory.findMany({
       where: {
         createdAt: {
-          gte: dateInit,
+          gte: dateInitial,
           lte: dateFinal,
         },
       },
       include: {
         sinister: true,
+        path :{
+         select: {
+          startsAt: true,
+          finishedAt: true,
+          type: true,
+        }
+      },
+    },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
     return paths;

@@ -98,6 +98,8 @@ export class MappedPathPinsDTO {
   vehicle?: string;
   @ApiProperty()
   driver?: string;
+  @ApiProperty()
+  routeType?: string;
 }
 
 export interface EmployeesByPin {

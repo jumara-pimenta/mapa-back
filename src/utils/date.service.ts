@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
-import { ETypeShiftEmployee, ETypeShiftRotue } from './ETypes';
+import { ETypePath, ETypeRoute, ETypeShiftEmployee, ETypeShiftEmployeeExports, ETypeShiftRotue } from './ETypes';
 import {
   dateInFormatOneRgx,
   dateInFormatThreeRgx,
@@ -126,6 +126,20 @@ export function convertTimeToDate(hour: string): Date {
         return {startAt : '03:30', finishAt : '12:00'}
  }
 
+ export function getShiftToGraphic(starstAt : string, type : string) : string {
+  if(starstAt === '07:30')
+      return 'Turno 1'
+  if(starstAt === '17:30')
+      return type === 'IDA' ? 'Turno 2' : 'Turno 1'
+  if(starstAt === '02:30')
+      return 'Turno 2'
+  if(starstAt === '03:30' || starstAt === '12:00')
+      return 'Turno 3'
+  return 'Extra'    
+      
+  
+}
+
 
 
  export function getStartAtAndFinishEmployee(type : ETypeShiftEmployee) : startAndFinishAt | null {
@@ -137,5 +151,16 @@ export function convertTimeToDate(hour: string): Date {
       return {startAt : '03:30', finishAt : '12:00'}
   if(type === ETypeShiftEmployee.NOT_DEFINED)        
       return  null
+}
+
+export function getShiftStartAtAndExports(type : ETypeShiftEmployeeExports) {
+  if(type === ETypeShiftEmployeeExports.FIRST)
+  return '1'
+  if(type === ETypeShiftEmployeeExports.SECOND)
+      return '2'
+  if(type === ETypeShiftEmployeeExports.THIRD)
+      return '3'
+  if(type === ETypeShiftEmployeeExports.NOT_DEFINED)        
+      return  'Sem Turno Estabelecido'
 }
 

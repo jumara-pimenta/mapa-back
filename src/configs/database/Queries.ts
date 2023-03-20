@@ -323,18 +323,18 @@ export function generateQueryByFiltersForRouteHistory(
   filters: any,
 ): IQueryRouteHistory {
   const fields = {
-    sequenceQr: () => ({
-      sequenceQr: convertAndVerifyNumber(filters.sequenceQr),
+    nameRoute: () => ({
+      nameRoute: {contains : filters.nameRoute},
     }),
-    process: () => ({
-      process: filters.process,
-    }),
-    type: () => ({
-      type: filters.type,
-    }),
-    product: () => ({
-      product: filters.product,
-    }),
+    createdAt: () => {
+      const { end, start } = getDateStartToEndOfDay(filters.createdAt);
+      return {
+        createdAt: {
+          gte: start,
+          lte: end,
+        },
+      };
+    },
   };
 
   const keysFields = Object.keys(fields);

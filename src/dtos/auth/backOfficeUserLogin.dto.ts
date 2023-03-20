@@ -51,4 +51,9 @@ export class BackOfficeUserUpdateDTO {
   @IsOptional()
   @IsString({ message: '[role] a função deve ser do tipo texto' })
   role?: string;
+
+  @ApiProperty({ example: faker.internet.password() })
+  @IsOptional()
+  @IsString({ message: '[password] a senha deve ser alfanumérico' })
+  password?: string;
 }

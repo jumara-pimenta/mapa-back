@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsDateString, IsOptional } from 'class-validator';
 
 export class FiltersRouteHistoryDTO {
   @ApiProperty({required: false})
-  sequenceQr?: number;
+  @IsOptional()
+  nameRoute?: string;
   @ApiProperty({required: false})
-  process?: string;
-  @ApiProperty({required: false})
-  type?: string;
-  @ApiProperty({required: false})
-  product?: string;
+  @IsDateString()
+  @IsOptional()
+  createdAt?: Date;
 }

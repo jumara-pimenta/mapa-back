@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { faker } from '@faker-js/faker';
+import { ETypePin } from 'src/utils/ETypes';
 
 faker.locale = 'pt_BR';
 export class FiltersEmployeeDTO {
@@ -24,4 +25,5 @@ export class FiltersEmployeeDTO {
   costCenter?: string;
   @ApiProperty({ required: false, example: `${faker.name.firstName()}` })
   name?: string;
+
 }
