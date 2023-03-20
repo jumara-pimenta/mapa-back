@@ -68,6 +68,7 @@ export enum ETypeShiftEmployee {
 export enum ETypeCategoryDrivers {
   C = 'C',
   D = 'D',
+  E = 'E',
 }
 
 export enum ETypeShiftEmployeeExports {
