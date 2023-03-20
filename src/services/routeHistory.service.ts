@@ -14,7 +14,7 @@ import {
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { compareDates, getDateStartToEndOfDay, getPeriod } from 'src/utils/Date';
+import { compareDates, convertDate, getDateStartToEndOfDay, getPeriod } from 'src/utils/Date';
 import { RouteByDateAndShift, RouteHistoryByDate, RouteSeparated, Shifts, ShiftsByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dto';
 import { SinisterService } from './sinister.service';
@@ -271,6 +271,9 @@ export class RouteHistoryService {
       return acc;
     }, []);
 
+    reponseReduce.map((item) => {
+      item.date = convertDate(item.date);
+    });
     return reponseReduce;
   }
 
@@ -293,6 +296,7 @@ export class RouteHistoryService {
         response.shifts[index].totalPaths += 1
       })
 
+      response.date = convertDate(response.date)
       return response
   }
 
@@ -325,7 +329,7 @@ export class RouteHistoryService {
 
 
 
-
+    response.date = convertDate(response.date)
     return response
   }
 }

@@ -190,7 +190,6 @@ export class RouteHistoryRepository
         createdAt: 'asc',
       },
     });
-    console.log(paths);
     return paths;
   }
 

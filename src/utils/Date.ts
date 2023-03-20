@@ -99,3 +99,15 @@ export function verifyDateFilter(date?: string) {
       throw new HttpException('Data inválida', HttpStatus.BAD_REQUEST);
   }
 }
+
+export function convertDate( date?: Date | string){
+  let convertedDate
+  if(typeof date === 'string')
+    convertedDate = date;
+  if(date instanceof Date)
+    convertedDate = date.toISOString().split('T')[0];
+  const dateParts = convertedDate.split('-');
+  
+  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+
+}
