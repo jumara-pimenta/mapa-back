@@ -242,7 +242,6 @@ export class RouteHistoryService {
 
   async getHistoricByDate(period: ETypePeriodHistory): Promise<any> {
     const dates = getPeriod(period);
-    console.log(dates);
     const historic = await this.routeHistoryRepository.getHistoricByDate(
       dates.dateInitial,
       dates.dateFinal,
@@ -307,7 +306,6 @@ export class RouteHistoryService {
       data.end,
     );
 
-    console.log({historic});
     
     const response : RouteByDateAndShift = {date : date, shift : shift, totalPaths : 0,routes : []}
 
