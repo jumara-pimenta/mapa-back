@@ -52,7 +52,6 @@ export class PathService {
   async finishPath(id: string): Promise<any> {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
-    console.log(route);
 
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const employeesOnPath = await this.employeesOnPathService.listByPath(

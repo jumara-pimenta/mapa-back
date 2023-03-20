@@ -211,7 +211,11 @@ export class PrismaService
         await this.vehicle.createMany({
           data: vehicleId,
         });
+
       }
+       
+
+   
     }
   }
   async onModuleDestroy() {

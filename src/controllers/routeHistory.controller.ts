@@ -20,7 +20,7 @@ import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
 import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
 import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
-import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
+import { DateShift, EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
 import * as moment from 'moment';
 
 @Controller('/api/routes/histories')
@@ -89,6 +89,7 @@ export class RouteHistoryController {
   ): Promise<PageResponse<MappedRouteHistoryDTO>> {
     return await this.RouteHistoryService.listAll(page, filters);
   }
+  
 
   @Get('/pathId/id')
   @Roles('list-historic')
@@ -103,5 +104,35 @@ export class RouteHistoryController {
   @HttpCode(HttpStatus.OK)
   async getEmployess(@Query() data: EmployeeHistoryDTO): Promise<any> {
     return await this.RouteHistoryService.listAllEmployess(data.id);
+  }
+
+  @Get('/shifts/byDate')
+  @Roles('list-historic')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get the shifts of an employee by date.',
+    schema: {
+      type: 'object',
+      example: ListRouteHistories,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getShiftsByDate(@Query() query: DateShift): Promise<any> {
+    return await this.RouteHistoryService.getShiftsByDate(query.data);
+  }
+
+  @Get('/shifts/byDate/route')
+  @Roles('list-historic')
+  @ApiCreatedResponse({
+    status: HttpStatus.OK,
+    description: 'Get the shifts of an employee by date.',
+    schema: {
+      type: 'object',
+      example: ListRouteHistories,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async getRoutesByDateAndShift(@Query() query: DateShift): Promise<any> {
+    return await this.RouteHistoryService.getRoutesByDateAndShift(query.data, query.shift);
   }
 }

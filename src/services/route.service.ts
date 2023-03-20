@@ -30,6 +30,7 @@ import {
 import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
+  getDateInLocaleTime,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -50,6 +51,9 @@ import { GoogleApiServiceIntegration } from 'src/integrations/services/googleSer
 import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
 import e from 'express';
 import { getDuration } from 'src/utils/Date';
+import { RouteHistoryService } from './routeHistory.service';
+import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class RouteService {
@@ -59,6 +63,7 @@ export class RouteService {
     private readonly driverService: DriverService,
     private readonly vehicleService: VehicleService,
     private readonly employeeService: EmployeeService,
+    private readonly routeHistoryService: RouteHistoryService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
     @Inject('IMapBoxServiceIntegration')
@@ -93,7 +98,7 @@ export class RouteService {
           },
         });
 
-        await this.create({
+       const route1=  await this.create({
           description: 'Rota de teste EXTRA',
           driverId: driver.items[1].id,
           vehicleId: vehicle.items[1].id,
@@ -101,14 +106,74 @@ export class RouteService {
           type: ETypeRoute.EXTRA,
           shift: ETypeShiftRotue.SECOND,
           pathDetails: {
-            startsAt: '06:00',
+            startsAt: '07:30',
             duration: '00:30',
-            startsReturnAt: '18:00',
+            startsReturnAt: '17:30',
             type: ETypePath.ROUND_TRIP,
             isAutoRoute: true,
           },
         });
+
+        const allPaths = await this.pathService.listAll();
+        const path = await this.pathService.listById(allPaths[0].id);
+        const pathObj = await this.pathService.getPathById(allPaths[0].id);
+
+        const path1 = await this.pathService.listById(allPaths[1].id);
+        const pathObj1 = await this.pathService.getPathById(allPaths[1].id);
+        const vehicleHistoric = await this.vehicleService.listById(path.vehicle);
+    const driverHistoric = await this.driverService.listById(
+     path.driver
+    );
+        const today = new Date();
+        //remove 1 day
+       
+        //create a for to create a route for 4 days
+        for (let i = 0; i < 20; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+        const props = new RouteHistory(
+          {
+            typeRoute: path.type,
+            nameRoute: faker.name.jobTitle(),
+            employeeIds: path.employeesOnPath.map(e => e.id).join(','),
+            itinerary: '-3.4441,-60.025',
+            totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+            totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+            startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+            finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
+          },
+          pathObj,
+           driverHistoric,
+           vehicleHistoric,
+          [],
+          date
+        );
+
+        const props2 = new RouteHistory(
+          {
+            typeRoute: path1.type,
+            nameRoute: faker.name.jobTitle(),
+            employeeIds: path1.employeesOnPath.map(e => e.id).join(','),
+            itinerary: '-3.4441,-60.025',
+            totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+            totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+            startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+            finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+          },
+          pathObj1,
+           driverHistoric,
+           vehicleHistoric,
+          [],
+          date
+        );
+        await this.routeHistoryService.create(props);
+        await this.routeHistoryService.create(props2);
+        }
+
+        
       }
+
+     
     }
   }
 
