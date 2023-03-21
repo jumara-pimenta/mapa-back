@@ -80,4 +80,13 @@ export class CreateEmployeePinDTO {
   @IsString({ message: '[title] não está definido como texto.' })
   @IsOptional()
   title?: string;
+
+  @ApiProperty({
+    default: 'Bairro do local',
+    description: 'Bairro do local',
+  })
+  @ApiProperty({ default: 'Bairro do local' })
+  @IsString({ message: '[district] não está definido como texto.' })
+  @IsOptional()
+  district?: string;
 }

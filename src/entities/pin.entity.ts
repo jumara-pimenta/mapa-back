@@ -9,6 +9,7 @@ export class Pin {
   details: string;
   lat: string;
   lng: string;
+  district: string;
   employees?: EmployeesOnPin;
   createdAt: Date;
   updatedAt?: Date;

@@ -94,7 +94,7 @@ export class EmployeeService {
           HttpStatus.BAD_REQUEST,
         );
     } else if (props.pin.typeCreation === ETypeCreationPin.IS_NEW) {
-      const { title, local, details, lat, lng } = props.pin;
+      const { title, local, details, lat, lng, district} = props.pin;
 
       if (!title || !local || !details || !lat || !lng) {
         throw new HttpException(
@@ -107,6 +107,7 @@ export class EmployeeService {
         title,
         local,
         details,
+        district,
         lat,
         lng,
       });
@@ -247,7 +248,7 @@ export class EmployeeService {
         );
       }
       if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
-        const { title, local, details, lat, lng } = data.pin;
+        const { title, local, details, lat, lng,district } = data.pin;
 
         if (!title || !local || !details || !lat || !lng) {
           throw new HttpException(
@@ -260,6 +261,7 @@ export class EmployeeService {
           title,
           local,
           details,
+          district,
           lat,
           lng,
         });
@@ -387,7 +389,7 @@ export class EmployeeService {
         state: 'AM',
         complement: row['Complemento'] ? row['Complemento'].toString() : '',
       };
-
+      
       const pin = row['PONTO DE COLETA']
         ? await this.getLocation(row['PONTO DE COLETA'])
         : null;
@@ -407,8 +409,9 @@ export class EmployeeService {
           : new Date(),
         pin: pin
           ? {
-            lat: pin.lat.toString(),
-            lng: pin.lng.toString(),
+            lat: pin.location.lat.toString(),
+            lng: pin.location.lng.toString(),
+            district: pin.district,
             title: row['PONTO DE COLETA']
               ? row['PONTO DE COLETA'].toString()
               : '',
@@ -464,14 +467,17 @@ export class EmployeeService {
         if (!existsRegistration) {
           const pin =
             item.employee.pin.title != 'Denso'
-              ? await this.pinService.create({
+              ? await this.pinService.listByLocalExcel(item.employee.pin.local) 
+              ?? await this.pinService.create({
                 title: item.employee.pin.title,
                 local: item.employee.pin.local,
                 details: item.employee.pin.details,
+                district: item.employee.pin.district,
                 lat: item.employee.pin.lat.toString(),
                 lng: item.employee.pin.lng.toString(),
               })
               : null;
+
 
           const getShift = getStartAtAndFinishEmployee(item.employee.shift);
 
