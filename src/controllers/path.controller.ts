@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { EStatusPath } from '../utils/ETypes';
@@ -28,6 +29,7 @@ import {
 } from 'src/utils/examples.swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RouteMobile } from 'src/utils/Utils';
+import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
 
 @Controller('/api/routes')
 @ApiTags('Paths')
@@ -210,8 +212,8 @@ export class PathController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async getAll(): Promise<any[]> {
-    return await this.pathService.listAll();
+  async getAll(@Query() filters: FiltersPathDTO): Promise<any[]> {
+    return await this.pathService.listAll(filters);
   }
 
   @Get('mobile/:pathId')

@@ -5,6 +5,7 @@ import { Path } from '../../entities/path.entity';
 import IPathRepository from './path.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { EStatusPath } from '../../utils/ETypes';
+import { generateQueryByFiltersForPaths } from 'src/configs/database/Queries';
 
 @Injectable()
 export class PathRepository extends Pageable<Path> implements IPathRepository {
@@ -437,10 +438,12 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   }
 
   async findAll(filter?: any): Promise<Path[]> {
+    const condition = generateQueryByFiltersForPaths(filter);
     return await this.repository.path.findMany({
       where: {
         deletedAt: null,
         ...filter,
+        ...condition,
       },
       select: {
         id: true,

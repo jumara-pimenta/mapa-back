@@ -29,6 +29,7 @@ import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { SinisterService } from './sinister.service';
 import { RouteMobile } from 'src/utils/Utils';
+import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
 
 @Injectable()
 export class PathService {
@@ -295,10 +296,9 @@ export class PathService {
 
   async delete(id: string): Promise<Path> {
     const path = await this.listById(id);
-  
+
     return await this.pathRepository.delete(path.id);
   }
-
 
   async deleteExtra(id: string): Promise<Path> {
     const path = await this.listById(id);
@@ -401,11 +401,12 @@ export class PathService {
     return path;
   }
 
-  async listAll(): Promise<any[]> {
-    const paths = await this.pathRepository.findAll();
+  async listAll(filters?: FiltersPathDTO): Promise<any[]> {
+    const paths = await this.pathRepository.findAll(filters);
 
     // const manyPath = await this.mapperMany(paths);
     // add driver name and plate of vehicle
+
     return paths.map((path: Path) => {
       const { driver, vehicle } = path.route;
       const { name, id } = driver;

@@ -267,13 +267,24 @@ export class AuthService {
   async updateBackOfficeUser(
     id: string,
     data: BackOfficeUserUpdateDTO,
+    token?: string,
   ): Promise<MappedBackOfficeUserDTO> {
     const user = await this.backOfficeUserRepository.findById(id);
 
     if (!user)
       throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
 
-    if (data?.password) data.password = bcrypt.hashSync(data.password, 10);
+    if (data?.password) {
+      if (!token)
+        throw new HttpException('Token não provido', HttpStatus.UNAUTHORIZED);
+      const admin = await this.decodeJWT(token);
+      if (admin.sub.name !== 'Admin')
+        throw new HttpException(
+          'Você não tem permissão para alterar a senha',
+          HttpStatus.UNAUTHORIZED,
+        );
+      data.password = bcrypt.hashSync(data.password, 10);
+    }
 
     const updatedUser = await this.backOfficeUserRepository.update(id, data);
 
