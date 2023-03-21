@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -117,8 +118,9 @@ export class AuthController {
   async backofficeAuthUpdate(
     @Param('id') id: string,
     @Body() payload: BackOfficeUserUpdateDTO,
+    @Headers('authorization') token?: string,
   ): Promise<any> {
-    return await this.authService.updateBackOfficeUser(id, payload);
+    return await this.authService.updateBackOfficeUser(id, payload, token);
   }
 
   @Delete('/backoffice/:id')
