@@ -39,7 +39,6 @@ export class PinService {
 
   async listByLocalExcel(local: string) {
     const pin = await this.pinRepository.findByLocalExcel(local);
-    console.log(pin);
     return pin;
   }
 

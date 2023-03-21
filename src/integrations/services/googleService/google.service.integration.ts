@@ -9,7 +9,6 @@ import { RootObject } from './response/getLocation.response';
 export class GoogleApiServiceIntegration implements IGoogleServiceIntegration {
   async getLocation(payload: any): Promise<any> {
     try {
-      console.log(payload)
       const { data }: AxiosResponse<RootObject> =
         await googleApi().get(`/maps/api/geocode/json?address=${payload}&key=${process.env.API_KEY_GOOGLE}`);
 
