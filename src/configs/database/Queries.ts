@@ -16,6 +16,7 @@ import { getDateStartToEndOfDay } from 'src/utils/Date';
 import { IQueryBackOfficeUser } from 'src/dtos/auth/queryBackOfficeUser.dto';
 import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
 import { IQuerySinister } from 'src/dtos/sinister/querySinister.dto';
+import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -318,13 +319,46 @@ export function generateQueryByFiltersForRoute(
 
   return query;
 }
+export function generateQueryByFiltersForPaths(filters: FiltersPathDTO): any {
+  const fields = {
+    type: () => ({
+      type: filters.type,
+    }),
+    status: () => ({
+      status: filters.status,
+    }),
+  };
+
+  const keysFields = Object.keys(fields);
+
+  let query: any;
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  let queryBuilder: Function;
+
+  for (const filter in filters) {
+    if (keysFields.includes(filter)) {
+      queryBuilder = fields[filter];
+
+      if (query) {
+        const newCondition = queryBuilder();
+
+        Object.assign(query, { ...newCondition });
+      } else {
+        query = queryBuilder();
+      }
+    }
+  }
+
+  return query;
+}
 
 export function generateQueryByFiltersForRouteHistory(
   filters: any,
 ): IQueryRouteHistory {
   const fields = {
     nameRoute: () => ({
-      nameRoute: {contains : filters.nameRoute},
+      nameRoute: { contains: filters.nameRoute },
     }),
     createdAt: () => {
       const { end, start } = getDateStartToEndOfDay(filters.createdAt);

@@ -98,6 +98,11 @@ export class RouteRepository
       where: {
         vehicleId,
         deletedAt: null,
+        path: {
+          some: {
+            deletedAt: null,
+          },
+        },
       },
       select: {
         id: true,
@@ -332,6 +337,11 @@ export class RouteRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -488,6 +498,11 @@ export class RouteRepository
             ...condition,
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           include: {
             driver: true,
@@ -531,6 +546,11 @@ export class RouteRepository
           where: {
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           include: {
             driver: true,
@@ -573,12 +593,22 @@ export class RouteRepository
             ...condition,
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         })
       : await this.repository.route.count({
           where: {
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         });
 
