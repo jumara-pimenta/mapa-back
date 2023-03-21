@@ -71,4 +71,12 @@ export class UpdateEmployeePinDTO {
   @IsString({ message: '[title] O título deve ser do tipo texto.' })
   @IsOptional()
   title?: string;
+
+  @ApiProperty({
+    default: 'Bairro do local',
+    description: 'Bairro do local',
+  })
+  @IsString({ message: '[district] O bairro deve ser do tipo texto.' })
+  @IsOptional()
+  district?: string;
 }

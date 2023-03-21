@@ -46,6 +46,7 @@ export class PrismaService
         details: 'Denso LTDA ',
         local:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
+          district: 'Distrito Industrial I',
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
         createdAt: getDateInLocaleTime(new Date()),
@@ -56,6 +57,8 @@ export class PrismaService
         details: 'Denso LTDA ',
         local:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
+          district: 'Distrito Industrial I',
+
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
         createdAt: getDateInLocaleTime(new Date()),
@@ -74,6 +77,7 @@ export class PrismaService
             local:
               'Av Gov. Danilo Matos Aerosa, 381 Bloco F - Fucapi - Distrito Industrial I, Manaus - AM, 69075-351 ',
             details: 'Em frente a ITEAM',
+            district: 'Distrito Industrial I',
             lat: '-3.1368534098377596',
             lng: '-59.98132250432473',
             createdAt: getDateInLocaleTime(new Date()),
@@ -82,8 +86,9 @@ export class PrismaService
             id: uuid(),
             title: 'UBS Almir Pedreira',
             local:
-              'UBS Almir Pedreira	 - R. Claudiano Moreira, s/n - Lagoa Verde, Manaus - AM, 69075-005',
+              'UBS Almir Pedreira	 - R. Claudiano Moreira, s/n - Crespo, Manaus - AM, 69075-005',
             details: 'Em frente a UBS Almir Pedreira',
+            district: 'Crespo',
             lat: '-3.1379972441350534',
             lng: '-59.984713639689815',
             createdAt: getDateInLocaleTime(new Date()),
@@ -94,6 +99,7 @@ export class PrismaService
             local:
               'Av. Gov. Danilo de Matos Areosa, 200 - Distrito Industrial I, Manaus - AM, 69075-351',
             details: 'Em frente a Distrito da Bola',
+            district: 'Distrito Industrial I',
             lat: '-3.1356565487524675',
             lng: '-59.98612092294195',
             createdAt: getDateInLocaleTime(new Date()),
@@ -104,6 +110,7 @@ export class PrismaService
             local:
               'Av. Buriti, 556 - Distrito Industrial I, Manaus - AM, 69075-510',
             details: 'Em frente a Top Pousada',
+            district: 'Distrito Industrial I',
             lat: '-3.119582454197964',
             lng: '-59.97671361130084',
             createdAt: getDateInLocaleTime(new Date()),
@@ -113,6 +120,7 @@ export class PrismaService
             title: 'Patricia Bradock Fardas',
             local: 'R. das Águias, 40 - São Lázaro, Manaus - AM, 69073-140',
             details: 'Em frente a Patricia Bradock Fardas',
+            district: 'São Lázaro',
             lat: '-3.138758531627776',
             lng: '-59.98713727671988',
             createdAt: getDateInLocaleTime(new Date()),
@@ -122,6 +130,7 @@ export class PrismaService
             title: 'Lagoa Verde',
             local: 'Av. Rodrigo Otávio, 2 - São Lázaro, Manaus - AM, 69073-177',
             details: 'Em frente a Lagoa Verde',
+            district: 'São Lázaro',
             lat: '-3.1376438100682718',
             lng: '-59.988923509861465',
             createdAt: getDateInLocaleTime(new Date()),

@@ -37,6 +37,13 @@ export class PinService {
     return pin;
   }
 
+  async listByLocalExcel(local: string) {
+    const pin = await this.pinRepository.findByLocalExcel(local);
+    console.log(pin);
+    return pin;
+  }
+
+
   async listAll(
     page: Page,
     filters?: FiltersPinDTO,
@@ -85,6 +92,7 @@ export class PinService {
         title: pin.title,
         local: pin.local,
         details: pin.details,
+        district: pin.district,
         lat: pin.lat,
         lng: pin.lng,
         createdAt: pin.createdAt,

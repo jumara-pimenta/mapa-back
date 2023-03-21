@@ -133,6 +133,7 @@ model Employee {
 
 model Pin {
   id        String           @id @unique
+  district  String           @db.VarChar(255)
   title     String           @db.VarChar(255)
   local     String           @db.VarChar(255)
   details   String           @db.VarChar(255)

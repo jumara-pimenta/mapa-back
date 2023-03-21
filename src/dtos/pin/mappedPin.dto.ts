@@ -14,5 +14,7 @@ export class MappedPinDTO {
   @ApiProperty()
   lng: string;
   @ApiProperty()
+  district: string;
+  @ApiProperty()
   createdAt: Date;
 }

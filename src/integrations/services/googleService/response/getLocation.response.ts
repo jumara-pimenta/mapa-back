@@ -1,4 +1,8 @@
 
+export class LatLngAndDistrict {
+    latLng: Location;
+    district: string;
+}
     class AddressComponent {
         long_name: string;
         short_name: string;
