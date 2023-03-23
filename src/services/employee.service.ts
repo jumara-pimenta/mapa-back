@@ -543,14 +543,14 @@ export class EmployeeService {
 
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
     const headers = [
-      'Matricula',
+      'Matrícula',
       'Nome Colaborador',
       'Admissão',
       'Cargo',
       'Turno',
       'Centro de Custo',
       'PONTO DE COLETA',
-      'Referencia',
+      'Referência',
     ];
     const today = new Date().toLocaleDateString('pt-BR');
 
@@ -661,6 +661,7 @@ export class EmployeeService {
 
     XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
     const pathFile = path.resolve(filePath);
+
     XLSX.writeFile(workBook, pathFile);
 
     const exportedKanbans = fs.createReadStream(pathFile);
