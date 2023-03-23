@@ -638,11 +638,20 @@ export class EmployeeService {
     return new StreamableFile(exportedKanbans);
   }
 
+
+  
   async exportsEmployeeFileAddress() {
+    
     const headers = [
       'Matricula',
       'Nome Colaborador',
-      'Endereço',
+      'Cep',
+      'City',
+      'Complement',
+      'Neighborhood',
+      'Number',
+      'State',
+      'Street',
       'Admissão',
       'Cargo',
       'Turno',
@@ -675,7 +684,13 @@ export class EmployeeService {
         return [
           employee.registration,
           employee.name,
-          employee.address,
+          employee.address.cep,
+          employee.address.city,
+          employee.address.complement,
+          employee.address.neighborhood,
+          employee.address.number,
+          employee.address.state,
+          employee.address.street,
           employee.admission,
           employee.role,
           employee.shift = convertShift,
