@@ -167,5 +167,43 @@ export class EmployeeController {
     return await this.employeeService.exportsEmployeeFile(page, filters);
   }
 
+  @Get('download/fileModel')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Colaboradores Exportados XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFileModel(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFileModel();
+  }
+
+  @Get('download/fileAddress')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Colaboradores Exportados XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFileAddress(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFileAddress();
+  }
+
 
 }
