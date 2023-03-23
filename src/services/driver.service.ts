@@ -40,7 +40,7 @@ export class DriverService {
   constructor(
     @Inject('IDriverRepository')
     private readonly driverRepository: IDriverRepository,
-  ) { }
+  ) {}
 
   async create(payload: CreateDriverDTO): Promise<Driver> {
     const cpfAlredyExist = await this.driverRepository.findByCpf(payload.cpf);
@@ -294,13 +294,7 @@ export class DriverService {
   }
 
   async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
-    const headers = [
-      'Nome',
-      'CPF',
-      'CNH',
-      'Validade',
-      'Categoria',
-    ];
+    const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
     const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './driver.xlsx';
@@ -328,14 +322,9 @@ export class DriverService {
           HttpStatus.NOT_FOUND,
         );
 
-
-      
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
-      const workSheetData = [
-        headers,
-        ...data,
-      ];
+      const workSheetData = [headers, ...data];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
         { wch: 30 },
@@ -360,5 +349,37 @@ export class DriverService {
       workSheetName,
       filePath,
     );
+  }
+
+  async exportDriverEmptFile() {
+    const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
+
+    const filePath = './driver.xlsx';
+    const workSheetName = 'Motoristas';
+
+    const exportedDriverToXLSX = async (
+      headers: string[],
+      workSheetName: string,
+      filePath: string,
+    ) => {
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 30 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 9 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+      const exportedKanbans = fs.createReadStream(pathFile);
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(headers, workSheetName, filePath);
   }
 }
