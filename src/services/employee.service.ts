@@ -681,16 +681,17 @@ export class EmployeeService {
 
       const data = employees.map((employee : Employee) => {
         const convertShift = getShiftStartAtAndExports(employee.shift as ETypeShiftEmployeeExports);
+        const addressObject = JSON.parse(employee.address)
         return [
           employee.registration,
           employee.name,
-          employee.address.cep,
-          employee.address.city,
-          employee.address.complement,
-          employee.address.neighborhood,
-          employee.address.number,
-          employee.address.state,
-          employee.address.street,
+          addressObject.cep,
+          addressObject.city,
+          addressObject.complement,
+          addressObject.neighborhood,
+          addressObject.number,
+          addressObject.state,
+          addressObject.street,
           employee.admission,
           employee.role,
           employee.shift = convertShift,
