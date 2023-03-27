@@ -1,15 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsDateString, IsOptional } from 'class-validator';
+import { IsDate, IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class FiltersRouteHistoryDTO {
+export class FiltersNameDriverVehicleDateRouteHistoryDTO {
   @ApiProperty({required: false})
   @IsOptional()
   nameRoute?: string;
   
-  @ApiProperty({required: false})
+  @ApiProperty({required: true})
   @IsDateString()
-  @IsOptional()
-  createdAt?: Date;
+  createdDate: Date;
 
   @ApiProperty({required: false})
   @IsOptional()
@@ -18,4 +17,5 @@ export class FiltersRouteHistoryDTO {
   @ApiProperty({required: false})
   @IsOptional()
   driverId?: String;
+
 }

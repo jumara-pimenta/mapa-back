@@ -20,6 +20,7 @@ import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dt
 import { SinisterService } from './sinister.service';
 import { ETypePeriodHistory } from 'src/utils/ETypes';
 import { getShiftToGraphic, getStartAtAndFinishAt } from 'src/utils/date.service';
+import { FiltersNameDriverVehicleDateRouteHistoryDTO } from 'src/dtos/routeHistory/filtersNameDriverVehicleDateRouteHistory.dto';
 
 @Injectable()
 export class RouteHistoryService {
@@ -329,5 +330,28 @@ export class RouteHistoryService {
 
     response.date = convertDate(response.date)
     return response
+  }
+
+  async getHistoricByDateNameDriverVehicle(
+    page: Page,
+    filters?: FiltersRouteHistoryDTO
+  ): Promise<PageResponse<MappedRouteHistoryDTO>> {
+    const routeHistory = await this.routeHistoryRepository.findAll(
+      page,
+      filters,
+    );
+    if (routeHistory.total === 0) {
+      throw new HttpException(
+        'Não existe(m) histórico(s) de trajeto(s) para esta pesquisa!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const items = await this.mapperMany(routeHistory.items);
+
+    return {
+      total: routeHistory.total,
+      items,
+    };
   }
 }

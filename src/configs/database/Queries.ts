@@ -369,6 +369,9 @@ export function generateQueryByFiltersForRouteHistory(
         },
       };
     },
+
+    driverId: () => ({ driver: { id: { eq: filters.driverId }} }),
+    vehicleId: () => ({ vehicle: { id: { eq: filters.vehicleId }} })
   };
 
   const keysFields = Object.keys(fields);
