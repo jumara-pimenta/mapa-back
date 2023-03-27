@@ -82,5 +82,5 @@ export enum EShiftType {
   FIRST = 'Turno 1',
   SECOND = 'Turno 2',
   THIRD = 'Turno 3',
-  EXTRA = 'EXTRA',
+  EXTRA = 'Extra',
 }
