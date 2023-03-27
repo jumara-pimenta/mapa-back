@@ -330,27 +330,4 @@ export class RouteHistoryService {
     response.date = convertDate(response.date)
     return response
   }
-
-  async getHistoricByDateNameDriverVehicle(
-    page: Page,
-    filters?: FiltersRouteHistoryDTO
-  ): Promise<PageResponse<MappedRouteHistoryDTO>> {
-    const routeHistory = await this.routeHistoryRepository.findAll(
-      page,
-      filters,
-    );
-    if (routeHistory.total === 0) {
-      throw new HttpException(
-        'Não existe(m) histórico(s) de trajeto(s) para esta pesquisa!',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const items = await this.mapperMany(routeHistory.items);
-
-    return {
-      total: routeHistory.total,
-      items,
-    };
-  }
 }
