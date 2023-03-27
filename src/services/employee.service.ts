@@ -531,7 +531,7 @@ export class EmployeeService {
     const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
 
     const employees = await this.employeeRepository.findAllExport();
 
@@ -599,12 +599,19 @@ export class EmployeeService {
       'Cargo',
       'Turno',
       'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
+      'CEP',
+      'Cidade',
+      'UF',
       'PONTO DE COLETA',
       'Referencia',
     ];
 
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
 
     const workBook = XLSX.utils.book_new();
     const workSheetData = [headers];
@@ -614,9 +621,16 @@ export class EmployeeService {
       { wch: 10 },
       { wch: 40 },
       { wch: 10 },
-      { wch: 30 },
-      { wch: 9 },
+      { wch: 20 },
+      { wch: 10 },
       { wch: 15 },
+      { wch: 40 },
+      { wch: 10 },
+      { wch: 30 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 10 },
       { wch: 70 },
       { wch: 50 },
     ];
@@ -634,23 +648,23 @@ export class EmployeeService {
     const headers = [
       'Matricula',
       'Nome Colaborador',
-      'Cep',
-      'Cidade',
-      'Complemento',
-      'Bairro',
-      'Número',
-      'Estado',
-      'Rua',
       'Admissão',
       'Cargo',
       'Turno',
       'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
+      'CEP',
+      'Cidade',
+      'UF',
       'PONTO DE COLETA',
       'Referencia',
     ];
 
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
 
     const employees = await this.employeeRepository.findAllExport();
 
@@ -675,17 +689,17 @@ export class EmployeeService {
         return [
           employee.registration,
           employee.name,
-          addressObject.cep,
-          addressObject.city,
-          addressObject.complement,
-          addressObject.neighborhood,
-          addressObject.number,
-          addressObject.state,
-          addressObject.street,
           employee.admission,
           employee.role,
           (employee.shift = convertShift),
           employee.costCenter,
+          addressObject.street,
+          addressObject.number,
+          addressObject.complement,
+          addressObject.neighborhood,
+          addressObject.cep,
+          addressObject.city,
+          addressObject.state,
           employee.pins[0].pin.local,
           employee.pins[0].pin.details,
         ];
