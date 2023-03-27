@@ -370,8 +370,8 @@ export function generateQueryByFiltersForRouteHistory(
       };
     },
 
-    driverId: () => ({ driver: { id: { eq: filters.driverId }} }),
-    vehicleId: () => ({ vehicle: { id: { eq: filters.vehicleId }} })
+    driverName: () => ({ driver: { name: { contains: filters.driverName }} }),
+    vehiclePlate: () => ({ vehicle: { plate: { contains: filters.vehiclePlate }} })
   };
 
   const keysFields = Object.keys(fields);

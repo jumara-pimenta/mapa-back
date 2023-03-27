@@ -21,8 +21,6 @@ import { RouteHistoryService } from '../services/routeHistory.service';
 import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
 import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 import { DateShift, EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
-import * as moment from 'moment';
-import { FiltersNameDriverVehicleDateRouteHistoryDTO } from 'src/dtos/routeHistory/filtersNameDriverVehicleDateRouteHistory.dto';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')
@@ -135,23 +133,5 @@ export class RouteHistoryController {
   @HttpCode(HttpStatus.OK)
   async getRoutesByDateAndShift(@Query() query: DateShift): Promise<any> {
     return await this.RouteHistoryService.getRoutesByDateAndShift(query.data, query.shift);
-  }
-
-  @Get('byDate/name/driver/vehicle')
-  @Roles('list-historic')
-  @ApiCreatedResponse({
-    status: HttpStatus.OK,
-    description: 'List of route histories filter by date, name, driver and vehicle',
-    schema: {
-      type: 'object',
-      example: ListRouteHistories,
-    },
-  })
-  @HttpCode(HttpStatus.OK)
-  async getHistoricByDateNameDriverVehicle(
-    @Query() page: Page,
-    @Query() filters: FiltersRouteHistoryDTO,
-  ): Promise<PageResponse<MappedRouteHistoryDTO>> {
-    return await this.RouteHistoryService.getHistoricByDateNameDriverVehicle(page, filters);
   }
 }

@@ -20,7 +20,6 @@ import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dt
 import { SinisterService } from './sinister.service';
 import { ETypePeriodHistory } from 'src/utils/ETypes';
 import { getShiftToGraphic, getStartAtAndFinishAt } from 'src/utils/date.service';
-import { FiltersNameDriverVehicleDateRouteHistoryDTO } from 'src/dtos/routeHistory/filtersNameDriverVehicleDateRouteHistory.dto';
 
 @Injectable()
 export class RouteHistoryService {

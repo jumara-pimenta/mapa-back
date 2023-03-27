@@ -13,9 +13,9 @@ export class FiltersRouteHistoryDTO {
 
   @ApiProperty({required: false})
   @IsOptional()
-  vehicleId?: String;
+  vehiclePlate?: String;
 
   @ApiProperty({required: false})
   @IsOptional()
-  driverId?: String;
+  driverName?: String;
 }
