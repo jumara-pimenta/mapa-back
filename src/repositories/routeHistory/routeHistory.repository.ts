@@ -80,7 +80,8 @@ export class RouteHistoryRepository
     
     const items = condition ? await this.repository.routeHistory.findMany({
       ...this.buildPage(page),
-      where:{...condition},
+      where:{...condition,
+      },
       orderBy: {
         createdAt: 'desc',
       },

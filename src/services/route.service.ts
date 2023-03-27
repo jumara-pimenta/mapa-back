@@ -1467,25 +1467,19 @@ export class RouteService {
   async  suggestRouteExtra (colabs: any, rotas : any[]){
 
     const ordemEmployee = calculateDistance(colabs, { lat: '-3.110944', lng: '-59.962604' },[]);
-    //dividir por mais perto
     const routes = separateWays(ordemEmployee,[]);
-  
     const extra : SuggestionExtra[]= [...rotas]
     const extraTime : SuggestionExtra[]= []
     for await(const route of routes) {
-      //roteirizar
       const path : SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
       if(path.totalDurationTime > getDuration('01:30'))
         extraTime.push(path)
       if(path.totalDurationTime < getDuration('01:30'))
         extra.push(path)
     }
-
     if(extraTime.length > 0){
       for await(const route of extraTime) {
-        //roteirizar
         const ordemEmployee = calculateDistance(route.employee, { lat: '-3.110944', lng: '-59.962604' },[]);
-        //dividir por mais perto
         const routes = separateWays(ordemEmployee,[],Math.round(ordemEmployee.length /2));
         for await(const route of routes) {
             const path : SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
