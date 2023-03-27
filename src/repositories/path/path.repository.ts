@@ -285,6 +285,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
       },
+      orderBy: {
+        status: 'asc',
+      },
     });
   }
   findByEmployee(employeeId: string): Promise<Path[]> {
@@ -344,6 +347,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             },
           },
         },
+      },
+      orderBy: {
+        status: 'asc',
       },
     });
   }
@@ -529,6 +535,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             },
           },
         },
+      },
+      orderBy: {
+        status: 'asc',
       },
     });
   }
