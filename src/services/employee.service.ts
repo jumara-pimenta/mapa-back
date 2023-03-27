@@ -665,7 +665,6 @@ export class EmployeeService {
 
     const filePath = './employee.xlsx';
     const workSheetName = 'Colaboradores';
-
     const exportedEmployeeToXLSX = async (
       headers: string[],
       workSheetName: string,
