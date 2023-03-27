@@ -543,14 +543,14 @@ export class EmployeeService {
 
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
     const headers = [
-      'Matrícula',
+      'Matricula',
       'Nome Colaborador',
       'Admissão',
       'Cargo',
       'Turno',
       'Centro de Custo',
       'PONTO DE COLETA',
-      'Referência',
+      'Referencia',
     ];
     const today = new Date().toLocaleDateString('pt-BR');
 
@@ -815,5 +815,64 @@ export class EmployeeService {
         };
       }),
     };
+  }
+
+  async exportsEmployeeEmptFile() {
+    const headers = [
+      'Matricula',
+      'Nome Colaborador',
+      'Admissão',
+      'Cargo',
+      'Turno',
+      'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
+      'CEP',
+      'Cidade',
+      'UF',
+      'PONTO DE COLETA',
+      'Referencia',
+    ];
+
+    const filePath = './employee.xlsx';
+    const workSheetName = 'LISTA DE COLABORADORES';
+    const exportedEmployeeToXLSX = async (
+      headers: string[],
+      workSheetName: string,
+      filePath: string,
+    ) => {
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 40 },
+        { wch: 40 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedEmployeeToXLSX(headers, workSheetName, filePath);
   }
 }
