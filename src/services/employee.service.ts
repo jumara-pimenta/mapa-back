@@ -519,14 +519,14 @@ export class EmployeeService {
 
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
     const headers = [
-      'Matrícula',
+      'Matricula',
       'Nome Colaborador',
       'Admissão',
       'Cargo',
       'Turno',
       'Centro de Custo',
       'PONTO DE COLETA',
-      'Referência',
+      'Referencia',
     ];
     const today = new Date().toLocaleDateString('pt-BR');
 
@@ -780,25 +780,25 @@ export class EmployeeService {
 
   async exportsEmployeeEmptFile() {
     const headers = [
-      'Matrícula',
+      'Matricula',
       'Nome Colaborador',
       'Admissão',
       'Cargo',
       'Turno',
       'Centro de Custo',
       'Endereço',
-      'Número',
+      'Numero',
       'Complemento',
       'Bairro',
       'CEP',
       'Cidade',
       'UF',
       'PONTO DE COLETA',
-      'Referência',
+      'Referencia',
     ];
 
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
     const exportedEmployeeToXLSX = async (
       headers: string[],
       workSheetName: string,
