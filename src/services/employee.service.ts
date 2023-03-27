@@ -530,7 +530,7 @@ export class EmployeeService {
     const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
 
     const employees = await this.employeeRepository.findAllExport();
  
@@ -617,7 +617,7 @@ export class EmployeeService {
     ];
   
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
   
     const workBook = XLSX.utils.book_new();
     const workSheetData = [
@@ -675,7 +675,7 @@ export class EmployeeService {
     ];
 
     const filePath = './employee.xlsx';
-    const workSheetName = 'Colaboradores';
+    const workSheetName = 'LISTA DE COLABORADORES';
 
     const employees = await this.employeeRepository.findAllExport();
  
