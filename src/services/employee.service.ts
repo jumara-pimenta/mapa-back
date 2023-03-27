@@ -63,7 +63,7 @@ export class EmployeeService {
     private readonly pinService: PinService,
     @Inject('IGoogleApiServiceIntegration')
     private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
-  ) { }
+  ) {}
 
   async getLocation(address: string): Promise<any> {
     const response = await this.googleApiServiceIntegration.getLocation(
@@ -94,7 +94,7 @@ export class EmployeeService {
           HttpStatus.BAD_REQUEST,
         );
     } else if (props.pin.typeCreation === ETypeCreationPin.IS_NEW) {
-      const { title, local, details, lat, lng, district} = props.pin;
+      const { title, local, details, lat, lng, district } = props.pin;
 
       if (!title || !local || !details || !lat || !lng) {
         throw new HttpException(
@@ -205,8 +205,8 @@ export class EmployeeService {
       );
     }
 
-    const items = this.mapperMany(employees.items);    
-      
+    const items = this.mapperMany(employees.items);
+
     return {
       total: employees.total,
       items,
@@ -248,7 +248,7 @@ export class EmployeeService {
         );
       }
       if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
-        const { title, local, details, lat, lng,district } = data.pin;
+        const { title, local, details, lat, lng, district } = data.pin;
 
         if (!title || !local || !details || !lat || !lng) {
           throw new HttpException(
@@ -389,7 +389,7 @@ export class EmployeeService {
         state: 'AM',
         complement: row['Complemento'] ? row['Complemento'].toString() : '',
       };
-      
+
       const pin = row['PONTO DE COLETA']
         ? await this.getLocation(row['PONTO DE COLETA'])
         : null;
@@ -409,18 +409,18 @@ export class EmployeeService {
           : new Date(),
         pin: pin
           ? {
-            lat: pin.location.lat.toString(),
-            lng: pin.location.lng.toString(),
-            district: pin.district,
-            title: row['PONTO DE COLETA']
-              ? row['PONTO DE COLETA'].toString()
-              : '',
-            local: row['PONTO DE COLETA']
-              ? row['PONTO DE COLETA'].toString()
-              : '',
-            details: row['Referencia'] ? row['Referencia'].toString() : '',
-            typeCreation: ETypeCreationPin.IS_NEW,
-          }
+              lat: pin.location.lat.toString(),
+              lng: pin.location.lng.toString(),
+              district: pin.district,
+              title: row['PONTO DE COLETA']
+                ? row['PONTO DE COLETA'].toString()
+                : '',
+              local: row['PONTO DE COLETA']
+                ? row['PONTO DE COLETA'].toString()
+                : '',
+              details: row['Referencia'] ? row['Referencia'].toString() : '',
+              typeCreation: ETypeCreationPin.IS_NEW,
+            }
           : { ...pinDenso, typeCreation: ETypeCreationPin.IS_EXISTENT },
       };
 
@@ -467,17 +467,18 @@ export class EmployeeService {
         if (!existsRegistration) {
           const pin =
             item.employee.pin.title != 'Denso'
-              ? await this.pinService.listByLocalExcel(item.employee.pin.local) 
-              ?? await this.pinService.create({
-                title: item.employee.pin.title,
-                local: item.employee.pin.local,
-                details: item.employee.pin.details,
-                district: item.employee.pin.district,
-                lat: item.employee.pin.lat.toString(),
-                lng: item.employee.pin.lng.toString(),
-              })
+              ? (await this.pinService.listByLocalExcel(
+                  item.employee.pin.local,
+                )) ??
+                (await this.pinService.create({
+                  title: item.employee.pin.title,
+                  local: item.employee.pin.local,
+                  details: item.employee.pin.details,
+                  district: item.employee.pin.district,
+                  lat: item.employee.pin.lat.toString(),
+                  lng: item.employee.pin.lng.toString(),
+                }))
               : null;
-
 
           const getShift = getStartAtAndFinishEmployee(item.employee.shift);
 
@@ -515,7 +516,7 @@ export class EmployeeService {
 
     return errors;
   }
- 
+
   async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
     const headers = [
       'Matricula',
@@ -533,7 +534,7 @@ export class EmployeeService {
     const workSheetName = 'LISTA DE COLABORADORES';
 
     const employees = await this.employeeRepository.findAllExport();
- 
+
     if (employees.length === 0) {
       throw new HttpException(
         'Não existem colaboradores para serem exportados!',
@@ -547,54 +548,47 @@ export class EmployeeService {
       workSheetName,
       filePath,
     ) => {
-
-      const data = employees.map((employee : Employee) => {
-        const convertShift = getShiftStartAtAndExports(employee.shift as ETypeShiftEmployeeExports);
+      const data = employees.map((employee: Employee) => {
+        const convertShift = getShiftStartAtAndExports(
+          employee.shift as ETypeShiftEmployeeExports,
+        );
         return [
           employee.registration,
           employee.name,
           employee.admission,
           employee.role,
-          employee.shift = convertShift,
+          (employee.shift = convertShift),
           employee.costCenter,
           employee.pins[0].pin.local,
           employee.pins[0].pin.details,
-        ]
-    });
-      
-    const workBook = XLSX.utils.book_new();
-    const workSheetData = [
-      headers,
-      ...data,
-    ];
+        ];
+      });
 
-    const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
-    workSheet['!cols'] = [
-      { wch: 10 },
-      { wch: 40 },
-      { wch: 10 },
-      { wch: 30 },
-      { wch: 9 },
-      { wch: 15 },
-      { wch: 70 },
-      { wch: 50 },
-    ];
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers, ...data];
 
-    XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
-    const pathFile = path.resolve(filePath);
-    XLSX.writeFile(workBook, pathFile);
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 9 },
+        { wch: 15 },
+        { wch: 70 },
+        { wch: 50 },
+      ];
 
-    const exportedKanbans = fs.createReadStream(pathFile);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
 
-    return new StreamableFile(exportedKanbans);
-  };
+      const exportedKanbans = fs.createReadStream(pathFile);
 
-    return exportedEmployeeToXLSX(
-    employees,
-    headers,
-    workSheetName,
-    filePath,
-  );
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedEmployeeToXLSX(employees, headers, workSheetName, filePath);
   }
 
   async exportsEmployeeFileModel() {
@@ -615,25 +609,23 @@ export class EmployeeService {
       'PONTO DE COLETA',
       'Referencia',
     ];
-  
+
     const filePath = './employee.xlsx';
     const workSheetName = 'LISTA DE COLABORADORES';
-  
+
     const workBook = XLSX.utils.book_new();
-    const workSheetData = [
-      headers,
-    ];
-  
+    const workSheetData = [headers];
+
     const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
     workSheet['!cols'] = [
       { wch: 10 },
       { wch: 40 },
       { wch: 10 },
       { wch: 20 },
-      { wch: 10 }, 
+      { wch: 10 },
       { wch: 15 },
-      { wch: 40 }, 
-      { wch: 10 }, 
+      { wch: 40 },
+      { wch: 10 },
       { wch: 30 },
       { wch: 30 },
       { wch: 15 },
@@ -642,20 +634,17 @@ export class EmployeeService {
       { wch: 70 },
       { wch: 50 },
     ];
-  
+
     XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
     const pathFile = path.resolve(filePath);
     XLSX.writeFile(workBook, pathFile);
-  
+
     const exportedKanbans = fs.createReadStream(pathFile);
-  
+
     return new StreamableFile(exportedKanbans);
   }
 
-
-  
   async exportsEmployeeFileAddress() {
-    
     const headers = [
       'Matricula',
       'Nome Colaborador',
@@ -678,7 +667,7 @@ export class EmployeeService {
     const workSheetName = 'LISTA DE COLABORADORES';
 
     const employees = await this.employeeRepository.findAllExport();
- 
+
     if (employees.length === 0) {
       throw new HttpException(
         'Não existem colaboradores para serem exportados!',
@@ -692,16 +681,17 @@ export class EmployeeService {
       workSheetName,
       filePath,
     ) => {
-
-      const data = employees.map((employee : Employee) => {
-        const convertShift = getShiftStartAtAndExports(employee.shift as ETypeShiftEmployeeExports);
-        const addressObject = JSON.parse(employee.address)
+      const data = employees.map((employee: Employee) => {
+        const convertShift = getShiftStartAtAndExports(
+          employee.shift as ETypeShiftEmployeeExports,
+        );
+        const addressObject = JSON.parse(employee.address);
         return [
           employee.registration,
           employee.name,
           employee.admission,
           employee.role,
-          employee.shift = convertShift,
+          (employee.shift = convertShift),
           employee.costCenter,
           addressObject.street,
           addressObject.number,
@@ -712,54 +702,72 @@ export class EmployeeService {
           addressObject.state,
           employee.pins[0].pin.local,
           employee.pins[0].pin.details,
-        ]
-    });
-      
-    const workBook = XLSX.utils.book_new();
-    const workSheetData = [
-      headers,
-      ...data,
-    ];
+        ];
+      });
 
-    const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
-    workSheet['!cols'] = [
-      { wch: 10 },
-      { wch: 40 },
-      { wch: 10 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 10 },
-      { wch: 30 },
-      { wch: 10 },
-      { wch: 30 },
-      { wch: 9 },
-      { wch: 15 },
-      { wch: 70 },
-      { wch: 50 },
-    ];
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers, ...data];
 
-    XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
-    const pathFile = path.resolve(filePath);
-    XLSX.writeFile(workBook, pathFile);
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 30 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 9 },
+        { wch: 15 },
+        { wch: 70 },
+        { wch: 50 },
+      ];
 
-    const exportedKanbans = fs.createReadStream(pathFile);
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
 
-    return new StreamableFile(exportedKanbans);
-  };
+      const exportedKanbans = fs.createReadStream(pathFile);
 
-    return exportedEmployeeToXLSX(
-    employees,
-    headers,
-    workSheetName,
-    filePath,
-  );
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedEmployeeToXLSX(employees, headers, workSheetName, filePath);
   }
 
+  private mapperMany(employees: Employee[]): MappedEmployeeDTO[] {
+    return employees.map((employee) => {
+      return {
+        id: employee.id,
+        name: employee.name,
+        address: JSON.parse(employee.address),
+        admission: employee.admission,
+        costCenter: employee.costCenter,
+        registration: employee.registration,
+        role: employee.role,
+        shift: employee.shift,
+        createdAt: employee.createdAt,
+        pins: employee.pins?.map((employeesOnPin) => {
+          return {
+            id: employeesOnPin.pin.id,
+            title: employeesOnPin.pin.title,
+            local: employeesOnPin.pin.local,
+            details: employeesOnPin.pin.details,
+            lat: employeesOnPin.pin.lat,
+            lng: employeesOnPin.pin.lng,
+            type: employeesOnPin.type as ETypePin,
+            createdAt: employeesOnPin.pin.createdAt,
+          };
+        }),
+      };
+    });
+  }
 
-  private mapperMany(employees: Employee[]): MappedEmployeeDTO[] {    
-  return employees.map((employee) => {
+  private mapperOne(employee: Employee): MappedEmployeeDTO {
     return {
       id: employee.id,
       name: employee.name,
@@ -770,7 +778,7 @@ export class EmployeeService {
       role: employee.role,
       shift: employee.shift,
       createdAt: employee.createdAt,
-      pins: employee.pins?.map((employeesOnPin) => {
+      pins: employee.pins.map((employeesOnPin) => {
         return {
           id: employeesOnPin.pin.id,
           title: employeesOnPin.pin.title,
@@ -779,36 +787,67 @@ export class EmployeeService {
           lat: employeesOnPin.pin.lat,
           lng: employeesOnPin.pin.lng,
           type: employeesOnPin.type as ETypePin,
-          createdAt: employeesOnPin.pin.createdAt,
         };
       }),
     };
-  });
-}
+  }
 
+  async exportsEmployeeEmptFile() {
+    const headers = [
+      'Matricula',
+      'Nome Colaborador',
+      'Admissão',
+      'Cargo',
+      'Turno',
+      'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
+      'CEP',
+      'Cidade',
+      'UF',
+      'PONTO DE COLETA',
+      'Referencia',
+    ];
 
-  private mapperOne(employee: Employee): MappedEmployeeDTO {
-  return {
-    id: employee.id,
-    name: employee.name,
-    address: JSON.parse(employee.address),
-    admission: employee.admission,
-    costCenter: employee.costCenter,
-    registration: employee.registration,
-    role: employee.role,
-    shift: employee.shift,
-    createdAt: employee.createdAt,
-    pins: employee.pins.map((employeesOnPin) => {
-      return {
-        id: employeesOnPin.pin.id,
-        title: employeesOnPin.pin.title,
-        local: employeesOnPin.pin.local,
-        details: employeesOnPin.pin.details,
-        lat: employeesOnPin.pin.lat,
-        lng: employeesOnPin.pin.lng,
-        type: employeesOnPin.type as ETypePin,
-      };
-    }),
-  };
-}
+    const filePath = './employee.xlsx';
+    const workSheetName = 'LISTA DE COLABORADORES';
+    const exportedEmployeeToXLSX = async (
+      headers: string[],
+      workSheetName: string,
+      filePath: string,
+    ) => {
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 40 },
+        { wch: 40 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedEmployeeToXLSX(headers, workSheetName, filePath);
+  }
 }

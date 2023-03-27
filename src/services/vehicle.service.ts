@@ -39,7 +39,7 @@ export class VehicleService {
   constructor(
     @Inject('IVehicleRepository')
     private readonly vehicleRepository: IVehicleRepository,
-  ) { }
+  ) {}
 
   async create(payload: CreateVehicleDTO): Promise<Vehicle> {
     const plateExists = await this.vehicleRepository.findByPlate(payload.plate);
@@ -347,7 +347,7 @@ export class VehicleService {
           vehicle.renavam,
           vehicle.lastMaintenance,
           vehicle.note,
-          vehicle.isAccessibility === true ? 'SIM' : 'NÃO'
+          vehicle.isAccessibility === true ? 'SIM' : 'NÃO',
         ];
       });
 
@@ -357,14 +357,9 @@ export class VehicleService {
           HttpStatus.NOT_FOUND,
         );
 
- 
-
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
-      const workSheetData = [
-        headers,
-        ...data,
-      ];
+      const workSheetData = [headers, ...data];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
         { wch: 10 },
@@ -394,5 +389,55 @@ export class VehicleService {
       workSheetName,
       filePath,
     );
+  }
+
+  async exportVehicleEmptFile() {
+    const headers = [
+      'Placa',
+      'Empresa',
+      'Tipo',
+      'Última vistoria',
+      'Vencimento',
+      'Capacidade',
+      'Renavam',
+      'Última manutenção',
+      'Observação',
+      'Acessibilidade',
+    ];
+
+    const filePath = './vehicle.xlsx';
+    const workSheetName = 'Veículos';
+
+    const exportedDriverToXLSX = async (
+      headers: string[],
+      workSheetName: string,
+      filePath: string,
+    ) => {
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 25 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 17 },
+        { wch: 25 },
+        { wch: 12 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(headers, workSheetName, filePath);
   }
 }
