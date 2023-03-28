@@ -21,7 +21,6 @@ import { RouteHistoryService } from '../services/routeHistory.service';
 import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
 import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 import { DateShift, EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
-import * as moment from 'moment';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')
