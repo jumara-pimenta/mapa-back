@@ -615,6 +615,154 @@ export class EmployeeService {
     return exportedEmployeeToXLSX(employees, headers, workSheetName, filePath);
   }
 
+  async exportsEmployeeFileModel() {
+    const headers = [
+      'Matricula',
+      'Nome Colaborador',
+      'Admissão',
+      'Cargo',
+      'Turno',
+      'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
+      'CEP',
+      'Cidade',
+      'UF',
+      'PONTO DE COLETA',
+      'Referencia',
+    ];
+
+    const filePath = './employee.xlsx';
+    const workSheetName = 'LISTA DE COLABORADORES';
+
+    const workBook = XLSX.utils.book_new();
+    const workSheetData = [headers];
+
+    const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+    workSheet['!cols'] = [
+      { wch: 10 },
+      { wch: 40 },
+      { wch: 10 },
+      { wch: 20 },
+      { wch: 10 },
+      { wch: 15 },
+      { wch: 40 },
+      { wch: 10 },
+      { wch: 30 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 10 },
+      { wch: 70 },
+      { wch: 50 },
+    ];
+
+    XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+    const pathFile = path.resolve(filePath);
+    XLSX.writeFile(workBook, pathFile);
+
+    const exportedKanbans = fs.createReadStream(pathFile);
+
+    return new StreamableFile(exportedKanbans);
+  }
+
+  async exportsEmployeeFileAddress() {
+    const headers = [
+      'Matricula',
+      'Nome Colaborador',
+      'Admissão',
+      'Cargo',
+      'Turno',
+      'Centro de Custo',
+      'Endereço',
+      'Numero',
+      'Complemento',
+      'Bairro',
+      'CEP',
+      'Cidade',
+      'UF',
+      'PONTO DE COLETA',
+      'Referencia',
+    ];
+
+    const filePath = './employee.xlsx';
+    const workSheetName = 'LISTA DE COLABORADORES';
+
+    const employees = await this.employeeRepository.findAllExport();
+
+    if (employees.length === 0) {
+      throw new HttpException(
+        'Não existem colaboradores para serem exportados!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const exportedEmployeeToXLSX = async (
+      employees,
+      headers,
+      workSheetName,
+      filePath,
+    ) => {
+      const data = employees.map((employee: Employee) => {
+        const convertShift = getShiftStartAtAndExports(
+          employee.shift as ETypeShiftEmployeeExports,
+        );
+        const addressObject = JSON.parse(employee.address);
+        return [
+          employee.registration,
+          employee.name,
+          employee.admission,
+          employee.role,
+          (employee.shift = convertShift),
+          employee.costCenter,
+          addressObject.street,
+          addressObject.number,
+          addressObject.complement,
+          addressObject.neighborhood,
+          addressObject.cep,
+          addressObject.city,
+          addressObject.state,
+          employee.pins[0].pin.local,
+          employee.pins[0].pin.details,
+        ];
+      });
+
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers, ...data];
+
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 30 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 10 },
+        { wch: 30 },
+        { wch: 9 },
+        { wch: 15 },
+        { wch: 70 },
+        { wch: 50 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedEmployeeToXLSX(employees, headers, workSheetName, filePath);
+  }
+
   private mapperMany(employees: Employee[]): MappedEmployeeDTO[] {
     return employees.map((employee) => {
       return {
