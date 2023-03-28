@@ -161,14 +161,6 @@ export class EmployeeRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
-            pins :{
-              some :{
-                NOT :{
-                  pinId : '1230-9130-9FLKJSDFKLJ'
-                }
-              }
-            }
-          
           },
           orderBy: {
             createdAt: 'desc',

@@ -236,15 +236,11 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-/* 
-    const bairros = separateByZone(employeesPins);
-    console.log(bairros); */
     const emplopyeeOrdened = await this.getWaypoints(
       employeesPins,
       payload.pathDetails.type,
       payload.pathDetails.duration,
     );
-    // const emplopyeeOrdened = employeesPins.map((e) => e.id);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
