@@ -57,7 +57,7 @@ import { faker, GitModule } from '@faker-js/faker';
 import { separateByDistrict, separateByZone } from 'src/utils/District';
 import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
 import { MappedEmployeeDTO } from 'src/dtos/employee/mappedEmployee.dto';
-import { SuggestionExtra } from 'src/dtos/route/createSuggestionExtra.dto';
+import { CreateSuggestionExtra, SuggestionExtra } from 'src/dtos/route/createSuggestionExtra.dto';
 
 @Injectable()
 export class RouteService {
@@ -306,21 +306,32 @@ export class RouteService {
     return newRoute;
   }
 
-  async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
+  async createSuggestion(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
 
-    //const employees = await this.employeeService.listAll({skip: 0, take: 1000})
+    //verify if has employee duplicated
+    const hasDuplicated = payload.employeeIds.some(
+      (e, i) => payload.employeeIds.indexOf(e) !== i,
+    );
+    if (hasDuplicated)
+      throw new HttpException(
+        'Não é possível adicionar colaboradores duplicados',
+        HttpStatus.BAD_REQUEST,
+      );
+      
     const colabs : MappedEmployeeDTO[] = []
      for await(const employeeId of payload.employeeIds) {
-       const employe = await this.employeeService.listById(employeeId);
+       const employe = await this.employeeService.listByIdExtra(employeeId);
         colabs.push(employe)
     } 
-    /* const response2 = employees.items.map((e) => e.id)
-    return response2 */
     
     const extra = this.suggestRouteExtra(colabs, [])
     return extra
   }
 
+  async createExtras(payload: CreateSuggestionExtra): Promise<any> {
+
+    return 'teste'
+  }
   
   async delete(id: string): Promise<Route> {
     const route = await this.listById(id);
@@ -1444,11 +1455,12 @@ export class RouteService {
     order.push(farthestEmployee)
 
     const totalDurationTime = totalDuration
-    const ordem = order.map((employee) => {
+    const ordem = order.map((employee,index) => {
       return {
         id: employee.id,
         name: employee.name,
         registration : employee.registration,
+        sequency: index + 1,
         distance: employee.distance,
         pins: [{
           id: employee.pins[0].id,

@@ -192,6 +192,19 @@ export class EmployeeService {
     return this.mapperOne(employee);
   }
 
+  async listByIdExtra(id: string): Promise<MappedEmployeeDTO> {
+    const employee = await this.employeeRepository.findById(id);
+
+    if (!employee)
+      throw new HttpException(
+        'Um ou mais colaboradores não foram encontrados!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(employee);
+  }
+
+
   async listAll(
     page: Page,
     filters?: FiltersEmployeeDTO,
