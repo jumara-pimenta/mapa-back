@@ -47,7 +47,7 @@ export enum ERoles {
 }
 
 export enum ETypePeriodHistory {
-  DAILY=  'DIÁRIO',
+  DAILY = 'DIÁRIO',
   WEEKLY = 'SEMANAL',
   BIWEEKLY = 'QUINZENAL',
   MONTHLY = 'MENSAL',

@@ -61,12 +61,13 @@ export class EmployeeController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(FileInterceptor('file', {
-    fileFilter: xlsxFileFilter,
-  }),)
-  async uploadFile(
-    @UploadedFile(
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: xlsxFileFilter,
+    }),
   )
+  async uploadFile(
+    @UploadedFile()
     file: any,
   ) {
     return this.employeeService.parseExcelFile(file);
@@ -167,5 +168,58 @@ export class EmployeeController {
     return await this.employeeService.exportsEmployeeFile(page, filters);
   }
 
+  @Get('download/fileModel')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Colaboradores Exportados XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFileModel(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFileModel();
+  }
 
+  @Get('download/fileAddress')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Colaboradores Exportados XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeFileAddress(
+    @Response({ passthrough: true }) res,
+    @Query() page: Page,
+    @Query() filters: FiltersEmployeeDTO,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeFileAddress();
+  }
+
+  @Get('/download/empt/file')
+  @Roles('export-employees')
+  @ApiCreatedResponse({
+    description: 'Lista Planilha Modelo Colaboradores  XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportsEmployeeEmptFile(
+    @Response({ passthrough: true }) res,
+  ): Promise<any> {
+    const fileName = 'Sonar Rotas - Lista Planilha Modelo Colaboradores.xlsx';
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    return await this.employeeService.exportsEmployeeEmptFile();
+  }
 }

@@ -52,17 +52,12 @@ export const verifyReportDirectory = async (): Promise<void> => {
   });
 };
 
-
-export function getShift(shift : string) : ETypeShiftEmployee {
-  if(shift === '1')
-    return ETypeShiftEmployee.FIRST
-    if(shift === '2')
-    return ETypeShiftEmployee.SECOND
-    if(shift === '3')
-    return ETypeShiftEmployee.THIRD
-    if(shift === 'Sem Turno Estabelecido')
-    return ETypeShiftEmployee.NOT_DEFINED
-  }
+export function getShift(shift: string): ETypeShiftEmployee {
+  if (shift === '1') return ETypeShiftEmployee.FIRST;
+  if (shift === '2') return ETypeShiftEmployee.SECOND;
+  if (shift === '3') return ETypeShiftEmployee.THIRD;
+  if (shift === 'Sem Turno Estabelecido') return ETypeShiftEmployee.NOT_DEFINED;
+}
 export type RouteMobile = {
   id: string;
   description: string;

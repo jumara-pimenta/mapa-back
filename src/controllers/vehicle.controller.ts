@@ -160,12 +160,34 @@ export class VehicleController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(FileInterceptor('file', {
-    fileFilter: xlsxFileFilter,
-  }),)  async uploadFile(
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: xlsxFileFilter,
+    }),
+  )
+  async uploadFile(
     @UploadedFile()
     file: any,
   ) {
     return this.vehicleService.parseExcelFile(file);
+  }
+
+  @Get('/exports/empt/file')
+  @Roles('list-vehicle')
+  @ApiCreatedResponse({
+    description: 'Lista Planilha Modelo Veículo XLSX.',
+  })
+  @HttpCode(HttpStatus.OK)
+  async exportVehicleEmptFile(
+    @Response({ passthrough: true }) res,
+  ): Promise<StreamableFile> {
+    const fileName = 'Sonar Rotas - Lista Planilha Modelo Veículo.xlsx';
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    return await this.vehicleService.exportVehicleEmptFile();
   }
 }
