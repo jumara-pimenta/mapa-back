@@ -339,10 +339,27 @@ export class RouteService {
     });
 
     // Promise
+    return Promise.all(
+      routes.map((route) =>
+        this.create(route)
+          .then((result) => {
+            console.log({ result });
+
+            return { description: result.description };
+          })
+          .catch((err) => {
+            console.log({ err });
+
+            return { erro: err.response.message };
+          }),
+      ),
+    );
   }
 
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
     //const employees = await this.employeeService.listAll({skip: 0, take: 1000})
+
+    await this.employeeService.checkExtraEmployee(payload.employeeIds);
     const colabs: MappedEmployeeDTO[] = [];
     for await (const employeeId of payload.employeeIds) {
       const employe = await this.employeeService.listById(employeeId);
