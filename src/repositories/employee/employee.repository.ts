@@ -154,7 +154,7 @@ export class EmployeeRepository
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: { ...condition, deletedAt: null },
+          where: { ...condition, deletedAt: null},
           orderBy: {
             createdAt: 'desc',
           },

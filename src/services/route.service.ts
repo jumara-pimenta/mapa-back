@@ -246,15 +246,11 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-    /* 
-    const bairros = separateByZone(employeesPins);
-    console.log(bairros); */
     const emplopyeeOrdened = await this.getWaypoints(
       employeesPins,
       payload.pathDetails.type,
       payload.pathDetails.duration,
     );
-    // const emplopyeeOrdened = employeesPins.map((e) => e.id);
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
@@ -1395,7 +1391,6 @@ export class RouteService {
     const response = await this.googleApiServiceIntegration.getWaypoints(
       payload,
     );
-
     const legs = response.routes[0].legs;
     let totalDistance = 0;
     let totalDuration = 0;
@@ -1466,7 +1461,6 @@ export class RouteService {
     const response = await this.googleApiServiceIntegration.getWaypoints(
       payload,
     );
-
     const legs = response.routes[0].legs;
     let totalDistance = 0;
     let totalDuration = 0;

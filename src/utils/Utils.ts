@@ -90,18 +90,29 @@ function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
 }
 
+<<<<<<< HEAD
 export function employeesPerRoute(employees: number, maxRotas?: number) {
   const maxRotasPerDay = maxRotas ? maxRotas : 22;
   const rotasPorDia = Math.ceil(employees / maxRotasPerDay);
   const colabsMin = Math.floor(employees / rotasPorDia);
 
   return colabsMin;
+=======
+export function employeesPerRoute(employees : number, maxRotas? : number){
+
+  const maxRotasPerDay = maxRotas ? maxRotas : 22
+    const rotasPorDia = Math.ceil(employees / maxRotasPerDay) 
+    const colabsMin = Math.floor(employees/rotasPorDia)
+    
+    return colabsMin
+>>>>>>> qa
 }
 
 //convert number to hours
 export function convertToHours(value: number) {
   const minutesTotal = value / 60;
   const hours = String(Math.floor(minutesTotal / 60)).padStart(2, '0');
+<<<<<<< HEAD
   let minute: any = minutesTotal % 60;
   minute = String(Math.round(minute)).padStart(2, '0');
   const time = `${hours}:${minute}`;
@@ -139,4 +150,43 @@ export interface EmployeeList {
     },
   ];
   minDistance: number;
+=======
+  let minute : any= minutesTotal % 60;
+  minute = String(Math.round(minute)).padStart(2, '0');
+  const time = `${hours}:${minute}`;
+  return  time;
+}
+
+export interface EmployeeList {
+  id: string,
+  name: string,
+  address: {
+      cep: string,
+      neighborhood: string,
+      number: string,
+      street: string,
+      city: string,
+      state: string,
+      complement: string
+  },
+  admission: string,
+  costCenter: string,
+  registration: string,
+  role: string,
+  shift: string,
+  createdAt: string,
+  pins: [
+      {
+          id: string,
+          title: string,
+          local: string,
+          details: string,
+          district: string,
+          lat: string,
+          lng: string,
+          type: string
+      },
+  ],
+  minDistance: number
+>>>>>>> qa
 }
