@@ -65,13 +65,23 @@ export class DriverRepository
     const items = condition
       ? await this.repository.driver.findMany({
           ...this.buildPage(page),
-          where: condition,
+          where: {
+            ...condition,
+            id: {
+              not: process.env.DENSO_ID,
+            },
+          },
           orderBy: {
             createdAt: 'desc',
           },
         })
       : await this.repository.driver.findMany({
           ...this.buildPage(page),
+          where: {
+            id: {
+              not: process.env.DENSO_ID,
+            },
+          },
           orderBy: {
             createdAt: 'desc',
           },
@@ -81,9 +91,18 @@ export class DriverRepository
       ? await this.repository.driver.findMany({
           where: {
             ...condition,
+            id: {
+              not: process.env.DENSO_ID,
+            },
           },
         })
-      : await this.repository.driver.count();
+      : await this.repository.driver.count({
+          where: {
+            id: {
+              not: process.env.DENSO_ID,
+            },
+          },
+        });
 
     return this.buildPageResponse(
       items,
@@ -93,20 +112,18 @@ export class DriverRepository
 
   async findAllExport(): Promise<PageResponse<Driver>> {
     const items = await this.repository.driver.findMany({
-          orderBy: {
-            createdAt: 'desc',
-          },
-        })
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
-    const total = await this.repository.driver.findMany({
-        })
-     
+    const total = await this.repository.driver.findMany({});
 
     return this.buildPageResponse(
       items,
       Array.isArray(total) ? total.length : total,
     );
-    }
+  }
 
   findByDrivers(): Promise<Driver[]> {
     return this.repository.driver.findMany();

@@ -102,7 +102,7 @@ export class RouteService {
           },
         });
 
-       const route1=  await this.create({
+        const route1 = await this.create({
           description: 'Rota de teste EXTRA',
           driverId: driver.items[1].id,
           vehicleId: vehicle.items[1].id,
@@ -124,60 +124,56 @@ export class RouteService {
 
         const path1 = await this.pathService.listById(allPaths[1].id);
         const pathObj1 = await this.pathService.getPathById(allPaths[1].id);
-        const vehicleHistoric = await this.vehicleService.listById(path.vehicle);
-    const driverHistoric = await this.driverService.listById(
-     path.driver
-    );
+        const vehicleHistoric = await this.vehicleService.listById(
+          path.vehicle,
+        );
+        const driverHistoric = await this.driverService.listById(path.driver);
         const today = new Date();
         //remove 1 day
-       
+
         //create a for to create a route for 4 days
         for (let i = 0; i < 20; i++) {
           const date = new Date(today);
           date.setDate(date.getDate() - i);
-        const props = new RouteHistory(
-          {
-            typeRoute: path.type,
-            nameRoute: faker.name.jobTitle(),
-            employeeIds: path.employeesOnPath.map(e => e.id).join(','),
-            itinerary: '-3.4441,-60.025',
-            totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
-            totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
-            startedAt: getDateInLocaleTime(new Date(path.startedAt)),
-            finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
-          },
-          pathObj,
-           driverHistoric,
-           vehicleHistoric,
-          [],
-          date
-        );
+          const props = new RouteHistory(
+            {
+              typeRoute: path.type,
+              nameRoute: faker.name.jobTitle(),
+              employeeIds: path.employeesOnPath.map((e) => e.id).join(','),
+              itinerary: '-3.4441,-60.025',
+              totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+              totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+              startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+              finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
+            },
+            pathObj,
+            driverHistoric,
+            vehicleHistoric,
+            [],
+            date,
+          );
 
-        const props2 = new RouteHistory(
-          {
-            typeRoute: path1.type,
-            nameRoute: faker.name.jobTitle(),
-            employeeIds: path1.employeesOnPath.map(e => e.id).join(','),
-            itinerary: '-3.4441,-60.025',
-            totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
-            totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
-            startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
-            finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
-          },
-          pathObj1,
-           driverHistoric,
-           vehicleHistoric,
-          [],
-          date
-        );
-        await this.routeHistoryService.create(props);
-        await this.routeHistoryService.create(props2);
+          const props2 = new RouteHistory(
+            {
+              typeRoute: path1.type,
+              nameRoute: faker.name.jobTitle(),
+              employeeIds: path1.employeesOnPath.map((e) => e.id).join(','),
+              itinerary: '-3.4441,-60.025',
+              totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+              totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+              startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+              finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+            },
+            pathObj1,
+            driverHistoric,
+            vehicleHistoric,
+            [],
+            date,
+          );
+          await this.routeHistoryService.create(props);
+          await this.routeHistoryService.create(props2);
         }
-
-        
       }
-
-     
     }
   }
 
@@ -228,8 +224,12 @@ export class RouteService {
       : payload.pathDetails.startsReturnAt
       ? payload.pathDetails.startsReturnAt
       : '';
-    const driver = await this.driverService.listById(payload.driverId);
-    const vehicle = await this.vehicleService.listById(payload.vehicleId);
+    const driver = await this.driverService.listById(
+      payload.driverId ?? process.env.DENSO_ID,
+    );
+    const vehicle = await this.vehicleService.listById(
+      payload.vehicleId ?? process.env.DENSO_ID,
+    );
 
     const employeesPins = await this.employeeService.listAllEmployeesPins(
       payload.employeeIds,
@@ -256,9 +256,11 @@ export class RouteService {
       vehicle.id,
     );
 
-    await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
+    if (driver.id !== process.env.DENSO_ID)
+      await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
 
-    await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
+    if (vehicle.id !== process.env.DENSO_ID)
+      await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
 
     await this.employeesInRoute(
       employeeInRoute,
