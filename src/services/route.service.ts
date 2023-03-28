@@ -343,13 +343,9 @@ export class RouteService {
       routes.map((route) =>
         this.create(route)
           .then((result) => {
-            console.log({ result });
-
             return { description: result.description };
           })
           .catch((err) => {
-            console.log({ err });
-
             return { erro: err.response.message };
           }),
       ),
