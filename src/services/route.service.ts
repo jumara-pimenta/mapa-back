@@ -46,14 +46,18 @@ import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
-import { distanceBetweenPoints, RouteMobile } from 'src/utils/Utils';
+import { convertToHours, distanceBetweenPoints, EmployeeList, employeesPerRoute, RouteMobile } from 'src/utils/Utils';
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
 import e from 'express';
 import { getDuration } from 'src/utils/Date';
 import { RouteHistoryService } from './routeHistory.service';
 import { RouteHistory } from 'src/entities/routeHistory.entity';
-import { faker } from '@faker-js/faker';
+import { faker, GitModule } from '@faker-js/faker';
+import { separateByDistrict, separateByZone } from 'src/utils/District';
+import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
+import { MappedEmployeeDTO } from 'src/dtos/employee/mappedEmployee.dto';
+import { CreateSuggestionExtra, SuggestionExtra } from 'src/dtos/route/createSuggestionExtra.dto';
 
 @Injectable()
 export class RouteService {
@@ -173,7 +177,7 @@ export class RouteService {
     }
   }
 
-  async create(payload: CreateRouteDTO): Promise<Route> {
+  async create(payload: CreateRouteDTO): Promise<any> {
     if (payload.employeeIds.length <= 1) {
       throw new HttpException(
         'É necessário selecionar pelo menos 2 colaboradores',
@@ -232,7 +236,9 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
-
+/* 
+    const bairros = separateByZone(employeesPins);
+    console.log(bairros); */
     const emplopyeeOrdened = await this.getWaypoints(
       employeesPins,
       payload.pathDetails.type,
@@ -302,6 +308,33 @@ export class RouteService {
     return newRoute;
   }
 
+  async createSuggestion(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
+
+    //verify if has employee duplicated
+    const hasDuplicated = payload.employeeIds.some(
+      (e, i) => payload.employeeIds.indexOf(e) !== i,
+    );
+    if (hasDuplicated)
+      throw new HttpException(
+        'Não é possível adicionar colaboradores duplicados',
+        HttpStatus.BAD_REQUEST,
+      );
+      
+    const colabs : MappedEmployeeDTO[] = []
+     for await(const employeeId of payload.employeeIds) {
+       const employe = await this.employeeService.listByIdExtra(employeeId);
+        colabs.push(employe)
+    } 
+    
+    const extra = this.suggestRouteExtra(colabs, [])
+    return extra
+  }
+
+  async createExtras(payload: CreateSuggestionExtra): Promise<any> {
+
+    return 'teste'
+  }
+  
   async delete(id: string): Promise<Route> {
     const route = await this.listById(id);
 
@@ -895,72 +928,7 @@ export class RouteService {
       );
     }
   }
-  /* 
-  async  employeesInRoute(
-    employeeRoute: Route[],
-    type: string,
-    ids: string[],
-    pathType?: string,
-  ): Promise<void> {
-    const employeesOnRoute: string[] = [];
-    const employeesOnOneWay: string[] = [];
-    const employeesOnReturn: string[] = [];
-  
-    employeeRoute.forEach((route: Route) => {
-      if (route.type !== ETypeRoute.EXTRA) {
-        route.path.forEach((path) => {
-          path.employeesOnPath.forEach((item) => {
-            if (type === route.type) {
-              employeesOnRoute.push(item.employee.name);
-            }
-          });
-        });
-      }
-      if (route.type === ETypeRoute.EXTRA) {
-        route.path.forEach((path) => {
-          if (type === ETypeRoute.EXTRA) {
-            if (path.type === ETypePath.ONE_WAY && pathType !== ETypePath.RETURN) {
-              const employees = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              }).map((item) => item.employee.name);
-              employeesOnOneWay.push(...employees);
-            }
-            if (path.type === ETypePath.RETURN && pathType !== ETypePath.ONE_WAY) {
-              const employees = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              }).map((item) => item.employee.name);
-              employeesOnReturn.push(...employees);
-            }
-          }
-        });
-      }
-    });
-  
-    if (employeesOnRoute.length > 0) {
-      throw new HttpException(
-        `The following employee(s) ${employeesOnRoute.join(', ')} is/are already in a route of type ${type.toLowerCase()}!`,
-        HttpStatus.CONFLICT,
-      );
-    }
-  
-    if (employeesOnOneWay.length > 0 || employeesOnReturn.length > 0) {
-      const message = [];
-      if (employeesOnOneWay.length > 0) {
-        message.push(`The following employee(s) ${employeesOnOneWay.join(', ')} is/are already in an extra route of type ${ETypePath.ONE_WAY.toLowerCase()}!`);
-      }
-      if (employeesOnReturn.length > 0) {
-        message.push(`The following employee(s) ${employeesOnReturn.join(', ')} is/are already in an extra route of type ${ETypePath.RETURN.toLowerCase()}!`);
-      }
-      throw new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          message,
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-  }
-  */
+
   async employeesInPins(route: Employee[], type: string): Promise<void> {
     const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
@@ -1353,6 +1321,9 @@ export class RouteService {
     type: ETypePath,
     duration: string,
   ): Promise<DetailsRoute> {
+    if(employees.length > 26) 
+      throw new HttpException('A roterização automática não pode ter mais de 26 colaboradores', HttpStatus.BAD_REQUEST);
+    
     const denso = { lat: '-3.110944', lng: '-59.962604' };
 
     let farthestEmployee: Employee = null;
@@ -1388,6 +1359,7 @@ export class RouteService {
     const response = await this.googleApiServiceIntegration.getWaypoints(
       payload,
     );
+    
     const legs = response.routes[0].legs;
     let totalDistance = 0;
     let totalDuration = 0;
@@ -1420,7 +1392,133 @@ export class RouteService {
 
     return { employeesIds, distance };
   }
+
+
+  async getWaypointsExtra(
+    employees: any[],
+    duration: string,
+  ): Promise<SuggestionExtra> {
+    const denso = { lat: '-3.110944', lng: '-59.962604' };
+    let farthestEmployee: any = null;
+    let maxDistance = 0;
+    for (const employee of employees) {
+      const employeeLocation = {
+        lat: employee.pins[0].lat,
+        lng: employee.pins[0].lng,
+      };
+      const distance = distanceBetweenPoints(denso, employeeLocation);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        farthestEmployee = employee;
+      }
+    }
+    const index = employees.indexOf(farthestEmployee);
+    if (index > -1) {
+      employees.splice(index, 1);
+    }
+    const waypoints = employees.map((employee) => {
+      return `${employee.pins[0].lat},${employee.pins[0].lng}`;
+    });
+
+    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].lat},${farthestEmployee.pins[0].lng}`;
+    const densoLatLng = `${denso.lat},${denso.lng}`;
+    const payload = {
+      origin: densoLatLng ,
+      destination: farthestEmployeeLatLng,
+      waypoints: waypoints.join('|'),
+      travelMode: 'DRIVING',
+    };
+    const response = await this.googleApiServiceIntegration.getWaypoints(
+      payload,
+    );
+    
+    const legs = response.routes[0].legs;
+    let totalDistance = 0;
+    let totalDuration = 0;
+    for (const leg of legs) {
+      totalDuration += leg.duration.value;
+      totalDistance += leg.distance.value;
+    }
+
+    const maxDuration = getDuration(duration);
+    if (totalDuration > maxDuration) {
+      throw new HttpException(
+        `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+    const order = waypointsOrder.map((item) => {
+      return employees[item];
+    });
+
+    const distance = totalDistance / 1000 + 'km';
+    order.push(farthestEmployee)
+
+    const totalDurationTime = totalDuration
+    const ordem = order.map((employee,index) => {
+      return {
+        id: employee.id,
+        name: employee.name,
+        registration : employee.registration,
+        sequency: index + 1,
+        distance: employee.distance,
+        pins: [{
+          id: employee.pins[0].id,
+          title : employee.pins[0].title,
+          local: employee.pins[0].local,
+          details: employee.pins[0].details,
+          lat : employee.pins[0].lat,
+          lng : employee.pins[0].lng,
+        }],
+      };
+    });
+    return { employee: ordem, distance, totalDurationTime };
+  }
+
+
+  async  suggestRouteExtra (colabs: any, rotas : any[]){
+
+    const ordemEmployee = calculateDistance(colabs, { lat: '-3.110944', lng: '-59.962604' },[]);
+    const routes = separateWays(ordemEmployee,[]);
+    const extra : SuggestionExtra[]= [...rotas]
+    const extraTime : SuggestionExtra[]= []
+    for await(const route of routes) {
+      const path : SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
+      if(path.totalDurationTime > getDuration('01:30'))
+        extraTime.push(path)
+      if(path.totalDurationTime < getDuration('01:30'))
+        extra.push(path)
+    }
+    if(extraTime.length > 0){
+      for await(const route of extraTime) {
+        const ordemEmployee = calculateDistance(route.employee, { lat: '-3.110944', lng: '-59.962604' },[]);
+        const routes = separateWays(ordemEmployee,[],Math.round(ordemEmployee.length /2));
+        for await(const route of routes) {
+            const path : SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
+            extra.push(path)
+        }
+      }
+    }
+
+    const response = extra.map((item) => {
+      return {
+        employees : item.employee,
+        distance : item.distance,
+        duration : convertToHours(item.totalDurationTime),}})
+
+    return response
+  }
 }
+
+
+
+
+
+
+
+
 
 const orderPins = (arr: Employee[]): string[] => {
   const latDenso = -3.110944;
@@ -1481,3 +1579,64 @@ const orderPins = (arr: Employee[]): string[] => {
 
   return employeeIdOrdened;
 };
+
+
+function calculateDistance(employee : any[], location : any, list: any) : any{
+
+  const employees = employee;
+  const startPoint = { lat: location.lat, lng: location.lng };
+  let farthestEmployee: any = null;
+  let minDistance = 10000;
+  for (const employee of employees) {
+    const employeeLocation = {
+      lat: employee.pins[0].lat,
+      lng: employee.pins[0].lng,
+    };
+    const distance = distanceBetweenPoints(startPoint, employeeLocation);
+    if (distance <= minDistance) {
+      minDistance = distance;
+      farthestEmployee = employee;
+    }
+  }
+  //remove farthestEmployee from array of employee
+  const index = employees.indexOf(farthestEmployee);
+  const listaLegal = list
+  if (index > -1) {
+    employees.splice(index, 1);
+    listaLegal.push({...farthestEmployee
+    ,minDistance});
+  }
+
+  if(employees.length > 0)
+    calculateDistance(employees, farthestEmployee.pins[0], listaLegal);
+
+  return listaLegal;
+
+
+} 
+
+function separateWays(list: EmployeeList[], new_list: any[], quantityColabs? : number): any {
+  const manipulateList = [...list]
+  const route = [...new_list];
+
+  if(list.length === 0) {
+      return new_list;
+  }
+  const colabsPerRoute = employeesPerRoute(list.length, quantityColabs);
+  if(list.length <= colabsPerRoute && list.length > 0) {
+      const listRoute = manipulateList.slice(0, list.length)
+      route.push([...listRoute]);
+      return separateWays([], route)
+  }
+
+  if (list.length > colabsPerRoute) {
+      const listRoute = manipulateList.slice(0, colabsPerRoute)
+      const listRest = manipulateList.slice(colabsPerRoute, list.length)
+      const ordemListRest = calculateDistance(listRest, { lat: '-3.110944', lng: '-59.962604' },[]);
+      route.push([...listRoute]);
+      return separateWays(ordemListRest, route)
+  }    
+
+}
+
+

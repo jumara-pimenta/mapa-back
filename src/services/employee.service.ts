@@ -192,6 +192,19 @@ export class EmployeeService {
     return this.mapperOne(employee);
   }
 
+  async listByIdExtra(id: string): Promise<MappedEmployeeDTO> {
+    const employee = await this.employeeRepository.findById(id);
+
+    if (!employee)
+      throw new HttpException(
+        'Um ou mais colaboradores não foram encontrados!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(employee);
+  }
+
+
   async listAll(
     page: Page,
     filters?: FiltersEmployeeDTO,
@@ -780,6 +793,7 @@ export class EmployeeService {
             id: employeesOnPin.pin.id,
             title: employeesOnPin.pin.title,
             local: employeesOnPin.pin.local,
+            district : employeesOnPin.pin.district,
             details: employeesOnPin.pin.details,
             lat: employeesOnPin.pin.lat,
             lng: employeesOnPin.pin.lng,
@@ -808,6 +822,7 @@ export class EmployeeService {
           title: employeesOnPin.pin.title,
           local: employeesOnPin.pin.local,
           details: employeesOnPin.pin.details,
+          district: employeesOnPin.pin.district,
           lat: employeesOnPin.pin.lat,
           lng: employeesOnPin.pin.lng,
           type: employeesOnPin.type as ETypePin,

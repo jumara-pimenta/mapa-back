@@ -27,6 +27,7 @@ export class MappedEmployeeDTO {
     title: string;
     local: string;
     details: string;
+    district : string;
     lat: string;
     lng: string;
     type: ETypePin;

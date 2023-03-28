@@ -131,7 +131,7 @@ export class EmployeeRepository
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: { ...condition, deletedAt: null },
+          where: { ...condition, deletedAt: null},
           orderBy: {
             createdAt: 'desc',
           },
@@ -147,6 +147,7 @@ export class EmployeeRepository
                     lng: true,
                     local: true,
                     title: true,
+                    district: true,
                   },
                 },
               },
@@ -160,6 +161,14 @@ export class EmployeeRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+            pins :{
+              some :{
+                NOT :{
+                  pinId : '1230-9130-9FLKJSDFKLJ'
+                }
+              }
+            }
+          
           },
           orderBy: {
             createdAt: 'desc',
@@ -176,6 +185,7 @@ export class EmployeeRepository
                     lng: true,
                     local: true,
                     title: true,
+                    district: true,
                   },
                 },
               },
