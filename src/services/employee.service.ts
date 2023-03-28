@@ -344,6 +344,30 @@ export class EmployeeService {
     ];
 
     if (
+      !sheet.A1 ||
+      !sheet.B1 ||
+      !sheet.C1 ||
+      !sheet.D1 ||
+      !sheet.E1 ||
+      !sheet.F1 ||
+      !sheet.G1 ||
+      !sheet.H1 ||
+      !sheet.I1 ||
+      !sheet.J1 ||
+      !sheet.K1 ||
+      !sheet.L1 ||
+      !sheet.M1 ||
+      !sheet.N1 ||
+      !sheet.O1
+    )
+      throw new HttpException(
+        ` Planilha tem que conter as colunas ${headers.join(
+          ', ',
+        )} respectivamente`,
+        HttpStatus.BAD_REQUEST,
+      );
+
+    if (
       headers.join('') !==
       [
         sheet.A1.v,

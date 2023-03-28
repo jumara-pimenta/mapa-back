@@ -168,23 +168,21 @@ export class EmployeeController {
     return await this.employeeService.exportsEmployeeFile(page, filters);
   }
 
-  @Get('download/fileModel')
+  @Get('/download/empt/file')
   @Roles('export-employees')
   @ApiCreatedResponse({
-    description: 'Colaboradores Exportados XLSX.',
+    description: 'Lista Planilha Modelo Colaboradores  XLSX.',
   })
   @HttpCode(HttpStatus.OK)
-  async exportsEmployeeFileModel(
+  async exportsEmployeeEmptFile(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersEmployeeDTO,
   ): Promise<any> {
-    const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
+    const fileName = 'Sonar Rotas - Lista Planilha Modelo Colaboradores.xlsx';
     res.set({
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
-    return await this.employeeService.exportsEmployeeFileModel();
+    return await this.employeeService.exportsEmployeeEmptFile();
   }
 
   @Get('download/fileAddress')
@@ -204,22 +202,5 @@ export class EmployeeController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
     return await this.employeeService.exportsEmployeeFileAddress();
-  }
-
-  @Get('/download/empt/file')
-  @Roles('export-employees')
-  @ApiCreatedResponse({
-    description: 'Lista Planilha Modelo Colaboradores  XLSX.',
-  })
-  @HttpCode(HttpStatus.OK)
-  async exportsEmployeeEmptFile(
-    @Response({ passthrough: true }) res,
-  ): Promise<any> {
-    const fileName = 'Sonar Rotas - Lista Planilha Modelo Colaboradores.xlsx';
-    res.set({
-      'Content-Type': 'application/json',
-      'Content-Disposition': `attachment; filename="${fileName}"`,
-    });
-    return await this.employeeService.exportsEmployeeEmptFile();
   }
 }

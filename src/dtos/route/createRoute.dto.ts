@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
-import { IsString, IsNotEmpty, ValidateNested, IsEnum, IsDefined, IsOptional, Matches } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  ValidateNested,
+  IsEnum,
+  IsDefined,
+  IsOptional,
+  Matches,
+} from 'class-validator';
 import { PathDetailsDTO } from '../path/pathDetails.dto';
 import { ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
 import { StartsAtRgx, durationPathRgx } from 'src/utils/Regex';
@@ -30,16 +38,18 @@ export class CreateRouteDTO {
     description: 'Id do motorista',
   })
   @IsString({ message: '[DriverId] não está definida como texto.' })
-  @IsNotEmpty({ message: '[DriverId] não pode receber um valor vazio.' })
-  driverId: string;
+  // @IsNotEmpty({ message: '[DriverId] não pode receber um valor vazio.' })
+  @IsOptional()
+  driverId?: string;
 
   @ApiProperty({
     default: '41b4eb3d-e18a-4c8e-a668-49824b21579c',
     description: 'Id do veículo',
   })
   @IsString({ message: '[VehicleId] não está definida como texto.' })
-  @IsNotEmpty({ message: '[VehicleId] não pode receber um valor vazio.' })
-  vehicleId: string;
+  // @IsNotEmpty({ message: '[VehicleId] não pode receber um valor vazio.' })
+  @IsOptional()
+  vehicleId?: string;
 
   @ApiProperty({
     default: [
@@ -76,8 +86,7 @@ export class CreateRouteDTO {
   })
   @IsOptional()
   @IsEnum(ETypeShiftRotue, {
-    message: '[shift] Turno não está definido como enum.'
+    message: '[shift] Turno não está definido como enum.',
   })
   shift?: ETypeShiftRotue;
-
 }

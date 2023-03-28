@@ -21,7 +21,7 @@ export class PrismaService
         email: 'admin@rotas.com.br',
       },
       create: {
-        id: uuid(),
+        id: process.env.DENSO_ID,
         email: 'admin@rotas.com.br',
         password: await bcrypt.hash('Denso', 10),
         name: 'Admin',
@@ -33,6 +33,7 @@ export class PrismaService
         password: await bcrypt.hash('Denso', 10),
         name: 'Admin',
         role: 'ADMIN',
+        id: process.env.DENSO_ID,
       },
     });
 
@@ -46,7 +47,7 @@ export class PrismaService
         details: 'Denso LTDA ',
         local:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
-          district: 'Distrito Industrial I',
+        district: 'Distrito Industrial I',
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
         createdAt: getDateInLocaleTime(new Date()),
@@ -57,7 +58,7 @@ export class PrismaService
         details: 'Denso LTDA ',
         local:
           'Av. Buriti, 3600 - Distrito Industrial I, Manaus - AM, 69057-000',
-          district: 'Distrito Industrial I',
+        district: 'Distrito Industrial I',
 
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
@@ -220,13 +221,52 @@ export class PrismaService
         await this.vehicle.createMany({
           data: vehicleId,
         });
-
       }
-       
-
-   
     }
+
+    await this.driver.upsert({
+      where: { id: process.env.DENSO_ID },
+      create: {
+        id: process.env.DENSO_ID,
+        name: 'Motorista Denso',
+        category: 'D',
+        cnh: '12345678910',
+        createdAt: getDateInLocaleTime(new Date()),
+        cpf: '12345678910',
+        password: await bcrypt.hash('Denso', 10),
+        validation: faker.date.future(),
+      },
+      update: {
+        name: 'Denso',
+        category: 'D',
+        cnh: '12345678910',
+        cpf: '12345678910',
+        password: await bcrypt.hash('Denso', 10),
+      },
+    });
+
+    await this.vehicle.upsert({
+      where: { id: process.env.DENSO_ID },
+      create: {
+        id: process.env.DENSO_ID,
+        capacity: 32,
+        expiration: faker.date.future(),
+        lastMaintenance: faker.date.past(),
+        note: faker.lorem.paragraph(),
+        lastSurvey: faker.date.past(),
+        plate: 'DEN5000',
+        renavam: '12345678910',
+        type: 'Van',
+        isAccessibility: true,
+        company: 'Denso',
+        createdAt: getDateInLocaleTime(new Date()),
+      },
+      update: {
+        id: process.env.DENSO_ID,
+      },
+    });
   }
+
   async onModuleDestroy() {
     await this.$disconnect();
   }

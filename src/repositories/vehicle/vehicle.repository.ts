@@ -68,13 +68,19 @@ export class VehicleRepository
     const items = condition
       ? await this.repository.vehicle.findMany({
           ...this.buildPage(page),
-          where: condition,
+          where: {
+            id: { not: process.env.DENSO_ID },
+            ...condition,
+          },
           orderBy: {
             createdAt: 'desc',
           },
         })
       : await this.repository.vehicle.findMany({
           ...this.buildPage(page),
+          where: {
+            id: { not: process.env.DENSO_ID },
+          },
           orderBy: {
             createdAt: 'desc',
           },
@@ -84,9 +90,14 @@ export class VehicleRepository
       ? await this.repository.vehicle.findMany({
           where: {
             ...condition,
+            id: { not: process.env.DENSO_ID },
           },
         })
-      : await this.repository.vehicle.count();
+      : await this.repository.vehicle.count({
+          where: {
+            id: { not: process.env.DENSO_ID },
+          },
+        });
 
     return this.buildPageResponse(
       items,
