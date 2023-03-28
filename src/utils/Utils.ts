@@ -89,3 +89,54 @@ export function distanceBetweenPoints(p1: any, p2: any) {
 function deg2rad(deg: number) {
   return deg * (Math.PI / 180);
 }
+
+export function employeesPerRoute(employees: number, maxRotas?: number) {
+  const maxRotasPerDay = maxRotas ? maxRotas : 22;
+  const rotasPorDia = Math.ceil(employees / maxRotasPerDay);
+  const colabsMin = Math.floor(employees / rotasPorDia);
+
+  return colabsMin;
+}
+
+//convert number to hours
+export function convertToHours(value: number) {
+  const minutesTotal = value / 60;
+  const hours = String(Math.floor(minutesTotal / 60)).padStart(2, '0');
+  let minute: any = minutesTotal % 60;
+  minute = String(Math.round(minute)).padStart(2, '0');
+  const time = `${hours}:${minute}`;
+  return time;
+}
+
+export interface EmployeeList {
+  id: string;
+  name: string;
+  address: {
+    cep: string;
+    neighborhood: string;
+    number: string;
+    street: string;
+    city: string;
+    state: string;
+    complement: string;
+  };
+  admission: string;
+  costCenter: string;
+  registration: string;
+  role: string;
+  shift: string;
+  createdAt: string;
+  pins: [
+    {
+      id: string;
+      title: string;
+      local: string;
+      details: string;
+      district: string;
+      lat: string;
+      lng: string;
+      type: string;
+    },
+  ];
+  minDistance: number;
+}

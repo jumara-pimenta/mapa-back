@@ -89,4 +89,12 @@ export class CreateRouteDTO {
     message: '[shift] Turno não está definido como enum.',
   })
   shift?: ETypeShiftRotue;
+
+  @ApiProperty({
+    description: 'Distância da rota',
+    default: '10.5 KM',
+  })
+  @IsOptional()
+  @IsString({ message: '[distance] A distância deve ser do tipo texto.' })
+  distance?: string;
 }

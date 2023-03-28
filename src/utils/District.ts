@@ -1,3 +1,6 @@
+import { Employee } from "src/entities/employee.entity"
+import { AddressComponent } from "src/integrations/services/googleService/response/getLocation.response"
+
 export function getZoneFromDistrict(district : string) {
     const southZone = [
         'Betânia',
@@ -47,6 +50,7 @@ export function getZoneFromDistrict(district : string) {
 
     const eastZone = ['Armando Mendes',
         'Colônia Antônio Aleixo',
+        'Col Antonio Aleixo',
         'Coroado',
         'Distrito Industrial II',
         'Gilberto Mestrinho',
@@ -64,6 +68,7 @@ export function getZoneFromDistrict(district : string) {
         'Chapada',
         'Flores',
         'Nossa Senhora das Graças',
+        'Nossa Sra. das Gracas',
         'Parque 10 de Novembro',
         'São Geraldo'
     ]
@@ -92,4 +97,59 @@ export function getZoneFromDistrict(district : string) {
 
         
         
+}
+
+class Zone {
+    name : string
+    employees : string[]
+}
+
+
+export function separateByZone(employees : any[]) : Zone[]{
+
+    const bairros = employees.reduce((acc, curr) => {
+        const district = getZoneFromDistrict(curr.pins[0].district)
+
+        const index = acc.findIndex((item) => item.name === district)
+        if(index === -1){
+            acc.push({name: district, employees: [curr]})
+        }
+
+        if(index !== -1){
+            acc[index].employees.push(curr)
+        }
+
+        return acc
+    },[])
+    
+    return bairros
+}
+
+export function separateByDistrict( employees : any[]) : Zone[]{
+    const bairros = employees.reduce((acc, curr) => {
+        const district = curr.pins[0].district
+
+        const index = acc.findIndex((item) => item.name === district)
+        if(index === -1){
+            acc.push({name: district, employees: [curr.id]})
+        }
+
+        if(index !== -1){
+            acc[index].employees.push(curr.id)
+        }
+
+        return acc
+    },[])
+    
+    return bairros
+}
+
+
+
+export function getDistrictGoogle(addressComponent : AddressComponent[]){
+ 
+    const district = addressComponent.find((item) => item.types.includes('sublocality_level_1'))
+    if(district)
+        return district.long_name
+    return 'Não identificado'
 }

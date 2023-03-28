@@ -9,6 +9,6 @@ export class DateShift {
   @IsDateString()
   data : string;
   @IsOptional()
-  @IsEnum(EShiftType, { message: 'Turno tem que ser do tipo TURNO 1, TURNO 2, TURNO 3 ou EXTRA' })
+  @IsEnum(EShiftType, { message: 'Turno tem que ser do tipo TURNO 1, TURNO 2, TURNO 3 ou Extra' })
   shift? : string
 }
