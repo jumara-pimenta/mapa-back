@@ -7,7 +7,6 @@ export class FiltersRouteHistoryDTO {
   nameRoute?: string;
   
   @ApiProperty({required: false})
-  @IsDateString()
   @IsOptional()
   createdAt?: Date;
 
