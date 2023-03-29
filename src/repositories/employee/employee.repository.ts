@@ -7,7 +7,7 @@ import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
-import { ETypePin } from '../../utils/ETypes';
+import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
 
 @Injectable()
 export class EmployeeRepository
@@ -122,6 +122,29 @@ export class EmployeeRepository
     });
   }
 
+  async checkExtraEmployee(ids: string[]): Promise<Employee[]> {
+    return this.repository.employee.findMany({
+      where: {
+        deletedAt: null,
+        id: {
+          in: ids,
+        },
+        employeeOnPath: {
+          some: {
+            path: {
+              deletedAt: null,
+              type: ETypePath.RETURN,
+              route: {
+                deletedAt: null,
+                type: ETypeRoute.EXTRA,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,
@@ -161,6 +184,13 @@ export class EmployeeRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+            pins: {
+              some: {
+                NOT: {
+                  pinId: '1230-9130-9FLKJSDFKLJ',
+                },
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -232,7 +262,7 @@ export class EmployeeRepository
       },
     });
 
-    return items
+    return items;
   }
 
   create(data: Employee): Promise<Employee> {

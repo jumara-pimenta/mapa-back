@@ -32,6 +32,7 @@ import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriver
 import { RouteMobile } from 'src/utils/Utils';
 import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
 import { CreateSuggestionExtra } from 'src/dtos/route/createSuggestionExtra.dto';
+import { CreateSugestedRouteDTO } from 'src/dtos/route/createSugestedRoute.dto';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
@@ -200,15 +201,15 @@ export class RouteController {
 
   @Post('/create/suggestion')
   @HttpCode(HttpStatus.OK)
-  async createSuggestion(@Body() payload: CreateRouteExtraEmployeeDTO): Promise<any> {
-    return await this.routeService.createSuggestion(payload);
+  async createSuggestion(
+    @Body() payload: CreateRouteExtraEmployeeDTO,
+  ): Promise<any> {
+    return await this.routeService.createExtras(payload);
   }
 
   @Post('/create/extra')
   @HttpCode(HttpStatus.OK)
-  async createExtras(@Body() payload: CreateSuggestionExtra): Promise<any> {
-    return await this.routeService.createExtras(payload);
+  async createExtras(@Body() payload: CreateSugestedRouteDTO): Promise<any> {
+    return await this.routeService.createSugestionRoute(payload);
   }
-
-
 }
