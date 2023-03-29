@@ -204,7 +204,6 @@ export class EmployeeService {
     return this.mapperOne(employee);
   }
 
-<<<<<<< HEAD
   async checkExtraEmployee(ids: string[]): Promise<any> {
     const employees = await this.employeeRepository.checkExtraEmployee(ids);
 
@@ -216,8 +215,6 @@ export class EmployeeService {
         HttpStatus.NOT_FOUND,
       );
   }
-=======
->>>>>>> qa
 
   async listAll(
     page: Page,
@@ -807,9 +804,8 @@ export class EmployeeService {
             id: employeesOnPin.pin.id,
             title: employeesOnPin.pin.title,
             local: employeesOnPin.pin.local,
-            district : employeesOnPin.pin.district,
-            details: employeesOnPin.pin.details,
             district: employeesOnPin.pin.district,
+            details: employeesOnPin.pin.details,
             lat: employeesOnPin.pin.lat,
             lng: employeesOnPin.pin.lng,
             type: employeesOnPin.type as ETypePin,
