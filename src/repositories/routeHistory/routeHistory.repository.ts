@@ -77,56 +77,59 @@ export class RouteHistoryRepository
     filters: FiltersRouteHistoryDTO,
   ): Promise<PageResponse<RouteHistory>> {
     const condition = generateQueryByFiltersForRouteHistory(filters);
-    
-    const items = condition ? await this.repository.routeHistory.findMany({
-      ...this.buildPage(page),
-      where:{...condition,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        id: true,
-        typeRoute: true,
-        nameRoute: true,
-        path: true,
-        employeeIds: true,
-        totalEmployees: true,
-        sinister: true,
-        totalConfirmed: true,
-        driver: true,
-        vehicle: true,
-        itinerary: true,
-        startedAt: true,
-        finishedAt: true,
-        createdAt: true,
-      },
-    }) : await this.repository.routeHistory.findMany({
-      ...this.buildPage(page),
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        id: true,
-        typeRoute: true,
-        nameRoute: true,
-        path: true,
-        employeeIds: true,
-        totalEmployees: true,
-        sinister: true,
-        totalConfirmed: true,
-        driver: true,
-        vehicle: true,
-        itinerary: true,
-        startedAt: true,
-        finishedAt: true,
-        createdAt: true,
-      },
-    });
 
-    const total = condition ? await this.repository.routeHistory.count({ 
-      where: {...condition},
-    }): await this.repository.routeHistory.count({});
+    const items = condition
+      ? await this.repository.routeHistory.findMany({
+          ...this.buildPage(page),
+          where: { ...condition },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          select: {
+            id: true,
+            typeRoute: true,
+            nameRoute: true,
+            path: true,
+            employeeIds: true,
+            totalEmployees: true,
+            sinister: true,
+            totalConfirmed: true,
+            driver: true,
+            vehicle: true,
+            itinerary: true,
+            startedAt: true,
+            finishedAt: true,
+            createdAt: true,
+          },
+        })
+      : await this.repository.routeHistory.findMany({
+          ...this.buildPage(page),
+          orderBy: {
+            createdAt: 'desc',
+          },
+          select: {
+            id: true,
+            typeRoute: true,
+            nameRoute: true,
+            path: true,
+            employeeIds: true,
+            totalEmployees: true,
+            sinister: true,
+            totalConfirmed: true,
+            driver: true,
+            vehicle: true,
+            itinerary: true,
+            startedAt: true,
+            finishedAt: true,
+            createdAt: true,
+          },
+        });
+
+    const total = condition
+      ? await this.repository.routeHistory.count({
+          where: { ...condition },
+        })
+      : await this.repository.routeHistory.count({});
 
     return this.buildPageResponse(
       items,
@@ -169,7 +172,10 @@ export class RouteHistoryRepository
     return routes;
   }
 
-  async getHistoricByDate(dateInitial: Date, dateFinal: Date): Promise<RouteHistory[]> {
+  async getHistoricByDate(
+    dateInitial: Date,
+    dateFinal: Date,
+  ): Promise<RouteHistory[]> {
     const paths = await this.repository.routeHistory.findMany({
       where: {
         createdAt: {
@@ -179,14 +185,14 @@ export class RouteHistoryRepository
       },
       include: {
         sinister: true,
-        path :{
-         select: {
-          startsAt: true,
-          finishedAt: true,
-          type: true,
-        }
+        path: {
+          select: {
+            startsAt: true,
+            finishedAt: true,
+            type: true,
+          },
+        },
       },
-    },
       orderBy: {
         createdAt: 'asc',
       },

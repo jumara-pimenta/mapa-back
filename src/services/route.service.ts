@@ -335,17 +335,26 @@ export class RouteService {
     });
 
     // Promise
-    return Promise.all(
-      routes.map((route) =>
-        this.create(route)
-          .then((result) => {
-            return { description: result.description };
-          })
-          .catch((err) => {
-            return { erro: err.response.message };
-          }),
-      ),
+    const PromiseRoutes = await Promise.allSettled(
+      routes.map((route) => this.create(route)),
     );
+
+    const response = PromiseRoutes.map((e, index) => {
+      if (e.status === 'rejected') {
+        return {
+          description: routes[index].description,
+          status: 400,
+          erro: e.reason.response.message,
+        };
+      }
+      if (e.status === 'fulfilled') {
+        return {
+          description: routes[index].description,
+          status: 201,
+        };
+      }
+    });
+    return response;
   }
 
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
