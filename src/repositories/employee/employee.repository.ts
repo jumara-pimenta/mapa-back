@@ -102,6 +102,15 @@ export class EmployeeRepository
     });
   }
 
+  findByRegistrationDeleted(registration: string): Promise<Employee> {
+    return this.repository.employee.findFirst({
+      where: {
+        registration: registration,
+        deletedAt: { not: null },
+      },
+    });
+  }
+
   findByRegistrationByImport(registration: string): Promise<Employee> {
     return this.repository.employee.findFirst({
       where: {
@@ -154,7 +163,7 @@ export class EmployeeRepository
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: { ...condition, deletedAt: null},
+          where: { ...condition, deletedAt: null },
           orderBy: {
             createdAt: 'desc',
           },

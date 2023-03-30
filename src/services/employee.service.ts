@@ -86,6 +86,17 @@ export class EmployeeService {
         HttpStatus.CONFLICT,
       );
     }
+    const deletedEmployee =
+      await this.employeeRepository.findByRegistrationDeleted(
+        props.registration,
+      );
+
+    if (deletedEmployee) {
+      throw new HttpException(
+        'Matrícula já cadastrada para outro(a) colaborador(a)!',
+        HttpStatus.CONFLICT,
+      );
+    }
 
     if (props.pin.typeCreation === ETypeCreationPin.IS_EXISTENT) {
       if (!props.pin.id)
