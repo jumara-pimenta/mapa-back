@@ -68,6 +68,7 @@ import {
   CreateSuggestionExtra,
   SuggestionExtra,
 } from 'src/dtos/route/createSuggestionExtra.dto';
+import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
 
 @Injectable()
 export class RouteService {
@@ -316,7 +317,7 @@ export class RouteService {
 
   async createSugestionRoute(
     payload: CreateSugestedRouteDTO,
-  ): Promise<Route[] | any> {
+  ): Promise<SuggenstionResultDTO[]> {
     const routes = payload.suggestedExtras.map((route) => {
       return {
         description: route.description,
@@ -326,7 +327,7 @@ export class RouteService {
         type: ETypeRoute.EXTRA,
         distance: route.distance,
         pathDetails: {
-          duration: '01:30',
+          duration: route.duration,
           type: ETypePath.RETURN,
           startsAt: route.time,
           isAutoRoute: false,
@@ -335,17 +336,27 @@ export class RouteService {
     });
 
     // Promise
-    return Promise.all(
-      routes.map((route) =>
-        this.create(route)
-          .then((result) => {
-            return { description: result.description };
-          })
-          .catch((err) => {
-            return { erro: err.response.message };
-          }),
-      ),
+    const PromiseRoutes = await Promise.allSettled(
+      routes.map((route) => this.create(route)),
     );
+
+    const response: SuggenstionResultDTO[] = PromiseRoutes.map((e, index) => {
+      if (e.status === 'rejected') {
+        return {
+          description: routes[index].description,
+          status: 400,
+          erro: e.reason.response.message ?? e.reason.response,
+        };
+      }
+      if (e.status === 'fulfilled') {
+        return {
+          description: routes[index].description,
+          status: 201,
+        };
+      }
+    });
+
+    return response;
   }
 
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {

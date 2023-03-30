@@ -12,6 +12,7 @@ export default interface IEmployeeRepository {
   findAllExport(): Promise<Employee[]>;
   findById(id: string): Promise<Employee>;
   findByRegistration(registration: string): Promise<Employee>;
+  findByRegistrationDeleted(registration: string): Promise<Employee>;
   findByRegistrationByImport(registration: string): Promise<Employee>;
   update(data: Employee): Promise<Employee>;
   findByIds(ids: string[]): Promise<Employee[]>;

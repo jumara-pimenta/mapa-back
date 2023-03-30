@@ -37,4 +37,6 @@ class suggestedExtrasDTO {
   employeesIds: string[];
   time: string;
   distance: string;
+
+  duration: string;
 }
