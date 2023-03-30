@@ -68,6 +68,7 @@ import {
   CreateSuggestionExtra,
   SuggestionExtra,
 } from 'src/dtos/route/createSuggestionExtra.dto';
+import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
 
 @Injectable()
 export class RouteService {
@@ -316,7 +317,7 @@ export class RouteService {
 
   async createSugestionRoute(
     payload: CreateSugestedRouteDTO,
-  ): Promise<Route[] | any> {
+  ): Promise<SuggenstionResultDTO[]> {
     const routes = payload.suggestedExtras.map((route) => {
       return {
         description: route.description,
@@ -339,7 +340,7 @@ export class RouteService {
       routes.map((route) => this.create(route)),
     );
 
-    const response = PromiseRoutes.map((e, index) => {
+    const response: SuggenstionResultDTO[] = PromiseRoutes.map((e, index) => {
       if (e.status === 'rejected') {
         return {
           description: routes[index].description,
@@ -354,6 +355,7 @@ export class RouteService {
         };
       }
     });
+
     return response;
   }
 
