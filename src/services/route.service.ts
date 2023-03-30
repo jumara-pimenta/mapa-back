@@ -327,7 +327,7 @@ export class RouteService {
         type: ETypeRoute.EXTRA,
         distance: route.distance,
         pathDetails: {
-          duration: '01:30',
+          duration: route.duration,
           type: ETypePath.RETURN,
           startsAt: route.time,
           isAutoRoute: false,
