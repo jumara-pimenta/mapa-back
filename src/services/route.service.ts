@@ -344,7 +344,7 @@ export class RouteService {
         return {
           description: routes[index].description,
           status: 400,
-          erro: e.reason.response.message,
+          erro: e.reason.response.message ?? e.reason.response,
         };
       }
       if (e.status === 'fulfilled') {
