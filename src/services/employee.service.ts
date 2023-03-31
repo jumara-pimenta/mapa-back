@@ -248,6 +248,18 @@ export class EmployeeService {
     };
   }
 
+  async findJokerPin(ids: string[]): Promise<any> {
+    const employees = await this.employeeRepository.findJokerPin(ids);
+
+    if (employees.length >= 1)
+      throw new HttpException(
+        `O(s) colaborador(es) ${employees.map(
+          (employee) => employee.name,
+        )} está(ão) cadastrado(s) sem um ponto de embarque!`,
+        HttpStatus.NOT_FOUND,
+      );
+  }
+
   async update(
     id: string,
     data: UpdateEmployeeDTO,

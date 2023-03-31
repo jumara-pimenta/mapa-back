@@ -333,4 +333,26 @@ export class EmployeeRepository
       },
     });
   }
+
+  async findJokerPin(ids: string[]): Promise<Partial<Employee>[]> {
+    return await this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        deletedAt: null,
+        pins: {
+          some: {
+            pinId: process.env.DENSO_ID,
+          },
+        },
+      },
+      select: {
+        name: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }
 }

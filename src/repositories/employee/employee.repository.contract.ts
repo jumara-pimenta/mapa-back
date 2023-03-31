@@ -18,4 +18,5 @@ export default interface IEmployeeRepository {
   findByIds(ids: string[]): Promise<Employee[]>;
   listAllEmployeesDeleted(ids: string[]): Promise<Employee[]>;
   checkExtraEmployee(ids: string[]): Promise<Employee[]>;
+  findJokerPin(ids: string[]): Promise<Partial<Employee>[]>;
 }
