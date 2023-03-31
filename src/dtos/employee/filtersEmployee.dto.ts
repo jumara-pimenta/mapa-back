@@ -25,5 +25,6 @@ export class FiltersEmployeeDTO {
   costCenter?: string;
   @ApiProperty({ required: false, example: `${faker.name.firstName()}` })
   name?: string;
-
+  @ApiProperty({ required: false, example: `${faker.name.firstName()}` })
+  extra?: string;
 }

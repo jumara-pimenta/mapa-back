@@ -189,7 +189,7 @@ export class RouteService {
   }
 
   async create(payload: CreateRouteDTO): Promise<any> {
-    await this.employeeService.findJokerPin(payload.employeeIds);
+    // await this.employeeService.findJokerPin(payload.employeeIds);
 
     if (payload.employeeIds.length <= 1) {
       throw new HttpException(
