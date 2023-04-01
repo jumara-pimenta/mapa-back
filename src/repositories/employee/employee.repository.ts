@@ -163,7 +163,10 @@ export class EmployeeRepository
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: { ...condition, deletedAt: null },
+          where: {
+            ...condition,
+            deletedAt: null,
+          },
           orderBy: {
             createdAt: 'desc',
           },
@@ -330,6 +333,28 @@ export class EmployeeRepository
       },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  async findJokerPin(ids: string[]): Promise<Partial<Employee>[]> {
+    return await this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        deletedAt: null,
+        pins: {
+          some: {
+            pinId: process.env.DENSO_ID,
+          },
+        },
+      },
+      select: {
+        name: true,
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
   }

@@ -189,6 +189,8 @@ export class RouteService {
   }
 
   async create(payload: CreateRouteDTO): Promise<any> {
+    // await this.employeeService.findJokerPin(payload.employeeIds);
+
     if (payload.employeeIds.length <= 1) {
       throw new HttpException(
         'É necessário selecionar pelo menos 2 colaboradores',
@@ -362,6 +364,7 @@ export class RouteService {
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
     //const employees = await this.employeeService.listAll({skip: 0, take: 1000})
 
+    await this.employeeService.findJokerPin(payload.employeeIds);
     await this.employeeService.checkExtraEmployee(payload.employeeIds);
     const colabs: MappedEmployeeDTO[] = [];
     for await (const employeeId of payload.employeeIds) {
