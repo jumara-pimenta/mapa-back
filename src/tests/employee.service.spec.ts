@@ -6,7 +6,7 @@ import { PinService } from '../services/pin.service';
 import { CreateEmployeeDTO } from '../dtos/employee/createEmployee.dto';
 import IEmployeeRepository from '../repositories/employee/employee.repository.contract';
 import { createMock } from '@golevelup/ts-jest';
-import { ETypeCreationPin } from '../utils/ETypes';
+import { ETypeCreationPin, ETypeShiftEmployee } from '../utils/ETypes';
 import { Employee } from '../entities/employee.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -33,7 +33,7 @@ const createEmployee: CreateEmployeeDTO = {
   },
   role: 'teste',
   registration: 'teste1',
-  shift: 'teste',
+  shift: ETypeShiftEmployee.FIRST,
 };
 
 // const newEmployee = new Employee({
