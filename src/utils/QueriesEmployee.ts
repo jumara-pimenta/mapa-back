@@ -32,13 +32,15 @@ export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
       if (filters.extra) {
         return {
           employeeOnPath: {
-            every: {
+            none: {
               path: {
-                type: { not: ETypePath.RETURN },
+                type: ETypePath.RETURN,
                 deletedAt: null,
-                route: {
-                  type: { not: ETypeRoute.EXTRA },
-                  deletedAt: null,
+                AND: {
+                  route: {
+                    type: ETypeRoute.EXTRA,
+                    deletedAt: null,
+                  },
                 },
               },
             },
