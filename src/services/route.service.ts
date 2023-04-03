@@ -1522,39 +1522,55 @@ export class RouteService {
     return { employee: ordem, distance, totalDurationTime };
   }
 
-  async suggestRouteExtra(colabs: any, rotas: any[], rotasExtraTime? : any[],quantityColabs?: number ) {
+  async suggestRouteExtra(
+    colabs: any,
+    rotas: any[],
+    rotasExtraTime?: any[],
+    quantityColabs?: number,
+  ) {
     const ordemEmployee = calculateDistance(
       colabs,
       { lat: '-3.110944', lng: '-59.962604' },
       [],
     );
     //dividir por mais perto
-    console.log('separateWays->>>', rotas.length,quantityColabs)
+    console.log('separateWays->>>', rotas.length, quantityColabs);
     const routes = separateWays(ordemEmployee, [], quantityColabs);
 
     const extra: SuggestionExtra[] = [...rotas];
-    console.log('rotas sugeridas -> ',extra.length)
-    const extraTime: SuggestionExtra[] =  rotasExtraTime ? [...rotasExtraTime] : [];
+    console.log('rotas sugeridas -> ', extra.length);
+    const extraTime: SuggestionExtra[] = rotasExtraTime
+      ? [...rotasExtraTime]
+      : [];
     for await (const route of routes) {
       //roteirizar
-      console.log('verificando o tempo da rota')
+      console.log('verificando o tempo da rota');
       const path: SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
       if (path.totalDurationTime > getDuration('01:30')) extraTime.push(path);
       if (path.totalDurationTime < getDuration('01:30')) extra.push(path);
     }
-    console.log('rotas sugeridas -> ',extra.length)
-    console.log('rotas extrapoladas -> ',extraTime.length)
+    console.log('rotas sugeridas -> ', extra.length);
+    console.log('rotas extrapoladas -> ', extraTime.length);
 
     if (extraTime.length > 0) {
-        const colabs = extraTime.map((item) => {
-            return item.employee;
-        });
-        console.log('quantidade de colabs -> \n ',colabs[0].length, colabs.length)
-        console.log('dividir mais uma vez');
-        extraTime.shift();
-        return await this.suggestRouteExtra(colabs[0], extra,extraTime, Math.round(colabs[0].length / 2));
+      const colabs = extraTime.map((item) => {
+        return item.employee;
+      });
+      console.log(
+        'quantidade de colabs -> \n ',
+        colabs[0].length,
+        colabs.length,
+      );
+      console.log('dividir mais uma vez');
+      extraTime.shift();
+      return await this.suggestRouteExtra(
+        colabs[0],
+        extra,
+        extraTime,
+        Math.round(colabs[0].length / 2),
+      );
     }
-    console.log('total as extras -> ',extra)
+    console.log('total as extras -> ', extra);
     const response = extra.map((item) => {
       return {
         employees: item.employee,

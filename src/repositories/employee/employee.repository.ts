@@ -159,7 +159,6 @@ export class EmployeeRepository
     filters: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>> {
     const condition = generateQueryForEmployee(filters);
-
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
@@ -199,7 +198,7 @@ export class EmployeeRepository
             pins: {
               some: {
                 NOT: {
-                  pinId: '1230-9130-9FLKJSDFKLJ',
+                  pinId: process.env.DENSO_ID,
                 },
               },
             },
