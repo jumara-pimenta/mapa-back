@@ -27,7 +27,7 @@ export enum ETypePath {
 export enum EStatusPath {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
-  FINISHED = 'FINALIZADO',
+  FINISHED = 'FINALIZADA',
 }
 
 export enum ETypeCreationPin {

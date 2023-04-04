@@ -679,6 +679,17 @@ export class PathService {
   private mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 
+    const today = new Date();
+    const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+    if (
+      today.getDay() === date.getDay() &&
+      today.getMonth() === date.getMonth() &&
+      today.getFullYear() === date.getFullYear()
+    ) {
+      path.status = EStatusPath.FINISHED;
+    }
+
     return {
       id: path.id,
       routeDescription: path?.route.description,
@@ -722,6 +733,17 @@ export class PathService {
 
   private mapperMany(paths: Path[]): MappedPathDTO[] {
     return paths.map((path) => {
+      const today = new Date();
+      const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+      if (
+        today.getDay() === date.getDay() &&
+        today.getMonth() === date.getMonth() &&
+        today.getFullYear() === date.getFullYear()
+      ) {
+        path.status = EStatusPath.FINISHED;
+      }
+
       const { employeesOnPath } = path;
       return {
         id: path.id,

@@ -450,6 +450,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         deletedAt: null,
         ...filter,
         ...condition,
+        AND: {
+          route: {
+            deletedAt: null,
+          },
+        },
       },
       select: {
         id: true,

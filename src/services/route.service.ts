@@ -649,6 +649,18 @@ export class RouteService {
 
     const path = await this.pathService.listByIdMobile(payload.pathId);
 
+    // check if this date: finishedAt is equal to today
+
+    const today = new Date();
+    const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+    if (
+      today.getDay() === date.getDay() &&
+      today.getMonth() === date.getMonth() &&
+      today.getFullYear() === date.getFullYear()
+    ) {
+      path.status = EStatusPath.FINISHED;
+    }
     return {
       vehicle: dataFilterWebsocket.vehicle,
       driver: dataFilterWebsocket.driver,
