@@ -17,9 +17,7 @@ export function getDateInLocaleTime(date: Date): Date {
 }
 
 export function getDateStartToEndOfDay(date: string): DateStartEnd {
-  const newDate = new Date(date);
-  console.log(newDate);
-  
+  const newDate = new Date(date);  
   const year = newDate.getFullYear();
   if (year < 2000 || year > 2100 || Number.isNaN(year))
     throw new HttpException(
