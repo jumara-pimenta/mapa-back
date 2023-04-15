@@ -252,7 +252,7 @@ export class PathService {
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds,
         pathId: path.id,
-        confirmation: type === ETypePath.ONE_WAY ? true : false,
+        confirmation: true,
       });
     } else if (type === ETypePath.ROUND_TRIP) {
       const pathOneWay = await this.pathRepository.create(
@@ -287,7 +287,7 @@ export class PathService {
       await this.employeesOnPathService.create({
         employeeIds: props.employeeIds.reverse(),
         pathId: pathReturn.id,
-        confirmation: false,
+        confirmation: true,
       });
     }
 
