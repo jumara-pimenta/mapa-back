@@ -158,7 +158,18 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
 
   findById(id: string): Promise<Path | null> {
     return this.repository.path.findFirst({
-      where: { id: id },
+      where: {
+        id: id,
+        deletedAt: null,
+        route: {
+          deletedAt: null,
+          path: {
+            some: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
       select: {
         id: true,
         type: true,

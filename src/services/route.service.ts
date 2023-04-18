@@ -517,7 +517,8 @@ export class RouteService {
       );
 
       for await (const path of route.paths) {
-        await this.pathService.delete(path.id);
+        // await this.pathService.delete(path.id);
+        await this.pathService.softDelete(path.id);
       }
 
       await this.pathService.generate({
@@ -1383,7 +1384,6 @@ export class RouteService {
       );
 
     const denso = { lat: '-3.110944', lng: '-59.962604' };
-
     let farthestEmployee: Employee = null;
     let maxDistance = 0;
     for (const employee of employees) {
