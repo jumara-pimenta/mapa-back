@@ -200,8 +200,8 @@ export class RouteRepository
   }
 
   findById(id: string): Promise<Route> {
-    return this.repository.route.findUnique({
-      where: { id },
+    return this.repository.route.findFirst({
+      where: { id, deletedAt: null },
       select: {
         id: true,
         description: true,
