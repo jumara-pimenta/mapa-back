@@ -517,7 +517,6 @@ export class RouteService {
       );
 
       for await (const path of route.paths) {
-        // await this.pathService.delete(path.id);
         await this.pathService.softDelete(path.id);
       }
 
