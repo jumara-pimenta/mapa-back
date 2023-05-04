@@ -30,6 +30,10 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { FilterRouteExport } from 'src/dtos/route/filterRouteExport';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
 import { RouteMobile } from 'src/utils/Utils';
+import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
+import { CreateSuggestionExtra } from 'src/dtos/route/createSuggestionExtra.dto';
+import { CreateSugestedRouteDTO } from 'src/dtos/route/createSugestedRoute.dto';
+import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
 
 @Controller('/api/routes')
 @ApiTags('Routes')
@@ -194,5 +198,21 @@ export class RouteController {
     @Body() payload: RouteReplacementDriverDTO,
   ): Promise<any> {
     return await this.routeService.routeReplacementDriver(payload);
+  }
+
+  @Post('/create/suggestion')
+  @HttpCode(HttpStatus.OK)
+  async createSuggestion(
+    @Body() payload: CreateRouteExtraEmployeeDTO,
+  ): Promise<any> {
+    return await this.routeService.createExtras(payload);
+  }
+
+  @Post('/create/extra')
+  @HttpCode(HttpStatus.OK)
+  async createExtras(
+    @Body() payload: CreateSugestedRouteDTO,
+  ): Promise<SuggenstionResultDTO[]> {
+    return await this.routeService.createSugestionRoute(payload);
   }
 }

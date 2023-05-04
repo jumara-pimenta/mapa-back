@@ -7,7 +7,7 @@ import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
-import { ETypePin } from '../../utils/ETypes';
+import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
 
 @Injectable()
 export class EmployeeRepository
@@ -102,6 +102,15 @@ export class EmployeeRepository
     });
   }
 
+  findByRegistrationDeleted(registration: string): Promise<Employee> {
+    return this.repository.employee.findFirst({
+      where: {
+        registration: registration,
+        deletedAt: { not: null },
+      },
+    });
+  }
+
   findByRegistrationByImport(registration: string): Promise<Employee> {
     return this.repository.employee.findFirst({
       where: {
@@ -111,43 +120,50 @@ export class EmployeeRepository
     });
   }
 
+  listAllEmployeesDeleted(ids: string[]): Promise<Employee[]> {
+    return this.repository.employee.findMany({
+      where: {
+        deletedAt: { not: null },
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
+
+  async checkExtraEmployee(ids: string[]): Promise<Employee[]> {
+    return this.repository.employee.findMany({
+      where: {
+        deletedAt: null,
+        id: {
+          in: ids,
+        },
+        employeeOnPath: {
+          some: {
+            path: {
+              deletedAt: null,
+              type: ETypePath.RETURN,
+              route: {
+                deletedAt: null,
+                type: ETypeRoute.EXTRA,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async findAll(
     page: Page,
     filters: FiltersEmployeeDTO,
   ): Promise<PageResponse<Employee>> {
     const condition = generateQueryForEmployee(filters);
-
     const items = condition
       ? await this.repository.employee.findMany({
           ...this.buildPage(page),
-          where: { ...condition, deletedAt: null },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          include: {
-            pins: {
-              select: {
-                type: true,
-                pin: {
-                  select: {
-                    id: true,
-                    details: true,
-                    lat: true,
-                    lng: true,
-                    local: true,
-                    title: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: 'desc',
-              },
-            },
-          },
-        })
-      : await this.repository.employee.findMany({
-          ...this.buildPage(page),
           where: {
+            ...condition,
             deletedAt: null,
           },
           orderBy: {
@@ -165,6 +181,44 @@ export class EmployeeRepository
                     lng: true,
                     local: true,
                     title: true,
+                    district: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: 'desc',
+              },
+            },
+          },
+        })
+      : await this.repository.employee.findMany({
+          ...this.buildPage(page),
+          where: {
+            deletedAt: null,
+            pins: {
+              some: {
+                NOT: {
+                  pinId: process.env.DENSO_ID,
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          include: {
+            pins: {
+              select: {
+                type: true,
+                pin: {
+                  select: {
+                    id: true,
+                    details: true,
+                    lat: true,
+                    lng: true,
+                    local: true,
+                    title: true,
+                    district: true,
                   },
                 },
               },
@@ -194,7 +248,7 @@ export class EmployeeRepository
     );
   }
 
-  async findAllExport(): Promise<PageResponse<Employee>> {
+  async findAllExport(): Promise<Employee[]> {
     const items = await this.repository.employee.findMany({
       where: { deletedAt: null },
       orderBy: {
@@ -206,10 +260,7 @@ export class EmployeeRepository
             type: true,
             pin: {
               select: {
-                id: true,
                 details: true,
-                lat: true,
-                lng: true,
                 local: true,
                 title: true,
               },
@@ -222,16 +273,7 @@ export class EmployeeRepository
       },
     });
 
-    const total = await this.repository.employee.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
-
-    return this.buildPageResponse(
-      items,
-      Array.isArray(total) ? total.length : total,
-    );
+    return items;
   }
 
   create(data: Employee): Promise<Employee> {
@@ -290,6 +332,28 @@ export class EmployeeRepository
       },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  async findJokerPin(ids: string[]): Promise<Partial<Employee>[]> {
+    return await this.repository.employee.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        deletedAt: null,
+        pins: {
+          some: {
+            pinId: process.env.DENSO_ID,
+          },
+        },
+      },
+      select: {
+        name: true,
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
   }

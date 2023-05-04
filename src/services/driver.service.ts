@@ -101,7 +101,7 @@ export class DriverService {
 
     if (!driver)
       throw new HttpException(
-        `Não foi encontrado um driver com o id: ${id}`,
+        `Não foi encontrado um motorista com essa identificação: ${id}`,
         HttpStatus.NOT_FOUND,
       );
 
@@ -294,20 +294,13 @@ export class DriverService {
   }
 
   async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
-    const headers = [
-      'Nome                          ',
-      'CPF',
-      'CNH',
-      'Validade',
-      'Categoria',
-    ];
+    const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
     const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './driver.xlsx';
-    const workSheetName = 'Motorista';
+    const workSheetName = 'Motoristas';
 
     const drivers = await this.driverRepository.findAllExport();
-
     const exportedDriverToXLSX = async (
       drivers,
       headers,
@@ -323,53 +316,23 @@ export class DriverService {
           driver.category,
         ];
       });
-
       if (!data.length)
         throw new HttpException(
           'Não foram encontrados motoristas para serem exportados',
           HttpStatus.NOT_FOUND,
         );
 
-      const driverInformationHeader = [
-        [`MOTORISTAS EXPORTADOS: ${today}`, '', '', '', '', ''],
-      ];
-
-      const driverInformationSubHeader = [
-        [`TOTAL DE MOTORISTAS EXPORTADOS: ${data.length}`],
-      ];
-
-      const driverInformationFooter = [
-        ['*************************************'],
-        ['***************'],
-        ['***************'],
-        ['***************'],
-        ['***********'],
-      ];
-
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
-      const workSheetData = [
-        ,
-        driverInformationHeader,
-        ,
-        driverInformationSubHeader,
-        ,
-        driverInformationFooter,
-        ,
-        headers,
-        ...data,
-        ,
-        driverInformationFooter,
-      ];
+      const workSheetData = [headers, ...data];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
         { wch: 30 },
-        { wch: 12 },
-        { wch: 12 },
+        { wch: 15 },
+        { wch: 15 },
         { wch: 12 },
         { wch: 9 },
       ];
-      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
 
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
@@ -386,5 +349,37 @@ export class DriverService {
       workSheetName,
       filePath,
     );
+  }
+
+  async exportDriverEmptFile() {
+    const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
+
+    const filePath = './driver.xlsx';
+    const workSheetName = 'Motoristas';
+
+    const exportedDriverToXLSX = async (
+      headers: string[],
+      workSheetName: string,
+      filePath: string,
+    ) => {
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 30 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 9 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+      const exportedKanbans = fs.createReadStream(pathFile);
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(headers, workSheetName, filePath);
   }
 }

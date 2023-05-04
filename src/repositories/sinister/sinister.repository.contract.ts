@@ -15,6 +15,6 @@ export default interface ISinisterRepository {
   vinculatePath(
     sinister: Sinister,
     routeHistoryId: string,
-    pathId: Path,
+    pathId: Partial<Path>,
   ): Promise<Sinister[]>;
 }

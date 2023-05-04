@@ -9,7 +9,7 @@ export class RouteHistory {
   id: string;
   typeRoute: ETypeRoute | string;
   nameRoute: string;
-  path?: Path;
+  path?: Partial<Path>;
   employeeIds: string;
   totalEmployees: number;
   totalConfirmed: number;
@@ -27,10 +27,11 @@ export class RouteHistory {
       RouteHistory,
       'id' | 'createdAt' | 'vehicle' | 'paths' | 'driver' | 'sinister'
     >,
-    path: Path,
+    path: Partial<Path>,
     driver: Driver,
     vehicle: Vehicle,
     sinister: Sinister[],
+    createdAt? : Date,
     id?: string,
   ) {
     Object.assign(this, props);
@@ -39,5 +40,6 @@ export class RouteHistory {
     this.driver = driver;
     this.vehicle = vehicle;
     this.sinister = sinister;
+    this.createdAt = createdAt ?? new Date();
   }
 }

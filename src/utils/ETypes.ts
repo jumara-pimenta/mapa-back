@@ -27,7 +27,7 @@ export enum ETypePath {
 export enum EStatusPath {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
-  FINISHED = 'FINALIZADO',
+  FINISHED = 'FINALIZADA',
 }
 
 export enum ETypeCreationPin {
@@ -47,6 +47,7 @@ export enum ERoles {
 }
 
 export enum ETypePeriodHistory {
+  DAILY = 'DIÁRIO',
   WEEKLY = 'SEMANAL',
   BIWEEKLY = 'QUINZENAL',
   MONTHLY = 'MENSAL',
@@ -67,4 +68,19 @@ export enum ETypeShiftEmployee {
 export enum ETypeCategoryDrivers {
   C = 'C',
   D = 'D',
+  E = 'E',
+}
+
+export enum ETypeShiftEmployeeExports {
+  FIRST = '07:30 às 17:30',
+  SECOND = '17:30 às 02:30',
+  THIRD = '03:30 às 12:00',
+  NOT_DEFINED = 'SEM TURNO ESTABELECIDO',
+}
+
+export enum EShiftType {
+  FIRST = 'Turno 1',
+  SECOND = 'Turno 2',
+  THIRD = 'Turno 3',
+  EXTRA = 'Extra',
 }

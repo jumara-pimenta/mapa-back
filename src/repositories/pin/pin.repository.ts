@@ -13,13 +13,22 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
   constructor(private readonly repository: PrismaService) {
     super();
   }
-  findByLocal(local: string): Promise<Pin> {
+  findByLocal(details: string): Promise<Pin> {
+    return this.repository.pin.findFirst({
+      where: {
+        details,
+      },
+    });
+  }
+
+  findByLocalExcel(local: string): Promise<Pin> {
     return this.repository.pin.findFirst({
       where: {
         local,
       },
     });
   }
+
 
   delete(id: string): Promise<any> {
     return this.repository.pin.delete({
@@ -34,6 +43,7 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
         title: data.title,
         local: data.local,
         details: data.details,
+        district: data.district,
         lat: data.lat,
         lng: data.lng,
         updatedAt: getDateInLocaleTime(new Date()),
@@ -90,6 +100,7 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
         title: data.title,
         local: data.local,
         details: data.details,
+        district: data.district,
         lat: data.lat,
         createdAt: data.createdAt,
         lng: data.lng,

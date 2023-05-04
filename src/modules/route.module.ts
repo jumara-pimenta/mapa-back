@@ -7,6 +7,7 @@ import { RouteService } from '../services/route.service';
 import { DriverModule } from './driver.module';
 import { EmployeeModule } from './employee.module';
 import { PathModule } from './path.module';
+import { RouteHistoryModule } from './routeHistory.module';
 import { VehicleModule } from './vehicle.module';
 
 @Module({
@@ -15,6 +16,7 @@ import { VehicleModule } from './vehicle.module';
     VehicleModule,
     forwardRef(() => EmployeeModule),
     forwardRef(() => PathModule),
+    forwardRef(() => RouteHistoryModule),
   ],
   controllers: [RouteController],
   providers: [

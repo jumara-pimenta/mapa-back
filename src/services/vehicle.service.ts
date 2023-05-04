@@ -318,8 +318,10 @@ export class VehicleService {
       'Última vistoria',
       'Vencimento',
       'Capacidade',
-      'Acessibilidade',
+      'Renavam',
       'Última manutenção',
+      'Observação',
+      'Acessibilidade',
     ];
     const today = new Date().toLocaleDateString('pt-BR');
 
@@ -342,8 +344,10 @@ export class VehicleService {
           vehicle.lastSurvey,
           vehicle.expiration,
           vehicle.capacity,
-          vehicle.isAccessibility === true ? 'SIM' : 'NÃO',
+          vehicle.renavam,
           vehicle.lastMaintenance,
+          vehicle.note,
+          vehicle.isAccessibility === true ? 'SIM' : 'NÃO',
         ];
       });
 
@@ -353,53 +357,22 @@ export class VehicleService {
           HttpStatus.NOT_FOUND,
         );
 
-      const vehicleInformationHeader = [
-        [`VEÍCULOS EXPORTADOS: ${today}`, '', '', '', '', ''],
-      ];
-
-      const driverInformationSubHeader = [
-        [`TOTAL DE VEÍCULOS EXPORTADOS: ${data.length}`],
-      ];
-
-      const vehicleInformationFooter = [
-        ['**************'],
-        ['*********************************'],
-        ['**********************'],
-        ['****************'],
-        ['****************'],
-        ['**************'],
-        ['******************'],
-        ['********************'],
-      ];
-
       const workBook = XLSX.utils.book_new();
       // eslint-disable-next-line no-sparse-arrays
-      const workSheetData = [
-        ,
-        vehicleInformationHeader,
-        ,
-        driverInformationSubHeader,
-        ,
-        vehicleInformationFooter,
-        ,
-        headers,
-        ...data,
-        ,
-        vehicleInformationFooter,
-      ];
+      const workSheetData = [headers, ...data];
       const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
       workSheet['!cols'] = [
         { wch: 10 },
         { wch: 25 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
         { wch: 15 },
-        { wch: 11 },
-        { wch: 10 },
-        { wch: 9 },
-        { wch: 11 },
-        { wch: 15 },
+        { wch: 17 },
+        { wch: 25 },
+        { wch: 12 },
       ];
-
-      workSheet['!merges'] = [{ s: { c: 0, r: 1 }, e: { c: 1, r: 1 } }];
 
       XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
       const pathFile = path.resolve(filePath);
@@ -416,5 +389,55 @@ export class VehicleService {
       workSheetName,
       filePath,
     );
+  }
+
+  async exportVehicleEmptFile() {
+    const headers = [
+      'Placa',
+      'Empresa',
+      'Tipo',
+      'Última vistoria',
+      'Vencimento',
+      'Capacidade',
+      'Renavam',
+      'Última manutenção',
+      'Observação',
+      'Acessibilidade',
+    ];
+
+    const filePath = './vehicle.xlsx';
+    const workSheetName = 'Veículos';
+
+    const exportedDriverToXLSX = async (
+      headers: string[],
+      workSheetName: string,
+      filePath: string,
+    ) => {
+      const workBook = XLSX.utils.book_new();
+      const workSheetData = [headers];
+      const workSheet = XLSX.utils.aoa_to_sheet(workSheetData);
+      workSheet['!cols'] = [
+        { wch: 10 },
+        { wch: 25 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 17 },
+        { wch: 25 },
+        { wch: 12 },
+      ];
+
+      XLSX.utils.book_append_sheet(workBook, workSheet, workSheetName);
+      const pathFile = path.resolve(filePath);
+      XLSX.writeFile(workBook, pathFile);
+
+      const exportedKanbans = fs.createReadStream(pathFile);
+
+      return new StreamableFile(exportedKanbans);
+    };
+
+    return exportedDriverToXLSX(headers, workSheetName, filePath);
   }
 }

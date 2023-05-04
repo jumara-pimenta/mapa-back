@@ -36,6 +36,9 @@ export class RouteRepository
         type: true,
         createdAt: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             id: true,
             duration: true,
@@ -48,6 +51,11 @@ export class RouteRepository
             employeesOnPath: {
               orderBy: {
                 position: 'asc',
+              },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
               },
               select: {
                 id: true,
@@ -90,6 +98,11 @@ export class RouteRepository
       where: {
         vehicleId,
         deletedAt: null,
+        path: {
+          some: {
+            deletedAt: null,
+          },
+        },
       },
       select: {
         id: true,
@@ -100,6 +113,9 @@ export class RouteRepository
         type: true,
         createdAt: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             id: true,
             duration: true,
@@ -168,7 +184,6 @@ export class RouteRepository
   }
 
   async update(data: Route): Promise<Route> {
-
     return await this.repository.route.update({
       data: {
         id: data.id,
@@ -185,8 +200,8 @@ export class RouteRepository
   }
 
   findById(id: string): Promise<Route> {
-    return this.repository.route.findUnique({
-      where: { id },
+    return this.repository.route.findFirst({
+      where: { id, deletedAt: null },
       select: {
         id: true,
         description: true,
@@ -196,6 +211,9 @@ export class RouteRepository
         type: true,
         createdAt: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             id: true,
             duration: true,
@@ -208,6 +226,11 @@ export class RouteRepository
             employeesOnPath: {
               orderBy: {
                 position: 'asc',
+              },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
               },
               select: {
                 id: true,
@@ -254,20 +277,37 @@ export class RouteRepository
     const items = condition
       ? await this.repository.route.findMany({
           ...this.buildPage(page),
+          // not show where employe is deletedAt: null
+
           where: {
             ...condition,
             deletedAt: null,
+
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
           },
+
           include: {
             driver: true,
             path: {
+              where: {
+                deletedAt: null,
+              },
               include: {
                 employeesOnPath: {
                   orderBy: {
                     position: 'desc',
+                  },
+                  where: {
+                    employee: {
+                      deletedAt: null,
+                    },
                   },
                   include: {
                     employee: {
@@ -297,6 +337,11 @@ export class RouteRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -304,10 +349,18 @@ export class RouteRepository
           include: {
             driver: true,
             path: {
+              where: {
+                deletedAt: null,
+              },
               include: {
                 employeesOnPath: {
                   orderBy: {
                     position: 'desc',
+                  },
+                  where: {
+                    employee: {
+                      deletedAt: null,
+                    },
                   },
                   include: {
                     employee: {
@@ -344,6 +397,11 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         })
       : await this.repository.route.count({
@@ -352,6 +410,11 @@ export class RouteRepository
           },
           where: {
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         });
 
@@ -378,6 +441,11 @@ export class RouteRepository
             employeesOnPath: {
               orderBy: {
                 position: 'asc',
+              },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
               },
               include: {
                 employee: {
@@ -430,10 +498,18 @@ export class RouteRepository
             ...condition,
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           include: {
             driver: true,
             path: {
+              where: {
+                deletedAt: null,
+              },
               include: {
                 employeesOnPath: {
                   orderBy: {
@@ -470,6 +546,11 @@ export class RouteRepository
           where: {
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
           include: {
             driver: true,
@@ -512,12 +593,22 @@ export class RouteRepository
             ...condition,
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         })
       : await this.repository.route.count({
           where: {
             deletedAt: null,
             driverId,
+            path: {
+              some: {
+                deletedAt: null,
+              },
+            },
           },
         });
 
@@ -550,12 +641,19 @@ export class RouteRepository
           every: {
             finishedAt: null,
           },
+          some: {
+            deletedAt: null,
+          },
         },
       },
+
       select: {
         id: true,
         status: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             startedAt: true,
             finishedAt: true,
@@ -577,6 +675,7 @@ export class RouteRepository
             finishedAt: null,
           },
           some: {
+            deletedAt: null,
             employeesOnPath: {
               some: {
                 employeeId: {
@@ -592,6 +691,9 @@ export class RouteRepository
         type: true,
         description: true,
         path: {
+          where: {
+            deletedAt: null,
+          },
           select: {
             employeesOnPath: {
               select: {
@@ -631,11 +733,14 @@ export class RouteRepository
         path: {
           some: {
             id: pathid,
+            deletedAt: null,
           },
+          // if all paths are deleted, the route is deleted
         },
       },
       select: {
         id: true,
+        type: true,
       },
     });
 
@@ -648,6 +753,7 @@ export class RouteRepository
         path: {
           some: {
             id: pathId,
+            deletedAt: null,
           },
         },
       },

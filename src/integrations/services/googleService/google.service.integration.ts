@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { Waypoints } from 'src/dtos/route/waypoints.dto';
 import { googleApi } from 'src/integrations/api';
+import { getDistrictGoogle } from 'src/utils/District';
 import IGoogleServiceIntegration from './google.service.integration.contract';
 import { RootObject } from './response/getLocation.response';
 
@@ -11,8 +12,8 @@ export class GoogleApiServiceIntegration implements IGoogleServiceIntegration {
     try {
       const { data }: AxiosResponse<RootObject> =
         await googleApi().get(`/maps/api/geocode/json?address=${payload}&key=${process.env.API_KEY_GOOGLE}`);
-        
-      return data.results[0]?.geometry?.location;
+
+      return {location : data.results[0]?.geometry?.location, district : getDistrictGoogle(data.results[0]?.address_components)};
     } catch (e) {
       new Logger('googleApi service integration').error('get location', e);
     }

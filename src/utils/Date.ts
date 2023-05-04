@@ -17,9 +17,13 @@ export function getDateInLocaleTime(date: Date): Date {
 }
 
 export function getDateStartToEndOfDay(date: string): DateStartEnd {
-  const newDate = new Date(date);
+  const newDate = new Date(date);  
   const year = newDate.getFullYear();
-  if(year < 2000 || year > 2100) throw new HttpException('Selecione uma data válida', HttpStatus.BAD_REQUEST);
+  if (year < 2000 || year > 2100 || Number.isNaN(year))
+    throw new HttpException(
+      'Selecione uma data válida',
+      HttpStatus.BAD_REQUEST,
+    );
   const start = new Date(
     newDate.getFullYear(),
     newDate.getMonth(),
@@ -41,8 +45,7 @@ export function getDateStartToEndOfDay(date: string): DateStartEnd {
   //  add 4 hours to get the correct date
   start.setHours(start.getHours() + 20);
   end.setHours(end.getHours() + 20);
-  
-  console.log(start,end);
+
   return { start, end };
 }
 
@@ -64,6 +67,10 @@ export function getPeriod(period: ETypePeriodHistory): PeriodInDate {
     59,
     999,
   );
+  if (period === ETypePeriodHistory.DAILY) {
+    const dateInitial = moment().subtract(1, 'days').toDate();
+    return { dateInitial, dateFinal: today };
+  }
   if (period === ETypePeriodHistory.WEEKLY) {
     const dateInitial = moment().subtract(7, 'days').toDate();
     return { dateInitial, dateFinal: today };
@@ -82,6 +89,7 @@ export function getDuration(duration: string) {
   if (duration === '01:00') return 1.16 * 60 * 60;
   if (duration === '01:30') return 1.66 * 60 * 60;
   if (duration === '02:00') return 2.16 * 60 * 60;
+  
 }
 
 export function verifyDateFilter(date?: string) {
@@ -91,4 +99,16 @@ export function verifyDateFilter(date?: string) {
     if (dateData.toString() === 'Invalid Date')
       throw new HttpException('Data inválida', HttpStatus.BAD_REQUEST);
   }
+}
+
+export function convertDate( date?: Date | string){
+  let convertedDate
+  if(typeof date === 'string')
+    convertedDate = date;
+  if(date instanceof Date)
+    convertedDate = date.toISOString().split('T')[0];
+  const dateParts = convertedDate.split('-');
+  
+  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+
 }

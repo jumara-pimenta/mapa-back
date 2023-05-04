@@ -9,4 +9,5 @@ export default interface IPinRepository {
   findById(id: string): Promise<Pin>;
   update(data: Pin): Promise<Pin>;
   findByLocal(local: string): Promise<Pin>;
+  findByLocalExcel(local: string): Promise<Pin>;
 }

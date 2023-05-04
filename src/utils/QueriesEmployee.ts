@@ -1,10 +1,11 @@
 import { FiltersEmployeeDTO } from '../dtos/employee/filtersEmployee.dto';
 import { getDateStartToEndOfDay } from './Date';
+import { ETypePath, ETypeRoute } from './ETypes';
 
 export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
   const fields = {
     registration: () => ({
-      registration: {contains : filters.registration},
+      registration: { contains: filters.registration },
     }),
     admission: () => {
       const { start, end } = getDateStartToEndOfDay(filters.admission);
@@ -19,7 +20,7 @@ export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
       role: { contains: filters.role },
     }),
     shift: () => ({
-      shift: {contains :filters.shift},
+      shift: { contains: filters.shift },
     }),
     costCenter: () => ({
       costCenter: filters.costCenter,
@@ -27,6 +28,26 @@ export function generateQueryForEmployee(filters: FiltersEmployeeDTO) {
     name: () => ({
       name: { contains: filters.name },
     }),
+    extra: () => {
+      if (filters.extra) {
+        return {
+          employeeOnPath: {
+            none: {
+              path: {
+                type: ETypePath.RETURN,
+                deletedAt: null,
+                AND: {
+                  route: {
+                    type: ETypeRoute.EXTRA,
+                    deletedAt: null,
+                  },
+                },
+              },
+            },
+          },
+        };
+      }
+    },
   };
 
   const keysFields = Object.keys(fields);

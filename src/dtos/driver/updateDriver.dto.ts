@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsDateString, IsEnum } from 'class-validator';
+import { ETypeCategoryDrivers } from 'src/utils/ETypes';
 
 export class UpdateDriverDTO {
   @ApiProperty({
@@ -39,11 +40,13 @@ export class UpdateDriverDTO {
   validation?: Date;
 
   @ApiProperty({
-    default: 'AB',
-    example: 'AB',
+    default: 'D',
+    example: 'D',
     description: 'Categoria da CNH do motorista',
   })
-  @IsString({ message: '[Category] não está definida como texto.' })
+  @IsEnum(ETypeCategoryDrivers, {
+    message: '[Category] Categoria tem que ser do tipo C, D ou E.',
+  })
   @IsOptional()
-  category?: string;
+  category?: ETypeCategoryDrivers;
 }

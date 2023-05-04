@@ -30,6 +30,7 @@ import {
 import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
+  getDateInLocaleTime,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -45,11 +46,29 @@ import { Path } from 'src/entities/path.entity';
 import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
-import { distanceBetweenPoints, RouteMobile } from 'src/utils/Utils';
+import {
+  convertToHours,
+  distanceBetweenPoints,
+  EmployeeList,
+  employeesPerRoute,
+  RouteMobile,
+} from 'src/utils/Utils';
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
 import e from 'express';
 import { getDuration } from 'src/utils/Date';
+import { RouteHistoryService } from './routeHistory.service';
+import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { faker, GitModule } from '@faker-js/faker';
+import { separateByDistrict, separateByZone } from 'src/utils/District';
+import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
+import { MappedEmployeeDTO } from 'src/dtos/employee/mappedEmployee.dto';
+import { CreateSugestedRouteDTO } from 'src/dtos/route/createSugestedRoute.dto';
+import {
+  CreateSuggestionExtra,
+  SuggestionExtra,
+} from 'src/dtos/route/createSuggestionExtra.dto';
+import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
 
 @Injectable()
 export class RouteService {
@@ -59,6 +78,7 @@ export class RouteService {
     private readonly driverService: DriverService,
     private readonly vehicleService: VehicleService,
     private readonly employeeService: EmployeeService,
+    private readonly routeHistoryService: RouteHistoryService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
     @Inject('IMapBoxServiceIntegration')
@@ -68,49 +88,109 @@ export class RouteService {
   ) {}
 
   async onModuleInit() {
-    const page = new Page();
-    const routes = await this.routeRepository.findAll(page);
+    if (process.env.NODE_ENV !== 'production') {
+      const page = new Page();
+      const routes = await this.routeRepository.findAll(page);
 
-    if (routes.total === 0) {
-      const driver = await this.driverService.listAll(page);
-      const vehicle = await this.vehicleService.listAll(page);
-      const employee = await this.employeeService.listAll(page);
+      if (routes.total === 0) {
+        const driver = await this.driverService.listAll(page);
+        const vehicle = await this.vehicleService.listAll(page);
+        const employee = await this.employeeService.listAll(page);
 
-      await this.create({
-        description: 'Rota de teste',
-        driverId: driver.items[0].id,
-        vehicleId: vehicle.items[0].id,
-        employeeIds: employee.items.map((e) => e.id),
-        type: ETypeRoute.CONVENTIONAL,
-        shift: ETypeShiftRotue.FIRST,
-        pathDetails: {
-          startsAt: '08:00',
-          duration: '00:30',
-          startsReturnAt: '18:00',
-          type: ETypePath.ROUND_TRIP,
-          isAutoRoute: true,
-        },
-      });
+        await this.create({
+          description: 'Rota de teste',
+          driverId: driver.items[0].id,
+          vehicleId: vehicle.items[0].id,
+          employeeIds: employee.items.map((e) => e.id),
+          type: ETypeRoute.CONVENTIONAL,
+          shift: ETypeShiftRotue.FIRST,
+          pathDetails: {
+            startsAt: '08:00',
+            duration: '00:30',
+            startsReturnAt: '18:00',
+            type: ETypePath.ROUND_TRIP,
+            isAutoRoute: true,
+          },
+        });
 
-      await this.create({
-        description: 'Rota de teste EXTRA',
-        driverId: driver.items[1].id,
-        vehicleId: vehicle.items[1].id,
-        employeeIds: employee.items.map((e) => e.id),
-        type: ETypeRoute.EXTRA,
-        shift: ETypeShiftRotue.SECOND,
-        pathDetails: {
-          startsAt: '06:00',
-          duration: '00:30',
-          startsReturnAt: '18:00',
-          type: ETypePath.ROUND_TRIP,
-          isAutoRoute: true,
-        },
-      });
+        const route1 = await this.create({
+          description: 'Rota de teste EXTRA',
+          driverId: driver.items[1].id,
+          vehicleId: vehicle.items[1].id,
+          employeeIds: employee.items.map((e) => e.id),
+          type: ETypeRoute.EXTRA,
+          shift: ETypeShiftRotue.SECOND,
+          pathDetails: {
+            startsAt: '07:30',
+            duration: '00:30',
+            startsReturnAt: '17:30',
+            type: ETypePath.ROUND_TRIP,
+            isAutoRoute: true,
+          },
+        });
+
+        const allPaths = await this.pathService.listAll();
+        const path = await this.pathService.listById(allPaths[0].id);
+        const pathObj = await this.pathService.getPathById(allPaths[0].id);
+
+        const path1 = await this.pathService.listById(allPaths[1].id);
+        const pathObj1 = await this.pathService.getPathById(allPaths[1].id);
+        const vehicleHistoric = await this.vehicleService.listById(
+          path.vehicle,
+        );
+        const driverHistoric = await this.driverService.listById(path.driver);
+        const today = new Date();
+        //remove 1 day
+
+        //create a for to create a route for 4 days
+        for (let i = 0; i < 20; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          const props = new RouteHistory(
+            {
+              typeRoute: path.type,
+              nameRoute: faker.name.jobTitle(),
+              employeeIds: path.employeesOnPath.map((e) => e.id).join(','),
+              itinerary: '-3.4441,-60.025',
+              totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+              totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+              startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+              finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
+            },
+            pathObj,
+            driverHistoric,
+            vehicleHistoric,
+            [],
+            date,
+          );
+
+          const props2 = new RouteHistory(
+            {
+              typeRoute: path1.type,
+              nameRoute: faker.name.jobTitle(),
+              employeeIds: path1.employeesOnPath.map((e) => e.id).join(','),
+              itinerary: '-3.4441,-60.025',
+              totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
+              totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
+              startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+              finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+            },
+            pathObj1,
+            driverHistoric,
+            vehicleHistoric,
+            [],
+            date,
+          );
+          await this.routeHistoryService.create(props);
+          await this.routeHistoryService.create(props2);
+        }
+      }
     }
   }
 
-  async create(payload: CreateRouteDTO): Promise<Route> {
+  async create(payload: CreateRouteDTO): Promise<any> {
+    // await this.employeeService.findJokerPin(payload.employeeIds);
+
     if (payload.employeeIds.length <= 1) {
       throw new HttpException(
         'É necessário selecionar pelo menos 2 colaboradores',
@@ -142,26 +222,39 @@ export class RouteService {
           HttpStatus.BAD_REQUEST,
         );
     }
+    await this.employeeService.ListAllEmployeesDeleted(payload.employeeIds);
 
-    const startAndReturnAt = (payload.shift && payload.type === ETypeRoute.CONVENTIONAL)
-      ? getStartAtAndFinishAt(payload.shift)
-      : null;
+    const startAndReturnAt =
+      payload.shift && payload.type === ETypeRoute.CONVENTIONAL
+        ? getStartAtAndFinishAt(payload.shift)
+        : null;
 
-    const initRouteDate = startAndReturnAt ? startAndReturnAt.startAt : payload.pathDetails.startsAt
-    const endRouteDate = startAndReturnAt ? startAndReturnAt.finishAt 
-    : payload.pathDetails.startsReturnAt ? payload.pathDetails.startsReturnAt : ''
-    const driver = await this.driverService.listById(payload.driverId);
-    const vehicle = await this.vehicleService.listById(payload.vehicleId);
+    const initRouteDate = startAndReturnAt
+      ? startAndReturnAt.startAt
+      : payload.pathDetails.startsAt;
+    const endRouteDate = startAndReturnAt
+      ? startAndReturnAt.finishAt
+      : payload.pathDetails.startsReturnAt
+      ? payload.pathDetails.startsReturnAt
+      : '';
+    const driver = await this.driverService.listById(
+      payload.driverId ?? process.env.DENSO_ID,
+    );
+    const vehicle = await this.vehicleService.listById(
+      payload.vehicleId ?? process.env.DENSO_ID,
+    );
 
     const employeesPins = await this.employeeService.listAllEmployeesPins(
       payload.employeeIds,
     );
 
     await this.employeesInPins(employeesPins, payload.type);
+    const emplopyeeOrdened = await this.getWaypoints(
+      employeesPins,
+      payload.pathDetails.type,
+      payload.pathDetails.duration,
+    );
 
-    const emplopyeeOrdened = await this.getWaypoints(employeesPins, payload.pathDetails.type, payload.pathDetails.duration);
-     // const emplopyeeOrdened = employeesPins.map((e) => e.id);
-   
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(
@@ -172,9 +265,11 @@ export class RouteService {
       vehicle.id,
     );
 
-    await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
+    if (driver.id !== process.env.DENSO_ID)
+      await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
 
-    await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
+    if (vehicle.id !== process.env.DENSO_ID)
+      await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
 
     await this.employeesInRoute(
       employeeInRoute,
@@ -215,13 +310,72 @@ export class RouteService {
       distanceLngLat.push([lng, lat]);
     });
 
-    
-
     const newRoute = await this.update(route.id, {
       distance: emplopyeeOrdened.distance,
     });
 
     return newRoute;
+  }
+
+  async createSugestionRoute(
+    payload: CreateSugestedRouteDTO,
+  ): Promise<SuggenstionResultDTO[]> {
+    const routes = payload.suggestedExtras.map((route) => {
+      return {
+        description: route.description,
+        driverId: route.driver,
+        employeeIds: route.employeesIds,
+        vehicleId: route.vehicle,
+        type: ETypeRoute.EXTRA,
+        distance: route.distance,
+        pathDetails: {
+          duration: route.duration,
+          type: ETypePath.RETURN,
+          startsAt: route.time,
+          isAutoRoute: false,
+        },
+      } as CreateRouteDTO;
+    });
+
+    // Promise
+    const PromiseRoutes = await Promise.allSettled(
+      routes.map((route) => this.create(route)),
+    );
+
+    const response: SuggenstionResultDTO[] = PromiseRoutes.map((e, index) => {
+      if (e.status === 'rejected') {
+        return {
+          description: routes[index].description,
+          status: 400,
+          erro: e.reason.response.message ?? e.reason.response,
+        };
+      }
+      if (e.status === 'fulfilled') {
+        return {
+          description: routes[index].description,
+          status: 201,
+        };
+      }
+    });
+
+    return response;
+  }
+
+  async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
+    //const employees = await this.employeeService.listAll({skip: 0, take: 1000})
+
+    await this.employeeService.findJokerPin(payload.employeeIds);
+    await this.employeeService.checkExtraEmployee(payload.employeeIds);
+    const colabs: MappedEmployeeDTO[] = [];
+    for await (const employeeId of payload.employeeIds) {
+      const employe = await this.employeeService.listById(employeeId);
+      colabs.push(employe);
+    }
+    /* const response2 = employees.items.map((e) => e.id)
+    return response2 */
+
+    const extra = this.suggestRouteExtra(colabs, []);
+    return extra;
   }
 
   async delete(id: string): Promise<Route> {
@@ -309,6 +463,16 @@ export class RouteService {
   async update(id: string, data: UpdateRouteDTO): Promise<Route> {
     const route = await this.listById(id);
     const routeEntity = await this.getById(id);
+
+    if (data.employeeIds?.length <= 1) {
+      throw new HttpException(
+        'É necessário selecionar pelo menos 2 colaboradores',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (data.employeeIds)
+      this.employeeService.ListAllEmployeesDeleted(data.employeeIds);
+
     let distance = '';
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
@@ -319,12 +483,11 @@ export class RouteService {
       );
       const type = data.type ?? route.type;
 
-      
       await this.employeesInPins(employeesPins, type);
       const types = route.paths.map((path) => {
         return path.type;
       });
-      
+
       let pathType;
       if (types.length === 2) {
         pathType = ETypePath.ROUND_TRIP;
@@ -334,12 +497,16 @@ export class RouteService {
       }
 
       const duration = data.duration ?? route.paths[0].duration;
-      const emplopyeeOrdened = await this.getWaypoints(employeesPins,pathType,duration);
-     
-      distance = emplopyeeOrdened.distance
+      const emplopyeeOrdened = await this.getWaypoints(
+        employeesPins,
+        pathType,
+        duration,
+      );
+
+      distance = emplopyeeOrdened.distance;
 
       for await (const employee of data.employeeIds) {
-         await this.employeeService.listById(employee);
+        await this.employeeService.listById(employee);
       }
       await this.employeesInRouteUpdate(
         employeeInRoute,
@@ -350,7 +517,7 @@ export class RouteService {
       );
 
       for await (const path of route.paths) {
-        await this.pathService.delete(path.id);
+        await this.pathService.softDelete(path.id);
       }
 
       await this.pathService.generate({
@@ -377,7 +544,7 @@ export class RouteService {
     }
     if (
       !data.employeeIds &&
-      (data.startsAt || data.startsReturnAt || data.duration || data.shift )
+      (data.startsAt || data.startsReturnAt || data.duration || data.shift)
     ) {
       if (route.paths.length === 2) {
         for await (const path of route.paths) {
@@ -416,8 +583,8 @@ export class RouteService {
     if (data.vehicleId) {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
-    
-    routeEntity.distance = distance === '' ? routeEntity.distance : distance
+
+    routeEntity.distance = distance === '' ? routeEntity.distance : distance;
     const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
@@ -433,6 +600,15 @@ export class RouteService {
   async routeReplacementDriver(data: RouteReplacementDriverDTO): Promise<void> {
     const route1 = await this.listById(data.routeId1);
     const route2 = await this.listById(data.routeId2);
+
+    if (
+      route1.status === EStatusRoute.IN_PROGRESS ||
+      route2.status === EStatusRoute.IN_PROGRESS
+    )
+      throw new HttpException(
+        'Não é possível trocar o motorista de uma rota em andamento!',
+        HttpStatus.CONFLICT,
+      );
 
     await this.update(route1.id, { driverId: route2.driver.id });
 
@@ -473,6 +649,18 @@ export class RouteService {
 
     const path = await this.pathService.listByIdMobile(payload.pathId);
 
+    // check if this date: finishedAt is equal to today
+
+    const today = new Date();
+    const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+    if (
+      today.getDay() === date.getDay() &&
+      today.getMonth() === date.getMonth() &&
+      today.getFullYear() === date.getFullYear()
+    ) {
+      path.status = EStatusPath.FINISHED;
+    }
     return {
       vehicle: dataFilterWebsocket.vehicle,
       driver: dataFilterWebsocket.driver,
@@ -706,7 +894,7 @@ export class RouteService {
     });
   }
 
-   async employeesInRoute(
+  async employeesInRoute(
     employeeRoute: Route[],
     type: string,
     ids: string[],
@@ -795,72 +983,7 @@ export class RouteService {
       );
     }
   }
- /* 
-  async  employeesInRoute(
-    employeeRoute: Route[],
-    type: string,
-    ids: string[],
-    pathType?: string,
-  ): Promise<void> {
-    const employeesOnRoute: string[] = [];
-    const employeesOnOneWay: string[] = [];
-    const employeesOnReturn: string[] = [];
-  
-    employeeRoute.forEach((route: Route) => {
-      if (route.type !== ETypeRoute.EXTRA) {
-        route.path.forEach((path) => {
-          path.employeesOnPath.forEach((item) => {
-            if (type === route.type) {
-              employeesOnRoute.push(item.employee.name);
-            }
-          });
-        });
-      }
-      if (route.type === ETypeRoute.EXTRA) {
-        route.path.forEach((path) => {
-          if (type === ETypeRoute.EXTRA) {
-            if (path.type === ETypePath.ONE_WAY && pathType !== ETypePath.RETURN) {
-              const employees = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              }).map((item) => item.employee.name);
-              employeesOnOneWay.push(...employees);
-            }
-            if (path.type === ETypePath.RETURN && pathType !== ETypePath.ONE_WAY) {
-              const employees = path.employeesOnPath.filter((item) => {
-                return ids.includes(item.employee.id);
-              }).map((item) => item.employee.name);
-              employeesOnReturn.push(...employees);
-            }
-          }
-        });
-      }
-    });
-  
-    if (employeesOnRoute.length > 0) {
-      throw new HttpException(
-        `The following employee(s) ${employeesOnRoute.join(', ')} is/are already in a route of type ${type.toLowerCase()}!`,
-        HttpStatus.CONFLICT,
-      );
-    }
-  
-    if (employeesOnOneWay.length > 0 || employeesOnReturn.length > 0) {
-      const message = [];
-      if (employeesOnOneWay.length > 0) {
-        message.push(`The following employee(s) ${employeesOnOneWay.join(', ')} is/are already in an extra route of type ${ETypePath.ONE_WAY.toLowerCase()}!`);
-      }
-      if (employeesOnReturn.length > 0) {
-        message.push(`The following employee(s) ${employeesOnReturn.join(', ')} is/are already in an extra route of type ${ETypePath.RETURN.toLowerCase()}!`);
-      }
-      throw new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          message,
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-  }
-  */ 
+
   async employeesInPins(route: Employee[], type: string): Promise<void> {
     const employeeArrayPins = [];
     route.forEach((employee: Employee) => {
@@ -1248,71 +1371,228 @@ export class RouteService {
     return routes;
   }
 
-  async getWaypoints(employees: Employee[], type : ETypePath, duration : string): Promise<DetailsRoute> {
+  async getWaypoints(
+    employees: Employee[],
+    type: ETypePath,
+    duration: string,
+  ): Promise<DetailsRoute> {
+    if (employees.length > 26)
+      throw new HttpException(
+        'A roterização automática não pode ter mais de 26 colaboradores',
+        HttpStatus.BAD_REQUEST,
+      );
 
- 
-    const denso = {lat : '-3.110944',
-                   lng : '-59.962604'}
-
+    const denso = { lat: '-3.110944', lng: '-59.962604' };
     let farthestEmployee: Employee = null;
     let maxDistance = 0;
     for (const employee of employees) {
-    const employeeLocation = { lat: employee.pins[0].pin.lat, lng: employee.pins[0].pin.lng };
-    const distance = distanceBetweenPoints(denso, employeeLocation);
-    if (distance > maxDistance) {
-      maxDistance = distance;
-      farthestEmployee = employee;
+      const employeeLocation = {
+        lat: employee.pins[0].pin.lat,
+        lng: employee.pins[0].pin.lng,
+      };
+      const distance = distanceBetweenPoints(denso, employeeLocation);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        farthestEmployee = employee;
+      }
     }
-  }
     const index = employees.indexOf(farthestEmployee);
     if (index > -1) {
       employees.splice(index, 1);
     }
-    const waypoints =  employees.map((employee) => {
-          return  `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`
-     })
-    
-  
-    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`
-    const densoLatLng = `${denso.lat},${denso.lng}`
+    const waypoints = employees.map((employee) => {
+      return `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`;
+    });
+
+    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`;
+    const densoLatLng = `${denso.lat},${denso.lng}`;
     const payload = {
       origin: type === ETypePath.RETURN ? densoLatLng : farthestEmployeeLatLng,
-      destination: type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
+      destination:
+        type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
       waypoints: waypoints.join('|'),
-      travelMode : 'DRIVING'
-    }
-    const response = await this.googleApiServiceIntegration.getWaypoints(payload);
+      travelMode: 'DRIVING',
+    };
+    const response = await this.googleApiServiceIntegration.getWaypoints(
+      payload,
+    );
     const legs = response.routes[0].legs;
-    let totalDistance = 0
+    let totalDistance = 0;
     let totalDuration = 0;
     for (const leg of legs) {
       totalDuration += leg.duration.value;
       totalDistance += leg.distance.value;
     }
 
-    const maxDuration = getDuration(duration)
+    const maxDuration = getDuration(duration);
     if (totalDuration > maxDuration) {
-      throw new HttpException(`Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    const waypointsOrder : number[]= response.routes[0]?.waypoint_order;
-    const order  = waypointsOrder.map((item) => {
-      return employees[item]
-    })
+    const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+    const order = waypointsOrder.map((item) => {
+      return employees[item];
+    });
 
-    const distance = totalDistance / 1000 +'km'
-    
-    type === ETypePath.RETURN ? order.push(farthestEmployee) : order.unshift(farthestEmployee)
+    const distance = totalDistance / 1000 + 'km';
+
+    type === ETypePath.RETURN
+      ? order.push(farthestEmployee)
+      : order.unshift(farthestEmployee);
     const employeesIds = order.map((employee) => {
       return employee.id;
-    })
+    });
 
-    return {employeesIds,distance}
+    return { employeesIds, distance };
+  }
+
+  async getWaypointsExtra(
+    employees: any[],
+    duration: string,
+  ): Promise<SuggestionExtra> {
+    const denso = { lat: '-3.110944', lng: '-59.962604' };
+    let farthestEmployee: any = null;
+    let maxDistance = 0;
+    for (const employee of employees) {
+      const employeeLocation = {
+        lat: employee.pins[0].lat,
+        lng: employee.pins[0].lng,
+      };
+      const distance = distanceBetweenPoints(denso, employeeLocation);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        farthestEmployee = employee;
+      }
+    }
+    const index = employees.indexOf(farthestEmployee);
+    if (index > -1) {
+      employees.splice(index, 1);
+    }
+    const waypoints = employees.map((employee) => {
+      return `${employee.pins[0].lat},${employee.pins[0].lng}`;
+    });
+
+    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].lat},${farthestEmployee.pins[0].lng}`;
+    const densoLatLng = `${denso.lat},${denso.lng}`;
+    const payload = {
+      origin: densoLatLng,
+      destination: farthestEmployeeLatLng,
+      waypoints: waypoints.join('|'),
+      travelMode: 'DRIVING',
+    };
+    const response = await this.googleApiServiceIntegration.getWaypoints(
+      payload,
+    );
+    const legs = response.routes[0].legs;
+    let totalDistance = 0;
+    let totalDuration = 0;
+    for (const leg of legs) {
+      totalDuration += leg.duration.value;
+      totalDistance += leg.distance.value;
+    }
+
+    const maxDuration = getDuration(duration);
+    if (totalDuration > maxDuration) {
+      throw new HttpException(
+        `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+    const order = waypointsOrder.map((item) => {
+      return employees[item];
+    });
+
+    const distance = totalDistance / 1000 + 'km';
+    order.push(farthestEmployee);
+
+    const totalDurationTime = totalDuration;
+    const ordem = order.map((employee, index) => {
+      return {
+        id: employee.id,
+        name: employee.name,
+        registration: employee.registration,
+        sequency: index + 1,
+        distance: employee.distance,
+        pins: [
+          {
+            id: employee.pins[0].id,
+            title: employee.pins[0].title,
+            local: employee.pins[0].local,
+            details: employee.pins[0].details,
+            lat: employee.pins[0].lat,
+            lng: employee.pins[0].lng,
+          },
+        ],
+      };
+    });
+    return { employee: ordem, distance, totalDurationTime };
+  }
+
+  async suggestRouteExtra(
+    colabs: any,
+    rotas: any[],
+    rotasExtraTime?: any[],
+    quantityColabs?: number,
+  ) {
+    const ordemEmployee = calculateDistance(
+      colabs,
+      { lat: '-3.110944', lng: '-59.962604' },
+      [],
+    );
+    //dividir por mais perto
+    console.log('separateWays->>>', rotas.length, quantityColabs);
+    const routes = separateWays(ordemEmployee, [], quantityColabs);
+
+    const extra: SuggestionExtra[] = [...rotas];
+    console.log('rotas sugeridas -> ', extra.length);
+    const extraTime: SuggestionExtra[] = rotasExtraTime
+      ? [...rotasExtraTime]
+      : [];
+    for await (const route of routes) {
+      //roteirizar
+      console.log('verificando o tempo da rota');
+      const path: SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
+      if (path.totalDurationTime > getDuration('01:30')) extraTime.push(path);
+      if (path.totalDurationTime < getDuration('01:30')) extra.push(path);
+    }
+    console.log('rotas sugeridas -> ', extra.length);
+    console.log('rotas extrapoladas -> ', extraTime.length);
+
+    if (extraTime.length > 0) {
+      const colabs = extraTime.map((item) => {
+        return item.employee;
+      });
+      console.log(
+        'quantidade de colabs -> \n ',
+        colabs[0].length,
+        colabs.length,
+      );
+      console.log('dividir mais uma vez');
+      extraTime.shift();
+      return await this.suggestRouteExtra(
+        colabs[0],
+        extra,
+        extraTime,
+        Math.round(colabs[0].length / 2),
+      );
+    }
+    console.log('total as extras -> ', extra);
+    const response = extra.map((item) => {
+      return {
+        employees: item.employee,
+        distance: item.distance,
+        duration: convertToHours(item.totalDurationTime),
+      };
+    });
+
+    return response;
+  }
 }
-
-}
-
-
 
 const orderPins = (arr: Employee[]): string[] => {
   const latDenso = -3.110944;
@@ -1373,3 +1653,64 @@ const orderPins = (arr: Employee[]): string[] => {
 
   return employeeIdOrdened;
 };
+
+function calculateDistance(employee: any[], location: any, list: any): any {
+  const employees = employee;
+  const startPoint = { lat: location.lat, lng: location.lng };
+  let farthestEmployee: any = null;
+  let minDistance = 10000;
+  for (const employee of employees) {
+    const employeeLocation = {
+      lat: employee.pins[0].lat,
+      lng: employee.pins[0].lng,
+    };
+    const distance = distanceBetweenPoints(startPoint, employeeLocation);
+    if (distance <= minDistance) {
+      minDistance = distance;
+      farthestEmployee = employee;
+    }
+  }
+  //remove farthestEmployee from array of employee
+  const index = employees.indexOf(farthestEmployee);
+  const listaLegal = list;
+  if (index > -1) {
+    employees.splice(index, 1);
+    listaLegal.push({ ...farthestEmployee, minDistance });
+  }
+
+  if (employees.length > 0)
+    calculateDistance(employees, farthestEmployee.pins[0], listaLegal);
+
+  return listaLegal;
+}
+
+function separateWays(
+  list: EmployeeList[],
+  new_list: any[],
+  quantityColabs?: number,
+): any {
+  const manipulateList = [...list];
+  const route = [...new_list];
+
+  if (list.length === 0) {
+    return new_list;
+  }
+  const colabsPerRoute = employeesPerRoute(list.length, quantityColabs);
+  if (list.length <= colabsPerRoute && list.length > 0) {
+    const listRoute = manipulateList.slice(0, list.length);
+    route.push([...listRoute]);
+    return separateWays([], route);
+  }
+
+  if (list.length > colabsPerRoute) {
+    const listRoute = manipulateList.slice(0, colabsPerRoute);
+    const listRest = manipulateList.slice(colabsPerRoute, list.length);
+    const ordemListRest = calculateDistance(
+      listRest,
+      { lat: '-3.110944', lng: '-59.962604' },
+      [],
+    );
+    route.push([...listRoute]);
+    return separateWays(ordemListRest, route);
+  }
+}

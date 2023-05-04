@@ -5,6 +5,7 @@ import { Path } from '../../entities/path.entity';
 import IPathRepository from './path.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { EStatusPath } from '../../utils/ETypes';
+import { generateQueryByFiltersForPaths } from 'src/configs/database/Queries';
 
 @Injectable()
 export class PathRepository extends Pageable<Path> implements IPathRepository {
@@ -19,6 +20,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     return this.repository.path.findFirst({
       where: {
         status,
+        deletedAt: null,
         route: {
           driver: {
             id: driverId,
@@ -77,6 +79,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   ): Promise<Path> {
     return this.repository.path.findFirst({
       where: {
+        deletedAt: null,
         status,
         employeesOnPath: {
           some: {
@@ -155,7 +158,18 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
 
   findById(id: string): Promise<Path | null> {
     return this.repository.path.findFirst({
-      where: { id: id },
+      where: {
+        id: id,
+        deletedAt: null,
+        route: {
+          deletedAt: null,
+          path: {
+            some: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
       select: {
         id: true,
         type: true,
@@ -175,6 +189,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
         employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
           select: {
             employeeId: true,
             id: true,
@@ -215,6 +234,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     return this.repository.path.findMany({
       where: {
         // find by driver id in route or substitute in path
+        deletedAt: null,
         OR: [
           {
             route: {
@@ -276,12 +296,15 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
       },
+      orderBy: {
+        status: 'asc',
+      },
     });
   }
   findByEmployee(employeeId: string): Promise<Path[]> {
     return this.repository.path.findMany({
       where: {
-        finishedAt: null,
+        deletedAt: null,
         employeesOnPath: {
           some: {
             employeeId: employeeId,
@@ -336,6 +359,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           },
         },
       },
+      orderBy: {
+        status: 'asc',
+      },
     });
   }
 
@@ -345,6 +371,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         route: {
           id: routeId,
         },
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -411,6 +438,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   async findByEmployeeOnPath(employeeOnPathId: string): Promise<Partial<Path>> {
     return await this.repository.path.findFirst({
       where: {
+        deletedAt: null,
         employeesOnPath: {
           some: {
             id: employeeOnPathId,
@@ -427,7 +455,18 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   }
 
   async findAll(filter?: any): Promise<Path[]> {
+    const condition = generateQueryByFiltersForPaths(filter);
     return await this.repository.path.findMany({
+      where: {
+        deletedAt: null,
+        ...filter,
+        ...condition,
+        AND: {
+          route: {
+            deletedAt: null,
+          },
+        },
+      },
       select: {
         id: true,
         type: true,
@@ -480,6 +519,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         },
 
         employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
           select: {
             id: true,
             boardingAt: true,
@@ -507,6 +551,20 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             },
           },
         },
+      },
+      orderBy: {
+        status: 'asc',
+      },
+    });
+  }
+
+  async softDelete(id: string): Promise<Path> {
+    return await this.repository.path.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
