@@ -344,6 +344,7 @@ export class RouteHistoryService {
         response.totalPaths += 1;
         route.startedAt = paths.startedAt;
         route.finishedAt = paths.finishedAt;
+        route.type = paths.path.type;
         response.routes.push(route);
       }
     });

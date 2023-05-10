@@ -27,6 +27,7 @@ export class RouteSeparated {
   totalSinister: number;
   startedAt: Date;
   finishedAt: Date;
+  type: string;
 }
 export class RouteHistoryByDate {
   date: string;
