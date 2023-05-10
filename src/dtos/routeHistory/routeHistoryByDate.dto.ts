@@ -1,17 +1,20 @@
+import { Path } from 'src/entities/path.entity';
+import { Sinister } from 'src/entities/sinister.entity';
+
 export class RouteByDateAndShift {
-  date : string
-  shift : string
-  totalPaths : number
-  routes : RouteSeparated[]
+  date: string;
+  shift: string;
+  totalPaths: number;
+  routes: RouteSeparated[];
 }
 
 export class Shifts {
-  shift : string
-  totalPaths : number
+  shift: string;
+  totalPaths: number;
 }
 export class ShiftsByDate {
-  date : string
-  shifts : Shifts[]
+  date: string;
+  shifts: Shifts[];
 }
 export class RouteSeparated {
   date: string;
@@ -22,8 +25,23 @@ export class RouteSeparated {
   totalEmployess: number;
   totalEmployessPresent: number;
   totalSinister: number;
+  startedAt: Date;
+  finishedAt: Date;
 }
 export class RouteHistoryByDate {
   date: string;
   totalPaths: number;
+}
+
+export class RouteHistoryByDateAndShift {
+  typeRoute: string;
+  nameRoute: string;
+  path: Path;
+  employeeIds: string;
+  totalEmployees: number;
+  totalConfirmed: number;
+  sinister: Sinister[];
+  startedAt: Date;
+  finishedAt: Date;
+  createdAt: Date;
 }

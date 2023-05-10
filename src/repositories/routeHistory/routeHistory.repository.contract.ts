@@ -2,10 +2,15 @@ import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistor
 import { Page, PageResponse } from 'src/configs/database/page.model';
 import { RouteHistory } from '../../entities/routeHistory.entity';
 import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
+import { Path, Sinister } from '@prisma/client';
+import { RouteHistoryByDateAndShift } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 
 export default interface IRouteHistoryRepository {
   getHistoric(): Promise<any>;
-  getHistoricByDate(dateInit: Date, dateFinal: Date): Promise<RouteHistory[]>;
+  getHistoricByDate(
+    dateInit: Date,
+    dateFinal: Date,
+  ): Promise<RouteHistoryByDateAndShift[]>;
   create(data: RouteHistory): Promise<RouteHistory | null>;
   delete(id: string): Promise<RouteHistory | null>;
   findById(id: string): Promise<RouteHistory | null>;

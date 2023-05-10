@@ -8,6 +8,7 @@ import { RouteHistory } from '../../entities/routeHistory.entity';
 import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
 import { getDateInLocaleTime, getDateStartToEndOfDay } from 'src/utils/Date';
 import { generateQueryByFiltersForRouteHistory } from 'src/configs/database/Queries';
+import { RouteHistoryByDateAndShift } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 
 @Injectable()
 export class RouteHistoryRepository
@@ -175,7 +176,7 @@ export class RouteHistoryRepository
   async getHistoricByDate(
     dateInitial: Date,
     dateFinal: Date,
-  ): Promise<RouteHistory[]> {
+  ): Promise<RouteHistoryByDateAndShift[]> {
     const paths = await this.repository.routeHistory.findMany({
       where: {
         createdAt: {
@@ -185,13 +186,7 @@ export class RouteHistoryRepository
       },
       include: {
         sinister: true,
-        path: {
-          select: {
-            startsAt: true,
-            finishedAt: true,
-            type: true,
-          },
-        },
+        path: true,
       },
       orderBy: {
         createdAt: 'asc',
