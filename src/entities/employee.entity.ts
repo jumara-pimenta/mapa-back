@@ -9,10 +9,10 @@ export class Employee {
   name: string;
   registration: string;
   password?: string;
-  admission: Date;
-  role: string;
+  admission?: Date;
+  role?: string;
   shift: string;
-  costCenter: string;
+  costCenter?: string;
   address: string;
   pins?: Partial<EmployeesOnPin>[];
   pin?: Pin;
@@ -24,7 +24,7 @@ export class Employee {
   constructor(
     props: Omit<
       Employee,
-      'pin' | 'id' | 'createdAt' | 'pins'  | 'employeeOnPath'
+      'pin' | 'id' | 'createdAt' | 'pins' | 'employeeOnPath'
     >,
     pin?: Pin,
     id?: string,
@@ -35,4 +35,3 @@ export class Employee {
     this.pin = pin;
   }
 }
-

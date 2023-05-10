@@ -7,6 +7,7 @@ import {
   ValidateNested,
   IsNumberString,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
@@ -30,15 +31,13 @@ export class CreateEmployeeDTO {
     {},
     { message: '[admission] A data de admissão deve ser do tipo data.' },
   )
-  @IsNotEmpty({
-    message: '[admission] A data de admissão deve ser preenchida.',
-  })
-  admission: Date;
+  @IsOptional()
+  admission?: Date;
 
   @ApiProperty({ default: `${faker.name.jobTitle()}` })
   @IsString({ message: '[role] O cargo deve ser do tipo texto.' })
-  @IsNotEmpty({ message: '[role] O cargo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsOptional()
   role: string;
 
   @ApiProperty({ default: `${faker.name.fullName()}` })
@@ -52,7 +51,8 @@ export class CreateEmployeeDTO {
     enum: ['PRIMEIRO', 'SEGUNDO', 'TERCEIRO', 'SEM TURNO ESTABELECIDO'],
   })
   @IsEnum(ETypeShiftEmployee, {
-    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
+    message:
+      '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
   })
   shift: ETypeShiftEmployee;
 
@@ -60,11 +60,9 @@ export class CreateEmployeeDTO {
   @IsString({
     message: '[costCenter] O centro de custo deve ser do tipo texto.',
   })
-  @IsNotEmpty({
-    message: '[costCenter] O centro de custo deve ser preenchido.',
-  })
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  costCenter: string;
+  @IsOptional()
+  costCenter?: string;
 
   @ApiProperty()
   @IsNotEmpty({ message: '[address] O endereço deve ser preenchido.' })

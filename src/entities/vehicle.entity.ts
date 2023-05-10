@@ -7,11 +7,11 @@ export class Vehicle {
   plate: string;
   company: string;
   type: string;
-  lastSurvey: Date;
+  lastSurvey?: Date;
   expiration: Date;
   capacity: number;
   renavam: string;
-  lastMaintenance: Date;
+  lastMaintenance?: Date;
   note: string;
   isAccessibility: boolean;
   route?: Route;
