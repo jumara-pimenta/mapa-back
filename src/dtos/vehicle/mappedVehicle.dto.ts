@@ -10,7 +10,7 @@ export class MappedVehicleDTO {
   @ApiProperty()
   type: string;
   @ApiProperty()
-  lastSurvey: Date;
+  lastSurvey: Date | null;
   @ApiProperty()
   expiration: Date;
   @ApiProperty()
@@ -18,7 +18,7 @@ export class MappedVehicleDTO {
   @ApiProperty()
   renavam: string;
   @ApiProperty()
-  lastMaintenance: Date;
+  lastMaintenance: Date | null;
   @ApiProperty()
   note: string;
   @ApiProperty()

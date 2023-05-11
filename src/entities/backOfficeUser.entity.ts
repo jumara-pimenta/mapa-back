@@ -7,6 +7,7 @@ export class BackOfficeUser {
   password: string;
   name: string;
   role: string;
+  roleType: string;
   createdAt: Date;
   updatedAt?: Date;
 
