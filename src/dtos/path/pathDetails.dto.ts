@@ -71,4 +71,30 @@ export class PathDetailsDTO {
     message: '[isAutoRoute] A roteirização automática deve ser preenchida.',
   })
   isAutoRoute: boolean;
+
+  @ApiProperty({
+    default: '08:30',
+    example: '08:30',
+    description: 'Hora de início do trajeto Espeical',
+    required: false,
+  })
+  @Matches(durationPathRgx, {
+    message:
+      '[backTime] A hora de início do retorno do trajeto deve ser entre 00:00 e 23:59',
+  })
+  @IsOptional()
+  backTime?: string;
+
+  @ApiProperty({
+    default: '08:30',
+    example: '08:30',
+    description: 'Hora de início da volta do trajeto',
+    required: false,
+  })
+  @Matches(durationPathRgx, {
+    message:
+      '[departureTime] A hora de início da partida do trajeto deve ser entre 00:00 e 23:59',
+  })
+  @IsOptional()
+  departureTime?: string;
 }
