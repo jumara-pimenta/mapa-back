@@ -43,9 +43,11 @@ export class BackOfficeUserCreateDTO {
   role: string;
 
   @ApiProperty({ example: faker.name.jobTitle() })
-  @IsString({ message: '[roleType] o tipo da função deve ser do tipo texto' })
-  @IsNotEmpty({ message: '[roleType] o Tipo da Função é obrigatório' })
-  roleType: string;
+  @IsNotEmpty({ message: '[roleType] a Função do sistema é obrigatória' })
+  @IsEnum(ERolesBackOfficeTypes, {
+    message: '[roleType] o tipo da função deve ser do tipo texto',
+  })
+  roleType: ERolesBackOfficeTypes;
 }
 
 export class BackOfficeUserUpdateDTO {

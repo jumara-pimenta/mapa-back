@@ -162,7 +162,7 @@ model BackOfficeUser {
   email     String    @unique
   password  String
   role      String
-  roleType  String?
+  roleType  String    @default("ADMIN")
   createdAt DateTime  @default(now()) @db.DateTimeOffset
   updatedAt DateTime? @db.DateTimeOffset
 }

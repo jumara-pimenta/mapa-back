@@ -128,7 +128,6 @@ export class AuthService {
       role: user.roleType,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, createdAt, password, ...result } = user;
 
     return { ...result, token };
