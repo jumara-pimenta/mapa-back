@@ -24,8 +24,9 @@ export class PrismaService
         id: process.env.DENSO_ID,
         email: 'admin@rotas.com.br',
         password: await bcrypt.hash('Denso', 10),
-        name: 'Admin',
+        name: 'Adm',
         role: 'ADMIN',
+        roleType: 'ADMIN',
         createdAt: getDateInLocaleTime(new Date()),
       },
       update: {
@@ -33,6 +34,7 @@ export class PrismaService
         password: await bcrypt.hash('Denso', 10),
         name: 'Admin',
         role: 'ADMIN',
+        roleType: 'ADMIN',
         id: process.env.DENSO_ID,
       },
     });

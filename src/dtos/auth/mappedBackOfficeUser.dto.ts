@@ -9,5 +9,7 @@ export class MappedBackOfficeUserDTO {
   @ApiProperty()
   role: string;
   @ApiProperty()
+  roleType: string;
+  @ApiProperty()
   createdAt: Date;
 }

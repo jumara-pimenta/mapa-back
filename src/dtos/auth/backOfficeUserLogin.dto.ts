@@ -1,6 +1,13 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { faker } from '@faker-js/faker';
+import { ERolesBackOfficeTypes } from 'src/utils/ETypes';
 
 export class BackOfficeUserDTO {
   @ApiProperty({ example: faker.internet.email() })
@@ -34,6 +41,11 @@ export class BackOfficeUserCreateDTO {
   @IsString({ message: '[role] a função deve ser do tipo texto' })
   @IsNotEmpty({ message: '[role] a Função é obrigatória' })
   role: string;
+
+  @ApiProperty({ example: faker.name.jobTitle() })
+  @IsString({ message: '[roleType] o tipo da função deve ser do tipo texto' })
+  @IsNotEmpty({ message: '[roleType] o Tipo da Função é obrigatório' })
+  roleType: string;
 }
 
 export class BackOfficeUserUpdateDTO {
@@ -51,6 +63,13 @@ export class BackOfficeUserUpdateDTO {
   @IsOptional()
   @IsString({ message: '[role] a função deve ser do tipo texto' })
   role?: string;
+
+  @ApiProperty({ example: faker.name.jobTitle() })
+  @IsOptional()
+  @IsEnum(ERolesBackOfficeTypes, {
+    message: '[roleType] o tipo da função deve ser do tipo texto',
+  })
+  roleType?: ERolesBackOfficeTypes;
 
   @ApiProperty({ example: faker.internet.password() })
   @IsOptional()
