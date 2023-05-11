@@ -63,6 +63,7 @@ export enum ETypeShiftRotue {
   FIRST = 'PRIMEIRO',
   SECOND = 'SEGUNDO',
   THIRD = 'TERCEIRO',
+  SPECIAL = 'TURNO ESPECIAL',
 }
 
 export enum ETypeShiftEmployee {

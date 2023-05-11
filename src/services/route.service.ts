@@ -31,6 +31,7 @@ import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
   getDateInLocaleTime,
+  getSpecialHour,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -226,7 +227,12 @@ export class RouteService {
 
     const startAndReturnAt =
       payload.shift && payload.type === ETypeRoute.CONVENTIONAL
-        ? getStartAtAndFinishAt(payload.shift)
+        ? payload.shift !== ETypeShiftRotue.SPECIAL
+          ? getStartAtAndFinishAt(payload.shift)
+          : getSpecialHour(
+              payload.pathDetails.departureTime,
+              payload.pathDetails.backTime,
+            )
         : null;
 
     const initRouteDate = startAndReturnAt
@@ -1544,35 +1550,22 @@ export class RouteService {
       { lat: '-3.110944', lng: '-59.962604' },
       [],
     );
-    //dividir por mais perto
-    console.log('separateWays->>>', rotas.length, quantityColabs);
     const routes = separateWays(ordemEmployee, [], quantityColabs);
 
     const extra: SuggestionExtra[] = [...rotas];
-    console.log('rotas sugeridas -> ', extra.length);
     const extraTime: SuggestionExtra[] = rotasExtraTime
       ? [...rotasExtraTime]
       : [];
     for await (const route of routes) {
-      //roteirizar
-      console.log('verificando o tempo da rota');
       const path: SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
       if (path.totalDurationTime > getDuration('01:30')) extraTime.push(path);
       if (path.totalDurationTime < getDuration('01:30')) extra.push(path);
     }
-    console.log('rotas sugeridas -> ', extra.length);
-    console.log('rotas extrapoladas -> ', extraTime.length);
 
     if (extraTime.length > 0) {
       const colabs = extraTime.map((item) => {
         return item.employee;
       });
-      console.log(
-        'quantidade de colabs -> \n ',
-        colabs[0].length,
-        colabs.length,
-      );
-      console.log('dividir mais uma vez');
       extraTime.shift();
       return await this.suggestRouteExtra(
         colabs[0],
@@ -1581,7 +1574,6 @@ export class RouteService {
         Math.round(colabs[0].length / 2),
       );
     }
-    console.log('total as extras -> ', extra);
     const response = extra.map((item) => {
       return {
         employees: item.employee,
