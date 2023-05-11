@@ -46,6 +46,12 @@ export enum ERoles {
   ROLE_DRIVER = 'DRIVER',
 }
 
+export enum ERolesBackOfficeTypes {
+  ROLE_ADMIN = 'ADMIN',
+  ROLE_MONITOR = 'MONITOR',
+  ROLE_SUPERVISOR = 'SUPERVISOR',
+}
+
 export enum ETypePeriodHistory {
   DAILY = 'DIÁRIO',
   WEEKLY = 'SEMANAL',
