@@ -17,7 +17,7 @@ export function getDateInLocaleTime(date: Date): Date {
 }
 
 export function getDateStartToEndOfDay(date: string): DateStartEnd {
-  const newDate = new Date(date);  
+  const newDate = new Date(date);
   const year = newDate.getFullYear();
   if (year < 2000 || year > 2100 || Number.isNaN(year))
     throw new HttpException(
@@ -89,26 +89,29 @@ export function getDuration(duration: string) {
   if (duration === '01:00') return 1.16 * 60 * 60;
   if (duration === '01:30') return 1.66 * 60 * 60;
   if (duration === '02:00') return 2.16 * 60 * 60;
-  
 }
 
 export function verifyDateFilter(date?: string) {
   if (date) {
     // verifica se a data em string é uma data válida
     const dateData = new Date(date);
+    console.log(dateData);
     if (dateData.toString() === 'Invalid Date')
       throw new HttpException('Data inválida', HttpStatus.BAD_REQUEST);
   }
 }
 
-export function convertDate( date?: Date | string){
-  let convertedDate
-  if(typeof date === 'string')
-    convertedDate = date;
-  if(date instanceof Date)
-    convertedDate = date.toISOString().split('T')[0];
-  const dateParts = convertedDate.split('-');
-  
-  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+export function canSchedule(date: Date) {
+  const atual = getDateInLocaleTime(new Date());
+  const agendamento = new Date(date);
+  return atual < agendamento;
+}
 
+export function convertDate(date?: Date | string) {
+  let convertedDate;
+  if (typeof date === 'string') convertedDate = date;
+  if (date instanceof Date) convertedDate = date.toISOString().split('T')[0];
+  const dateParts = convertedDate.split('-');
+
+  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
 }

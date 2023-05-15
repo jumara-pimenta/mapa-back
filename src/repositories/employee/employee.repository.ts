@@ -8,6 +8,7 @@ import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
+import { getDateStartToEndOfDay } from 'src/utils/Date';
 
 @Injectable()
 export class EmployeeRepository
@@ -131,7 +132,11 @@ export class EmployeeRepository
     });
   }
 
-  async checkExtraEmployee(ids: string[]): Promise<Employee[]> {
+  async checkExtraEmployee(ids: string[], date: string): Promise<Employee[]> {
+    const data = date ? new Date(date) : getDateInLocaleTime(new Date());
+
+    const { start, end } = getDateStartToEndOfDay(data.toDateString());
+    console.log(start, end);
     return this.repository.employee.findMany({
       where: {
         deletedAt: null,
@@ -146,6 +151,10 @@ export class EmployeeRepository
               route: {
                 deletedAt: null,
                 type: ETypeRoute.EXTRA,
+              },
+              scheduleDate: {
+                gte: start,
+                lte: end,
               },
             },
           },

@@ -24,6 +24,11 @@ export enum ETypePath {
   ROUND_TRIP = 'IDA E VOLTA',
 }
 
+export enum ETypePathExtra {
+  RETURN = 'VOLTA',
+  ROUND_TRIP = 'IDA E VOLTA',
+}
+
 export enum EStatusPath {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',

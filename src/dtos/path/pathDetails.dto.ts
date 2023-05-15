@@ -97,4 +97,6 @@ export class PathDetailsDTO {
   })
   @IsOptional()
   departureTime?: string;
+
+  scheduleDate?: Date;
 }

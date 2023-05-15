@@ -164,7 +164,7 @@ export class EmployeeService {
       throw new HttpException(
         `O(s) colaborador(es) ${employees.map(
           (employee) => employee.name,
-        )} está(ão) exluido(s) do sistema!`,
+        )} está(ão) exluído(s) do sistema!`,
         HttpStatus.NOT_FOUND,
       );
   }
@@ -215,14 +215,17 @@ export class EmployeeService {
     return this.mapperOne(employee);
   }
 
-  async checkExtraEmployee(ids: string[]): Promise<any> {
-    const employees = await this.employeeRepository.checkExtraEmployee(ids);
+  async checkExtraEmployee(ids: string[], date: string): Promise<any> {
+    const employees = await this.employeeRepository.checkExtraEmployee(
+      ids,
+      date,
+    );
 
     if (employees.length >= 1)
       throw new HttpException(
         `O(s) colaborador(es) ${employees.map(
           (employee) => employee.name,
-        )} já está(ão) cadastrado(s) em outra rota extra!`,
+        )} já está(ão) cadastrado(s) em outra rota extra.`,
         HttpStatus.NOT_FOUND,
       );
   }

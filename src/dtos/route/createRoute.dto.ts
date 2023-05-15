@@ -97,4 +97,15 @@ export class CreateRouteDTO {
   @IsOptional()
   @IsString({ message: '[distance] A distância deve ser do tipo texto.' })
   distance?: string;
+
+  @ApiProperty({
+    description: 'Data da rota extra',
+    default: '10.5 KM',
+  })
+  @IsOptional()
+  @IsString({
+    message:
+      '[scheduleDate] A Data do agendamento extra tem que ser do tipo texto',
+  })
+  scheduleDate?: string;
 }

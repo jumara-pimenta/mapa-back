@@ -18,11 +18,11 @@ export class PrismaService
 
     await this.backOfficeUser.upsert({
       where: {
-        email: 'admin@rotas.com.br',
+        email: 'adm@rotas.com.br',
       },
       create: {
         id: process.env.DENSO_ID,
-        email: 'admin@rotas.com.br',
+        email: 'adm@rotas.com.br',
         password: await bcrypt.hash('Denso', 10),
         name: 'Adm',
         role: 'ADMIN',
@@ -30,9 +30,9 @@ export class PrismaService
         createdAt: getDateInLocaleTime(new Date()),
       },
       update: {
-        email: 'admin@rotas.com.br',
+        email: 'adm@rotas.com.br',
         password: await bcrypt.hash('Denso', 10),
-        name: 'Admin',
+        name: 'adm',
         role: 'ADMIN',
         roleType: 'ADMIN',
         id: process.env.DENSO_ID,
