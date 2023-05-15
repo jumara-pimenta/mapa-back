@@ -134,9 +134,7 @@ export class EmployeeRepository
 
   async checkExtraEmployee(ids: string[], date: string): Promise<Employee[]> {
     const data = date ? new Date(date) : getDateInLocaleTime(new Date());
-
-    const { start, end } = getDateStartToEndOfDay(data.toDateString());
-    console.log(start, end);
+    const { start, end } = getDateStartToEndOfDay(data.toISOString());
     return this.repository.employee.findMany({
       where: {
         deletedAt: null,

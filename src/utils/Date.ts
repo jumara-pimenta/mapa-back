@@ -24,27 +24,29 @@ export function getDateStartToEndOfDay(date: string): DateStartEnd {
       'Selecione uma data válida',
       HttpStatus.BAD_REQUEST,
     );
-  const start = new Date(
-    newDate.getFullYear(),
-    newDate.getMonth(),
-    newDate.getDate(),
-    0,
-    0,
-    0,
-    0,
+  const start = getDateInLocaleTime(
+    new Date(
+      newDate.getFullYear(),
+      newDate.getMonth(),
+      newDate.getUTCDate(),
+      0,
+      0,
+      0,
+      0,
+    ),
   );
-  const end = new Date(
-    newDate.getFullYear(),
-    newDate.getMonth(),
-    newDate.getDate(),
-    23,
-    59,
-    59,
-    999,
+  const end = getDateInLocaleTime(
+    new Date(
+      newDate.getFullYear(),
+      newDate.getMonth(),
+      newDate.getUTCDate(),
+      23,
+      59,
+      59,
+      999,
+    ),
   );
   //  add 4 hours to get the correct date
-  start.setHours(start.getHours() + 20);
-  end.setHours(end.getHours() + 20);
 
   return { start, end };
 }
@@ -95,7 +97,6 @@ export function verifyDateFilter(date?: string) {
   if (date) {
     // verifica se a data em string é uma data válida
     const dateData = new Date(date);
-    console.log(dateData);
     if (dateData.toString() === 'Invalid Date')
       throw new HttpException('Data inválida', HttpStatus.BAD_REQUEST);
   }

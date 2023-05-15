@@ -361,7 +361,6 @@ export class RouteService {
 
     const response: SuggenstionResultDTO[] = PromiseRoutes.map((e, index) => {
       if (e.status === 'rejected') {
-        console.log(e);
         return {
           description: routes[index].description,
           status: 400,
@@ -380,8 +379,6 @@ export class RouteService {
   }
 
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
-    console.log(payload);
-
     if (payload.schedule) {
       if (payload.date === undefined)
         throw new HttpException(
@@ -762,6 +759,7 @@ export class RouteService {
             status: item.status,
             type: item.type,
             createdAt: item.createdAt,
+            scheduleDate: item.scheduleDate,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
 

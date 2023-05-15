@@ -225,7 +225,7 @@ export class EmployeeService {
       throw new HttpException(
         `O(s) colaborador(es) ${employees.map(
           (employee) => employee.name,
-        )} já está(ão) cadastrado(s) em outra rota extra.`,
+        )} já está(ão) cadastrado(s) em outra rota extra.}.`,
         HttpStatus.NOT_FOUND,
       );
   }
