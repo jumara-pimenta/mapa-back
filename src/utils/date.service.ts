@@ -1,7 +1,13 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
-import { ETypePath, ETypeRoute, ETypeShiftEmployee, ETypeShiftEmployeeExports, ETypeShiftRotue } from './ETypes';
+import {
+  ETypePath,
+  ETypeRoute,
+  ETypeShiftEmployee,
+  ETypeShiftEmployeeExports,
+  ETypeShiftRotue,
+} from './ETypes';
 import {
   dateInFormatOneRgx,
   dateInFormatThreeRgx,
@@ -109,58 +115,67 @@ export function convertTimeToDate(hour: string): Date {
   );
 }
 
- export function convertToDate(date : string) : Date | null{
-    const data = new Date('12/30/1899')
-    //how to add days to date
-    
-    data.setDate(data.getDate() + Number(date))
-    return data
- }
+export function convertToDate(date: string): Date | null {
+  const data = new Date('12/30/1899');
+  //how to add days to date
 
- export function getStartAtAndFinishAt(type : ETypeShiftRotue) : startAndFinishAt {
-    if(type === ETypeShiftRotue.FIRST)
-        return {startAt : '07:30', finishAt : '17:30'}
-    if(type === ETypeShiftRotue.SECOND)
-        return {startAt : '17:30', finishAt : '02:30'}
-    if(type === ETypeShiftRotue.THIRD)
-        return {startAt : '03:30', finishAt : '12:00'}
- }
-
- export function getShiftToGraphic(starstAt : string, type : string) : string {
-  if(starstAt === '07:30')
-      return 'Turno 1'
-  if(starstAt === '17:30')
-      return type === 'IDA' ? 'Turno 2' : 'Turno 1'
-  if(starstAt === '02:30')
-      return 'Turno 2'
-  if(starstAt === '03:30' || starstAt === '12:00')
-      return 'Turno 3'
-  return 'Extra'    
-      
-  
+  data.setDate(data.getDate() + Number(date));
+  return data;
 }
 
-
-
- export function getStartAtAndFinishEmployee(type : ETypeShiftEmployee) : startAndFinishAt | null {
-  if(type === ETypeShiftEmployee.FIRST)
-      return {startAt : '07:30', finishAt : '17:30'}
-  if(type === ETypeShiftEmployee.SECOND)
-      return {startAt : '17:30', finishAt : '02:30'}
-  if(type === ETypeShiftEmployee.THIRD)
-      return {startAt : '03:30', finishAt : '12:00'}
-  if(type === ETypeShiftEmployee.NOT_DEFINED)        
-      return  null
+export function getStartAtAndFinishAt(type: ETypeShiftRotue): startAndFinishAt {
+  if (type === ETypeShiftRotue.FIRST)
+    return { startAt: '07:30', finishAt: '17:30' };
+  if (type === ETypeShiftRotue.SECOND)
+    return { startAt: '17:30', finishAt: '02:30' };
+  if (type === ETypeShiftRotue.THIRD)
+    return { startAt: '03:30', finishAt: '12:00' };
 }
 
-export function getShiftStartAtAndExports(type : ETypeShiftEmployeeExports) {
-  if(type === ETypeShiftEmployeeExports.FIRST)
-  return '1'
-  if(type === ETypeShiftEmployeeExports.SECOND)
-      return '2'
-  if(type === ETypeShiftEmployeeExports.THIRD)
-      return '3'
-  if(type === ETypeShiftEmployeeExports.NOT_DEFINED)        
-      return  'Sem Turno Estabelecido'
+export function getSpecialHour(
+  depatureTime: string,
+  backTime: string,
+): startAndFinishAt {
+  if (!(depatureTime && backTime))
+    throw new HttpException(
+      'Hora de partida e hora de retorno são obrigatórias."',
+      HttpStatus.BAD_REQUEST,
+    );
+  if (
+    depatureTime.match(/^[0-9]{2}:[0-9]{2}$/) &&
+    backTime.match(/^[0-9]{2}:[0-9]{2}$/)
+  ) {
+    return { startAt: depatureTime, finishAt: backTime };
+  }
+  throw new HttpException(
+    `Formato de hora inválido. Foi enviado "${depatureTime}" e "${backTime}", mas esperava ['hh:mm']`,
+    HttpStatus.BAD_REQUEST,
+  );
+}
+export function getShiftToGraphic(starstAt: string, type: string): string {
+  if (starstAt === '07:30') return 'Turno 1';
+  if (starstAt === '17:30') return type === 'IDA' ? 'Turno 2' : 'Turno 1';
+  if (starstAt === '02:30') return 'Turno 2';
+  if (starstAt === '03:30' || starstAt === '12:00') return 'Turno 3';
+  return 'Extra';
 }
 
+export function getStartAtAndFinishEmployee(
+  type: ETypeShiftEmployee,
+): startAndFinishAt | null {
+  if (type === ETypeShiftEmployee.FIRST)
+    return { startAt: '07:30', finishAt: '17:30' };
+  if (type === ETypeShiftEmployee.SECOND)
+    return { startAt: '17:30', finishAt: '02:30' };
+  if (type === ETypeShiftEmployee.THIRD)
+    return { startAt: '03:30', finishAt: '12:00' };
+  if (type === ETypeShiftEmployee.NOT_DEFINED) return null;
+}
+
+export function getShiftStartAtAndExports(type: ETypeShiftEmployeeExports) {
+  if (type === ETypeShiftEmployeeExports.FIRST) return '1';
+  if (type === ETypeShiftEmployeeExports.SECOND) return '2';
+  if (type === ETypeShiftEmployeeExports.THIRD) return '3';
+  if (type === ETypeShiftEmployeeExports.NOT_DEFINED)
+    return 'Sem Turno Estabelecido';
+}

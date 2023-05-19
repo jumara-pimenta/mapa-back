@@ -10,7 +10,11 @@ import {
   Matches,
 } from 'class-validator';
 import { PathDetailsDTO } from '../path/pathDetails.dto';
-import { ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
+import {
+  ETypePathExtra,
+  ETypeRoute,
+  ETypeShiftRotue,
+} from '../../utils/ETypes';
 import { StartsAtRgx, durationPathRgx } from 'src/utils/Regex';
 
 export class CreateSugestedRouteDTO {
@@ -19,6 +23,13 @@ export class CreateSugestedRouteDTO {
   })
   @Type(() => suggestedExtrasDTO)
   suggestedExtras: suggestedExtrasDTO[];
+  @IsEnum(ETypePathExtra, {
+    message:
+      '[typeShift] O tipo da rota deve ser do tipo VOLTA ou IDA E VOLTA.',
+  })
+  type: ETypePathExtra;
+  schedule?: boolean;
+  date?: string;
 }
 
 class suggestedExtrasDTO {

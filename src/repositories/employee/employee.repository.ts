@@ -8,6 +8,8 @@ import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
+import { getDateStartToEndOfDay } from 'src/utils/Date';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeRepository
@@ -131,7 +133,9 @@ export class EmployeeRepository
     });
   }
 
-  async checkExtraEmployee(ids: string[]): Promise<Employee[]> {
+  async checkExtraEmployee(ids: string[], date: string): Promise<Employee[]> {
+    const data = date ? new Date(date) : getDateInLocaleTime(new Date());
+    const { start, end } = getDateStartToEndOfDay(data.toISOString());
     return this.repository.employee.findMany({
       where: {
         deletedAt: null,
@@ -146,6 +150,10 @@ export class EmployeeRepository
               route: {
                 deletedAt: null,
                 type: ETypeRoute.EXTRA,
+              },
+              scheduleDate: {
+                gte: start,
+                lte: end,
               },
             },
           },
@@ -286,6 +294,7 @@ export class EmployeeRepository
         name: data.name,
         registration: data.registration,
         password: data.password,
+        firstAccess: true,
         role: data.role,
         shift: data.shift,
         createdAt: data.createdAt,
@@ -356,5 +365,31 @@ export class EmployeeRepository
         name: 'asc',
       },
     });
+  }
+
+  updateEmployeePassword(registration: string, password: string): Promise<Employee>{
+    return  this.repository.employee.update({
+      where: {
+        registration: registration
+      },
+      data: {
+        password: password,
+        firstAccess: false,
+        updatedAt: new Date()
+      }
+    })
+  }
+
+  async resetEmployeePassword(registration: string): Promise<Employee>{
+    return  this.repository.employee.update({
+      where: {
+        registration: registration
+      },
+      data: {
+        password: await bcrypt.hash(registration, 10),
+        firstAccess: true,
+        updatedAt: new Date()
+      }
+    })
   }
 }

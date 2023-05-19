@@ -58,7 +58,7 @@ export class PathService {
     const employeesOnPath = await this.employeesOnPathService.listByPath(
       path.id,
     );
-    let driverId = path.substituteId;
+    const driverId = path.substituteId;
     const driver = await this.driverService.listById(
       driverId ? driverId : route.driver,
     );
@@ -262,6 +262,7 @@ export class PathService {
             startsAt: startsAt,
             type: ETypePath.ONE_WAY,
             status: EStatusPath.PENDING,
+            scheduleDate: props.details.scheduleDate,
           },
           route,
         ),
@@ -273,6 +274,7 @@ export class PathService {
             startsAt: startsReturnAt ?? startsAt,
             type: ETypePath.RETURN,
             status: EStatusPath.PENDING,
+            scheduleDate: props.details.scheduleDate,
           },
           route,
         ),
@@ -411,7 +413,7 @@ export class PathService {
       const { driver, vehicle } = path.route;
       const { name, id } = driver;
       const { plate } = vehicle;
-      let path1 = this.mapperOne(path);
+      const path1 = this.mapperOne(path);
 
       return {
         ...path1,

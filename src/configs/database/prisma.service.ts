@@ -18,21 +18,23 @@ export class PrismaService
 
     await this.backOfficeUser.upsert({
       where: {
-        email: 'admin@rotas.com.br',
+        email: 'adm@rotas.com.br',
       },
       create: {
         id: process.env.DENSO_ID,
-        email: 'admin@rotas.com.br',
+        email: 'adm@rotas.com.br',
         password: await bcrypt.hash('Denso', 10),
-        name: 'Admin',
+        name: 'Adm',
         role: 'ADMIN',
+        roleType: 'ADMIN',
         createdAt: getDateInLocaleTime(new Date()),
       },
       update: {
-        email: 'admin@rotas.com.br',
+        email: 'adm@rotas.com.br',
         password: await bcrypt.hash('Denso', 10),
-        name: 'Admin',
+        name: 'adm',
         role: 'ADMIN',
+        roleType: 'ADMIN',
         id: process.env.DENSO_ID,
       },
     });
@@ -152,6 +154,7 @@ export class PrismaService
             }),
             registration: faker.random.numeric(6).toString(),
             costCenter: faker.random.numeric(6).toString(),
+            firstAccess: true,
             password: await bcrypt.hash('Denso', 10),
             admission: faker.date.past(),
             role: faker.company.name(),
@@ -186,6 +189,7 @@ export class PrismaService
             id: uuid(),
             name: faker.name.fullName(),
             category: 'D',
+            firstAccess: true,
             cnh: faker.random.numeric(11).toString(),
             createdAt: getDateInLocaleTime(new Date()),
 
@@ -231,6 +235,7 @@ export class PrismaService
         name: 'Motorista Denso',
         category: 'D',
         cnh: '12345678910',
+        firstAccess: true,
         createdAt: getDateInLocaleTime(new Date()),
         cpf: '12345678910',
         password: await bcrypt.hash('Denso', 10),

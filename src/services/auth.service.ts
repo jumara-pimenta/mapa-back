@@ -13,7 +13,7 @@ import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
 import { setPermissions } from 'src/utils/roles.permissions';
 import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
 import { VerifyTokenResponse } from 'src/integrations/services/coreService/response/verifyToken.response';
-import { ERoles } from 'src/utils/ETypes';
+import { ERoles, ERolesBackOfficeTypes } from 'src/utils/ETypes';
 import { EmployeeService } from './employee.service';
 import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
 import { DriverService } from './driver.service';
@@ -125,10 +125,9 @@ export class AuthService {
     const token = this.generateToken(1 * 1000 * 60 * 60, {
       id: user.id,
       name: user.name,
-      role: ERoles.ROLE_ADMIN,
+      role: user.roleType,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, createdAt, password, ...result } = user;
 
     return { ...result, token };

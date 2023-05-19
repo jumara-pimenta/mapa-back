@@ -17,6 +17,7 @@ export class Path {
   createdAt: Date;
   updatedAt?: Date;
   deletedAt?: Date;
+  scheduleDate?: Date | null;
   substituteId?: string;
 
   constructor(

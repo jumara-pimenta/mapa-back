@@ -39,6 +39,7 @@ import {
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { getShift } from 'src/utils/Utils';
 import { verifyDateFilter } from 'src/utils/Date';
+import { FirstAccessEmployeeDTO } from 'src/dtos/employee/firstAccessEmployee.dto';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -164,7 +165,7 @@ export class EmployeeService {
       throw new HttpException(
         `O(s) colaborador(es) ${employees.map(
           (employee) => employee.name,
-        )} está(ão) exluido(s) do sistema!`,
+        )} está(ão) exluído(s) do sistema!`,
         HttpStatus.NOT_FOUND,
       );
   }
@@ -215,14 +216,17 @@ export class EmployeeService {
     return this.mapperOne(employee);
   }
 
-  async checkExtraEmployee(ids: string[]): Promise<any> {
-    const employees = await this.employeeRepository.checkExtraEmployee(ids);
+  async checkExtraEmployee(ids: string[], date: string): Promise<any> {
+    const employees = await this.employeeRepository.checkExtraEmployee(
+      ids,
+      date,
+    );
 
     if (employees.length >= 1)
       throw new HttpException(
         `O(s) colaborador(es) ${employees.map(
           (employee) => employee.name,
-        )} já está(ão) cadastrado(s) em outra rota extra!`,
+        )} já está(ão) cadastrado(s) em outra rota extra.}.`,
         HttpStatus.NOT_FOUND,
       );
   }
@@ -922,5 +926,42 @@ export class EmployeeService {
     };
 
     return exportedEmployeeToXLSX(headers, workSheetName, filePath);
+  }
+
+  async firstAccess(data: FirstAccessEmployeeDTO): Promise<Employee>{
+
+    const employeeAlreadyExists = await this.employeeRepository.findByRegistration(data.registration)
+
+    if(!employeeAlreadyExists){
+      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    if(employeeAlreadyExists.firstAccess == false){
+      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST)
+    }
+    
+    const checkIfPasswordMatches = data.password === data.confirmPassword
+
+    if(!checkIfPasswordMatches){
+      throw new HttpException('Senhas não correspondem', HttpStatus.BAD_REQUEST)
+    }
+
+    const passwordHashed = await bcrypt.hash(data.password, 10)
+
+    return await this.employeeRepository.updateEmployeePassword(data.registration, passwordHashed)
+  }
+
+  async resetEmployeePassword(registration: string): Promise<Employee>{
+    const employeeAlreadyExists = await this.employeeRepository.findByRegistration(registration)
+
+    if(!employeeAlreadyExists){
+      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    if(employeeAlreadyExists.firstAccess == true){
+      throw new HttpException('Colaborador ainda não definiu sua senha', HttpStatus.BAD_REQUEST)
+    }
+
+    return await this.employeeRepository.resetEmployeePassword(registration)
   }
 }

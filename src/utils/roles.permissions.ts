@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ERoles } from './ETypes';
+import { ERoles, ERolesBackOfficeTypes } from './ETypes';
 
 export const setPermissions = (roles: ERoles) => {
   if (!roles)
@@ -10,6 +10,8 @@ export const setPermissions = (roles: ERoles) => {
       'ADMIN',
       'create-employee',
       'edit-employee',
+      'driver-reset-password',
+      'employee-reset-password',
       'delete-employee',
       'list-employee',
       'export-employees',
@@ -50,6 +52,7 @@ export const setPermissions = (roles: ERoles) => {
       'list-path',
       'list-vehicle',
       'list-route',
+      'employee-first-access',
       'edit-employeeOnPath',
       'list-employeeOnPath',
       'list-employee',
@@ -68,11 +71,43 @@ export const setPermissions = (roles: ERoles) => {
       'edit-vehicle',
       'edit-route',
       'list-route',
+      'driver-first-access',
       'edit-employeeOnPath',
       'list-employeeOnPath',
       'list-employee',
       'create-sinister',
       'list-sinister',
       'edit-sinister',
+    ];
+
+  if (roles === ERolesBackOfficeTypes.ROLE_SUPERVISOR)
+    return [
+      'list-driver',
+      'list-path',
+      'list-vehicle',
+      'list-route',
+      'list-employeeOnPath',
+      'list-employee',
+      'list-sinister',
+    ];
+
+  if (roles === ERolesBackOfficeTypes.ROLE_MONITOR)
+    return [
+      'list-path',
+      'list-route',
+      'list-employeeOnPath',
+      'list-employee',
+      'list-sinister',
+      'create-employeeOnPath',
+      'edit-employeeOnPath',
+      'create-pin',
+      'create-sinister',
+      'edit-sinister',
+      'create-employee',
+      'edit-employee',
+      'create-route',
+      'edit-route',
+      'create-path',
+      'edit-path',
     ];
 };

@@ -7,6 +7,7 @@ import { Driver } from '../../entities/driver.entity';
 import IDriverRepository from './driver.repository.contract';
 import { generateQueryByFiltersForDriver } from '../../configs/database/Queries';
 import { getDateInLocaleTime } from '../../utils/Date';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class DriverRepository
@@ -138,8 +139,36 @@ export class DriverRepository
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
+        firstAccess: true,
         validation: new Date(data.validation),
       },
     });
   }
+
+  updateDriverPassword(cpf: string, password: string): Promise<Driver>{
+    return this.repository.driver.update({
+      where: {
+        cpf: cpf
+      },
+      data: {
+        password: password,
+        firstAccess: false,
+        updatedAt: new Date()
+      }
+    })
+  }
+
+  async resetDriverPassword(cpf: string): Promise<Driver>{
+    return this.repository.driver.update({
+      where: {
+        cpf: cpf
+      },
+      data: {
+        password: await bcrypt.hash(cpf, 10),
+        firstAccess: true,
+        updatedAt: new Date()
+      }
+    })
+  }
+
 }

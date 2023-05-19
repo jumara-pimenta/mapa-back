@@ -17,6 +17,8 @@ export default interface IEmployeeRepository {
   update(data: Employee): Promise<Employee>;
   findByIds(ids: string[]): Promise<Employee[]>;
   listAllEmployeesDeleted(ids: string[]): Promise<Employee[]>;
-  checkExtraEmployee(ids: string[]): Promise<Employee[]>;
+  checkExtraEmployee(ids: string[], date: string): Promise<Employee[]>;
   findJokerPin(ids: string[]): Promise<Partial<Employee>[]>;
+  updateEmployeePassword(registration: string, password: string): Promise<Employee>;
+  resetEmployeePassword(registration: string): Promise<Employee>;
 }

@@ -24,6 +24,11 @@ export enum ETypePath {
   ROUND_TRIP = 'IDA E VOLTA',
 }
 
+export enum ETypePathExtra {
+  RETURN = 'VOLTA',
+  ROUND_TRIP = 'IDA E VOLTA',
+}
+
 export enum EStatusPath {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
@@ -46,6 +51,12 @@ export enum ERoles {
   ROLE_DRIVER = 'DRIVER',
 }
 
+export enum ERolesBackOfficeTypes {
+  ROLE_ADMIN = 'ADMIN',
+  ROLE_MONITOR = 'MONITOR',
+  ROLE_SUPERVISOR = 'SUPERVISOR',
+}
+
 export enum ETypePeriodHistory {
   DAILY = 'DIÁRIO',
   WEEKLY = 'SEMANAL',
@@ -57,6 +68,7 @@ export enum ETypeShiftRotue {
   FIRST = 'PRIMEIRO',
   SECOND = 'SEGUNDO',
   THIRD = 'TERCEIRO',
+  SPECIAL = 'TURNO ESPECIAL',
 }
 
 export enum ETypeShiftEmployee {

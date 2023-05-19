@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsDateString,
   Length,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateVehicleDTO {
@@ -49,10 +50,8 @@ export class CreateVehicleDTO {
     {},
     { message: '[lastSurvey] A última vistoria deve ser do tipo data.' },
   )
-  @IsNotEmpty({
-    message: '[lastSurvey] A última vistoria deve ser preenchida.',
-  })
-  lastSurvey: Date;
+  @IsOptional()
+  lastSurvey?: Date;
 
   @ApiProperty({
     default: 28,
@@ -93,10 +92,8 @@ export class CreateVehicleDTO {
     {},
     { message: '[lastMaintenance] A última manutenção deve ser do tipo data.' },
   )
-  @IsNotEmpty({
-    message: '[lastMaintenance] A última manutenção deve ser preenchida.',
-  })
-  lastMaintenance: Date;
+  @IsOptional()
+  lastMaintenance?: Date;
 
   @ApiProperty({ default: 'Teste', description: 'Campo de observação' })
   @IsString({

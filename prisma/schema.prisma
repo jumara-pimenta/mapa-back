@@ -18,6 +18,7 @@ model Driver {
   validation   DateTime       @db.DateTimeOffset
   category     String
   route        Route[]
+  firstAccess  Boolean
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
   updatedAt    DateTime?      @db.DateTimeOffset
   deletedAt    DateTime?      @db.DateTimeOffset
@@ -55,6 +56,7 @@ model Path {
   updatedAt       DateTime?         @db.DateTimeOffset
   substituteId    String?           @db.VarChar(255)
   deletedAt       DateTime?         @db.DateTimeOffset
+  scheduleDate    DateTime?         @db.DateTimeOffset
   RouteHistory    RouteHistory[]
 }
 
@@ -101,11 +103,11 @@ model Vehicle {
   plate           String         @unique
   company         String
   type            String
-  lastSurvey      DateTime
+  lastSurvey      DateTime?
   expiration      DateTime
   capacity        Int
   renavam         String         @unique @db.VarChar(11)
-  lastMaintenance DateTime       @db.DateTimeOffset
+  lastMaintenance DateTime?      @db.DateTimeOffset
   note            String
   isAccessibility Boolean        @default(false)
   routes          Route[]
@@ -118,14 +120,15 @@ model Employee {
   id             String            @id @unique
   registration   String            @unique
   name           String
-  admission      DateTime          @db.DateTimeOffset
-  role           String
+  admission      DateTime?         @db.DateTimeOffset
+  role           String?
   shift          String
-  costCenter     String
+  costCenter     String?
   address        String            @db.VarChar(255)
   password       String            @db.VarChar(255)
   pins           EmployeesOnPin[]
   employeeOnPath EmployeesOnPath[]
+  firstAccess    Boolean
   createdAt      DateTime          @default(now()) @db.DateTimeOffset
   updatedAt      DateTime?         @db.DateTimeOffset
   deletedAt      DateTime?         @db.DateTimeOffset
@@ -162,6 +165,7 @@ model BackOfficeUser {
   email     String    @unique
   password  String
   role      String
+  roleType  String    @default("ADMIN")
   createdAt DateTime  @default(now()) @db.DateTimeOffset
   updatedAt DateTime? @db.DateTimeOffset
 }

@@ -14,12 +14,26 @@ import {
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import { compareDates, convertDate, getDateStartToEndOfDay, getPeriod } from 'src/utils/Date';
-import { RouteByDateAndShift, RouteHistoryByDate, RouteSeparated, Shifts, ShiftsByDate } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
+import {
+  compareDates,
+  convertDate,
+  getDateStartToEndOfDay,
+  getPeriod,
+} from 'src/utils/Date';
+import {
+  RouteByDateAndShift,
+  RouteHistoryByDate,
+  RouteSeparated,
+  Shifts,
+  ShiftsByDate,
+} from 'src/dtos/routeHistory/routeHistoryByDate.dto';
 import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dto';
 import { SinisterService } from './sinister.service';
 import { ETypePeriodHistory } from 'src/utils/ETypes';
-import { getShiftToGraphic, getStartAtAndFinishAt } from 'src/utils/date.service';
+import {
+  getShiftToGraphic,
+  getStartAtAndFinishAt,
+} from 'src/utils/date.service';
 
 @Injectable()
 export class RouteHistoryService {
@@ -29,8 +43,6 @@ export class RouteHistoryService {
     @Inject(forwardRef(() => SinisterService))
     private readonly sinisterService: SinisterService,
   ) {}
-
- 
 
   async create(props: RouteHistory): Promise<RouteHistory> {
     const newRouteHistory = new RouteHistory(
@@ -48,7 +60,7 @@ export class RouteHistoryService {
       props.driver,
       props.vehicle,
       props.sinister,
-      props.createdAt
+      props.createdAt,
     );
     const routeHistory = await this.routeHistoryRepository.create(
       newRouteHistory,
@@ -260,10 +272,10 @@ export class RouteHistoryService {
       const index = acc.findIndex((d) => d.date === date);
 
       if (index == -1) {
-         acc.push(curr);
+        acc.push(curr);
       }
-      
-      if (index >= 0) {       
+
+      if (index >= 0) {
         acc[index].totalPaths += 1;
       }
 
@@ -276,58 +288,69 @@ export class RouteHistoryService {
     return reponseReduce;
   }
 
-  async getShiftsByDate(date : string): Promise<any> {
-    const data = getDateStartToEndOfDay(date)
+  async getShiftsByDate(date: string): Promise<any> {
+    const data = getDateStartToEndOfDay(date);
     const historic = await this.routeHistoryRepository.getHistoricByDate(
       data.start,
       data.end,
     );
 
-    const response : ShiftsByDate = {date : date, shifts : []}
-    response.shifts.push({shift : 'Turno 1', totalPaths : 0})
-    response.shifts.push({shift : 'Turno 2', totalPaths : 0})
-    response.shifts.push({shift : 'Turno 3', totalPaths : 0})
-    response.shifts.push({shift : 'Extra', totalPaths : 0})
-
-      historic.map((paths) => {
-        const shift = getShiftToGraphic(paths.path.startsAt,paths.typeRoute)
-        const index = response.shifts.findIndex((d) => d.shift === shift);
-        response.shifts[index].totalPaths += 1
-      })
-
-      response.date = convertDate(response.date)
-      return response
-  }
-
-  async getRoutesByDateAndShift(date : string, shift : string): Promise<any> {
-    const data = getDateStartToEndOfDay(date)
-    const historic = await this.routeHistoryRepository.getHistoricByDate(
-      data.start,
-      data.end,
-    );
-
-    
-    const response : RouteByDateAndShift = {date : date, shift : shift, totalPaths : 0,routes : []}
+    const response: ShiftsByDate = { date: date, shifts: [] };
+    response.shifts.push({ shift: 'Turno 1', totalPaths: 0 });
+    response.shifts.push({ shift: 'Turno 2', totalPaths: 0 });
+    response.shifts.push({ shift: 'Turno 3', totalPaths: 0 });
+    response.shifts.push({ shift: 'Extra', totalPaths: 0 });
 
     historic.map((paths) => {
-      const shiftGraphic = getShiftToGraphic(paths.path.startsAt,paths.typeRoute)
-      if(shiftGraphic === shift){
-        const route = new RouteSeparated()
+      const shift = getShiftToGraphic(paths.path.startsAt, paths.typeRoute);
+      const index = response.shifts.findIndex((d) => d.shift === shift);
+      response.shifts[index].totalPaths += 1;
+    });
+
+    response.date = convertDate(response.date);
+    return response;
+  }
+
+  async getRoutesByDateAndShift(date: string, shift: string): Promise<any> {
+    const data = getDateStartToEndOfDay(date);
+    const historic = await this.routeHistoryRepository.getHistoricByDate(
+      data.start,
+      data.end,
+    );
+
+    const response: RouteByDateAndShift = {
+      date: date,
+      shift: shift,
+      totalPaths: 0,
+      routes: [],
+    };
+
+    historic.map((paths) => {
+      const shiftGraphic = getShiftToGraphic(
+        paths.path.startsAt,
+        paths.typeRoute,
+      );
+      if (shiftGraphic === shift) {
+        const route = new RouteSeparated();
         route.date = paths.nameRoute;
         route.totalEmployess = paths.totalEmployees;
         route.totalEmployessConfirmed = paths.totalConfirmed;
-        route.totalEmployessNotConfirmed = route.totalEmployess - route.totalEmployessConfirmed;
+        route.totalEmployessNotConfirmed =
+          route.totalEmployess - route.totalEmployessConfirmed;
         route.totalEmployessPresent = paths.employeeIds.split(',').length;
-        route.totalEmployessConfirmedButNotPresent = route.totalEmployessConfirmed - route.totalEmployessPresent;
+        route.totalEmployessConfirmedButNotPresent =
+          route.totalEmployessConfirmed - route.totalEmployessPresent;
         route.totalSinister = paths.sinister.length;
-        response.totalPaths += 1
-        response.routes.push(route)
+        response.totalPaths += 1;
+        route.startedAt = paths.startedAt;
+        route.finishedAt = paths.finishedAt;
+        route.type = paths.path.type;
+        response.routes.push(route);
       }
-    })
+    });
 
+    response.date = convertDate(response.date);
 
-
-    response.date = convertDate(response.date)
-    return response
+    return response;
   }
 }

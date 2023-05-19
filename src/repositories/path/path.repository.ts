@@ -431,6 +431,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         status: data.status,
         type: data.type,
         routeId: data.route.id,
+        scheduleDate: data.scheduleDate,
       },
     });
   }

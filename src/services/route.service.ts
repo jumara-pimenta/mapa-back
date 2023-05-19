@@ -31,6 +31,7 @@ import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
   getDateInLocaleTime,
+  getSpecialHour,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
@@ -56,7 +57,7 @@ import {
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
 import e from 'express';
-import { getDuration } from 'src/utils/Date';
+import { canSchedule, getDuration, verifyDateFilter } from 'src/utils/Date';
 import { RouteHistoryService } from './routeHistory.service';
 import { RouteHistory } from 'src/entities/routeHistory.entity';
 import { faker, GitModule } from '@faker-js/faker';
@@ -69,6 +70,7 @@ import {
   SuggestionExtra,
 } from 'src/dtos/route/createSuggestionExtra.dto';
 import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
+import { scheduled } from 'rxjs';
 
 @Injectable()
 export class RouteService {
@@ -110,6 +112,7 @@ export class RouteService {
             startsReturnAt: '18:00',
             type: ETypePath.ROUND_TRIP,
             isAutoRoute: true,
+            scheduleDate: getDateInLocaleTime(new Date()),
           },
         });
 
@@ -126,6 +129,7 @@ export class RouteService {
             startsReturnAt: '17:30',
             type: ETypePath.ROUND_TRIP,
             isAutoRoute: true,
+            scheduleDate: getDateInLocaleTime(new Date()),
           },
         });
 
@@ -226,7 +230,12 @@ export class RouteService {
 
     const startAndReturnAt =
       payload.shift && payload.type === ETypeRoute.CONVENTIONAL
-        ? getStartAtAndFinishAt(payload.shift)
+        ? payload.shift !== ETypeShiftRotue.SPECIAL
+          ? getStartAtAndFinishAt(payload.shift)
+          : getSpecialHour(
+              payload.pathDetails.departureTime,
+              payload.pathDetails.backTime,
+            )
         : null;
 
     const initRouteDate = startAndReturnAt
@@ -271,12 +280,13 @@ export class RouteService {
     if (vehicle.id !== process.env.DENSO_ID)
       await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
 
-    await this.employeesInRoute(
-      employeeInRoute,
-      payload.type,
-      emplopyeeOrdened.employeesIds,
-      payload.pathDetails.type,
-    );
+    if (!scheduled)
+      await this.employeesInRoute(
+        employeeInRoute,
+        payload.type,
+        emplopyeeOrdened.employeesIds,
+        payload.pathDetails.type,
+      );
 
     const props = new Route(
       {
@@ -297,6 +307,8 @@ export class RouteService {
         ...payload.pathDetails,
         startsAt: initRouteDate,
         startsReturnAt: endRouteDate,
+        scheduleDate:
+          payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
       },
     });
 
@@ -330,9 +342,14 @@ export class RouteService {
         distance: route.distance,
         pathDetails: {
           duration: route.duration,
-          type: ETypePath.RETURN,
+          type:
+            payload.type === 'VOLTA' ? ETypePath.RETURN : ETypePath.ROUND_TRIP,
           startsAt: route.time,
+          startsReturnAt: route.time,
           isAutoRoute: false,
+          scheduleDate: payload.schedule
+            ? new Date(payload.date)
+            : getDateInLocaleTime(new Date()),
         },
       } as CreateRouteDTO;
     });
@@ -362,17 +379,31 @@ export class RouteService {
   }
 
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
-    //const employees = await this.employeeService.listAll({skip: 0, take: 1000})
+    if (payload.schedule) {
+      if (payload.date === undefined)
+        throw new HttpException(
+          'É necessário informar a data para agendar a rota.',
+          HttpStatus.BAD_REQUEST,
+        );
+      verifyDateFilter(payload.date);
+      if (!canSchedule(new Date(payload.date))) {
+        throw new HttpException(
+          'Só é possível agendar rotas para datas futuras.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
 
     await this.employeeService.findJokerPin(payload.employeeIds);
-    await this.employeeService.checkExtraEmployee(payload.employeeIds);
+    await this.employeeService.checkExtraEmployee(
+      payload.employeeIds,
+      payload.date,
+    );
     const colabs: MappedEmployeeDTO[] = [];
     for await (const employeeId of payload.employeeIds) {
       const employe = await this.employeeService.listById(employeeId);
       colabs.push(employe);
     }
-    /* const response2 = employees.items.map((e) => e.id)
-    return response2 */
 
     const extra = this.suggestRouteExtra(colabs, []);
     return extra;
@@ -728,6 +759,7 @@ export class RouteService {
             status: item.status,
             type: item.type,
             createdAt: item.createdAt,
+            scheduleDate: item.scheduleDate,
             employeesOnPath: employeesOnPath.map((item) => {
               const { employee } = item;
 
@@ -1544,35 +1576,22 @@ export class RouteService {
       { lat: '-3.110944', lng: '-59.962604' },
       [],
     );
-    //dividir por mais perto
-    console.log('separateWays->>>', rotas.length, quantityColabs);
     const routes = separateWays(ordemEmployee, [], quantityColabs);
 
     const extra: SuggestionExtra[] = [...rotas];
-    console.log('rotas sugeridas -> ', extra.length);
     const extraTime: SuggestionExtra[] = rotasExtraTime
       ? [...rotasExtraTime]
       : [];
     for await (const route of routes) {
-      //roteirizar
-      console.log('verificando o tempo da rota');
       const path: SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
       if (path.totalDurationTime > getDuration('01:30')) extraTime.push(path);
       if (path.totalDurationTime < getDuration('01:30')) extra.push(path);
     }
-    console.log('rotas sugeridas -> ', extra.length);
-    console.log('rotas extrapoladas -> ', extraTime.length);
 
     if (extraTime.length > 0) {
       const colabs = extraTime.map((item) => {
         return item.employee;
       });
-      console.log(
-        'quantidade de colabs -> \n ',
-        colabs[0].length,
-        colabs.length,
-      );
-      console.log('dividir mais uma vez');
       extraTime.shift();
       return await this.suggestRouteExtra(
         colabs[0],
@@ -1581,7 +1600,6 @@ export class RouteService {
         Math.round(colabs[0].length / 2),
       );
     }
-    console.log('total as extras -> ', extra);
     const response = extra.map((item) => {
       return {
         employees: item.employee,
@@ -1657,7 +1675,7 @@ const orderPins = (arr: Employee[]): string[] => {
 function calculateDistance(employee: any[], location: any, list: any): any {
   const employees = employee;
   const startPoint = { lat: location.lat, lng: location.lng };
-  let farthestEmployee: any = null;
+  let closestEmployee: any = null;
   let minDistance = 10000;
   for (const employee of employees) {
     const employeeLocation = {
@@ -1667,19 +1685,18 @@ function calculateDistance(employee: any[], location: any, list: any): any {
     const distance = distanceBetweenPoints(startPoint, employeeLocation);
     if (distance <= minDistance) {
       minDistance = distance;
-      farthestEmployee = employee;
+      closestEmployee = employee;
     }
   }
-  //remove farthestEmployee from array of employee
-  const index = employees.indexOf(farthestEmployee);
+  const index = employees.indexOf(closestEmployee);
   const listaLegal = list;
   if (index > -1) {
     employees.splice(index, 1);
-    listaLegal.push({ ...farthestEmployee, minDistance });
+    listaLegal.push({ ...closestEmployee, minDistance });
   }
 
   if (employees.length > 0)
-    calculateDistance(employees, farthestEmployee.pins[0], listaLegal);
+    calculateDistance(employees, closestEmployee.pins[0], listaLegal);
 
   return listaLegal;
 }

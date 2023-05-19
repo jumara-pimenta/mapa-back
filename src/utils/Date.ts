@@ -17,34 +17,36 @@ export function getDateInLocaleTime(date: Date): Date {
 }
 
 export function getDateStartToEndOfDay(date: string): DateStartEnd {
-  const newDate = new Date(date);  
+  const newDate = new Date(date);
   const year = newDate.getFullYear();
   if (year < 2000 || year > 2100 || Number.isNaN(year))
     throw new HttpException(
       'Selecione uma data válida',
       HttpStatus.BAD_REQUEST,
     );
-  const start = new Date(
-    newDate.getFullYear(),
-    newDate.getMonth(),
-    newDate.getDate(),
-    0,
-    0,
-    0,
-    0,
+  const start = getDateInLocaleTime(
+    new Date(
+      newDate.getFullYear(),
+      newDate.getMonth(),
+      newDate.getUTCDate(),
+      0,
+      0,
+      0,
+      0,
+    ),
   );
-  const end = new Date(
-    newDate.getFullYear(),
-    newDate.getMonth(),
-    newDate.getDate(),
-    23,
-    59,
-    59,
-    999,
+  const end = getDateInLocaleTime(
+    new Date(
+      newDate.getFullYear(),
+      newDate.getMonth(),
+      newDate.getUTCDate(),
+      23,
+      59,
+      59,
+      999,
+    ),
   );
   //  add 4 hours to get the correct date
-  start.setHours(start.getHours() + 20);
-  end.setHours(end.getHours() + 20);
 
   return { start, end };
 }
@@ -89,7 +91,6 @@ export function getDuration(duration: string) {
   if (duration === '01:00') return 1.16 * 60 * 60;
   if (duration === '01:30') return 1.66 * 60 * 60;
   if (duration === '02:00') return 2.16 * 60 * 60;
-  
 }
 
 export function verifyDateFilter(date?: string) {
@@ -101,14 +102,17 @@ export function verifyDateFilter(date?: string) {
   }
 }
 
-export function convertDate( date?: Date | string){
-  let convertedDate
-  if(typeof date === 'string')
-    convertedDate = date;
-  if(date instanceof Date)
-    convertedDate = date.toISOString().split('T')[0];
-  const dateParts = convertedDate.split('-');
-  
-  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+export function canSchedule(date: Date) {
+  const atual = getDateInLocaleTime(new Date());
+  const agendamento = new Date(date);
+  return atual < agendamento;
+}
 
+export function convertDate(date?: Date | string) {
+  let convertedDate;
+  if (typeof date === 'string') convertedDate = date;
+  if (date instanceof Date) convertedDate = date.toISOString().split('T')[0];
+  const dateParts = convertedDate.split('-');
+
+  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
 }
