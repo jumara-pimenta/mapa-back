@@ -950,4 +950,18 @@ export class EmployeeService {
 
     return await this.employeeRepository.updateEmployeePassword(data.registration, passwordHashed)
   }
+
+  async resetEmployeePassword(registration: string): Promise<Employee>{
+    const employeeAlreadyExists = await this.employeeRepository.findByRegistration(registration)
+
+    if(!employeeAlreadyExists){
+      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    if(employeeAlreadyExists.firstAccess == true){
+      throw new HttpException('Colaborador ainda não definiu sua senha', HttpStatus.BAD_REQUEST)
+    }
+
+    return await this.employeeRepository.resetEmployeePassword(registration)
+  }
 }

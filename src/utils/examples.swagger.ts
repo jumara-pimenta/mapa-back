@@ -1051,3 +1051,11 @@ export const firstAccessEmployeeExample = {
   password: 'senhaSegura',
   confirmPassword: 'senhaSegura'
 }
+
+export const resetDriverPasswordExample = {
+  cpf: '76762928642',
+}
+
+export const resetEmployeePasswordExample = {
+  registration: '6598594',
+}

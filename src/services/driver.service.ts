@@ -406,4 +406,18 @@ export class DriverService {
 
     return await this.driverRepository.updateDriverPassword(data.cpf, passwordHashed)
   }
+
+  async resetDriverPassword(cpf: string): Promise<Driver>{
+    const driversAlreadyExists = await this.driverRepository.findByCpf(cpf)
+
+    if(!driversAlreadyExists){
+      throw new HttpException('Motorista não encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    if(driversAlreadyExists.firstAccess == true){
+      throw new HttpException('Motorista ainda não definiu sua senha', HttpStatus.BAD_REQUEST)
+    }
+
+    return await this.driverRepository.resetDriverPassword(cpf)
+  }
 }
