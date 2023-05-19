@@ -32,13 +32,17 @@ import {
 import {
   CreateEmployee,
   DeleteEmployee,
+  firstAccessEmployeeExample,
   GetAllEmployee,
   GetEmployee,
+  resetEmployeePasswordExample,
   UpdateEmployee,
 } from '../utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from '../decorators/roles.decorator';
 import { xlsxFileFilter } from 'src/middlewares/image.middleware';
+import { FirstAccessEmployeeDTO } from 'src/dtos/employee/firstAccessEmployee.dto';
+import { resetEmployeePasswordDTO } from 'src/dtos/employee/resetEmployee.dto';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -202,5 +206,33 @@ export class EmployeeController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
     return await this.employeeService.exportsEmployeeFileAddress();
+  }
+
+  @Post('/firstAccess')
+  @Roles('employee-first-access')
+  @ApiCreatedResponse({
+    description: 'Primeiro acesso de colaborador.',
+    schema: {
+      type: 'object',
+      example: firstAccessEmployeeExample,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async firstAccessDriver(@Body() data: FirstAccessEmployeeDTO): Promise<Employee>{
+    return await this.employeeService.firstAccess(data)
+  }
+
+  @Post('/resetPassword')
+  @Roles('employee-reset-password')
+  @ApiCreatedResponse({
+    description: 'Reseta a senha do colaborador.',
+    schema: {
+      type: 'object',
+      example: resetEmployeePasswordExample,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async resetEmployeePassword(@Body() data: resetEmployeePasswordDTO): Promise<Employee>{
+    return await this.employeeService.resetEmployeePassword(data.registration)
   }
 }

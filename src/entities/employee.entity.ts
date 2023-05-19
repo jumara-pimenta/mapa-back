@@ -14,6 +14,7 @@ export class Employee {
   shift: string;
   costCenter?: string;
   address: string;
+  firstAccess?: boolean;
   pins?: Partial<EmployeesOnPin>[];
   pin?: Pin;
   employeeOnPath?: EmployeesOnPath;

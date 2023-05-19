@@ -18,6 +18,7 @@ model Driver {
   validation   DateTime       @db.DateTimeOffset
   category     String
   route        Route[]
+  firstAccess  Boolean
   createdAt    DateTime       @default(now()) @db.DateTimeOffset
   updatedAt    DateTime?      @db.DateTimeOffset
   deletedAt    DateTime?      @db.DateTimeOffset
@@ -127,6 +128,7 @@ model Employee {
   password       String            @db.VarChar(255)
   pins           EmployeesOnPin[]
   employeeOnPath EmployeesOnPath[]
+  firstAccess    Boolean
   createdAt      DateTime          @default(now()) @db.DateTimeOffset
   updatedAt      DateTime?         @db.DateTimeOffset
   deletedAt      DateTime?         @db.DateTimeOffset

@@ -9,6 +9,7 @@ import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
 import { getDateStartToEndOfDay } from 'src/utils/Date';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeRepository
@@ -293,6 +294,7 @@ export class EmployeeRepository
         name: data.name,
         registration: data.registration,
         password: data.password,
+        firstAccess: true,
         role: data.role,
         shift: data.shift,
         createdAt: data.createdAt,
@@ -363,5 +365,31 @@ export class EmployeeRepository
         name: 'asc',
       },
     });
+  }
+
+  updateEmployeePassword(registration: string, password: string): Promise<Employee>{
+    return  this.repository.employee.update({
+      where: {
+        registration: registration
+      },
+      data: {
+        password: password,
+        firstAccess: false,
+        updatedAt: new Date()
+      }
+    })
+  }
+
+  async resetEmployeePassword(registration: string): Promise<Employee>{
+    return  this.repository.employee.update({
+      where: {
+        registration: registration
+      },
+      data: {
+        password: await bcrypt.hash(registration, 10),
+        firstAccess: true,
+        updatedAt: new Date()
+      }
+    })
   }
 }
