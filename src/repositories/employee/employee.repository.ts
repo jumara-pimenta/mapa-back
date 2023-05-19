@@ -387,7 +387,7 @@ export class EmployeeRepository
       },
       data: {
         password: await bcrypt.hash(registration, 10),
-        firstAccess: false,
+        firstAccess: true,
         updatedAt: new Date()
       }
     })
