@@ -402,6 +402,8 @@ export class DriverService {
       throw new HttpException('Senhas não correspondem', HttpStatus.BAD_REQUEST)
     }
 
-    return await this.driverRepository.updateDriverPassword(data.cpf, data.password)
+    const passwordHashed = await bcrypt.hash(data.password, 10)
+
+    return await this.driverRepository.updateDriverPassword(data.cpf, passwordHashed)
   }
 }
