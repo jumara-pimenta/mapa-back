@@ -30,6 +30,7 @@ import {
 import {
   CreateDriver,
   DeleteDriver,
+  firstAccessDriverExample,
   GetAllDriver,
   GetDriver,
   UpdateDriver,
@@ -38,6 +39,7 @@ import {
 import { Roles } from 'src/decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { xlsxFileFilter } from 'src/middlewares/image.middleware';
+import { FirstAccessDriverDTO } from 'src/dtos/driver/firstAccess.dto';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -187,5 +189,19 @@ export class DriverController {
     });
 
     return await this.driverService.exportDriverEmptFile();
+  }
+  
+  @Post('/firstAccess')
+  @Roles('driver-first-access')
+  @ApiCreatedResponse({
+    description: 'Primeiro acesso de motorista.',
+    schema: {
+      type: 'object',
+      example: firstAccessDriverExample,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async firstAccessDriver(@Body() data: FirstAccessDriverDTO): Promise<Driver>{
+    return await this.driverService.firstAccess(data)
   }
 }

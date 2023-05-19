@@ -293,6 +293,7 @@ export class EmployeeRepository
         name: data.name,
         registration: data.registration,
         password: data.password,
+        firstAccess: true,
         role: data.role,
         shift: data.shift,
         createdAt: data.createdAt,
@@ -363,5 +364,18 @@ export class EmployeeRepository
         name: 'asc',
       },
     });
+  }
+
+  updateEmployeePassword(registration: string, password: string): Promise<Employee>{
+    return  this.repository.employee.update({
+      where: {
+        registration: registration
+      },
+      data: {
+        password: password,
+        firstAccess: false,
+        updatedAt: new Date()
+      }
+    })
   }
 }

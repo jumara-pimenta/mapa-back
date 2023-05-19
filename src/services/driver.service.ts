@@ -21,6 +21,7 @@ import { validate } from 'class-validator';
 import { CreateDriverFileDTO } from 'src/dtos/driver/createDriverFile.dto';
 import { convertToDate } from 'src/utils/date.service';
 import { verifyDateFilter } from 'src/utils/Date';
+import { FirstAccessDriverDTO } from 'src/dtos/driver/firstAccess.dto';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -381,5 +382,26 @@ export class DriverService {
     };
 
     return exportedDriverToXLSX(headers, workSheetName, filePath);
+  }
+
+  async firstAccess(data: FirstAccessDriverDTO): Promise<Driver>{
+
+    const driversAlreadyExists = await this.driverRepository.findByCpf(data.cpf)
+
+    if(!driversAlreadyExists){
+      throw new HttpException('Motorista não encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    if(driversAlreadyExists.firstAccess == false){
+      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST)
+    }
+    
+    const checkIfPasswordMatches = data.password === data.confirmPassword
+
+    if(!checkIfPasswordMatches){
+      throw new HttpException('Senhas não correspondem', HttpStatus.BAD_REQUEST)
+    }
+
+    return await this.driverRepository.updateDriverPassword(data.cpf, data.password)
   }
 }

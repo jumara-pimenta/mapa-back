@@ -10,6 +10,7 @@ export class Driver {
   validation: Date;
   category: string;
   route?: Route;
+  firstAccess?: boolean;
   password?: string;
   createdAt: Date;
   updatedAt?: Date;

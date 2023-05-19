@@ -32,6 +32,7 @@ import {
 import {
   CreateEmployee,
   DeleteEmployee,
+  firstAccessEmployeeExample,
   GetAllEmployee,
   GetEmployee,
   UpdateEmployee,
@@ -39,6 +40,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from '../decorators/roles.decorator';
 import { xlsxFileFilter } from 'src/middlewares/image.middleware';
+import { FirstAccessEmployeeDTO } from 'src/dtos/employee/firstAccessEmployee.dto';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -202,5 +204,19 @@ export class EmployeeController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
     return await this.employeeService.exportsEmployeeFileAddress();
+  }
+
+  @Post('/firstAccess')
+  @Roles('employee-first-access')
+  @ApiCreatedResponse({
+    description: 'Primeiro acesso de colaborador.',
+    schema: {
+      type: 'object',
+      example: firstAccessEmployeeExample,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async firstAccessDriver(@Body() data: FirstAccessEmployeeDTO): Promise<Employee>{
+    return await this.employeeService.firstAccess(data)
   }
 }

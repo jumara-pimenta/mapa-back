@@ -138,8 +138,23 @@ export class DriverRepository
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
+        firstAccess: true,
         validation: new Date(data.validation),
       },
     });
   }
+
+  updateDriverPassword(cpf: string, password: string): Promise<Driver>{
+    return this.repository.driver.update({
+      where: {
+        cpf: cpf
+      },
+      data: {
+        password: password,
+        firstAccess: false,
+        updatedAt: new Date()
+      }
+    })
+  }
+
 }

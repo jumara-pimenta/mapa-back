@@ -39,6 +39,7 @@ import {
 import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
 import { getShift } from 'src/utils/Utils';
 import { verifyDateFilter } from 'src/utils/Date';
+import { FirstAccessEmployeeDTO } from 'src/dtos/employee/firstAccessEmployee.dto';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -925,5 +926,26 @@ export class EmployeeService {
     };
 
     return exportedEmployeeToXLSX(headers, workSheetName, filePath);
+  }
+
+  async firstAccess(data: FirstAccessEmployeeDTO): Promise<Employee>{
+
+    const employeeAlreadyExists = await this.employeeRepository.findByRegistration(data.registration)
+
+    if(!employeeAlreadyExists){
+      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    if(employeeAlreadyExists.firstAccess == false){
+      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST)
+    }
+    
+    const checkIfPasswordMatches = data.password === data.confirmPassword
+
+    if(!checkIfPasswordMatches){
+      throw new HttpException('Senhas não correspondem', HttpStatus.BAD_REQUEST)
+    }
+
+    return await this.employeeRepository.updateEmployeePassword(data.registration, data.password)
   }
 }

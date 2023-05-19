@@ -1039,3 +1039,15 @@ export const GetAllSinister = {
     },
   ],
 };
+
+export const firstAccessDriverExample = {
+  cpf: '76762928642',
+  password: 'senhaSegura',
+  confirmPassword: 'senhaSegura'
+}
+
+export const firstAccessEmployeeExample = {
+  registration: '6598594',
+  password: 'senhaSegura',
+  confirmPassword: 'senhaSegura'
+}
