@@ -31,7 +31,6 @@ import { FilterRouteExport } from '../dtos/route/filterRouteExport';
 import { RouteReplacementDriverDTO } from '../dtos/route/routeReplacementDriverDTO.dto';
 import { RouteMobile } from '../utils/Utils';
 import { CreateRouteExtraEmployeeDTO } from '../dtos/route/createRouteExtraEmployee.dto';
-import { CreateSuggestionExtra } from '../dtos/route/createSuggestionExtra.dto';
 import { CreateSugestedRouteDTO } from '../dtos/route/createSugestedRoute.dto';
 import { SuggenstionResultDTO } from '../dtos/route/SuggenstionResult.dto';
 

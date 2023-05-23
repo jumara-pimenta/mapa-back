@@ -5,9 +5,7 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsEnum,
-  IsDefined,
   IsOptional,
-  Matches,
 } from 'class-validator';
 import { PathDetailsDTO } from '../path/pathDetails.dto';
 import { ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';

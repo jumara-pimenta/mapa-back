@@ -1,9 +1,5 @@
 import { Page, PageResponse } from '../../configs/database/page.model';
-import {
-  BackOfficeUserCreateDTO,
-  BackOfficeUserDTO,
-  BackOfficeUserUpdateDTO,
-} from '../../dtos/auth/backOfficeUserLogin.dto';
+import { BackOfficeUserUpdateDTO } from '../../dtos/auth/backOfficeUserLogin.dto';
 import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
 
 export default interface IBackOfficeUserRepository {

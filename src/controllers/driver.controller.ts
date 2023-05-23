@@ -21,12 +21,7 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiCreatedResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateDriver,
   DeleteDriver,
@@ -131,8 +126,6 @@ export class DriverController {
   @HttpCode(HttpStatus.OK)
   async exportDriverFile(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersDriverDTO,
   ): Promise<StreamableFile> {
     const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx';
 
@@ -141,7 +134,7 @@ export class DriverController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
 
-    return await this.driverService.exportDriverFile(page, filters);
+    return await this.driverService.exportDriverFile();
   }
 
   @Post('/upload')

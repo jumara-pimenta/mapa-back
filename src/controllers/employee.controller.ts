@@ -2,13 +2,10 @@ import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   Post,
   Put,
   Query,
@@ -161,15 +158,13 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async exportsEmployeeFile(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersEmployeeDTO,
   ): Promise<any> {
     const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
     res.set({
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
-    return await this.employeeService.exportsEmployeeFile(page, filters);
+    return await this.employeeService.exportsEmployeeFile();
   }
 
   @Get('/download/empt/file')
@@ -197,8 +192,6 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async exportsEmployeeFileAddress(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersEmployeeDTO,
   ): Promise<any> {
     const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
     res.set({

@@ -37,15 +37,11 @@ import {
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
-import { MappedPathPinsDTO } from '../dtos/path/mappedPath.dto';
-import * as turf from '@turf/turf';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
 import * as fs from 'fs';
 import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
-import { Path } from '../entities/path.entity';
 import IMapBoxServiceIntegration from '../integrations/services/mapBoxService/mapbox.service.integration.contract';
-import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteReplacementDriverDTO } from '../dtos/route/routeReplacementDriverDTO.dto';
 import {
   convertToHours,
@@ -55,18 +51,15 @@ import {
   RouteMobile,
 } from '../utils/Utils';
 import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
-import { DetailsRoute, Waypoints } from '../dtos/route/waypoints.dto';
-import e from 'express';
+import { DetailsRoute } from '../dtos/route/waypoints.dto';
 import { canSchedule, getDuration, verifyDateFilter } from '../utils/Date';
 import { RouteHistoryService } from './routeHistory.service';
 import { RouteHistory } from '../entities/routeHistory.entity';
-import { faker, GitModule } from '@faker-js/faker';
-import { separateByDistrict, separateByZone } from '../utils/District';
+import { faker } from '@faker-js/faker';
 import { CreateRouteExtraEmployeeDTO } from '../dtos/route/createRouteExtraEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { CreateSugestedRouteDTO } from '../dtos/route/createSugestedRoute.dto';
 import {
-  CreateSuggestionExtra,
   SuggestionExtra,
 } from '../dtos/route/createSuggestionExtra.dto';
 import { SuggenstionResultDTO } from '../dtos/route/SuggenstionResult.dto';
@@ -116,7 +109,7 @@ export class RouteService {
           },
         });
 
-        const route1 = await this.create({
+         await this.create({
           description: 'Rota de teste EXTRA',
           driverId: driver.items[1].id,
           vehicleId: vehicle.items[1].id,
@@ -1279,7 +1272,6 @@ export class RouteService {
   }
 
   async exportsPathToFile(id: string): Promise<any> {
-    const today = new Date().toLocaleDateString('pt-BR');
     const filePath = './routes.xlsx';
     const workSheetName = 'Rotas';
     const workSheetPath = 'Trajetos';
@@ -1289,8 +1281,6 @@ export class RouteService {
 
     if (!route)
       throw new HttpException('Rota não encontrada!', HttpStatus.NOT_FOUND);
-
-    const paths: Path[] = [];
 
     const exportedPathToXLSX = async (
       routes: Route,
@@ -1611,66 +1601,6 @@ export class RouteService {
     return response;
   }
 }
-
-const orderPins = (arr: Employee[]): string[] => {
-  const latDenso = -3.110944;
-  const longDenso = -59.962604;
-
-  const newArr = [];
-
-  for (const employee of arr) {
-    newArr.push(employee);
-  }
-
-  const n = newArr.length;
-
-  for (let i = 0; i < n - 1; i++) {
-    for (let j = 0; j < n - i - 1; j++) {
-      const lat = Number(
-        Number(
-          newArr[j].pins[newArr[j].pins.length - 1].pin.lat.trim(),
-        ).toFixed(5),
-      );
-      const long = Number(
-        Number(
-          newArr[j].pins[newArr[j].pins.length - 1].pin.lng.trim(),
-        ).toFixed(5),
-      );
-
-      const latPointAhead = Number(
-        Number(
-          newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lat.trim(),
-        ).toFixed(5),
-      );
-      const longPointAhead = Number(
-        Number(
-          newArr[j + 1].pins[newArr[j].pins.length - 1].pin.lng.trim(),
-        ).toFixed(5),
-      );
-      const fromPoint = turf.point([long, lat]);
-      const fromPointAhead = turf.point([longPointAhead, latPointAhead]);
-
-      const toDenso = turf.point([longDenso, latDenso]);
-
-      const distanceToDenso = turf.distance(fromPoint, toDenso);
-      const distancePointAheadToDenso = turf.distance(fromPointAhead, toDenso);
-
-      if (distanceToDenso < distancePointAheadToDenso) {
-        const temp = newArr[j];
-        newArr[j] = newArr[j + 1];
-        newArr[j + 1] = temp;
-      }
-    }
-  }
-
-  const employeeIdOrdened = [];
-
-  for (const employee of newArr) {
-    employeeIdOrdened.push(employee.id);
-  }
-
-  return employeeIdOrdened;
-};
 
 function calculateDistance(employee: any[], location: any, list: any): any {
   const employees = employee;

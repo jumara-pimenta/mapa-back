@@ -6,7 +6,6 @@ import { Sinister } from '../../entities/sinister.entity';
 import ISinisterRepository from './sinister.repository.contract';
 import { FiltersSinisterDTO } from '../../dtos/sinister/filtersSinister.dto';
 import { generateQueryByFiltersForSinister } from '../../configs/database/Queries';
-import { Path } from '../../entities/path.entity';
 import { getDateInLocaleTime } from '../../utils/Date';
 
 @Injectable()
@@ -88,7 +87,6 @@ export class SinisterRepository
   async vinculatePath(
     sinister: Sinister,
     routeHistoryId: string,
-    path: Path,
   ): Promise<any> {
     return this.repository.sinister.update({
       data: {

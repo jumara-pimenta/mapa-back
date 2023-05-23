@@ -2,7 +2,6 @@ import { FiltersRouteHistoryDTO } from '../../dtos/routeHistory/filtersRouteHist
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { RouteHistory } from '../../entities/routeHistory.entity';
 import { EmployeeHistoryDTO } from '../../dtos/routeHistory/mappedRouteHistory.dto';
-import { Path, Sinister } from '@prisma/client';
 import { RouteHistoryByDateAndShift } from '../../dtos/routeHistory/routeHistoryByDate.dto';
 
 export default interface IRouteHistoryRepository {

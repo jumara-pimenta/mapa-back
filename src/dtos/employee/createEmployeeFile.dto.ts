@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsNumberString,
-  IsInt,
   IsOptional,
   IsEnum,
 } from 'class-validator';

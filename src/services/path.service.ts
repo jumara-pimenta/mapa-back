@@ -453,7 +453,6 @@ export class PathService {
           const {
             name,
             registration,
-            id: employeeId,
           } = employeeOnPath.employee;
 
           if (agroupedEmployees.includes(employeeOnPath.id)) return;
@@ -633,7 +632,7 @@ export class PathService {
   async addSubstituteDriver(driverId: string, pathId: string): Promise<Path> {
     const path = await this.listById(pathId);
 
-    const driver = await this.driverService.listById(driverId);
+    await this.driverService.listById(driverId);
 
     if (path.status === EStatusPath.IN_PROGRESS)
       throw new HttpException(

@@ -14,26 +14,17 @@ import {
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import {
-  compareDates,
-  convertDate,
-  getDateStartToEndOfDay,
-  getPeriod,
-} from '../utils/Date';
+import { convertDate, getDateStartToEndOfDay, getPeriod } from '../utils/Date';
 import {
   RouteByDateAndShift,
   RouteHistoryByDate,
   RouteSeparated,
-  Shifts,
   ShiftsByDate,
 } from '../dtos/routeHistory/routeHistoryByDate.dto';
 import { MappedPathHistoryDTO } from '../dtos/routeHistory/mappedPathHistory.dto';
 import { SinisterService } from './sinister.service';
 import { ETypePeriodHistory } from '../utils/ETypes';
-import {
-  getShiftToGraphic,
-  getStartAtAndFinishAt,
-} from '../utils/date.service';
+import { getShiftToGraphic } from '../utils/date.service';
 
 @Injectable()
 export class RouteHistoryService {

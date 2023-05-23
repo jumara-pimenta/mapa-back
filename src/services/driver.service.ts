@@ -294,9 +294,8 @@ export class DriverService {
     return errors;
   }
 
-  async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
+  async exportDriverFile() {
     const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
-    const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './driver.xlsx';
     const workSheetName = 'Motoristas';

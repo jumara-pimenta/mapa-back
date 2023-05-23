@@ -30,7 +30,6 @@ import { plainToClass } from 'class-transformer';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
-import { json } from 'stream/consumers';
 import {
   convertToDate,
   getShiftStartAtAndExports,
@@ -151,6 +150,7 @@ export class EmployeeService {
           : pin.id,
       type: ETypePin.CONVENTIONAL,
     });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...data } = employee;
 
     return { ...data, address: JSON.parse(data.address) };
@@ -592,7 +592,7 @@ export class EmployeeService {
     return errors;
   }
 
-  async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
+  async exportsEmployeeFile() {
     const headers = [
       'Matricula',
       'Nome Colaborador',
@@ -603,7 +603,6 @@ export class EmployeeService {
       'PONTO DE COLETA',
       'Referencia',
     ];
-    const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './employee.xlsx';
     const workSheetName = 'LISTA DE COLABORADORES';

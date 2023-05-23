@@ -310,7 +310,7 @@ export class VehicleService {
     return errors;
   }
 
-  async exportVehicleFile(page: Page, filters?: FiltersVehicleDTO) {
+  async exportVehicleFile() {
     const headers = [
       'Placa',
       'Empresa',
@@ -323,7 +323,6 @@ export class VehicleService {
       'Observação',
       'Acessibilidade',
     ];
-    const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './vehicle.xlsx';
     const workSheetName = 'Veículos';

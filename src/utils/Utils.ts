@@ -5,11 +5,11 @@ import * as path from 'path';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 import { ETypeShiftEmployee } from './ETypes';
+import * as crypto from 'crypto';
 
 export const pipelineAsync = promisify(pipeline);
 const uploadDirectory = path.join(process.cwd(), 'tmp', 'reports');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const randomBytesAsync = promisify(require('crypto').randomBytes);
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 export function convertAndVerifyNumber(value: number): number {
   const valueConverted = Number(value);
@@ -36,7 +36,7 @@ export const verifyReportDirectory = async (): Promise<void> => {
   if (!fs.existsSync(uploadDirectory)) {
     const _uploadDirectory = path.join(process.cwd(), 'tmp', 'reports');
 
-    return fs.mkdir(_uploadDirectory, { recursive: true }, (err) => undefined);
+    return fs.mkdir(_uploadDirectory, { recursive: true }, () => undefined);
   }
 
   fs.readdir(uploadDirectory, async (err, files) => {

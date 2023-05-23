@@ -1,7 +1,5 @@
 import {
   forwardRef,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
 } from '@nestjs/common';
@@ -11,9 +9,7 @@ import { EmployeesOnPin } from '../entities/employeesOnPin.entity';
 import IEmployeesOnPinRepository from '../repositories/employeesOnPin/employeesOnPin.repository.contract';
 import { EmployeeService } from './employee.service';
 import { ETypePin } from '../utils/ETypes';
-import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { Employee } from '../entities/employee.entity';
-import { Pin } from '../entities/pin.entity';
 
 @Injectable()
 export class EmployeesOnPinService {

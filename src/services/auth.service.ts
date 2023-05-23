@@ -12,8 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { BackOfficeUser } from '../entities/backOfficeUser.entity';
 import { setPermissions } from '../utils/roles.permissions';
 import { CoreTokenDTO } from '../dtos/auth/CoreToken.dto';
-import { VerifyTokenResponse } from '../integrations/services/coreService/response/verifyToken.response';
-import { ERoles, ERolesBackOfficeTypes } from '../utils/ETypes';
+import { ERoles } from '../utils/ETypes';
 import { EmployeeService } from './employee.service';
 import { SignInEmployeeDTO } from '../dtos/employee/signInEmployee.dto';
 import { DriverService } from './driver.service';
@@ -128,7 +127,7 @@ export class AuthService {
       role: user.roleType,
     });
 
-    const { updatedAt, createdAt, password, ...result } = user;
+    const { ...result } = user;
 
     return { ...result, token };
   }
@@ -308,7 +307,7 @@ export class AuthService {
   }
 
   private mapper(BackOfficeUser: BackOfficeUser): MappedBackOfficeUserDTO {
-    const { password, ...result } = BackOfficeUser;
+    const { ...result } = BackOfficeUser;
 
     return result;
   }

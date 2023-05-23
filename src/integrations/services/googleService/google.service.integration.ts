@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { Waypoints } from '../../../dtos/route/waypoints.dto';
 import { googleApi } from '../../../integrations/api';

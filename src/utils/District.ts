@@ -1,4 +1,3 @@
-import { Employee } from '../entities/employee.entity';
 import { AddressComponent } from '../integrations/services/googleService/response/getLocation.response';
 
 export function getZoneFromDistrict(district: string) {
