@@ -9,18 +9,16 @@ import {
 } from 'class-validator';
 import { UpdateEmployeePinDTO } from '../pin/updateEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
-import { faker } from '@faker-js/faker';
-import { ETypeShiftEmployee } from 'src/utils/ETypes';
-
-faker.locale = 'pt_BR';
+import { faker } from '@faker-js/faker/locale/pt_BR';
+import { ETypeShiftEmployee } from '../../utils/ETypes';
 
 export class UpdateEmployeeDTO {
   @ApiProperty({
     required: false,
-    example: `${faker.random.numeric(6)}`,
+    example: `${faker.string.numeric(6)}`,
     description: 'Matrícula do colaborador',
   })
-  @ApiProperty({ required: false, example: `${faker.random.numeric(6)}` })
+  @ApiProperty({ required: false, example: `${faker.string.numeric(6)}` })
   @IsString({ message: '[registration] A matrícula deve ser do tipo texto.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -40,10 +38,10 @@ export class UpdateEmployeeDTO {
 
   @ApiProperty({
     required: false,
-    example: `${faker.name.fullName()}`,
+    example: `${faker.person.fullName()}`,
     description: 'Nome do colaborador',
   })
-  @ApiProperty({ required: false, example: `${faker.name.fullName()}` })
+  @ApiProperty({ required: false, example: `${faker.person.fullName()}` })
   @IsString({ message: '[name] o nome deve ser do tipo texto.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -51,10 +49,10 @@ export class UpdateEmployeeDTO {
 
   @ApiProperty({
     required: false,
-    example: `${faker.name.jobTitle()}`,
+    example: `${faker.person.jobTitle()}`,
     description: 'Cargo do colaborador',
   })
-  @ApiProperty({ required: false, example: `${faker.name.jobTitle()}` })
+  @ApiProperty({ required: false, example: `${faker.person.jobTitle()}` })
   @IsString({ message: '[rola] o cargo deve ser do tipo texto.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -62,14 +60,16 @@ export class UpdateEmployeeDTO {
 
   @ApiProperty({
     required: false,
-    example: `${faker.random.numeric(1, {
+    example: `${faker.string.numeric({
       allowLeadingZeros: false,
-      bannedDigits: ['0', '5', '6', '7', '8', '9'],
+      length: 1,
+      exclude: ['0', '5', '6', '7', '8', '9'],
     })}`,
     description: 'Turno de trabalho do colaborador',
   })
   @IsEnum(ETypeShiftEmployee, {
-    message: '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
+    message:
+      '[shift] Turno tem que ser do tipo PRIMEIRO, SEGUNDO, TERCEIRO ou SEM TURNO ESTABELECIDO',
   })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())
@@ -77,10 +77,10 @@ export class UpdateEmployeeDTO {
 
   @ApiProperty({
     required: false,
-    example: `${faker.random.numeric(6)}`,
+    example: `${faker.string.numeric(6)}`,
     description: 'Centro de custo do colaborador',
   })
-  @ApiProperty({ required: false, example: `${faker.random.numeric(6)}` })
+  @ApiProperty({ required: false, example: `${faker.string.numeric(6)}` })
   @IsString({ message: '[costCenter] o campo custo deve ser do tipo texto.' })
   @IsOptional()
   @Transform(({ value }: TransformFnParams) => value?.trim())

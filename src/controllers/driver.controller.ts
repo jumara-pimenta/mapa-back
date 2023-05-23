@@ -36,12 +36,12 @@ import {
   resetDriverPasswordExample,
   UpdateDriver,
   UploadFileDrivers,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { xlsxFileFilter } from 'src/middlewares/image.middleware';
-import { FirstAccessDriverDTO } from 'src/dtos/driver/firstAccess.dto';
-import { resetDriverPasswordDTO } from 'src/dtos/driver/resetPassword.dto';
+import { xlsxFileFilter } from '../middlewares/image.middleware';
+import { FirstAccessDriverDTO } from '../dtos/driver/firstAccess.dto';
+import { resetDriverPasswordDTO } from '../dtos/driver/resetPassword.dto';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -192,7 +192,7 @@ export class DriverController {
 
     return await this.driverService.exportDriverEmptFile();
   }
-  
+
   @Post('/firstAccess')
   @Roles('driver-first-access')
   @ApiCreatedResponse({
@@ -203,8 +203,8 @@ export class DriverController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async firstAccessDriver(@Body() data: FirstAccessDriverDTO): Promise<Driver>{
-    return await this.driverService.firstAccess(data)
+  async firstAccessDriver(@Body() data: FirstAccessDriverDTO): Promise<Driver> {
+    return await this.driverService.firstAccess(data);
   }
 
   @Post('/resetPassword')
@@ -217,7 +217,9 @@ export class DriverController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async resetDriverPassword(@Body() data: resetDriverPasswordDTO): Promise<Driver>{
-    return await this.driverService.resetDriverPassword(data.cpf)
+  async resetDriverPassword(
+    @Body() data: resetDriverPasswordDTO,
+  ): Promise<Driver> {
+    return await this.driverService.resetDriverPassword(data.cpf);
   }
 }

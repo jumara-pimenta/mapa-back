@@ -37,39 +37,39 @@ import {
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
-import { MappedPathPinsDTO } from 'src/dtos/path/mappedPath.dto';
+import { MappedPathPinsDTO } from '../dtos/path/mappedPath.dto';
 import * as turf from '@turf/turf';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
 import * as fs from 'fs';
-import { EmployeesOnPath } from 'src/entities/employeesOnPath.entity';
-import { Path } from 'src/entities/path.entity';
-import IMapBoxServiceIntegration from 'src/integrations/services/mapBoxService/mapbox.service.integration.contract';
-import { UpdatePathDTO } from 'src/dtos/path/updatePath.dto';
-import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
+import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
+import { Path } from '../entities/path.entity';
+import IMapBoxServiceIntegration from '../integrations/services/mapBoxService/mapbox.service.integration.contract';
+import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
+import { RouteReplacementDriverDTO } from '../dtos/route/routeReplacementDriverDTO.dto';
 import {
   convertToHours,
   distanceBetweenPoints,
   EmployeeList,
   employeesPerRoute,
   RouteMobile,
-} from 'src/utils/Utils';
-import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
-import { DetailsRoute, Waypoints } from 'src/dtos/route/waypoints.dto';
+} from '../utils/Utils';
+import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
+import { DetailsRoute, Waypoints } from '../dtos/route/waypoints.dto';
 import e from 'express';
-import { canSchedule, getDuration, verifyDateFilter } from 'src/utils/Date';
+import { canSchedule, getDuration, verifyDateFilter } from '../utils/Date';
 import { RouteHistoryService } from './routeHistory.service';
-import { RouteHistory } from 'src/entities/routeHistory.entity';
+import { RouteHistory } from '../entities/routeHistory.entity';
 import { faker, GitModule } from '@faker-js/faker';
-import { separateByDistrict, separateByZone } from 'src/utils/District';
-import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
-import { MappedEmployeeDTO } from 'src/dtos/employee/mappedEmployee.dto';
-import { CreateSugestedRouteDTO } from 'src/dtos/route/createSugestedRoute.dto';
+import { separateByDistrict, separateByZone } from '../utils/District';
+import { CreateRouteExtraEmployeeDTO } from '../dtos/route/createRouteExtraEmployee.dto';
+import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
+import { CreateSugestedRouteDTO } from '../dtos/route/createSugestedRoute.dto';
 import {
   CreateSuggestionExtra,
   SuggestionExtra,
-} from 'src/dtos/route/createSuggestionExtra.dto';
-import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
+} from '../dtos/route/createSuggestionExtra.dto';
+import { SuggenstionResultDTO } from '../dtos/route/SuggenstionResult.dto';
 import { scheduled } from 'rxjs';
 
 @Injectable()
@@ -153,7 +153,7 @@ export class RouteService {
           const props = new RouteHistory(
             {
               typeRoute: path.type,
-              nameRoute: faker.name.jobTitle(),
+              nameRoute: faker.person.jobTitle(),
               employeeIds: path.employeesOnPath.map((e) => e.id).join(','),
               itinerary: '-3.4441,-60.025',
               totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
@@ -171,7 +171,7 @@ export class RouteService {
           const props2 = new RouteHistory(
             {
               typeRoute: path1.type,
-              nameRoute: faker.name.jobTitle(),
+              nameRoute: faker.person.jobTitle(),
               employeeIds: path1.employeesOnPath.map((e) => e.id).join(','),
               itinerary: '-3.4441,-60.025',
               totalEmployees: faker.datatype.number({ min: 10, max: 40 }),

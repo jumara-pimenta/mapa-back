@@ -1,9 +1,9 @@
-import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
-import { Page, PageResponse } from 'src/configs/database/page.model';
+import { FiltersRouteHistoryDTO } from '../../dtos/routeHistory/filtersRouteHistory.dto';
+import { Page, PageResponse } from '../../configs/database/page.model';
 import { RouteHistory } from '../../entities/routeHistory.entity';
-import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
+import { EmployeeHistoryDTO } from '../../dtos/routeHistory/mappedRouteHistory.dto';
 import { Path, Sinister } from '@prisma/client';
-import { RouteHistoryByDateAndShift } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
+import { RouteHistoryByDateAndShift } from '../../dtos/routeHistory/routeHistoryByDate.dto';
 
 export default interface IRouteHistoryRepository {
   getHistoric(): Promise<any>;

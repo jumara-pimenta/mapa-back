@@ -1,5 +1,5 @@
-import { IsDateString, IsEnum, IsOptional } from "class-validator";
-import { EShiftType } from "src/utils/ETypes";
+import { IsDateString, IsEnum, IsOptional } from 'class-validator';
+import { EShiftType } from '../../utils/ETypes';
 
 export class EmployeeHistoryDTO {
   id: string;
@@ -7,8 +7,10 @@ export class EmployeeHistoryDTO {
 
 export class DateShift {
   @IsDateString()
-  data : string;
+  data: string;
   @IsOptional()
-  @IsEnum(EShiftType, { message: 'Turno tem que ser do tipo TURNO 1, TURNO 2, TURNO 3 ou Extra' })
-  shift? : string
+  @IsEnum(EShiftType, {
+    message: 'Turno tem que ser do tipo TURNO 1, TURNO 2, TURNO 3 ou Extra',
+  })
+  shift?: string;
 }

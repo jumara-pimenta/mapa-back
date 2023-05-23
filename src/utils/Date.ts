@@ -2,7 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { getDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import * as moment from 'moment';
-import { PeriodInDate } from 'src/dtos/routeHistory/dateFilter.dto';
+import { PeriodInDate } from '../dtos/routeHistory/dateFilter.dto';
 import { ETypePeriodHistory } from './ETypes';
 
 interface DateStartEnd {

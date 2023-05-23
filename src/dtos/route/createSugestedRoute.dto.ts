@@ -9,13 +9,9 @@ import {
   IsOptional,
   Matches,
 } from 'class-validator';
-import { PathDetailsDTO } from '../path/pathDetails.dto';
 import {
   ETypePathExtra,
-  ETypeRoute,
-  ETypeShiftRotue,
 } from '../../utils/ETypes';
-import { StartsAtRgx, durationPathRgx } from 'src/utils/Regex';
 
 export class CreateSugestedRouteDTO {
   @ValidateNested({

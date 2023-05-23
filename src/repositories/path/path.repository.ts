@@ -5,7 +5,7 @@ import { Path } from '../../entities/path.entity';
 import IPathRepository from './path.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { EStatusPath } from '../../utils/ETypes';
-import { generateQueryByFiltersForPaths } from 'src/configs/database/Queries';
+import { generateQueryByFiltersForPaths } from '../../configs/database/Queries';
 
 @Injectable()
 export class PathRepository extends Pageable<Path> implements IPathRepository {

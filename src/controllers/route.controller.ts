@@ -25,15 +25,15 @@ import {
   GetRoutesByDriver,
   ListRoutes,
   UpdateRoute,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { FilterRouteExport } from 'src/dtos/route/filterRouteExport';
-import { RouteReplacementDriverDTO } from 'src/dtos/route/routeReplacementDriverDTO.dto';
-import { RouteMobile } from 'src/utils/Utils';
-import { CreateRouteExtraEmployeeDTO } from 'src/dtos/route/createRouteExtraEmployee.dto';
-import { CreateSuggestionExtra } from 'src/dtos/route/createSuggestionExtra.dto';
-import { CreateSugestedRouteDTO } from 'src/dtos/route/createSugestedRoute.dto';
-import { SuggenstionResultDTO } from 'src/dtos/route/SuggenstionResult.dto';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
+import { FilterRouteExport } from '../dtos/route/filterRouteExport';
+import { RouteReplacementDriverDTO } from '../dtos/route/routeReplacementDriverDTO.dto';
+import { RouteMobile } from '../utils/Utils';
+import { CreateRouteExtraEmployeeDTO } from '../dtos/route/createRouteExtraEmployee.dto';
+import { CreateSuggestionExtra } from '../dtos/route/createSuggestionExtra.dto';
+import { CreateSugestedRouteDTO } from '../dtos/route/createSugestedRoute.dto';
+import { SuggenstionResultDTO } from '../dtos/route/SuggenstionResult.dto';
 
 @Controller('/api/routes')
 @ApiTags('Routes')

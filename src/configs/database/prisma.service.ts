@@ -1,9 +1,9 @@
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker/locale/pt_BR';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { getDateInLocaleTime } from 'src/utils/Date';
-import { ETypePin } from 'src/utils/ETypes';
+import { getDateInLocaleTime } from '../../utils/Date';
+import { ETypePin } from '../../utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -70,7 +70,6 @@ export class PrismaService
 
     if (process.env.NODE_ENV !== 'production') {
       if (paths.length === 0) {
-        faker.locale = 'pt_BR';
         const employees: any[] = [];
 
         const pins = [
@@ -142,18 +141,18 @@ export class PrismaService
 
         for (let i = 0; i < 6; i++) {
           employees.push({
-            name: faker.name.fullName(),
+            name: faker.person.fullName(),
             address: JSON.stringify({
-              cep: faker.address.zipCodeByState('AM').replace('-', ''),
-              city: faker.address.city(),
+              cep: faker.location.zipCodeByState('AM').replace('-', ''),
+              city: faker.location.city(),
               complement: '',
-              neighborhood: faker.address.secondaryAddress(),
-              number: faker.random.numeric(8).toString(),
+              neighborhood: faker.location.secondaryAddress(),
+              number: faker.string.numeric(8).toString(),
               state: 'AM',
-              street: faker.address.streetAddress(true),
+              street: faker.location.streetAddress(true),
             }),
-            registration: faker.random.numeric(6).toString(),
-            costCenter: faker.random.numeric(6).toString(),
+            registration: faker.string.numeric(6).toString(),
+            costCenter: faker.string.numeric(6).toString(),
             firstAccess: true,
             password: await bcrypt.hash('Denso', 10),
             admission: faker.date.past(),
@@ -187,13 +186,13 @@ export class PrismaService
         for (let i = 0; i < 2; i++) {
           driverId.push({
             id: uuid(),
-            name: faker.name.fullName(),
+            name: faker.person.fullName(),
             category: 'D',
             firstAccess: true,
-            cnh: faker.random.numeric(11).toString(),
+            cnh: faker.string.numeric(11).toString(),
             createdAt: getDateInLocaleTime(new Date()),
 
-            cpf: faker.random.numeric(11).toString(),
+            cpf: faker.string.numeric(11).toString(),
             password: await bcrypt.hash('Denso', 10),
             validation: faker.date.future(),
           });
@@ -208,13 +207,13 @@ export class PrismaService
         for (let i = 0; i < 2; i++) {
           vehicleId.push({
             id: uuid(),
-            capacity: +faker.random.numeric(2),
+            capacity: +faker.string.numeric(2),
             expiration: faker.date.future(),
             lastMaintenance: faker.date.past(),
             note: faker.lorem.paragraph(),
             lastSurvey: faker.date.past(),
             plate: faker.vehicle.vrm(),
-            renavam: faker.random.numeric(11).toString(),
+            renavam: faker.string.numeric(11).toString(),
             type: faker.vehicle.type(),
             isAccessibility: true,
             company: faker.company.name(),

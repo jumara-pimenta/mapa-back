@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
+import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
 import { EmployeeController } from '../controllers/employee.controller';
 import { EmployeeRepository } from '../repositories/employee/employee.repository';
 import { EmployeeService } from '../services/employee.service';

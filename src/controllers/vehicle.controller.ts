@@ -34,10 +34,10 @@ import {
   GetVehicle,
   UpdateVehicle,
   UploadFileVehicles,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { xlsxFileFilter } from 'src/middlewares/image.middleware';
+import { xlsxFileFilter } from '../middlewares/image.middleware';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')

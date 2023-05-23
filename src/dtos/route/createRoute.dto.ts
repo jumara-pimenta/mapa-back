@@ -11,7 +11,6 @@ import {
 } from 'class-validator';
 import { PathDetailsDTO } from '../path/pathDetails.dto';
 import { ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
-import { StartsAtRgx, durationPathRgx } from 'src/utils/Regex';
 
 export class CreateRouteDTO {
   @ApiProperty({

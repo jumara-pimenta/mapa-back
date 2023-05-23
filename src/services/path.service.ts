@@ -28,8 +28,8 @@ import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { SinisterService } from './sinister.service';
-import { RouteMobile } from 'src/utils/Utils';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+import { RouteMobile } from '../utils/Utils';
+import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
 
 @Injectable()
 export class PathService {

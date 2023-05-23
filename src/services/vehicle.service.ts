@@ -17,9 +17,9 @@ import { FiltersVehicleDTO } from '../dtos/vehicle/filtersVehicle.dto';
 import { MappedVehicleDTO } from '../dtos/vehicle/mappedVehicle.dto';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
-import { CreateVehicleFileDTO } from 'src/dtos/vehicle/createVehicleFile.dto';
-import { convertToDate } from 'src/utils/date.service';
-import { verifyDateFilter } from 'src/utils/Date';
+import { CreateVehicleFileDTO } from '../dtos/vehicle/createVehicleFile.dto';
+import { convertToDate } from '../utils/date.service';
+import { verifyDateFilter } from '../utils/Date';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
