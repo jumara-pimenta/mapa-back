@@ -250,7 +250,7 @@ export class EmployeesOnPathService {
     }
 
     if (path.type === ETypePath.RETURN) {
-      await this.employeesOnPathRepository.updateMany(employeesOnPath, false);
+      await this.employeesOnPathRepository.updateMany(employeesOnPath, true);
     }
   }
 
