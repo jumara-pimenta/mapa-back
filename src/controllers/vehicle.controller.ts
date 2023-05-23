@@ -21,12 +21,7 @@ import { Vehicle } from '../entities/vehicle.entity';
 import { VehicleService } from '../services/vehicle.service';
 import { CreateVehicleDTO } from '../dtos/vehicle/createVehicle.dto';
 import { UpdateVehicleDTO } from '../dtos/vehicle/updateVehicle.dto';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiCreatedResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateVehicle,
   DeleteVehicle,
@@ -34,10 +29,10 @@ import {
   GetVehicle,
   UpdateVehicle,
   UploadFileVehicles,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { xlsxFileFilter } from 'src/middlewares/image.middleware';
+import { xlsxFileFilter } from '../middlewares/image.middleware';
 
 @Controller('/api/vehicles')
 @ApiTags('Vehicles')
@@ -129,8 +124,6 @@ export class VehicleController {
   @HttpCode(HttpStatus.OK)
   async exportVehicleFile(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersVehicleDTO,
   ): Promise<StreamableFile> {
     const fileName = 'Sonar Rotas - Veículos Exportados.xlsx';
 
@@ -139,7 +132,7 @@ export class VehicleController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
 
-    return await this.vehicleService.exportVehicleFile(page, filters);
+    return await this.vehicleService.exportVehicleFile();
   }
 
   @Post('/upload')

@@ -1,14 +1,14 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
+import { Page, PageResponse } from '../../configs/database/page.model';
 import { FiltersRouteHistoryDTO } from './../../dtos/routeHistory/filtersRouteHistory.dto';
 import { Injectable } from '@nestjs/common';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IRouteHistoryRepository from './routeHistory.repository.contract';
 import { RouteHistory } from '../../entities/routeHistory.entity';
-import { EmployeeHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
-import { getDateInLocaleTime, getDateStartToEndOfDay } from 'src/utils/Date';
-import { generateQueryByFiltersForRouteHistory } from 'src/configs/database/Queries';
-import { RouteHistoryByDateAndShift } from 'src/dtos/routeHistory/routeHistoryByDate.dto';
+import { EmployeeHistoryDTO } from '../../dtos/routeHistory/mappedRouteHistory.dto';
+import { getDateInLocaleTime, getDateStartToEndOfDay } from '../../utils/Date';
+import { generateQueryByFiltersForRouteHistory } from '../../configs/database/Queries';
+import { RouteHistoryByDateAndShift } from '../../dtos/routeHistory/routeHistoryByDate.dto';
 
 @Injectable()
 export class RouteHistoryRepository

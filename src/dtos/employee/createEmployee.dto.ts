@@ -11,13 +11,11 @@ import {
 } from 'class-validator';
 import { CreateEmployeePinDTO } from '../pin/createEmployeePin.dto';
 import { EmployeeAddressDTO } from './employeeAddress.dto';
-import { faker } from '@faker-js/faker';
-import { ETypeShiftEmployee } from 'src/utils/ETypes';
-
-faker.locale = 'pt_BR';
+import { ETypeShiftEmployee } from '../../utils/ETypes';
+import { faker } from '@faker-js/faker/locale/pt_BR';
 
 export class CreateEmployeeDTO {
-  @ApiProperty({ default: `${faker.random.numeric(6)}` })
+  @ApiProperty({ default: `${faker.string.numeric(6)}` })
   @IsNumberString(
     {},
     { message: '[registration] A matrícula deve ser do tipo texto.' },
@@ -34,13 +32,13 @@ export class CreateEmployeeDTO {
   @IsOptional()
   admission?: Date;
 
-  @ApiProperty({ default: `${faker.name.jobTitle()}` })
+  @ApiProperty({ default: `${faker.person.jobTitle()}` })
   @IsString({ message: '[role] O cargo deve ser do tipo texto.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsOptional()
   role: string;
 
-  @ApiProperty({ default: `${faker.name.fullName()}` })
+  @ApiProperty({ default: `${faker.person.fullName()}` })
   @IsString({ message: '[name] O nome deve ser do tipo texto.' })
   @IsNotEmpty({ message: '[role] O nome deve ser preenchido.' })
   name: string;
@@ -56,7 +54,7 @@ export class CreateEmployeeDTO {
   })
   shift: ETypeShiftEmployee;
 
-  @ApiProperty({ default: `${faker.random.numeric(6)}` })
+  @ApiProperty({ default: `${faker.string.numeric(6)}` })
   @IsString({
     message: '[costCenter] O centro de custo deve ser do tipo texto.',
   })

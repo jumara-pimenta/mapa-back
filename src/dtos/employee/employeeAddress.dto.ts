@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker/locale/pt_BR';
 
-faker.locale = 'pt_BR';
 export class EmployeeAddressDTO {
   @ApiProperty({
-    default: `${faker.address.zipCode('########')}`,
+    default: `${faker.location.zipCode('########')}`,
     description: 'CEP do endereço do colaborador',
   })
   @IsString({ message: '[cep] O cep deve ser do tipo alfanumérico.' })
@@ -13,7 +12,7 @@ export class EmployeeAddressDTO {
   cep: string;
 
   @ApiProperty({
-    default: `${faker.address.city()}`,
+    default: `${faker.location.city()}`,
     description: 'Cidade do colaborador',
   })
   @IsString({ message: '[city] A cidade deve ser do tipo texto.' })
@@ -21,7 +20,7 @@ export class EmployeeAddressDTO {
   city: string;
 
   @ApiProperty({
-    default: `${faker.address.street()}`,
+    default: `${faker.location.street()}`,
     description: 'Complemento do endereço do colaborador',
   })
   @IsString({ message: '[complement] O complemento deve ser do tipo texto.' })
@@ -29,7 +28,7 @@ export class EmployeeAddressDTO {
   complement?: string;
 
   @ApiProperty({
-    default: `${faker.address.street()}`,
+    default: `${faker.location.street()}`,
     description: 'Bairro do endereço do colaborador',
   })
   @IsString({ message: '[neighborhood] O bairro deve ser do tipo texto.' })
@@ -37,14 +36,14 @@ export class EmployeeAddressDTO {
   neighborhood: string;
 
   @ApiProperty({
-    default: `${faker.address.buildingNumber()}`,
+    default: `${faker.location.buildingNumber()}`,
     description: 'Número do endereço do colaborador',
   })
   @IsString({ message: '[number] O número deve ser do tipo texto.' })
   number: string;
 
   @ApiProperty({
-    default: `${faker.address.state()}`,
+    default: `${faker.location.state()}`,
     description: 'Estado do endereço do colaborador',
   })
   @IsString({ message: '[state] O estado deve ser do tipo texto.' })
@@ -52,7 +51,7 @@ export class EmployeeAddressDTO {
   state: string;
 
   @ApiProperty({
-    default: `${faker.address.street()}`,
+    default: `${faker.location.street()}`,
     description: 'Rua do endereço do colaborador',
   })
   @IsString({ message: '[street] A rua deve ser do tipo texto.' })

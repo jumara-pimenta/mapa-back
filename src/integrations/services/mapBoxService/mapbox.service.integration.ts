@@ -18,6 +18,6 @@ export class MapBoxServiceIntegration implements IMapBoxServiceIntegration {
   }
 
   private error(e?: string) {
-    throw new HttpException('Token inválido', HttpStatus.UNAUTHORIZED);
+    throw new HttpException(e, HttpStatus.UNAUTHORIZED);
   }
 }

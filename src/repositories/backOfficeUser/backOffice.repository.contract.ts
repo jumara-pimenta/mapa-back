@@ -1,10 +1,6 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import {
-  BackOfficeUserCreateDTO,
-  BackOfficeUserDTO,
-  BackOfficeUserUpdateDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { BackOfficeUserUpdateDTO } from '../../dtos/auth/backOfficeUserLogin.dto';
+import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
 
 export default interface IBackOfficeUserRepository {
   create(data: BackOfficeUser): Promise<BackOfficeUser>;

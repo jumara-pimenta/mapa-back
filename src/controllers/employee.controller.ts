@@ -2,13 +2,10 @@ import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   Post,
   Put,
   Query,
@@ -40,9 +37,9 @@ import {
 } from '../utils/examples.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from '../decorators/roles.decorator';
-import { xlsxFileFilter } from 'src/middlewares/image.middleware';
-import { FirstAccessEmployeeDTO } from 'src/dtos/employee/firstAccessEmployee.dto';
-import { resetEmployeePasswordDTO } from 'src/dtos/employee/resetEmployee.dto';
+import { xlsxFileFilter } from '../middlewares/image.middleware';
+import { FirstAccessEmployeeDTO } from '../dtos/employee/firstAccessEmployee.dto';
+import { resetEmployeePasswordDTO } from '../dtos/employee/resetEmployee.dto';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -161,15 +158,13 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async exportsEmployeeFile(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersEmployeeDTO,
   ): Promise<any> {
     const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
     res.set({
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
-    return await this.employeeService.exportsEmployeeFile(page, filters);
+    return await this.employeeService.exportsEmployeeFile();
   }
 
   @Get('/download/empt/file')
@@ -197,8 +192,6 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async exportsEmployeeFileAddress(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersEmployeeDTO,
   ): Promise<any> {
     const fileName = 'Sonar Rotas - Colaboradores Exportados.xlsx';
     res.set({
@@ -218,8 +211,10 @@ export class EmployeeController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async firstAccessDriver(@Body() data: FirstAccessEmployeeDTO): Promise<Employee>{
-    return await this.employeeService.firstAccess(data)
+  async firstAccessDriver(
+    @Body() data: FirstAccessEmployeeDTO,
+  ): Promise<Employee> {
+    return await this.employeeService.firstAccess(data);
   }
 
   @Post('/resetPassword')
@@ -232,7 +227,9 @@ export class EmployeeController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async resetEmployeePassword(@Body() data: resetEmployeePasswordDTO): Promise<Employee>{
-    return await this.employeeService.resetEmployeePassword(data.registration)
+  async resetEmployeePassword(
+    @Body() data: resetEmployeePasswordDTO,
+  ): Promise<Employee> {
+    return await this.employeeService.resetEmployeePassword(data.registration);
   }
 }

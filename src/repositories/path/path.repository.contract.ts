@@ -1,6 +1,6 @@
 import { EStatusPath } from '../../utils/ETypes';
 import { Path } from '../../entities/path.entity';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
 
 export default interface IPathRepository {
   create(data: Path): Promise<Path>;

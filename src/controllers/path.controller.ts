@@ -26,10 +26,10 @@ import {
   GetPathByPins,
   GetPathByRoutes,
   UpdatePathById,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { RouteMobile } from 'src/utils/Utils';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
+import { RouteMobile } from '../utils/Utils';
+import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
 
 @Controller('/api/routes')
 @ApiTags('Paths')

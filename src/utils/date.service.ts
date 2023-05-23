@@ -2,8 +2,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import {
-  ETypePath,
-  ETypeRoute,
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
   ETypeShiftRotue,
@@ -90,7 +88,9 @@ export function verifyAndFormatDate(date: string): Date {
 
     dateInString = `${year}-${month}-${day}`;
 
-    return (dateInFormatExpected = resetHour(new Date(dateInString)));
+    dateInFormatExpected = resetHour(new Date(dateInString))
+
+    return (dateInFormatExpected);
   }
 
   const dateInFormatValue = new Date(date);

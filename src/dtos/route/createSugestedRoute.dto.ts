@@ -1,21 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
-import {
-  IsString,
-  IsNotEmpty,
-  ValidateNested,
-  IsEnum,
-  IsDefined,
-  IsOptional,
-  Matches,
-} from 'class-validator';
-import { PathDetailsDTO } from '../path/pathDetails.dto';
-import {
-  ETypePathExtra,
-  ETypeRoute,
-  ETypeShiftRotue,
-} from '../../utils/ETypes';
-import { StartsAtRgx, durationPathRgx } from 'src/utils/Regex';
+import { IsString, IsNotEmpty, ValidateNested, IsEnum } from 'class-validator';
+import { ETypePathExtra } from '../../utils/ETypes';
 
 export class CreateSugestedRouteDTO {
   @ValidateNested({

@@ -2,7 +2,7 @@ import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { Route } from '../../entities/route.entity';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
-import { ETypeRouteExport } from 'src/utils/ETypes';
+import { ETypeRouteExport } from '../../utils/ETypes';
 
 export default interface IRouteRepository {
   findRouteDataByPathId(pathId: string): unknown;

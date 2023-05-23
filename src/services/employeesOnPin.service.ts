@@ -1,7 +1,5 @@
 import {
   forwardRef,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
 } from '@nestjs/common';
@@ -11,9 +9,7 @@ import { EmployeesOnPin } from '../entities/employeesOnPin.entity';
 import IEmployeesOnPinRepository from '../repositories/employeesOnPin/employeesOnPin.repository.contract';
 import { EmployeeService } from './employee.service';
 import { ETypePin } from '../utils/ETypes';
-import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
-import { Employee } from 'src/entities/employee.entity';
-import { Pin } from 'src/entities/pin.entity';
+import { Employee } from '../entities/employee.entity';
 
 @Injectable()
 export class EmployeesOnPinService {
@@ -60,15 +56,16 @@ export class EmployeesOnPinService {
     employee: Employee,
   ): Promise<EmployeesOnPin> {
     const pin = await this.pinService.listById(pinId);
-    if (pin.id !== employee.pins[0]?.id) 
-            await this.employeesOnPinRepository.delete(employee.id, employee.pins[0]?.id);
-         
-      
-      return await this.employeesOnPinRepository.create(
-        new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),
+    if (pin.id !== employee.pins[0]?.id)
+      await this.employeesOnPinRepository.delete(
+        employee.id,
+        employee.pins[0]?.id,
       );
-    }
-  
+
+    return await this.employeesOnPinRepository.create(
+      new EmployeesOnPin({ type: ETypePin.CONVENTIONAL }, employee, pin),
+    );
+  }
 
   async delete(employeeId: string, pinId: string): Promise<void> {
     return await this.employeesOnPinRepository.delete(employeeId, pinId);

@@ -6,21 +6,20 @@ import {
   BackOfficeUserCreateDTO,
   BackOfficeUserDTO,
   BackOfficeUserUpdateDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import IBackOfficeUserRepository from 'src/repositories/backOfficeUser/backOffice.repository.contract';
+} from '../dtos/auth/backOfficeUserLogin.dto';
+import IBackOfficeUserRepository from '../repositories/backOfficeUser/backOffice.repository.contract';
 import * as bcrypt from 'bcrypt';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
-import { setPermissions } from 'src/utils/roles.permissions';
-import { CoreTokenDTO } from 'src/dtos/auth/CoreToken.dto';
-import { VerifyTokenResponse } from 'src/integrations/services/coreService/response/verifyToken.response';
-import { ERoles, ERolesBackOfficeTypes } from 'src/utils/ETypes';
+import { BackOfficeUser } from '../entities/backOfficeUser.entity';
+import { setPermissions } from '../utils/roles.permissions';
+import { CoreTokenDTO } from '../dtos/auth/CoreToken.dto';
+import { ERoles } from '../utils/ETypes';
 import { EmployeeService } from './employee.service';
-import { SignInEmployeeDTO } from 'src/dtos/employee/signInEmployee.dto';
+import { SignInEmployeeDTO } from '../dtos/employee/signInEmployee.dto';
 import { DriverService } from './driver.service';
-import { signInDriverDTO } from 'src/dtos/driver/signInDriver.dto';
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
-import { MappedBackOfficeUserDTO } from 'src/dtos/auth/mappedBackOfficeUser.dto';
+import { signInDriverDTO } from '../dtos/driver/signInDriver.dto';
+import { Page, PageResponse } from '../configs/database/page.model';
+import { FilterBackOfficeUserDTO } from '../dtos/auth/filterBackOfficeUser.dto';
+import { MappedBackOfficeUserDTO } from '../dtos/auth/mappedBackOfficeUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -128,7 +127,7 @@ export class AuthService {
       role: user.roleType,
     });
 
-    const { updatedAt, createdAt, password, ...result } = user;
+    const { ...result } = user;
 
     return { ...result, token };
   }
@@ -308,7 +307,7 @@ export class AuthService {
   }
 
   private mapper(BackOfficeUser: BackOfficeUser): MappedBackOfficeUserDTO {
-    const { password, ...result } = BackOfficeUser;
+    const { ...result } = BackOfficeUser;
 
     return result;
   }

@@ -1,12 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
-import { faker } from '@faker-js/faker';
-
-faker.locale = 'pt_BR';
+import { faker } from '@faker-js/faker/locale/pt_BR';
 
 export class signInDriverDTO {
   @ApiProperty({
-    default: `${faker.random.numeric(11)}`,
+    default: `${faker.string.numeric(11)}`,
     description: '[login] cpf para fazer o login',
   })
   @IsString({ message: '[login] O login:cpf deve ser do tipo texto.' })

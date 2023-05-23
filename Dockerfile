@@ -12,6 +12,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY package.json yarn.lock ./
 
+RUN yarn cache clean --mirror
+
 RUN yarn global add @nestjs/cli
 
 COPY . ./

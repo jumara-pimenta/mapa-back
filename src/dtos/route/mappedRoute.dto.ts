@@ -164,12 +164,3 @@ class IVehicleShort {
   @ApiProperty()
   plate: string;
 }
-
-class IPathShort {
-  @ApiProperty()
-  id: string;
-  @ApiProperty()
-  startsAt: string;
-  @ApiProperty()
-  employeesOnPath: IEmployeesOnPathDTO[];
-}

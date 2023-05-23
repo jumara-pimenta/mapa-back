@@ -42,11 +42,10 @@ const createEmployee: CreateEmployeeDTO = {
 //   address: JSON.stringify(createEmployee.address),
 // });
 
-let EmployeeRepositoryMock = createMock<IEmployeeRepository>();
-let EmployeesOnPinServiceMock = createMock<EmployeesOnPinService>();
-let PinServiceMock = createMock<PinService>();
+const EmployeeRepositoryMock = createMock<IEmployeeRepository>();
+const EmployeesOnPinServiceMock = createMock<EmployeesOnPinService>();
+const PinServiceMock = createMock<PinService>();
 describe('EmployeeService', () => {
-  let employeeController: EmployeeController;
   let service: EmployeeService;
 
   beforeEach(async () => {

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsString, IsNotEmpty, Length, IsEnum } from 'class-validator';
-import { ETypeCategoryDrivers } from 'src/utils/ETypes';
+import { ETypeCategoryDrivers } from '../../utils/ETypes';
 
 export class CreateDriverFileDTO {
   @ApiProperty({

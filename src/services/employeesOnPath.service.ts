@@ -14,7 +14,7 @@ import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employee
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
 import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
-import { ETypePath } from 'src/utils/ETypes';
+import { ETypePath } from '../utils/ETypes';
 
 @Injectable()
 export class EmployeesOnPathService {

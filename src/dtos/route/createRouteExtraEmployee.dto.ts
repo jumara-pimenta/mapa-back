@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArrayMinSize, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { ETypePathExtra } from 'src/utils/ETypes';
+import { ETypePathExtra } from '../../utils/ETypes';
 
 export class CreateRouteExtraEmployeeDTO {
   @ApiProperty({

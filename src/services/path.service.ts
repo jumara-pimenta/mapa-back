@@ -28,8 +28,8 @@ import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { SinisterService } from './sinister.service';
-import { RouteMobile } from 'src/utils/Utils';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+import { RouteMobile } from '../utils/Utils';
+import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
 
 @Injectable()
 export class PathService {
@@ -453,7 +453,6 @@ export class PathService {
           const {
             name,
             registration,
-            id: employeeId,
           } = employeeOnPath.employee;
 
           if (agroupedEmployees.includes(employeeOnPath.id)) return;
@@ -633,7 +632,7 @@ export class PathService {
   async addSubstituteDriver(driverId: string, pathId: string): Promise<Path> {
     const path = await this.listById(pathId);
 
-    const driver = await this.driverService.listById(driverId);
+    await this.driverService.listById(driverId);
 
     if (path.status === EStatusPath.IN_PROGRESS)
       throw new HttpException(
