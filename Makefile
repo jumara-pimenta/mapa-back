@@ -1,14 +1,16 @@
 # Commands by Docker
 build:
-	yarn build
+	docker compose build --no-cache 
 	docker compose up -d --build 
+	docker logs sonar-rotas-backend -f
 
 .PHONY: build
 
 deploy:
 	git pull
-	yarn build
+	docker compose build --no-cache
 	docker compose up -d --build 
+	docker logs sonar-rotas-backend -f
 
 .PHONY: deploy
 
