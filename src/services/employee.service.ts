@@ -156,7 +156,7 @@ export class EmployeeService {
     return { ...data, address: JSON.parse(data.address) };
   }
 
-  async ListAllEmployeesDeleted(ids: string[]): Promise<any> {
+  async checkIfThereAreDeletedEmployees(ids: string[]): Promise<any> {
     const employees = await this.employeeRepository.listAllEmployeesDeleted(
       ids,
     );
