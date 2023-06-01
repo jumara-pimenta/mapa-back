@@ -3,6 +3,7 @@ import { Page, PageResponse } from '../../configs/database/page.model';
 import { Route } from '../../entities/route.entity';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 import { ETypeRouteExport } from '../../utils/ETypes';
+import { TTypeRoute } from '../../utils/TTypes';
 
 export default interface IRouteRepository {
   findRouteDataByPathId(pathId: string): unknown;
@@ -27,4 +28,8 @@ export default interface IRouteRepository {
     filters?: FiltersRouteDTO,
   ): Promise<PageResponse<Route>>;
   findRouteIdByPathId(id: string): Promise<string>;
+  findEmployeeOnRouteByType(
+    employeeId: string,
+    type: TTypeRoute,
+  ): Promise<Route>;
 }

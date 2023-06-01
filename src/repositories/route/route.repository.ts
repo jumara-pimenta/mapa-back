@@ -11,6 +11,7 @@ import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
 import { ETypeRouteExport } from '../../utils/ETypes';
+import { TTypeRoute } from '../../utils/TTypes';
 
 @Injectable()
 export class RouteRepository
@@ -22,6 +23,28 @@ export class RouteRepository
     private readonly driverService: DriverService,
   ) {
     super();
+  }
+
+  async findEmployeeOnRouteByType(
+    employeeId: string,
+    type: TTypeRoute,
+  ): Promise<Route> {
+    return await this.repository.route.findFirst({
+      where: {
+        type,
+        path: {
+          some: {
+            employeesOnPath: {
+              some: {
+                employee: {
+                  id: employeeId,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async findByIdWebsocket(id: string): Promise<any> {
