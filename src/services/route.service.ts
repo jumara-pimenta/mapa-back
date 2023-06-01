@@ -59,9 +59,7 @@ import { faker } from '@faker-js/faker';
 import { CreateRouteExtraEmployeeDTO } from '../dtos/route/createRouteExtraEmployee.dto';
 import { MappedEmployeeDTO } from '../dtos/employee/mappedEmployee.dto';
 import { CreateSugestedRouteDTO } from '../dtos/route/createSugestedRoute.dto';
-import {
-  SuggestionExtra,
-} from '../dtos/route/createSuggestionExtra.dto';
+import { SuggestionExtra } from '../dtos/route/createSuggestionExtra.dto';
 import { SuggenstionResultDTO } from '../dtos/route/SuggenstionResult.dto';
 import { scheduled } from 'rxjs';
 
@@ -109,7 +107,7 @@ export class RouteService {
           },
         });
 
-         await this.create({
+        await this.create({
           description: 'Rota de teste EXTRA',
           driverId: driver.items[1].id,
           vehicleId: vehicle.items[1].id,
@@ -194,6 +192,7 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     if (payload.type === ETypeRoute.CONVENTIONAL && !payload.shift)
       throw new HttpException(
         'É necessário selecionar o turno da rota ao criar uma rota convencional.',
@@ -204,11 +203,12 @@ export class RouteService {
       if (
         payload.pathDetails.type === ETypePath.ROUND_TRIP &&
         (!payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt)
-      )
+      ) {
         throw new HttpException(
           'É necessário selecionar o horário de ida e volta da rota extra.',
           HttpStatus.BAD_REQUEST,
         );
+      }
 
       if (
         payload.pathDetails.type === ETypePath.ONE_WAY &&
@@ -219,7 +219,27 @@ export class RouteService {
           HttpStatus.BAD_REQUEST,
         );
     }
-    await this.employeeService.ListAllEmployeesDeleted(payload.employeeIds);
+
+    if (payload.type === ETypeRoute.CONVENTIONAL) {
+      for await (const employeeId of payload.employeeIds) {
+        const employee = await this.employeeService.listById(employeeId);
+
+        const employeeOnAnotherRoute =
+          await this.routeRepository.findEmployeeOnRouteByType(
+            employee.id,
+            'CONVENCIONAL',
+          );
+
+        if (employeeOnAnotherRoute) {
+          throw new HttpException(
+            `Colaborador já está alocado em outra rota convencional: ${employee.name}`,
+            HttpStatus.CONFLICT,
+          );
+        }
+      }
+    }
+
+    await this.employeeService.checkIfThereAreDeletedEmployees(payload.employeeIds);
 
     const startAndReturnAt =
       payload.shift && payload.type === ETypeRoute.CONVENTIONAL
@@ -234,14 +254,17 @@ export class RouteService {
     const initRouteDate = startAndReturnAt
       ? startAndReturnAt.startAt
       : payload.pathDetails.startsAt;
+
     const endRouteDate = startAndReturnAt
       ? startAndReturnAt.finishAt
       : payload.pathDetails.startsReturnAt
       ? payload.pathDetails.startsReturnAt
       : '';
+
     const driver = await this.driverService.listById(
       payload.driverId ?? process.env.DENSO_ID,
     );
+
     const vehicle = await this.vehicleService.listById(
       payload.vehicleId ?? process.env.DENSO_ID,
     );
@@ -251,6 +274,7 @@ export class RouteService {
     );
 
     await this.employeesInPins(employeesPins, payload.type);
+
     const emplopyeeOrdened = await this.getWaypoints(
       employeesPins,
       payload.pathDetails.type,
@@ -293,6 +317,7 @@ export class RouteService {
     );
 
     const route = await this.routeRepository.create(props);
+
     await this.pathService.generate({
       routeId: route.id,
       employeeIds: emplopyeeOrdened.employeesIds,
@@ -495,7 +520,7 @@ export class RouteService {
       );
     }
     if (data.employeeIds)
-      this.employeeService.ListAllEmployeesDeleted(data.employeeIds);
+      this.employeeService.checkIfThereAreDeletedEmployees(data.employeeIds);
 
     let distance = '';
     if (data.employeeIds) {
