@@ -677,6 +677,18 @@ export class PathService {
     };
   }
 
+  async listByEmployeeOnPath(employeeOnPathId: string): Promise<Partial<Path>> {
+    const path = await this.pathRepository.findByEmployeeOnPath(employeeOnPathId);
+
+    if (!path)
+      throw new HttpException(
+        'Colaborador não encontrado no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return path;
+  }
+
   private mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 

@@ -449,9 +449,6 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
           deletedAt: null,
         },
       },
-      select: {
-        id: true,
-      },
     });
   }
 

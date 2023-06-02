@@ -14,7 +14,7 @@ import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employee
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
 import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
-import { ETypePath } from '../utils/ETypes';
+import { EStatusPath, ETypePath } from '../utils/ETypes';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -180,6 +180,31 @@ export class EmployeesOnPathService {
   async update(id: string, data: UpdateEmployeesOnPathDTO): Promise<any> {
     const employeesOnPath = await this.listById(id);
 
+    const { confirmation } = data;
+
+    if (confirmation) {
+      const path = await this.pathService.listByEmployeeOnPath(
+        employeesOnPath.id,
+      );
+
+      if (path.status === EStatusPath.FINISHED) {
+        throw new HttpException(
+          'Não é possível alterar presença em um trajeto finalizado!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      if (employeesOnPath.confirmation === true && confirmation !== true) {
+
+        if (path.status === (EStatusPath.IN_PROGRESS || EStatusPath.FINISHED)) {
+          throw new HttpException(
+            'Não é possível desconfirmar presença em um trajeto em andamento ou finalizado!',
+            HttpStatus.NOT_ACCEPTABLE,
+          );
+        }
+      }
+    }
+
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
       Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
     );
@@ -192,6 +217,30 @@ export class EmployeesOnPathService {
     data: UpdateEmployeesOnPathDTO,
   ): Promise<void> {
     const employeesOnPath = await this.listById(id);
+    const { confirmation } = data;
+
+    if (confirmation) {
+      const path = await this.pathService.listByEmployeeOnPath(
+        employeesOnPath.id,
+      );
+
+      if (path.status === EStatusPath.FINISHED) {
+        throw new HttpException(
+          'Não é possível alterar presença em um trajeto finalizado!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      if (employeesOnPath.confirmation === true && confirmation !== true) {
+
+        if (path.status === (EStatusPath.IN_PROGRESS || EStatusPath.FINISHED)) {
+          throw new HttpException(
+            'Não é possível desconfirmar presença em um trajeto em andamento ou finalizado!',
+            HttpStatus.NOT_ACCEPTABLE,
+          );
+        }
+      }
+    }
 
     await this.employeesOnPathRepository.update(
       Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
