@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile
       context: .
     container_name: sonar-rotas-backend
-    network_mode: brigde
     ports:
       - ${PORT_BACKEND}:${PORT_BACKEND}
     restart: always
