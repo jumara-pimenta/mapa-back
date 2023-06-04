@@ -73,7 +73,7 @@ export class EmployeesOnPathRepository
   findByIds(id: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: { employeeId: id },
-      
+
       select: {
         id: true,
         confirmation: true,
@@ -289,6 +289,17 @@ export class EmployeesOnPathRepository
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
+      include: {
+        employee: {
+          include: {
+            pins: {
+              include: {
+                pin: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 

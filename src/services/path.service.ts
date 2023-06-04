@@ -64,6 +64,7 @@ export class PathService {
     );
 
     const sinister = await this.sinisterService.listByPathId(path.id);
+
     if (path.finishedAt !== null)
       throw new HttpException(
         'Não é possível alterar uma rota que já foi finalizada!',
@@ -75,12 +76,17 @@ export class PathService {
         'Não é possível finalizar uma rota que não foi iniciada!',
         HttpStatus.CONFLICT,
       );
+    
     const totalInEachPin = route.employeesOnPins.map((item) => {
       return item.employees.length;
     });
+
     const employeeArray = [] as string[];
+
     const itinerariesArray = [];
+
     const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
+
     let totalConfirmed = 0;
 
     /*  for await (const employeesPins of route.employeesOnPins) {
@@ -101,11 +107,14 @@ export class PathService {
 
     for await (const employee of employeesOnPath) {
       if (employee.confirmation === true) totalConfirmed++;
+
       itinerariesArray.push([
         `${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`,
       ]);
+
       if (employee.confirmation === true && employee.present === true) {
         employeeArray.push(employee.employee.id);
+
         if (path.type === ETypePath.ONE_WAY) {
           await this.employeesOnPathService.update(employee.id, {
             disembarkAt: getDateInLocaleTime(new Date()),
@@ -136,6 +145,7 @@ export class PathService {
         substituteId: null,
       },
     };
+    
     path.status = EStatusPath.FINISHED;
 
     const props = new RouteHistory(
@@ -450,10 +460,7 @@ export class PathService {
         let data = {} as EmployeesByPin;
 
         employeesOnSamePin.forEach((employeeOnPath) => {
-          const {
-            name,
-            registration,
-          } = employeeOnPath.employee;
+          const { name, registration } = employeeOnPath.employee;
 
           if (agroupedEmployees.includes(employeeOnPath.id)) return;
 
@@ -678,7 +685,9 @@ export class PathService {
   }
 
   async listByEmployeeOnPath(employeeOnPathId: string): Promise<Partial<Path>> {
-    const path = await this.pathRepository.findByEmployeeOnPath(employeeOnPathId);
+    const path = await this.pathRepository.findByEmployeeOnPath(
+      employeeOnPathId,
+    );
 
     if (!path)
       throw new HttpException(
