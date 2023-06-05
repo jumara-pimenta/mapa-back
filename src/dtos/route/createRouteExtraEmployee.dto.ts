@@ -19,12 +19,16 @@ export class CreateRouteExtraEmployeeDTO {
       '[employeeIds] Deve ser informado ao menos dois ids de funcionário.',
   })
   employeeIds: string[];
+  
   @IsEnum(ETypePathExtra, {
     message:
       '[typeShift] O tipo da rota deve ser do tipo VOLTA ou IDA E VOLTA.',
   })
   type: ETypePathExtra;
 
+  duration: string;
+
   schedule?: boolean;
+
   date?: string;
 }

@@ -52,7 +52,7 @@ import {
 } from '../utils/Utils';
 import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
 import { DetailsRoute } from '../dtos/route/waypoints.dto';
-import { canSchedule, getDuration, verifyDateFilter } from '../utils/Date';
+import { canSchedule, getDuration, validateDurationIsInTheRange, verifyDateFilter } from '../utils/Date';
 import { RouteHistoryService } from './routeHistory.service';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { faker } from '@faker-js/faker';
@@ -239,7 +239,9 @@ export class RouteService {
       }
     }
 
-    await this.employeeService.checkIfThereAreDeletedEmployees(payload.employeeIds);
+    await this.employeeService.checkIfThereAreDeletedEmployees(
+      payload.employeeIds,
+    );
 
     const startAndReturnAt =
       payload.shift && payload.type === ETypeRoute.CONVENTIONAL
@@ -279,6 +281,7 @@ export class RouteService {
       employeesPins,
       payload.pathDetails.type,
       payload.pathDetails.duration,
+      ETypeRoute.CONVENTIONAL,
     );
 
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
@@ -364,7 +367,7 @@ export class RouteService {
             payload.type === 'VOLTA' ? ETypePath.RETURN : ETypePath.ROUND_TRIP,
           startsAt: route.time,
           startsReturnAt: route.time,
-          isAutoRoute: false,
+          isAutoRoute: true,
           scheduleDate: payload.schedule
             ? new Date(payload.date)
             : getDateInLocaleTime(new Date()),
@@ -382,7 +385,7 @@ export class RouteService {
         return {
           description: routes[index].description,
           status: 400,
-          erro: e.reason.response.message ?? e.reason.response,
+          erro: e.reason.response?.message ?? e.reason.response,
         };
       }
       if (e.status === 'fulfilled') {
@@ -403,7 +406,9 @@ export class RouteService {
           'É necessário informar a data para agendar a rota.',
           HttpStatus.BAD_REQUEST,
         );
+
       verifyDateFilter(payload.date);
+
       if (!canSchedule(new Date(payload.date))) {
         throw new HttpException(
           'Só é possível agendar rotas para datas futuras.',
@@ -413,17 +418,21 @@ export class RouteService {
     }
 
     await this.employeeService.findJokerPin(payload.employeeIds);
+
     await this.employeeService.checkExtraEmployee(
       payload.employeeIds,
       payload.date,
     );
+
     const colabs: MappedEmployeeDTO[] = [];
+
     for await (const employeeId of payload.employeeIds) {
       const employe = await this.employeeService.listById(employeeId);
       colabs.push(employe);
     }
 
-    const extra = this.suggestRouteExtra(colabs, []);
+    const extra = this.suggestRouteExtra(colabs, [], payload.duration);
+
     return extra;
   }
 
@@ -465,6 +474,7 @@ export class RouteService {
       items,
     };
   }
+
   async listByIdWebsocket(id: string): Promise<Route> {
     const route = await this.routeRepository.findByIdWebsocket(id);
 
@@ -523,6 +533,7 @@ export class RouteService {
       this.employeeService.checkIfThereAreDeletedEmployees(data.employeeIds);
 
     let distance = '';
+
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
         await this.routeRepository.findByEmployeeIds(data.employeeIds);
@@ -546,10 +557,12 @@ export class RouteService {
       }
 
       const duration = data.duration ?? route.paths[0].duration;
+
       const emplopyeeOrdened = await this.getWaypoints(
         employeesPins,
         pathType,
         duration,
+        data.type,
       );
 
       distance = emplopyeeOrdened.distance;
@@ -1213,6 +1226,7 @@ export class RouteService {
     }
     return path;
   }
+
   async exportsRouteFile(page: Page, type: ETypeRouteExport): Promise<any> {
     const headers = [
       'DESCRIÇÃO',
@@ -1422,6 +1436,7 @@ export class RouteService {
     employees: Employee[],
     type: ETypePath,
     duration: string,
+    typeRoute: ETypeRoute,
   ): Promise<DetailsRoute> {
     if (employees.length > 26)
       throw new HttpException(
@@ -1463,23 +1478,30 @@ export class RouteService {
     const response = await this.googleApiServiceIntegration.getWaypoints(
       payload,
     );
+
     const legs = response.routes[0].legs;
+
     let totalDistance = 0;
     let totalDuration = 0;
+
     for (const leg of legs) {
       totalDuration += leg.duration.value;
       totalDistance += leg.distance.value;
     }
 
     const maxDuration = getDuration(duration);
-    if (totalDuration > maxDuration) {
-      throw new HttpException(
-        `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
-        HttpStatus.BAD_REQUEST,
-      );
+
+    if (typeRoute === ETypeRoute.CONVENTIONAL) {
+      if (totalDuration > maxDuration) {
+        throw new HttpException(
+          `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+
     const order = waypointsOrder.map((item) => {
       return employees[item];
     });
@@ -1499,22 +1521,28 @@ export class RouteService {
   async getWaypointsExtra(
     employees: any[],
     duration: string,
+    typeRoute: ETypeRoute,
   ): Promise<SuggestionExtra> {
     const denso = { lat: '-3.110944', lng: '-59.962604' };
     let farthestEmployee: any = null;
     let maxDistance = 0;
+
     for (const employee of employees) {
       const employeeLocation = {
         lat: employee.pins[0].lat,
         lng: employee.pins[0].lng,
       };
+
       const distance = distanceBetweenPoints(denso, employeeLocation);
+
       if (distance > maxDistance) {
         maxDistance = distance;
         farthestEmployee = employee;
       }
     }
+
     const index = employees.indexOf(farthestEmployee);
+
     if (index > -1) {
       employees.splice(index, 1);
     }
@@ -1523,41 +1551,56 @@ export class RouteService {
     });
 
     const farthestEmployeeLatLng = `${farthestEmployee.pins[0].lat},${farthestEmployee.pins[0].lng}`;
+
     const densoLatLng = `${denso.lat},${denso.lng}`;
+
     const payload = {
       origin: densoLatLng,
       destination: farthestEmployeeLatLng,
       waypoints: waypoints.join('|'),
       travelMode: 'DRIVING',
     };
+
     const response = await this.googleApiServiceIntegration.getWaypoints(
       payload,
     );
+
     const legs = response.routes[0].legs;
+
     let totalDistance = 0;
     let totalDuration = 0;
+
     for (const leg of legs) {
       totalDuration += leg.duration.value;
       totalDistance += leg.distance.value;
     }
 
+    console.log('Duração total:', totalDuration);
+    console.log('Duração da rota:', getDuration(duration));
+
     const maxDuration = getDuration(duration);
-    if (totalDuration > maxDuration) {
-      throw new HttpException(
-        `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
-        HttpStatus.BAD_REQUEST,
-      );
+
+    if (typeRoute === ETypeRoute.CONVENTIONAL) {
+      if (totalDuration > maxDuration) {
+        throw new HttpException(
+          `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+
     const order = waypointsOrder.map((item) => {
       return employees[item];
     });
 
     const distance = totalDistance / 1000 + 'km';
+
     order.push(farthestEmployee);
 
     const totalDurationTime = totalDuration;
+
     const ordem = order.map((employee, index) => {
       return {
         id: employee.id,
@@ -1577,44 +1620,66 @@ export class RouteService {
         ],
       };
     });
+
     return { employee: ordem, distance, totalDurationTime };
   }
 
   async suggestRouteExtra(
     colabs: any,
     rotas: any[],
+    duration: string,
     rotasExtraTime?: any[],
     quantityColabs?: number,
   ) {
+    
+    validateDurationIsInTheRange(duration, {
+      maxHour: 2,
+      maxMinute: 60,
+      minMinute: 20
+    });
+
     const ordemEmployee = calculateDistance(
       colabs,
       { lat: '-3.110944', lng: '-59.962604' },
       [],
     );
+
     const routes = separateWays(ordemEmployee, [], quantityColabs);
 
     const extra: SuggestionExtra[] = [...rotas];
+
     const extraTime: SuggestionExtra[] = rotasExtraTime
       ? [...rotasExtraTime]
       : [];
+
     for await (const route of routes) {
-      const path: SuggestionExtra = await this.getWaypointsExtra(route, '1:30');
-      if (path.totalDurationTime > getDuration('01:30')) extraTime.push(path);
-      if (path.totalDurationTime < getDuration('01:30')) extra.push(path);
+      const path: SuggestionExtra = await this.getWaypointsExtra(
+        route,
+        duration,
+        ETypeRoute.EXTRA,
+      );
+
+      if (path.totalDurationTime > getDuration(duration)) extraTime.push(path);
+
+      if (path.totalDurationTime < getDuration(duration)) extra.push(path);
     }
 
     if (extraTime.length > 0) {
       const colabs = extraTime.map((item) => {
         return item.employee;
       });
+
       extraTime.shift();
+
       return await this.suggestRouteExtra(
         colabs[0],
         extra,
+        duration,
         extraTime,
         Math.round(colabs[0].length / 2),
       );
     }
+
     const response = extra.map((item) => {
       return {
         employees: item.employee,
@@ -1629,22 +1694,31 @@ export class RouteService {
 
 function calculateDistance(employee: any[], location: any, list: any): any {
   const employees = employee;
+
   const startPoint = { lat: location.lat, lng: location.lng };
+
   let closestEmployee: any = null;
+
   let minDistance = 10000;
+
   for (const employee of employees) {
     const employeeLocation = {
       lat: employee.pins[0].lat,
       lng: employee.pins[0].lng,
     };
+
     const distance = distanceBetweenPoints(startPoint, employeeLocation);
+
     if (distance <= minDistance) {
       minDistance = distance;
       closestEmployee = employee;
     }
   }
+
   const index = employees.indexOf(closestEmployee);
+
   const listaLegal = list;
+
   if (index > -1) {
     employees.splice(index, 1);
     listaLegal.push({ ...closestEmployee, minDistance });
@@ -1667,7 +1741,9 @@ function separateWays(
   if (list.length === 0) {
     return new_list;
   }
+
   const colabsPerRoute = employeesPerRoute(list.length, quantityColabs);
+
   if (list.length <= colabsPerRoute && list.length > 0) {
     const listRoute = manipulateList.slice(0, list.length);
     route.push([...listRoute]);
@@ -1683,6 +1759,7 @@ function separateWays(
       [],
     );
     route.push([...listRoute]);
+
     return separateWays(ordemListRest, route);
   }
 }
