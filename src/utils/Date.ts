@@ -9,6 +9,12 @@ interface DateStartEnd {
   end: Date;
 }
 
+interface Options {
+  maxHour: number;
+  maxMinute: number;
+  minMinute: number;
+}
+
 export function getDateInLocaleTime(date: Date): Date {
   const newDate = zonedTimeToUtc(date, 'UTC');
 
@@ -111,25 +117,16 @@ export function getDuration(duration: string): number | undefined {
   return undefined;
 }
 
-interface Options {
-  maxHour: number;
-  maxMinute: number;
-  minMinute: number;
-}
-
 export function validateDurationIsInTheRange(
   duration: string,
   options: Options,
 ) {
-  console.log('duration:', duration);
   
   const [hours, minutes] = duration.split(':');
 
   const parsedHours = parseInt(hours, 10);
   const parsedMinutes = parseInt(minutes, 10);
 
-  console.log(parsedHours, parsedMinutes);
-  
   if (parsedHours === 0 && parsedMinutes === 0) {
     throw new HttpException(
       `A duração deve ser, no mínimo, ${options.minMinute} minutos!`,

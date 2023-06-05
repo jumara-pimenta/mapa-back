@@ -10,10 +10,7 @@ import { Route } from '../entities/route.entity';
 import IRouteRepository from '../repositories/route/route.repository.contract';
 import { Page, PageResponse } from '../configs/database/page.model';
 import { FiltersRouteDTO } from '../dtos/route/filtersRoute.dto';
-import {
-  MappedRouteDTO,
-  MappedRouteShortDTO,
-} from '../dtos/route/mappedRoute.dto';
+import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
 import { CreateRouteDTO } from '../dtos/route/createRoute.dto';
 import { UpdateRouteDTO } from '../dtos/route/updateRoute.dto';
 import { DriverService } from './driver.service';
@@ -40,7 +37,6 @@ import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
 import * as fs from 'fs';
-import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
 import IMapBoxServiceIntegration from '../integrations/services/mapBoxService/mapbox.service.integration.contract';
 import { RouteReplacementDriverDTO } from '../dtos/route/routeReplacementDriverDTO.dto';
 import {
@@ -52,7 +48,12 @@ import {
 } from '../utils/Utils';
 import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
 import { DetailsRoute } from '../dtos/route/waypoints.dto';
-import { canSchedule, getDuration, validateDurationIsInTheRange, verifyDateFilter } from '../utils/Date';
+import {
+  canSchedule,
+  getDuration,
+  validateDurationIsInTheRange,
+  verifyDateFilter,
+} from '../utils/Date';
 import { RouteHistoryService } from './routeHistory.service';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { faker } from '@faker-js/faker';
@@ -62,6 +63,15 @@ import { CreateSugestedRouteDTO } from '../dtos/route/createSugestedRoute.dto';
 import { SuggestionExtra } from '../dtos/route/createSuggestionExtra.dto';
 import { SuggenstionResultDTO } from '../dtos/route/SuggenstionResult.dto';
 import { scheduled } from 'rxjs';
+import {
+  DENSO_COORDINATES,
+  DENSO_LOCATION,
+  MAX_HOUR_DURATION,
+  MAX_MINUTE_DURATION,
+  MAXIMUM_DURATION_TIME_OF_THE_ROUTE_SECONDS,
+  MIN_MINUTE_DURATION,
+  ROUTE_LIMIT_EMPLOYEES,
+} from '../utils/Constants';
 
 @Injectable()
 export class RouteService {
@@ -184,84 +194,57 @@ export class RouteService {
   }
 
   async create(payload: CreateRouteDTO): Promise<any> {
-    // await this.employeeService.findJokerPin(payload.employeeIds);
+    const {
+      numberOfEmployeesIsInsufficient,
+      shiftWasNotProvided,
+      itsAnConventionalRoute,
+      itsAnExtraRoute,
+      itsAnRoundTripPath,
+      roundTripTimeNotProvided,
+      itsAnOneWayPath,
+      oneWayTimeNotProvided,
+    } = this.getValidationCriteriaToCreateRoute(payload);
 
-    if (payload.employeeIds.length <= 1) {
+    if (numberOfEmployeesIsInsufficient) {
       throw new HttpException(
-        'É necessário selecionar pelo menos 2 colaboradores',
+        'É necessário selecionar pelo menos 2 colaboradores!',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (payload.type === ETypeRoute.CONVENTIONAL && !payload.shift)
-      throw new HttpException(
-        'É necessário selecionar o turno da rota ao criar uma rota convencional.',
-        HttpStatus.BAD_REQUEST,
-      );
+    if (itsAnConventionalRoute) {
+      if (shiftWasNotProvided) {
+        throw new HttpException(
+          'É necessário selecionar o turno da rota ao criar uma rota convencional.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    if (payload.type === ETypeRoute.EXTRA) {
-      if (
-        payload.pathDetails.type === ETypePath.ROUND_TRIP &&
-        (!payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt)
-      ) {
+      await this.checkForEmployeesOnAnotherConventionalRoute(
+        payload.employeeIds,
+      );
+    }
+
+    if (itsAnExtraRoute) {
+      if (itsAnRoundTripPath && roundTripTimeNotProvided) {
         throw new HttpException(
           'É necessário selecionar o horário de ida e volta da rota extra.',
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      if (
-        payload.pathDetails.type === ETypePath.ONE_WAY &&
-        !payload.pathDetails.startsAt
-      )
+      if (itsAnOneWayPath && oneWayTimeNotProvided)
         throw new HttpException(
           'É necessário selecionar o horário de ida da rota extra.',
           HttpStatus.BAD_REQUEST,
         );
     }
 
-    if (payload.type === ETypeRoute.CONVENTIONAL) {
-      for await (const employeeId of payload.employeeIds) {
-        const employee = await this.employeeService.listById(employeeId);
-
-        const employeeOnAnotherRoute =
-          await this.routeRepository.findEmployeeOnRouteByType(
-            employee.id,
-            'CONVENCIONAL',
-          );
-
-        if (employeeOnAnotherRoute) {
-          throw new HttpException(
-            `Colaborador já está alocado em outra rota convencional: ${employee.name}`,
-            HttpStatus.CONFLICT,
-          );
-        }
-      }
-    }
-
     await this.employeeService.checkIfThereAreDeletedEmployees(
       payload.employeeIds,
     );
 
-    const startAndReturnAt =
-      payload.shift && payload.type === ETypeRoute.CONVENTIONAL
-        ? payload.shift !== ETypeShiftRotue.SPECIAL
-          ? getStartAtAndFinishAt(payload.shift)
-          : getSpecialHour(
-              payload.pathDetails.departureTime,
-              payload.pathDetails.backTime,
-            )
-        : null;
-
-    const initRouteDate = startAndReturnAt
-      ? startAndReturnAt.startAt
-      : payload.pathDetails.startsAt;
-
-    const endRouteDate = startAndReturnAt
-      ? startAndReturnAt.finishAt
-      : payload.pathDetails.startsReturnAt
-      ? payload.pathDetails.startsReturnAt
-      : '';
+    const { endRouteDate, initRouteDate } = this.getTimesForRoute(payload);
 
     const driver = await this.driverService.listById(
       payload.driverId ?? process.env.DENSO_ID,
@@ -308,21 +291,21 @@ export class RouteService {
         payload.pathDetails.type,
       );
 
-    const props = new Route(
-      {
-        description: payload.description,
-        distance: 'EM PROCESSAMENTO',
-        status: EStatusRoute.PENDING,
-        type: payload.type,
-      },
-      driver,
-      vehicle,
+    const createdRoute = await this.routeRepository.create(
+      new Route(
+        {
+          description: payload.description,
+          distance: 'EM PROCESSAMENTO',
+          status: EStatusRoute.PENDING,
+          type: payload.type,
+        },
+        driver,
+        vehicle,
+      ),
     );
 
-    const route = await this.routeRepository.create(props);
-
     await this.pathService.generate({
-      routeId: route.id,
+      routeId: createdRoute.id,
       employeeIds: emplopyeeOrdened.employeesIds,
       details: {
         ...payload.pathDetails,
@@ -333,21 +316,11 @@ export class RouteService {
       },
     });
 
-    const routeForUpdate = await this.routeRepository.findById(route.id);
-
-    const distanceLngLat = [];
-
-    routeForUpdate.path[0].employeesOnPath.map((e: EmployeesOnPath) => {
-      const lng = +e.employee.pins.at(0).pin.lng;
-      const lat = +e.employee.pins.at(0).pin.lat;
-      distanceLngLat.push([lng, lat]);
-    });
-
-    const newRoute = await this.update(route.id, {
+    const updatedRoute = await this.update(createdRoute.id, {
       distance: emplopyeeOrdened.distance,
     });
 
-    return newRoute;
+    return updatedRoute;
   }
 
   async createSugestionRoute(
@@ -375,28 +348,31 @@ export class RouteService {
       } as CreateRouteDTO;
     });
 
-    // Promise
-    const PromiseRoutes = await Promise.allSettled(
+    const manyRoutesProcessed = await Promise.allSettled(
       routes.map((route) => this.create(route)),
     );
 
-    const response: SuggenstionResultDTO[] = PromiseRoutes.map((e, index) => {
-      if (e.status === 'rejected') {
-        return {
-          description: routes[index].description,
-          status: 400,
-          erro: e.reason.response?.message ?? e.reason.response,
-        };
-      }
-      if (e.status === 'fulfilled') {
-        return {
-          description: routes[index].description,
-          status: 201,
-        };
-      }
-    });
+    const resolvedRoutes: SuggenstionResultDTO[] = manyRoutesProcessed.map(
+      (resolved, routePosition) => {
+        if (resolved.status === 'rejected') {
+          return {
+            description: routes[routePosition].description,
+            status: 400,
+            error:
+              resolved.reason.response?.message ?? resolved.reason.response,
+          };
+        }
 
-    return response;
+        if (resolved.status === 'fulfilled') {
+          return {
+            description: routes[routePosition].description,
+            status: 201,
+          };
+        }
+      },
+    );
+
+    return resolvedRoutes;
   }
 
   async createExtras(payload: CreateRouteExtraEmployeeDTO): Promise<any> {
@@ -740,184 +716,6 @@ export class RouteService {
     const route = await this.routeRepository.findById(id);
 
     return this.mapperOne(route);
-  }
-
-  private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {
-    return routes.map((route) => {
-      const { driver, vehicle, path } = route;
-
-      return {
-        id: route.id,
-        description: route.description,
-        distance: route.distance,
-        status: route.status,
-        type: route.type,
-        createdAt: route.createdAt,
-        driver: {
-          id: driver.id,
-          name: driver.name,
-          cpf: driver.cpf,
-          cnh: driver.cnh,
-          validation: driver.validation,
-          category: driver.category,
-          createdAt: driver.createdAt,
-          updatedAt: driver.updatedAt,
-        },
-        vehicle: {
-          id: vehicle.id,
-          plate: vehicle.plate,
-          company: vehicle.company,
-          type: vehicle.type,
-          lastSurvey: vehicle.lastSurvey,
-          expiration: vehicle.expiration,
-          capacity: vehicle.capacity,
-          renavam: vehicle.renavam,
-          lastMaintenance: vehicle.lastMaintenance,
-          note: vehicle.note,
-          isAccessibility: vehicle.isAccessibility,
-          createdAt: vehicle.createdAt,
-          updatedAt: vehicle.updatedAt,
-        },
-        paths: path.map((item) => {
-          const { employeesOnPath } = item;
-
-          return {
-            id: item.id,
-            duration: item.duration,
-            finishedAt: item.finishedAt,
-            startedAt: item.startedAt,
-            startsAt: item.startsAt,
-            status: item.status,
-            type: item.type,
-            createdAt: item.createdAt,
-            scheduleDate: item.scheduleDate,
-            employeesOnPath: employeesOnPath.map((item) => {
-              const { employee } = item;
-
-              return {
-                id: item.id,
-                boardingAt: item.boardingAt,
-                confirmation: item.confirmation,
-                disembarkAt: item.disembarkAt,
-                position: item.position,
-                details: {
-                  id: employee?.id,
-                  name: employee?.name,
-                  address: employee?.address,
-                  shift: employee?.shift,
-                  registration: employee?.registration,
-                  location: {
-                    lat: item?.employee?.pins?.at(0)?.pin?.lat,
-                    lng: item?.employee?.pins?.at(0)?.pin?.lng,
-                  },
-                },
-              };
-            }),
-          };
-        }),
-        quantityEmployees: path[0]?.employeesOnPath?.length,
-      };
-    });
-  }
-
-  private mapperDataRoutes(routes: Route[]): MappedRouteShortDTO[] {
-    return routes.map((route) => {
-      const { driver, vehicle } = route;
-
-      return {
-        id: route.id,
-        description: route.description,
-        distance: route.description,
-        type: route.type,
-        driver: {
-          id: driver.id,
-          name: driver.name,
-        },
-        vehicle: {
-          id: vehicle.id,
-          plate: vehicle.plate,
-        },
-      };
-    });
-  }
-
-  private mapperOne(route: Route): MappedRouteDTO {
-    const { driver, vehicle, path } = route;
-
-    return {
-      id: route.id,
-      description: route.description,
-      distance: route.distance,
-      status: route.status,
-      type: route.type,
-      createdAt: route.createdAt,
-      driver: {
-        id: driver.id,
-        name: driver.name,
-        cpf: driver.cpf,
-        cnh: driver.cnh,
-        validation: driver.validation,
-        category: driver.category,
-        createdAt: driver.createdAt,
-        updatedAt: driver.updatedAt,
-      },
-      vehicle: {
-        id: vehicle.id,
-        plate: vehicle.plate,
-        company: vehicle.company,
-        type: vehicle.type,
-        lastSurvey: vehicle.lastSurvey,
-        expiration: vehicle.expiration,
-        capacity: vehicle.capacity,
-        renavam: vehicle.renavam,
-        lastMaintenance: vehicle.lastMaintenance,
-        note: vehicle.note,
-        isAccessibility: vehicle.isAccessibility,
-        createdAt: vehicle.createdAt,
-        updatedAt: vehicle.updatedAt,
-      },
-      paths: path.map((item) => {
-        const { employeesOnPath } = item;
-
-        return {
-          id: item.id,
-          duration: item.duration,
-          finishedAt: item.finishedAt,
-          startedAt: item.startedAt,
-          startsAt: item.startsAt,
-          status: item.status,
-          type: item.type,
-          createdAt: item.createdAt,
-          employeesOnPath: employeesOnPath.map((item) => {
-            const { employee } = item;
-            const { pins } = employee;
-
-            return {
-              id: item.id,
-              boardingAt: item.boardingAt,
-              confirmation: item.confirmation,
-              disembarkAt: item.disembarkAt,
-              position: item.position,
-              details: {
-                id: employee.id,
-                name: employee.name,
-                address: employee.address,
-                shift: employee.shift,
-                registration: employee.registration,
-                location: {
-                  lat: pins.at(0).pin.lat,
-                  lng: pins.at(0).pin.lng,
-                  title: pins.at(0).pin.title,
-                  details: pins.at(0).pin.details,
-                  local: pins.at(0).pin.local,
-                },
-              },
-            };
-          }),
-        };
-      }),
-      quantityEmployees: path[0]?.employeesOnPath?.length,
-    };
   }
 
   async driversInRoute(
@@ -1397,7 +1195,6 @@ export class RouteService {
     const res = await this.listAll(page, filters);
 
     const routes = res.items.map((route) => {
-      // check if path is Return, One Way or Round Trip
       const pathType =
         route.paths.length === 1 ? route.paths[0].type : 'Ida e Volta';
 
@@ -1425,7 +1222,6 @@ export class RouteService {
       };
     });
 
-    // return routes without driver
     if (driverId) {
       return routes.filter((route) => route.driverId !== driverId);
     }
@@ -1438,48 +1234,59 @@ export class RouteService {
     duration: string,
     typeRoute: ETypeRoute,
   ): Promise<DetailsRoute> {
-    if (employees.length > 26)
+    if (employees.length > ROUTE_LIMIT_EMPLOYEES)
       throw new HttpException(
         'A roterização automática não pode ter mais de 26 colaboradores',
         HttpStatus.BAD_REQUEST,
       );
 
-    const denso = { lat: '-3.110944', lng: '-59.962604' };
     let farthestEmployee: Employee = null;
-    let maxDistance = 0;
+    let MAX_DISTANCE = 0;
+
     for (const employee of employees) {
-      const employeeLocation = {
+      const EMPLOYEE_COORDINATES = {
         lat: employee.pins[0].pin.lat,
         lng: employee.pins[0].pin.lng,
       };
-      const distance = distanceBetweenPoints(denso, employeeLocation);
-      if (distance > maxDistance) {
-        maxDistance = distance;
+
+      const distance = distanceBetweenPoints(
+        DENSO_COORDINATES,
+        EMPLOYEE_COORDINATES,
+      );
+
+      if (distance > MAX_DISTANCE) {
+        MAX_DISTANCE = distance;
         farthestEmployee = employee;
       }
     }
+
     const index = employees.indexOf(farthestEmployee);
+
     if (index > -1) {
       employees.splice(index, 1);
     }
+
     const waypoints = employees.map((employee) => {
       return `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`;
     });
 
-    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`;
-    const densoLatLng = `${denso.lat},${denso.lng}`;
-    const payload = {
-      origin: type === ETypePath.RETURN ? densoLatLng : farthestEmployeeLatLng,
-      destination:
-        type === ETypePath.RETURN ? farthestEmployeeLatLng : densoLatLng,
-      waypoints: waypoints.join('|'),
-      travelMode: 'DRIVING',
-    };
-    const response = await this.googleApiServiceIntegration.getWaypoints(
-      payload,
-    );
+    const FARTHEST_EMPLOYEE_LOCATION = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`;
 
-    const legs = response.routes[0].legs;
+    const generatedWaypoints =
+      await this.googleApiServiceIntegration.getWaypoints({
+        origin:
+          type === ETypePath.RETURN
+            ? DENSO_LOCATION
+            : FARTHEST_EMPLOYEE_LOCATION,
+        destination:
+          type === ETypePath.RETURN
+            ? FARTHEST_EMPLOYEE_LOCATION
+            : DENSO_LOCATION,
+        waypoints: waypoints.join('|'),
+        travelMode: 'DRIVING',
+      });
+
+    const legs = generatedWaypoints.routes[0].legs;
 
     let totalDistance = 0;
     let totalDuration = 0;
@@ -1489,33 +1296,33 @@ export class RouteService {
       totalDistance += leg.distance.value;
     }
 
-    const maxDuration = getDuration(duration);
-
     if (typeRoute === ETypeRoute.CONVENTIONAL) {
-      if (totalDuration > maxDuration) {
+      if (totalDuration > MAXIMUM_DURATION_TIME_OF_THE_ROUTE_SECONDS) {
         throw new HttpException(
-          `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
+          `A duração da rota é maior do que ${MAXIMUM_DURATION_TIME_OF_THE_ROUTE_SECONDS} horas. Reduza a quantidade de colaboradores e/ou aumente a duração da rota.`,
           HttpStatus.BAD_REQUEST,
         );
       }
     }
 
-    const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+    const waypointsOrder: number[] =
+      generatedWaypoints.routes[0]?.waypoint_order;
 
     const order = waypointsOrder.map((item) => {
       return employees[item];
     });
 
-    const distance = totalDistance / 1000 + 'km';
+    const FINISH_DISTANCE = totalDistance / 1000 + 'km';
 
     type === ETypePath.RETURN
       ? order.push(farthestEmployee)
       : order.unshift(farthestEmployee);
+
     const employeesIds = order.map((employee) => {
       return employee.id;
     });
 
-    return { employeesIds, distance };
+    return { employeesIds, distance: FINISH_DISTANCE };
   }
 
   async getWaypointsExtra(
@@ -1523,65 +1330,40 @@ export class RouteService {
     duration: string,
     typeRoute: ETypeRoute,
   ): Promise<SuggestionExtra> {
-    const denso = { lat: '-3.110944', lng: '-59.962604' };
-    let farthestEmployee: any = null;
-    let maxDistance = 0;
+    const FARTHEST_EMPLOYEE = this.getFarthestEmployee(employees);
 
-    for (const employee of employees) {
-      const employeeLocation = {
-        lat: employee.pins[0].lat,
-        lng: employee.pins[0].lng,
-      };
+    const FARTHEST_EMPLOYEE_POSITION = employees.indexOf(FARTHEST_EMPLOYEE);
 
-      const distance = distanceBetweenPoints(denso, employeeLocation);
-
-      if (distance > maxDistance) {
-        maxDistance = distance;
-        farthestEmployee = employee;
-      }
+    if (FARTHEST_EMPLOYEE_POSITION > -1) {
+      employees.splice(FARTHEST_EMPLOYEE_POSITION, 1);
     }
 
-    const index = employees.indexOf(farthestEmployee);
-
-    if (index > -1) {
-      employees.splice(index, 1);
-    }
     const waypoints = employees.map((employee) => {
       return `${employee.pins[0].lat},${employee.pins[0].lng}`;
     });
 
-    const farthestEmployeeLatLng = `${farthestEmployee.pins[0].lat},${farthestEmployee.pins[0].lng}`;
+    const FARTHEST_EMPLOYEE_COORDINATES = `${FARTHEST_EMPLOYEE.pins[0].lat},${FARTHEST_EMPLOYEE.pins[0].lng}`;
 
-    const densoLatLng = `${denso.lat},${denso.lng}`;
+    const generatedWaypoints =
+      await this.googleApiServiceIntegration.getWaypoints({
+        origin: DENSO_LOCATION,
+        destination: FARTHEST_EMPLOYEE_COORDINATES,
+        waypoints: waypoints.join('|'),
+        travelMode: 'DRIVING',
+      });
 
-    const payload = {
-      origin: densoLatLng,
-      destination: farthestEmployeeLatLng,
-      waypoints: waypoints.join('|'),
-      travelMode: 'DRIVING',
-    };
+    const legs = generatedWaypoints.routes[0].legs;
 
-    const response = await this.googleApiServiceIntegration.getWaypoints(
-      payload,
-    );
-
-    const legs = response.routes[0].legs;
-
-    let totalDistance = 0;
-    let totalDuration = 0;
+    let TOTAL_DISTANCE = 0;
+    let TOTAL_DURATION = 0;
 
     for (const leg of legs) {
-      totalDuration += leg.duration.value;
-      totalDistance += leg.distance.value;
+      TOTAL_DURATION += leg.duration.value;
+      TOTAL_DISTANCE += leg.distance.value;
     }
 
-    console.log('Duração total:', totalDuration);
-    console.log('Duração da rota:', getDuration(duration));
-
-    const maxDuration = getDuration(duration);
-
     if (typeRoute === ETypeRoute.CONVENTIONAL) {
-      if (totalDuration > maxDuration) {
+      if (TOTAL_DURATION > MAXIMUM_DURATION_TIME_OF_THE_ROUTE_SECONDS) {
         throw new HttpException(
           `Tempo da viagem é maior que ${duration} hora(s), favor diminuir a quantidade de colaboradores e/ou aumentar a duração da rota.`,
           HttpStatus.BAD_REQUEST,
@@ -1589,19 +1371,18 @@ export class RouteService {
       }
     }
 
-    const waypointsOrder: number[] = response.routes[0]?.waypoint_order;
+    const waypointsOrder: number[] =
+      generatedWaypoints.routes[0]?.waypoint_order;
 
     const order = waypointsOrder.map((item) => {
       return employees[item];
     });
 
-    const distance = totalDistance / 1000 + 'km';
+    const FINAL_DISTANCE = TOTAL_DISTANCE / 1000 + 'km';
 
-    order.push(farthestEmployee);
+    order.push(FARTHEST_EMPLOYEE);
 
-    const totalDurationTime = totalDuration;
-
-    const ordem = order.map((employee, index) => {
+    const finalOrderEmployees = order.map((employee, index) => {
       return {
         id: employee.id,
         name: employee.name,
@@ -1621,7 +1402,35 @@ export class RouteService {
       };
     });
 
-    return { employee: ordem, distance, totalDurationTime };
+    return {
+      employee: finalOrderEmployees,
+      distance: FINAL_DISTANCE,
+      totalDurationTime: TOTAL_DURATION,
+    };
+  }
+
+  private getFarthestEmployee(employees: any[]) {
+    let FARTHEST_EMPLOYEE: any = null;
+    let MAX_DISTANCE = 0;
+
+    for (const employee of employees) {
+      const EMPLOYEE_COORDINATES = {
+        lat: employee.pins[0].lat,
+        lng: employee.pins[0].lng,
+      };
+
+      const DISTANCE = distanceBetweenPoints(
+        DENSO_COORDINATES,
+        EMPLOYEE_COORDINATES,
+      );
+
+      if (DISTANCE > MAX_DISTANCE) {
+        MAX_DISTANCE = DISTANCE;
+        FARTHEST_EMPLOYEE = employee;
+      }
+    }
+
+    return FARTHEST_EMPLOYEE;
   }
 
   async suggestRouteExtra(
@@ -1631,20 +1440,15 @@ export class RouteService {
     rotasExtraTime?: any[],
     quantityColabs?: number,
   ) {
-    
     validateDurationIsInTheRange(duration, {
-      maxHour: 2,
-      maxMinute: 60,
-      minMinute: 20
+      maxHour: MAX_HOUR_DURATION,
+      maxMinute: MAX_MINUTE_DURATION,
+      minMinute: MIN_MINUTE_DURATION,
     });
 
-    const ordemEmployee = calculateDistance(
-      colabs,
-      { lat: '-3.110944', lng: '-59.962604' },
-      [],
-    );
+    const ordemEmployee = this.calculateDistance(colabs, DENSO_COORDINATES, []);
 
-    const routes = separateWays(ordemEmployee, [], quantityColabs);
+    const routes = this.separateWays(ordemEmployee, [], quantityColabs);
 
     const extra: SuggestionExtra[] = [...rotas];
 
@@ -1690,76 +1494,310 @@ export class RouteService {
 
     return response;
   }
-}
 
-function calculateDistance(employee: any[], location: any, list: any): any {
-  const employees = employee;
+  private getValidationCriteriaToCreateRoute(payload: CreateRouteDTO) {
+    const numberOfEmployeesIsInsufficient =
+      payload.employeeIds.length <= 1 ? true : false;
 
-  const startPoint = { lat: location.lat, lng: location.lng };
+    const shiftWasNotProvided = !payload.shift ? true : false;
 
-  let closestEmployee: any = null;
+    const itsAnConventionalRoute =
+      payload.type === ETypeRoute.CONVENTIONAL ? true : false;
 
-  let minDistance = 10000;
+    const itsAnExtraRoute = payload.type === ETypeRoute.EXTRA ? true : false;
 
-  for (const employee of employees) {
-    const employeeLocation = {
-      lat: employee.pins[0].lat,
-      lng: employee.pins[0].lng,
+    const itsAnRoundTripPath =
+      payload.pathDetails.type === ETypePath.ROUND_TRIP ? true : false;
+
+    const roundTripTimeNotProvided =
+      !payload.pathDetails.startsAt || !payload.pathDetails.startsReturnAt
+        ? true
+        : false;
+
+    const itsAnOneWayPath =
+      payload.pathDetails.type === ETypePath.ONE_WAY ? true : false;
+
+    const oneWayTimeNotProvided = !payload.pathDetails.startsAt ? true : false;
+
+    return {
+      numberOfEmployeesIsInsufficient,
+      shiftWasNotProvided,
+      itsAnConventionalRoute,
+      itsAnExtraRoute,
+      itsAnRoundTripPath,
+      roundTripTimeNotProvided,
+      itsAnOneWayPath,
+      oneWayTimeNotProvided,
     };
+  }
 
-    const distance = distanceBetweenPoints(startPoint, employeeLocation);
+  private async checkForEmployeesOnAnotherConventionalRoute(
+    employeesId: string[],
+  ): Promise<void> {
+    for await (const id of employeesId) {
+      const employee = await this.employeeService.listById(id);
 
-    if (distance <= minDistance) {
-      minDistance = distance;
-      closestEmployee = employee;
+      const employeeOnAnotherRoute =
+        await this.routeRepository.findEmployeeOnRouteByType(
+          employee.id,
+          'CONVENCIONAL',
+        );
+
+      if (employeeOnAnotherRoute) {
+        throw new HttpException(
+          `Colaborador já está alocado em outra rota convencional: ${employee.name}`,
+          HttpStatus.CONFLICT,
+        );
+      }
     }
   }
 
-  const index = employees.indexOf(closestEmployee);
+  private getTimesForRoute(props: CreateRouteDTO) {
+    const startAndReturnAt =
+      props.shift && props.type === ETypeRoute.CONVENTIONAL
+        ? props.shift !== ETypeShiftRotue.SPECIAL
+          ? getStartAtAndFinishAt(props.shift)
+          : getSpecialHour(
+              props.pathDetails.departureTime,
+              props.pathDetails.backTime,
+            )
+        : null;
 
-  const listaLegal = list;
+    const initRouteDate = startAndReturnAt
+      ? startAndReturnAt.startAt
+      : props.pathDetails.startsAt;
 
-  if (index > -1) {
-    employees.splice(index, 1);
-    listaLegal.push({ ...closestEmployee, minDistance });
+    const endRouteDate = startAndReturnAt
+      ? startAndReturnAt.finishAt
+      : props.pathDetails.startsReturnAt
+      ? props.pathDetails.startsReturnAt
+      : '';
+
+    return { startAndReturnAt, initRouteDate, endRouteDate };
   }
 
-  if (employees.length > 0)
-    calculateDistance(employees, closestEmployee.pins[0], listaLegal);
-
-  return listaLegal;
-}
-
-function separateWays(
-  list: EmployeeList[],
-  new_list: any[],
-  quantityColabs?: number,
-): any {
-  const manipulateList = [...list];
-  const route = [...new_list];
-
-  if (list.length === 0) {
-    return new_list;
+  private calculateDistance(employee: any[], location: any, list: any): any {
+    const employees = employee;
+  
+    const startPoint = { lat: location.lat, lng: location.lng };
+  
+    let closestEmployee: any = null;
+  
+    let minDistance = 10000;
+  
+    for (const employee of employees) {
+      const employeeLocation = {
+        lat: employee.pins[0].lat,
+        lng: employee.pins[0].lng,
+      };
+  
+      const distance = distanceBetweenPoints(startPoint, employeeLocation);
+  
+      if (distance <= minDistance) {
+        minDistance = distance;
+        closestEmployee = employee;
+      }
+    }
+  
+    const index = employees.indexOf(closestEmployee);
+  
+    const listaLegal = list;
+  
+    if (index > -1) {
+      employees.splice(index, 1);
+      listaLegal.push({ ...closestEmployee, minDistance });
+    }
+  
+    if (employees.length > 0)
+      this.calculateDistance(employees, closestEmployee.pins[0], listaLegal);
+  
+    return listaLegal;
+  }
+  
+  private separateWays(
+    list: EmployeeList[],
+    new_list: any[],
+    quantityColabs?: number,
+  ): any {
+    const manipulateList = [...list];
+    const route = [...new_list];
+  
+    if (list.length === 0) {
+      return new_list;
+    }
+  
+    const colabsPerRoute = employeesPerRoute(list.length, quantityColabs);
+  
+    if (list.length <= colabsPerRoute && list.length > 0) {
+      const listRoute = manipulateList.slice(0, list.length);
+      route.push([...listRoute]);
+      return this.separateWays([], route);
+    }
+  
+    if (list.length > colabsPerRoute) {
+      const listRoute = manipulateList.slice(0, colabsPerRoute);
+      const listRest = manipulateList.slice(colabsPerRoute, list.length);
+      const ordemListRest = this.calculateDistance(listRest, DENSO_COORDINATES, []);
+      route.push([...listRoute]);
+  
+      return this.separateWays(ordemListRest, route);
+    }
   }
 
-  const colabsPerRoute = employeesPerRoute(list.length, quantityColabs);
+  private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {
+    return routes.map((route) => {
+      const { driver, vehicle, path } = route;
 
-  if (list.length <= colabsPerRoute && list.length > 0) {
-    const listRoute = manipulateList.slice(0, list.length);
-    route.push([...listRoute]);
-    return separateWays([], route);
+      return {
+        id: route.id,
+        description: route.description,
+        distance: route.distance,
+        status: route.status,
+        type: route.type,
+        createdAt: route.createdAt,
+        driver: {
+          id: driver.id,
+          name: driver.name,
+          cpf: driver.cpf,
+          cnh: driver.cnh,
+          validation: driver.validation,
+          category: driver.category,
+          createdAt: driver.createdAt,
+          updatedAt: driver.updatedAt,
+        },
+        vehicle: {
+          id: vehicle.id,
+          plate: vehicle.plate,
+          company: vehicle.company,
+          type: vehicle.type,
+          lastSurvey: vehicle.lastSurvey,
+          expiration: vehicle.expiration,
+          capacity: vehicle.capacity,
+          renavam: vehicle.renavam,
+          lastMaintenance: vehicle.lastMaintenance,
+          note: vehicle.note,
+          isAccessibility: vehicle.isAccessibility,
+          createdAt: vehicle.createdAt,
+          updatedAt: vehicle.updatedAt,
+        },
+        paths: path.map((item) => {
+          const { employeesOnPath } = item;
+
+          return {
+            id: item.id,
+            duration: item.duration,
+            finishedAt: item.finishedAt,
+            startedAt: item.startedAt,
+            startsAt: item.startsAt,
+            status: item.status,
+            type: item.type,
+            createdAt: item.createdAt,
+            scheduleDate: item.scheduleDate,
+            employeesOnPath: employeesOnPath.map((item) => {
+              const { employee } = item;
+
+              return {
+                id: item.id,
+                boardingAt: item.boardingAt,
+                confirmation: item.confirmation,
+                disembarkAt: item.disembarkAt,
+                position: item.position,
+                details: {
+                  id: employee?.id,
+                  name: employee?.name,
+                  address: employee?.address,
+                  shift: employee?.shift,
+                  registration: employee?.registration,
+                  location: {
+                    lat: item?.employee?.pins?.at(0)?.pin?.lat,
+                    lng: item?.employee?.pins?.at(0)?.pin?.lng,
+                  },
+                },
+              };
+            }),
+          };
+        }),
+        quantityEmployees: path[0]?.employeesOnPath?.length,
+      };
+    });
   }
 
-  if (list.length > colabsPerRoute) {
-    const listRoute = manipulateList.slice(0, colabsPerRoute);
-    const listRest = manipulateList.slice(colabsPerRoute, list.length);
-    const ordemListRest = calculateDistance(
-      listRest,
-      { lat: '-3.110944', lng: '-59.962604' },
-      [],
-    );
-    route.push([...listRoute]);
+  private mapperOne(route: Route): MappedRouteDTO {
+    const { driver, vehicle, path } = route;
 
-    return separateWays(ordemListRest, route);
+    return {
+      id: route.id,
+      description: route.description,
+      distance: route.distance,
+      status: route.status,
+      type: route.type,
+      createdAt: route.createdAt,
+      driver: {
+        id: driver.id,
+        name: driver.name,
+        cpf: driver.cpf,
+        cnh: driver.cnh,
+        validation: driver.validation,
+        category: driver.category,
+        createdAt: driver.createdAt,
+        updatedAt: driver.updatedAt,
+      },
+      vehicle: {
+        id: vehicle.id,
+        plate: vehicle.plate,
+        company: vehicle.company,
+        type: vehicle.type,
+        lastSurvey: vehicle.lastSurvey,
+        expiration: vehicle.expiration,
+        capacity: vehicle.capacity,
+        renavam: vehicle.renavam,
+        lastMaintenance: vehicle.lastMaintenance,
+        note: vehicle.note,
+        isAccessibility: vehicle.isAccessibility,
+        createdAt: vehicle.createdAt,
+        updatedAt: vehicle.updatedAt,
+      },
+      paths: path.map((item) => {
+        const { employeesOnPath } = item;
+
+        return {
+          id: item.id,
+          duration: item.duration,
+          finishedAt: item.finishedAt,
+          startedAt: item.startedAt,
+          startsAt: item.startsAt,
+          status: item.status,
+          type: item.type,
+          createdAt: item.createdAt,
+          employeesOnPath: employeesOnPath.map((item) => {
+            const { employee } = item;
+            const { pins } = employee;
+
+            return {
+              id: item.id,
+              boardingAt: item.boardingAt,
+              confirmation: item.confirmation,
+              disembarkAt: item.disembarkAt,
+              position: item.position,
+              details: {
+                id: employee.id,
+                name: employee.name,
+                address: employee.address,
+                shift: employee.shift,
+                registration: employee.registration,
+                location: {
+                  lat: pins.at(0).pin.lat,
+                  lng: pins.at(0).pin.lng,
+                  title: pins.at(0).pin.title,
+                  details: pins.at(0).pin.details,
+                  local: pins.at(0).pin.local,
+                },
+              },
+            };
+          }),
+        };
+      }),
+      quantityEmployees: path[0]?.employeesOnPath?.length,
+    };
   }
 }

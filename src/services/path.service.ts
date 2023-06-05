@@ -30,6 +30,7 @@ import { VehicleService } from './vehicle.service';
 import { SinisterService } from './sinister.service';
 import { RouteMobile } from '../utils/Utils';
 import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
+import { DENSO_LOCATION } from '../utils/Constants';
 
 @Injectable()
 export class PathService {
@@ -124,8 +125,8 @@ export class PathService {
     }
 
     path.type === ETypePath.RETURN
-      ? itinerariesArray.unshift(['-3.110944,-59.962604'])
-      : itinerariesArray.push(['-3.110944,-59.962604']);
+      ? itinerariesArray.unshift([DENSO_LOCATION])
+      : itinerariesArray.push([DENSO_LOCATION]);
 
     if (employeeArray.length === 0)
       throw new HttpException(
