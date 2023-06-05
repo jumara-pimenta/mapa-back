@@ -121,6 +121,8 @@ export function validateDurationIsInTheRange(
   duration: string,
   options: Options,
 ) {
+  console.log('duration:', duration);
+  
   const [hours, minutes] = duration.split(':');
 
   const parsedHours = parseInt(hours, 10);

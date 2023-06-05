@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMinSize, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { ArrayMinSize, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { ETypePathExtra } from '../../utils/ETypes';
+import { durationPathRgx } from '../../utils/Regex';
 
 export class CreateRouteExtraEmployeeDTO {
   @ApiProperty({
@@ -26,6 +27,8 @@ export class CreateRouteExtraEmployeeDTO {
   })
   type: ETypePathExtra;
 
+  @IsNotEmpty({ message: '[duration] A duração da rota deve ser enviada.' })
+  @Matches(durationPathRgx, { message: '[duration] O formato da duração deve ser HH:MM.'})
   duration: string;
 
   schedule?: boolean;

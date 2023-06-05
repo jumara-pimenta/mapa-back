@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, Matches } from 'class-validator';
+import { durationPathRgx } from '../../utils/Regex';
 
 export class SuggestionExtraDTO {
   @ApiProperty({
@@ -13,6 +14,10 @@ export class SuggestionExtraDTO {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
 
+  @IsNotEmpty({ message: '[duration] A duração da rota deve ser enviada.' })
+  @Matches(durationPathRgx, {
+    message: '[duration] O formato da duração deve ser HH:MM.',
+  })
   duration: string;
 
   driver: string;
