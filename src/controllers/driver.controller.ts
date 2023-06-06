@@ -37,6 +37,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { xlsxFileFilter } from '../middlewares/image.middleware';
 import { FirstAccessDriverDTO } from '../dtos/driver/firstAccess.dto';
 import { resetDriverPasswordDTO } from '../dtos/driver/resetPassword.dto';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -187,6 +188,7 @@ export class DriverController {
   }
 
   @Post('/firstAccess')
+  @Public()
   @ApiCreatedResponse({
     description: 'Primeiro acesso de motorista.',
     schema: {

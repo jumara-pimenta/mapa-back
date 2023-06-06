@@ -40,6 +40,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { xlsxFileFilter } from '../middlewares/image.middleware';
 import { FirstAccessEmployeeDTO } from '../dtos/employee/firstAccessEmployee.dto';
 import { resetEmployeePasswordDTO } from '../dtos/employee/resetEmployee.dto';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('/api/employees')
 @ApiTags('Employees')
@@ -202,6 +203,7 @@ export class EmployeeController {
   }
 
   @Post('/firstAccess')
+  @Public()
   @ApiCreatedResponse({
     description: 'Primeiro acesso de colaborador.',
     schema: {
