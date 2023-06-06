@@ -202,7 +202,6 @@ export class EmployeeController {
   }
 
   @Post('/firstAccess')
-  @Roles('employee-first-access')
   @ApiCreatedResponse({
     description: 'Primeiro acesso de colaborador.',
     schema: {

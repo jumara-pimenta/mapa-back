@@ -187,7 +187,6 @@ export class DriverController {
   }
 
   @Post('/firstAccess')
-  @Roles('driver-first-access')
   @ApiCreatedResponse({
     description: 'Primeiro acesso de motorista.',
     schema: {

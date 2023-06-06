@@ -1286,6 +1286,8 @@ export class RouteService {
         travelMode: 'DRIVING',
       });
 
+    console.log('Rotas geradas:', generatedWaypoints);
+
     const legs = generatedWaypoints.routes[0].legs;
 
     let totalDistance = 0;
@@ -1578,42 +1580,42 @@ export class RouteService {
 
   private calculateDistance(employee: any[], location: any, list: any): any {
     const employees = employee;
-  
+
     const startPoint = { lat: location.lat, lng: location.lng };
-  
+
     let closestEmployee: any = null;
-  
+
     let minDistance = 10000;
-  
+
     for (const employee of employees) {
       const employeeLocation = {
         lat: employee.pins[0].lat,
         lng: employee.pins[0].lng,
       };
-  
+
       const distance = distanceBetweenPoints(startPoint, employeeLocation);
-  
+
       if (distance <= minDistance) {
         minDistance = distance;
         closestEmployee = employee;
       }
     }
-  
+
     const index = employees.indexOf(closestEmployee);
-  
+
     const listaLegal = list;
-  
+
     if (index > -1) {
       employees.splice(index, 1);
       listaLegal.push({ ...closestEmployee, minDistance });
     }
-  
+
     if (employees.length > 0)
       this.calculateDistance(employees, closestEmployee.pins[0], listaLegal);
-  
+
     return listaLegal;
   }
-  
+
   private separateWays(
     list: EmployeeList[],
     new_list: any[],
@@ -1621,25 +1623,29 @@ export class RouteService {
   ): any {
     const manipulateList = [...list];
     const route = [...new_list];
-  
+
     if (list.length === 0) {
       return new_list;
     }
-  
+
     const colabsPerRoute = employeesPerRoute(list.length, quantityColabs);
-  
+
     if (list.length <= colabsPerRoute && list.length > 0) {
       const listRoute = manipulateList.slice(0, list.length);
       route.push([...listRoute]);
       return this.separateWays([], route);
     }
-  
+
     if (list.length > colabsPerRoute) {
       const listRoute = manipulateList.slice(0, colabsPerRoute);
       const listRest = manipulateList.slice(colabsPerRoute, list.length);
-      const ordemListRest = this.calculateDistance(listRest, DENSO_COORDINATES, []);
+      const ordemListRest = this.calculateDistance(
+        listRest,
+        DENSO_COORDINATES,
+        [],
+      );
       route.push([...listRoute]);
-  
+
       return this.separateWays(ordemListRest, route);
     }
   }
