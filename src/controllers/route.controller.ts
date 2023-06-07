@@ -212,6 +212,6 @@ export class RouteController {
   async createExtras(
     @Body() payload: CreateSugestedRouteDTO,
   ): Promise<SuggenstionResultDTO[]> {
-    return await this.routeService.createSugestionRoute(payload);
+    return await this.routeService.createSuggestedRoutes(payload);
   }
 }
