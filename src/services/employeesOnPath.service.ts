@@ -28,6 +28,7 @@ export class EmployeesOnPathService {
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
     let position = 1;
+
     const path = await this.pathService.listById(props.pathId);
 
     for await (const id of props.employeeIds) {
@@ -245,9 +246,6 @@ export class EmployeesOnPathService {
 
         return this.mappedOne(updatedEmployeeOnPath);
       };
-    
-    console.log(path);
-    
 
     // Se a rota já finalizou, colaborador não pode fazer nada
     if (path.status === EStatusPath.FINISHED) {
