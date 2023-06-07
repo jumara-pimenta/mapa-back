@@ -91,106 +91,108 @@ export class RouteService {
   ) {}
 
   async onModuleInit() {
-    if (process.env.NODE_ENV !== 'production') {
-      const page = new Page();
-      const routes = await this.routeRepository.findAll(page);
+    setTimeout(async () => {
+      if (process.env.NODE_ENV !== 'production') {
+        const page = new Page();
+        const routes = await this.routeRepository.findAll(page);
 
-      if (routes.total === 0) {
-        const driver = await this.driverService.listAll(page);
-        const vehicle = await this.vehicleService.listAll(page);
-        const employee = await this.employeeService.listAll(page);
+        if (routes.total === 0) {
+          const driver = await this.driverService.listAll(page);
+          const vehicle = await this.vehicleService.listAll(page);
+          const employee = await this.employeeService.listAll(page);
 
-        await this.create({
-          description: 'Rota de teste',
-          driverId: driver.items[0].id,
-          vehicleId: vehicle.items[0].id,
-          employeeIds: employee.items.map((e) => e.id),
-          type: ETypeRoute.CONVENTIONAL,
-          shift: ETypeShiftRotue.FIRST,
-          pathDetails: {
-            startsAt: '08:00',
-            duration: '00:30',
-            startsReturnAt: '18:00',
-            type: ETypePath.ROUND_TRIP,
-            isAutoRoute: true,
-            scheduleDate: getDateInLocaleTime(new Date()),
-          },
-        });
-
-        await this.create({
-          description: 'Rota de teste EXTRA',
-          driverId: driver.items[1].id,
-          vehicleId: vehicle.items[1].id,
-          employeeIds: employee.items.map((e) => e.id),
-          type: ETypeRoute.EXTRA,
-          shift: ETypeShiftRotue.SECOND,
-          pathDetails: {
-            startsAt: '07:30',
-            duration: '00:30',
-            startsReturnAt: '17:30',
-            type: ETypePath.ROUND_TRIP,
-            isAutoRoute: true,
-            scheduleDate: getDateInLocaleTime(new Date()),
-          },
-        });
-
-        const allPaths = await this.pathService.listAll();
-        const path = await this.pathService.listById(allPaths[0].id);
-        const pathObj = await this.pathService.getPathById(allPaths[0].id);
-
-        const path1 = await this.pathService.listById(allPaths[1].id);
-        const pathObj1 = await this.pathService.getPathById(allPaths[1].id);
-        const vehicleHistoric = await this.vehicleService.listById(
-          path.vehicle,
-        );
-        const driverHistoric = await this.driverService.listById(path.driver);
-        const today = new Date();
-        //remove 1 day
-
-        //create a for to create a route for 4 days
-        for (let i = 0; i < 20; i++) {
-          const date = new Date(today);
-          date.setDate(date.getDate() - i);
-          const props = new RouteHistory(
-            {
-              typeRoute: path.type,
-              nameRoute: faker.person.jobTitle(),
-              employeeIds: path.employeesOnPath.map((e) => e.id).join(','),
-              itinerary: '-3.4441,-60.025',
-              totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
-              totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
-              startedAt: getDateInLocaleTime(new Date(path.startedAt)),
-              finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
+          await this.create({
+            description: 'Rota de teste',
+            driverId: driver.items[0].id,
+            vehicleId: vehicle.items[0].id,
+            employeeIds: employee.items.map((e) => e.id),
+            type: ETypeRoute.CONVENTIONAL,
+            shift: ETypeShiftRotue.FIRST,
+            pathDetails: {
+              startsAt: '08:00',
+              duration: '00:30',
+              startsReturnAt: '18:00',
+              type: ETypePath.ROUND_TRIP,
+              isAutoRoute: true,
+              scheduleDate: getDateInLocaleTime(new Date()),
             },
-            pathObj,
-            driverHistoric,
-            vehicleHistoric,
-            [],
-            date,
-          );
+          });
 
-          const props2 = new RouteHistory(
-            {
-              typeRoute: path1.type,
-              nameRoute: faker.person.jobTitle(),
-              employeeIds: path1.employeesOnPath.map((e) => e.id).join(','),
-              itinerary: '-3.4441,-60.025',
-              totalEmployees: faker.datatype.number({ min: 10, max: 40 }),
-              totalConfirmed: faker.datatype.number({ min: 10, max: 20 }),
-              startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
-              finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+          await this.create({
+            description: 'Rota de teste EXTRA',
+            driverId: driver.items[1].id,
+            vehicleId: vehicle.items[1].id,
+            employeeIds: employee.items.map((e) => e.id),
+            type: ETypeRoute.EXTRA,
+            shift: ETypeShiftRotue.SECOND,
+            pathDetails: {
+              startsAt: '07:30',
+              duration: '00:30',
+              startsReturnAt: '17:30',
+              type: ETypePath.ROUND_TRIP,
+              isAutoRoute: true,
+              scheduleDate: getDateInLocaleTime(new Date()),
             },
-            pathObj1,
-            driverHistoric,
-            vehicleHistoric,
-            [],
-            date,
+          });
+
+          const allPaths = await this.pathService.listAll();
+          const path = await this.pathService.listById(allPaths[0].id);
+          const pathObj = await this.pathService.getPathById(allPaths[0].id);
+
+          const path1 = await this.pathService.listById(allPaths[1].id);
+          const pathObj1 = await this.pathService.getPathById(allPaths[1].id);
+          const vehicleHistoric = await this.vehicleService.listById(
+            path.vehicle,
           );
-          await this.routeHistoryService.create(props);
-          await this.routeHistoryService.create(props2);
+          const driverHistoric = await this.driverService.listById(path.driver);
+          const today = new Date();
+          //remove 1 day
+
+          //create a for to create a route for 4 days
+          for (let i = 0; i < 20; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const props = new RouteHistory(
+              {
+                typeRoute: path.type,
+                nameRoute: faker.person.jobTitle(),
+                employeeIds: path.employeesOnPath.map((e) => e.id).join(','),
+                itinerary: '-3.4441,-60.025',
+                totalEmployees: faker.number.int({ min: 10, max: 40 }),
+                totalConfirmed: faker.number.int({ min: 10, max: 20 }),
+                startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+                finishedAt: getDateInLocaleTime(new Date(path.startedAt)),
+              },
+              pathObj,
+              driverHistoric,
+              vehicleHistoric,
+              [],
+              date,
+            );
+
+            const props2 = new RouteHistory(
+              {
+                typeRoute: path1.type,
+                nameRoute: faker.person.jobTitle(),
+                employeeIds: path1.employeesOnPath.map((e) => e.id).join(','),
+                itinerary: '-3.4441,-60.025',
+                totalEmployees: faker.number.int({ min: 10, max: 40 }),
+                totalConfirmed: faker.number.int({ min: 10, max: 20 }),
+                startedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+                finishedAt: getDateInLocaleTime(new Date(path1.startedAt)),
+              },
+              pathObj1,
+              driverHistoric,
+              vehicleHistoric,
+              [],
+              date,
+            );
+            await this.routeHistoryService.create(props);
+            await this.routeHistoryService.create(props2);
+          }
         }
       }
-    }
+    }, 10000);
   }
 
   async create(payload: CreateRouteDTO): Promise<any> {
@@ -284,7 +286,7 @@ export class RouteService {
       await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
 
     if (!scheduled)
-      await this.employeesInRoute(
+      await this.checkIfEmployeesOnAnotherRoute(
         employeeInRoute,
         payload.type,
         emplopyeeOrdened.employeesIds,
@@ -323,9 +325,133 @@ export class RouteService {
     return updatedRoute;
   }
 
-  async createSugestionRoute(
+  async createOrderedRoute(payload: CreateRouteDTO): Promise<any> {
+    const {
+      numberOfEmployeesIsInsufficient,
+      shiftWasNotProvided,
+      itsAnConventionalRoute,
+      itsAnExtraRoute,
+      itsAnRoundTripPath,
+      roundTripTimeNotProvided,
+      itsAnOneWayPath,
+      oneWayTimeNotProvided,
+    } = this.getValidationCriteriaToCreateRoute(payload);
+
+    if (numberOfEmployeesIsInsufficient) {
+      throw new HttpException(
+        'É necessário selecionar pelo menos 2 colaboradores!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (itsAnConventionalRoute) {
+      if (shiftWasNotProvided) {
+        throw new HttpException(
+          'É necessário selecionar o turno da rota ao criar uma rota convencional.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      await this.checkForEmployeesOnAnotherConventionalRoute(
+        payload.employeeIds,
+      );
+    }
+
+    if (itsAnExtraRoute) {
+      if (itsAnRoundTripPath && roundTripTimeNotProvided) {
+        throw new HttpException(
+          'É necessário selecionar o horário de ida e volta da rota extra.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (itsAnOneWayPath && oneWayTimeNotProvided)
+        throw new HttpException(
+          'É necessário selecionar o horário de ida da rota extra.',
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    await this.employeeService.checkIfThereAreDeletedEmployees(
+      payload.employeeIds,
+    );
+
+    const { endRouteDate, initRouteDate } = this.getTimesForRoute(payload);
+
+    const driver = await this.driverService.listById(
+      payload.driverId ?? process.env.DENSO_ID,
+    );
+
+    const vehicle = await this.vehicleService.listById(
+      payload.vehicleId ?? process.env.DENSO_ID,
+    );
+
+    const employeesPins = await this.employeeService.listAllEmployeesPins(
+      payload.employeeIds,
+    );
+
+    await this.employeesInPins(employeesPins, payload.type);
+
+    const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
+
+    const employeeInRoute = await this.routeRepository.findByEmployeeIds(
+      payload.employeeIds,
+    );
+
+    const vehicleInRoute = await this.routeRepository.findByVehicleId(
+      vehicle.id,
+    );
+
+    if (driver.id !== process.env.DENSO_ID)
+      await this.driversInRoute(driverInRoute, initRouteDate, endRouteDate);
+
+    if (vehicle.id !== process.env.DENSO_ID)
+      await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
+
+    if (!scheduled)
+      await this.checkIfEmployeesOnAnotherRoute(
+        employeeInRoute,
+        payload.type,
+        payload.employeeIds,
+        payload.pathDetails.type,
+      );
+
+    const createdRoute = await this.routeRepository.create(
+      new Route(
+        {
+          description: payload.description,
+          distance: 'EM PROCESSAMENTO',
+          status: EStatusRoute.PENDING,
+          type: payload.type,
+        },
+        driver,
+        vehicle,
+      ),
+    );
+
+    await this.pathService.generate({
+      routeId: createdRoute.id,
+      employeeIds: payload.employeeIds,
+      details: {
+        ...payload.pathDetails,
+        startsAt: initRouteDate,
+        startsReturnAt: endRouteDate,
+        scheduleDate:
+          payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
+      },
+    });
+
+    const updatedRoute = await this.update(createdRoute.id, {
+      distance: payload.distance,
+    });
+
+    return updatedRoute;
+  }
+
+  async createSuggestedRoutes(
     payload: CreateSugestedRouteDTO,
   ): Promise<SuggenstionResultDTO[]> {
+
     const routes = payload.suggestedExtras.map((route) => {
       return {
         description: route.description,
@@ -349,12 +475,13 @@ export class RouteService {
     });
 
     const manyRoutesProcessed = await Promise.allSettled(
-      routes.map((route) => this.create(route)),
+      routes.map((route) => this.createOrderedRoute(route)),
     );
 
     const resolvedRoutes: SuggenstionResultDTO[] = manyRoutesProcessed.map(
       (resolved, routePosition) => {
         if (resolved.status === 'rejected') {
+          
           return {
             description: routes[routePosition].description,
             status: 400,
@@ -505,10 +632,9 @@ export class RouteService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     if (data.employeeIds)
       this.employeeService.checkIfThereAreDeletedEmployees(data.employeeIds);
-
-    let distance = '';
 
     if (data.employeeIds) {
       const employeeInRoute: Route[] =
@@ -520,11 +646,13 @@ export class RouteService {
       const type = data.type ?? route.type;
 
       await this.employeesInPins(employeesPins, type);
+
       const types = route.paths.map((path) => {
         return path.type;
       });
 
       let pathType;
+
       if (types.length === 2) {
         pathType = ETypePath.ROUND_TRIP;
       }
@@ -532,25 +660,15 @@ export class RouteService {
         pathType = types[0];
       }
 
-      const duration = data.duration ?? route.paths[0].duration;
-
-      const emplopyeeOrdened = await this.getWaypoints(
-        employeesPins,
-        pathType,
-        duration,
-        data.type,
-      );
-
-      distance = emplopyeeOrdened.distance;
-
       for await (const employee of data.employeeIds) {
         await this.employeeService.listById(employee);
       }
-      await this.employeesInRouteUpdate(
+
+      await this.checkIfEmployeesOnAnotherRouteOnUpdate(
         employeeInRoute,
         type,
         route,
-        emplopyeeOrdened.employeesIds,
+        data.employeeIds,
         pathType,
       );
 
@@ -560,7 +678,7 @@ export class RouteService {
 
       await this.pathService.generate({
         routeId: id,
-        employeeIds: emplopyeeOrdened.employeesIds,
+        employeeIds: data.employeeIds,
         details: {
           type: pathType as ETypePath,
           startsAt:
@@ -580,6 +698,7 @@ export class RouteService {
         },
       });
     }
+
     if (
       !data.employeeIds &&
       (data.startsAt || data.startsReturnAt || data.duration || data.shift)
@@ -622,7 +741,6 @@ export class RouteService {
       vehicle = await this.vehicleService.listById(data.vehicleId);
     }
 
-    routeEntity.distance = distance === '' ? routeEntity.distance : distance;
     const { ...rest } = routeEntity;
 
     const UpdateRoute = new Route(
@@ -755,27 +873,30 @@ export class RouteService {
     });
   }
 
-  async employeesInRoute(
+  async checkIfEmployeesOnAnotherRoute(
     employeeRoute: Route[],
     type: string,
     ids: string[],
     pathType?: string,
   ): Promise<void> {
-    let employeeArray = [];
-    const employeeOnReturn = [];
+    let employeesAllocatedToAnotherRoute = [];
     const employeeOnOneWay = [];
+    const employeeOnReturn = [];
+
     let ida;
     let volta;
+
     employeeRoute.forEach((route: Route) => {
       if (route.type !== ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
           path.employeesOnPath.filter((item) => {
             if (type === route.type && ids.includes(item.employee.id)) {
-              employeeArray.push(item.employee);
+              employeesAllocatedToAnotherRoute.push(item.employee);
             }
           });
         });
       }
+
       if (route.type === ETypeRoute.EXTRA) {
         route.path.forEach((path) => {
           if (type === ETypeRoute.EXTRA) {
@@ -790,6 +911,7 @@ export class RouteService {
                 employeeOnOneWay.push(ida);
               }
             }
+
             if (path.type === ETypePath.RETURN) {
               if (
                 pathType === ETypePath.RETURN ||
@@ -805,36 +927,43 @@ export class RouteService {
         });
       }
     });
-    employeeArray.filter((item) => item !== null);
-    if (employeeArray.length > 0) {
-      employeeArray = employeeArray.filter(
-        (item, index, self) =>
-          index === self.findIndex((t) => t.id === item.id),
-      );
+
+    employeesAllocatedToAnotherRoute.filter((item) => item !== null);
+
+    if (employeesAllocatedToAnotherRoute.length > 0) {
+      employeesAllocatedToAnotherRoute =
+        employeesAllocatedToAnotherRoute.filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t.id === item.id),
+        );
 
       throw new HttpException(
-        `O(s) colaborador(es)${employeeArray.map(
+        `O(s) colaborador(es)${employeesAllocatedToAnotherRoute.map(
           (item) => ' ' + item.name,
         )} já está(ão) em uma rota do tipo ${type.toLocaleLowerCase()}!`,
         HttpStatus.CONFLICT,
       );
     }
 
-    if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
+    const employeesAllocatedInAnotherExtraRoute =
+      employeeOnOneWay.length > 0 || employeeOnReturn.length > 0 ? true : false;
+
+    if (employeesAllocatedInAnotherExtraRoute) {
       let message = [
         employeeOnOneWay.length > 0
           ? `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
               item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY}!`
           : null,
         employeeOnReturn.length > 0
           ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
               item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN}!`
           : null,
       ];
 
       message = message.filter((item) => item !== null);
+
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
@@ -908,7 +1037,7 @@ export class RouteService {
     });
   }
 
-  async employeesInRouteUpdate(
+  async checkIfEmployeesOnAnotherRouteOnUpdate(
     routes: Route[],
     type: string,
     route: Route,
@@ -916,10 +1045,13 @@ export class RouteService {
     pathType: string,
   ): Promise<void> {
     let employeeArray = [];
+
     const employeeOnReturn = [];
     const employeeOnOneWay = [];
+
     let ida;
     let volta;
+
     routes
       .filter((_r) => _r.id != route.id && route.type === _r.type)
       .forEach((routeItem: Route) => {
@@ -967,6 +1099,7 @@ export class RouteService {
       });
 
     employeeArray.filter((item) => item !== null);
+
     if (employeeArray.length > 0) {
       throw new HttpException(
         `Um ou mais coloboradores já estão em outra rota do tipo ${type.toLocaleLowerCase()}.  ${employeeArray.map(
@@ -982,23 +1115,26 @@ export class RouteService {
         HttpStatus.CONFLICT,
       );
     }
+
     employeeArray = employeeArray.filter(
       (item, index, self) => index === self.findIndex((t) => t.id === item.id),
     );
+
     if (employeeOnOneWay.length > 0 || employeeOnReturn.length > 0) {
       let message = [
         employeeOnOneWay.length &&
           `O(s) colaborador(es)${employeeOnOneWay.map((item) =>
             item?.map((employee) => ' ' + employee.employee.name),
-          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY.toLocaleLowerCase()}!`,
+          )} já está(ão) em uma rota extra do tipo ${ETypePath.ONE_WAY}!`,
         employeeOnReturn.length > 0
           ? `O(s) colaborador(es)${employeeOnReturn.map((item) =>
               item?.map((employee) => ' ' + employee.employee.name),
-            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN.toLocaleLowerCase()}!`
+            )} já está(ão) em uma rota extra do tipo ${ETypePath.RETURN}!`
           : null,
       ];
 
       message = message.filter((item) => item !== null);
+
       throw new HttpException(
         {
           status: HttpStatus.CONFLICT,
@@ -1286,8 +1422,6 @@ export class RouteService {
         travelMode: 'DRIVING',
       });
 
-    console.log('Rotas geradas:', generatedWaypoints);
-
     const legs = generatedWaypoints.routes[0].legs;
 
     let totalDistance = 0;
@@ -1498,8 +1632,9 @@ export class RouteService {
   }
 
   private getValidationCriteriaToCreateRoute(payload: CreateRouteDTO) {
+    
     const numberOfEmployeesIsInsufficient =
-      payload.employeeIds.length <= 1 ? true : false;
+      payload.employeeIds?.length <= 1 ? true : false;
 
     const shiftWasNotProvided = !payload.shift ? true : false;
 
