@@ -24,6 +24,9 @@ export class SuggestionExtraDTO {
 
   vehicle: string;
 
+  @IsString({ each: true, message: '[employeesIds] Os ids dos colaboradores devem ser do tipo texto.' })
+  @IsNotEmpty({ each: true, message: '[employeesIds] Os ids dos colaboradores devem ser preenchidos.' })
+  @Transform(({ value }) => value?.map((id: string) => id.trim()))
   employeesIds: string[];
 
   time: string;
