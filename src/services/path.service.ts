@@ -246,7 +246,9 @@ export class PathService {
 
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt, startsReturnAt } = props.details;
+    
     const route = await this.routeService.listById(props.routeId);
+
     if (type === ETypePath.ONE_WAY || type === ETypePath.RETURN) {
       const path = await this.pathRepository.create(
         new Path(
@@ -278,6 +280,7 @@ export class PathService {
           route,
         ),
       );
+
       const pathReturn = await this.pathRepository.create(
         new Path(
           {
