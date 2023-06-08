@@ -936,7 +936,10 @@ export class EmployeeService {
     }
 
     if (employeeAlreadyExists.firstAccess == false) {
-      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'A senha de primeiro acesso já foi definida. Entre em contato com a administração!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const checkIfPasswordMatches = data.password === data.confirmPassword;
