@@ -32,6 +32,9 @@ export class RouteRepository
     return await this.repository.route.findFirst({
       where: {
         type,
+        NOT: {
+          status: 'deleted',
+        },
         path: {
           some: {
             employeesOnPath: {
