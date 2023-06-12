@@ -853,7 +853,7 @@ export class EmployeeService {
       role: employee.role,
       shift: employee.shift,
       createdAt: employee.createdAt,
-      pins: employee.pins.map((employeesOnPin) => {
+      pins: employee.pins?.length ? employee.pins.map((employeesOnPin) => {
         return {
           id: employeesOnPin.pin.id,
           title: employeesOnPin.pin.title,
@@ -864,7 +864,7 @@ export class EmployeeService {
           lng: employeesOnPin.pin.lng,
           type: employeesOnPin.type as ETypePin,
         };
-      }),
+      }) : null,
     };
   }
 
@@ -927,7 +927,7 @@ export class EmployeeService {
     return exportedEmployeeToXLSX(headers, workSheetName, filePath);
   }
 
-  async firstAccess(data: FirstAccessEmployeeDTO): Promise<Employee> {
+  async firstAccess(data: FirstAccessEmployeeDTO): Promise<MappedEmployeeDTO> {
     const employeeAlreadyExists =
       await this.employeeRepository.findByRegistration(data.registration);
 
@@ -953,10 +953,13 @@ export class EmployeeService {
 
     const passwordHashed = await bcrypt.hash(data.password, 10);
 
-    return await this.employeeRepository.updateEmployeePassword(
-      data.registration,
-      passwordHashed,
-    );
+    const updatedEmployee =
+      await this.employeeRepository.updateEmployeePassword(
+        data.registration,
+        passwordHashed,
+      );
+
+    return this.mapperOne(updatedEmployee);
   }
 
   async resetEmployeePassword(registration: string): Promise<Employee> {
