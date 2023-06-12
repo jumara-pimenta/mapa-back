@@ -9,4 +9,5 @@ export default interface IBackOfficeUserRepository {
   delete(id: string): Promise<BackOfficeUser>;
   findAll(page: Page, filters?: any): Promise<PageResponse<BackOfficeUser>>;
   update(id: string, data: BackOfficeUserUpdateDTO): Promise<BackOfficeUser>;
+  updatePassword(id: string, password: string): Promise<BackOfficeUser>
 }

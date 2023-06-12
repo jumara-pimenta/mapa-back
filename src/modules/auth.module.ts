@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { BackofficeUserModule } from './backofficeUser.module';
+import { Module, forwardRef } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { RoleGuard } from '../configs/authentication/auth.guard';
@@ -19,6 +20,7 @@ import { DriverModule } from './driver.module';
         expiresIn: process.env.EXPIRES_IN_ACCESS_TOKEN,
       },
     }),
+    forwardRef(() => BackofficeUserModule),
     EmployeeModule,
     DriverModule,
     RequestContextModule,

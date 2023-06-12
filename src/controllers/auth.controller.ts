@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -31,11 +32,17 @@ import {
 import { Public } from '../decorators/public.decorator';
 import { TokenDTO } from '../dtos/auth/token.dto';
 import { AuthService } from '../services/auth.service';
+import { UpdateBackofficeUserPasswordDTO } from '../dtos/backofficeUser/updateBackofficeUserPassword.dto';
+import { MappedBackOfficeUserDTO } from '../dtos/auth/mappedBackOfficeUser.dto';
+import { BackofficeUserService } from '../services/backOfficeUser.service';
 
 @Controller('/api/auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly backofficeUserService: BackofficeUserService,
+  ) {}
 
   @Post('/backoffice/signin')
   @Public()
@@ -128,5 +135,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async backofficeAuthDelete(@Param('id') id: string): Promise<any> {
     return await this.authService.deleteBackOfficeUser(id);
+  }
+
+  @Patch('/backoffice/resetPassword')
+  @Roles('ADMIN')
+  @HttpCode(HttpStatus.OK)
+  async updateBackofficeUserPassword(
+    @Body() payload: UpdateBackofficeUserPasswordDTO,
+  ): Promise<MappedBackOfficeUserDTO> {
+    return await this.backofficeUserService.updatePassword(payload);
   }
 }

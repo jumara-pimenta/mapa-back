@@ -3,9 +3,7 @@ import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
 import { generateQueryByFiltersForUser } from '../../configs/database/Queries';
 import { PrismaService } from '../../configs/database/prisma.service';
-import {
-  BackOfficeUserUpdateDTO,
-} from '../../dtos/auth/backOfficeUserLogin.dto';
+import { BackOfficeUserUpdateDTO } from '../../dtos/auth/backOfficeUserLogin.dto';
 import { FilterBackOfficeUserDTO } from '../../dtos/auth/filterBackOfficeUser.dto';
 import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
 import IBackOfficeUserRepository from './backOffice.repository.contract';
@@ -17,6 +15,15 @@ export class BackOfficeUserRepository
 {
   constructor(private readonly repository: PrismaService) {
     super();
+  }
+
+  async updatePassword(id: string, password: string): Promise<BackOfficeUser> {
+    return await this.repository.backOfficeUser.update({
+      where: { id },
+      data: {
+        password,
+      },
+    });
   }
 
   async create(data: BackOfficeUser): Promise<BackOfficeUser> {
