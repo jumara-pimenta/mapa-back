@@ -15,6 +15,9 @@ export default interface IPathRepository {
     employeeId: string,
     status: EStatusPath,
   ): Promise<Path>;
+  findManyPathsNotStartedByEmployee(
+    employeeId: string,
+  ): Promise<Path[]>;
   findByEmployeeOnPath(employeeId: string): Promise<Partial<Path>>;
   findAll(filter?: FiltersPathDTO): Promise<Path[]>;
   softDelete(id: string): Promise<Path>;

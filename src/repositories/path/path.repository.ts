@@ -12,6 +12,63 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   constructor(private readonly repository: PrismaService) {
     super();
   }
+  findManyPathsNotStartedByEmployee(employeeId: string): Promise<Path[]> {
+    return this.repository.path.findMany({
+      where: {
+        deletedAt: null,
+        status: EStatusPath.PENDING,
+        employeesOnPath: {
+          some: {
+            employeeId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        route: {
+          select: {
+            description: true,
+            type: true,
+          },
+        },
+        employeesOnPath: {
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 
   findByDriverIdAndStatus(
     driverId: string,
