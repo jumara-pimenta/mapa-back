@@ -77,7 +77,7 @@ export class PathService {
         'Não é possível finalizar uma rota que não foi iniciada!',
         HttpStatus.CONFLICT,
       );
-    
+
     const totalInEachPin = route.employeesOnPins.map((item) => {
       return item.employees.length;
     });
@@ -146,7 +146,7 @@ export class PathService {
         substituteId: null,
       },
     };
-    
+
     path.status = EStatusPath.FINISHED;
 
     const props = new RouteHistory(
@@ -178,13 +178,10 @@ export class PathService {
 
     return await this.routeService.updateWebsocket(finishAt);
   }
+
   async startPath(id: string): Promise<any> {
     const path = await this.listById(id);
-    /* if (path.finishedAt !== null)
-      throw new HttpException(
-        'Não é possível alterar uma rota que já foi finalizada!',
-        HttpStatus.CONFLICT,
-      ); */
+
     const hasHistoric = await this.routeHistoryService.listByPathId(id);
 
     if (hasHistoric.length > 0)
@@ -246,7 +243,7 @@ export class PathService {
 
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt, startsReturnAt } = props.details;
-    
+
     const route = await this.routeService.listById(props.routeId);
 
     if (type === ETypePath.ONE_WAY || type === ETypePath.RETURN) {
@@ -420,9 +417,6 @@ export class PathService {
   async listAll(filters?: FiltersPathDTO): Promise<any[]> {
     const paths = await this.pathRepository.findAll(filters);
 
-    // const manyPath = await this.mapperMany(paths);
-    // add driver name and plate of vehicle
-
     return paths.map((path: Path) => {
       const { driver, vehicle } = path.route;
       const { name, id } = driver;
@@ -557,11 +551,13 @@ export class PathService {
 
   async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByEmployee(employeeId);
+
     if (!path.length)
       throw new HttpException(
         'Não foram encontrados trajetos para este colaborador!',
         HttpStatus.NOT_FOUND,
       );
+
     return this.mapperMany(path);
   }
 
@@ -638,6 +634,16 @@ export class PathService {
       );
 
     return this.mapperOne(path);
+  }
+
+  async listPathsNotStartedByEmployee(
+    employeeId: string,
+  ): Promise<Path[]> {
+    const paths = await this.pathRepository.findManyPathsNotStartedByEmployee(
+      employeeId,
+    );
+
+    return paths;
   }
 
   async addSubstituteDriver(driverId: string, pathId: string): Promise<Path> {

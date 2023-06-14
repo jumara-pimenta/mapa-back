@@ -18,8 +18,8 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import {
   ETypeCreationPin,
-  ETypeEditionPin,
   ETypePin,
+  ETypeRoute,
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
 } from '../utils/ETypes';
@@ -39,6 +39,8 @@ import { GoogleApiServiceIntegration } from '../integrations/services/googleServ
 import { getShift } from '../utils/Utils';
 import { verifyDateFilter } from '../utils/Date';
 import { FirstAccessEmployeeDTO } from '../dtos/employee/firstAccessEmployee.dto';
+import { PathService } from './path.service';
+import { EmployeesOnPathService } from './employeesOnPath.service';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -47,6 +49,7 @@ const validateAsync = (schema: any): Promise<any> => {
       .catch((error: any) => reject(error));
   });
 };
+
 interface abc {
   line: number;
   employee: CreateEmployeeFileDTO;
@@ -63,6 +66,10 @@ export class EmployeeService {
     private readonly pinService: PinService,
     @Inject('IGoogleApiServiceIntegration')
     private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
+    @Inject(forwardRef(() => PathService))
+    private readonly pathService: PathService,
+    @Inject(forwardRef(() => EmployeesOnPathService))
+    private readonly employeeOnPathService: EmployeesOnPathService,
   ) {}
 
   async getLocation(address: string): Promise<any> {
@@ -269,7 +276,8 @@ export class EmployeeService {
     data: UpdateEmployeeDTO,
   ): Promise<MappedEmployeeDTO> {
     const employee = await this.listById(id);
-    let pin: Pin;
+
+    const { typeEdition, details, district, lat, lng, local, title } = data.pin;
 
     if (data.registration) {
       const registrationExists =
@@ -285,46 +293,57 @@ export class EmployeeService {
         );
       }
     }
+
     if (data.pin) {
-      if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
-        if (!data.pin.id)
-          throw new HttpException(
-            'O ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
-            HttpStatus.BAD_REQUEST,
-          );
-
-        await this.employeeOnPinService.associateEmployeeByService(
-          data.pin.id,
+      this.pinService.validateUpdateEmployeePin(
+        {
+          typeEdition,
+          pinId: data.pin.id,
           employee,
-        );
-      }
-      if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
-        const { title, local, details, lat, lng, district } = data.pin;
+        },
+        { details, district, lat, lng, local, title },
+      );
 
-        if (!title || !local || !details || !lat || !lng) {
-          throw new HttpException(
-            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: título, local e detalhes.',
-            HttpStatus.BAD_REQUEST,
+      const pathsThatTheEmployeeIsIncluded =
+        await this.pathService.listPathsNotStartedByEmployee(employee.id);
+
+      if (pathsThatTheEmployeeIsIncluded.length > 0) {
+        let newEmployeePosition = 1;
+
+        for await (const path of pathsThatTheEmployeeIsIncluded) {
+          await this.employeeOnPathService.removeEmployeeOnPath(
+            employee.id,
+            path.id,
           );
+
+          if (path.route.type === ETypeRoute.CONVENTIONAL) {
+            await this.employeeOnPathService.updateEmployeePositionByEmployeeAndPath(
+              employee.id,
+              path.id,
+              newEmployeePosition,
+            );
+
+            newEmployeePosition++;
+          }
+
+          if (path.route.type === ETypeRoute.EXTRA) {
+            // Reordenar e salva
+          }
         }
-
-        pin = await this.pinService.create({
-          title,
-          local,
-          details,
-          district,
-          lat,
-          lng,
-        });
-
-        await this.employeeOnPinService.associateEmployeeByService(
-          pin.id,
-          employee,
-        );
       }
+
+      await this.pinService.changeEmployeePin(
+        {
+          typeEdition,
+          pinId: data.pin.id,
+          employee,
+        },
+        { details, district, lat, lng, local, title },
+      );
     }
 
     let shiftScheduleUpdate: string = null;
+
     if (data.shift) {
       const getShiftUpdate = getStartAtAndFinishEmployee(data.shift);
 
@@ -333,6 +352,7 @@ export class EmployeeService {
       if (getShiftUpdate)
         shiftScheduleUpdate = `${getShiftUpdate.startAt} às ${getShiftUpdate.finishAt}`;
     }
+
     const address = JSON.stringify(data?.address);
 
     const employeeDataUpdated = { ...data, address };
@@ -853,18 +873,20 @@ export class EmployeeService {
       role: employee.role,
       shift: employee.shift,
       createdAt: employee.createdAt,
-      pins: employee.pins?.length ? employee.pins.map((employeesOnPin) => {
-        return {
-          id: employeesOnPin.pin.id,
-          title: employeesOnPin.pin.title,
-          local: employeesOnPin.pin.local,
-          details: employeesOnPin.pin.details,
-          district: employeesOnPin.pin.district,
-          lat: employeesOnPin.pin.lat,
-          lng: employeesOnPin.pin.lng,
-          type: employeesOnPin.type as ETypePin,
-        };
-      }) : null,
+      pins: employee.pins?.length
+        ? employee.pins.map((employeesOnPin) => {
+            return {
+              id: employeesOnPin.pin.id,
+              title: employeesOnPin.pin.title,
+              local: employeesOnPin.pin.local,
+              details: employeesOnPin.pin.details,
+              district: employeesOnPin.pin.district,
+              lat: employeesOnPin.pin.lat,
+              lng: employeesOnPin.pin.lng,
+              type: employeesOnPin.type as ETypePin,
+            };
+          })
+        : null,
     };
   }
 

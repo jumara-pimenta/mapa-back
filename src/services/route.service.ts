@@ -80,6 +80,7 @@ export class RouteService {
     private readonly routeRepository: IRouteRepository,
     private readonly driverService: DriverService,
     private readonly vehicleService: VehicleService,
+    @Inject(forwardRef(() => EmployeeService))
     private readonly employeeService: EmployeeService,
     private readonly routeHistoryService: RouteHistoryService,
     @Inject(forwardRef(() => PathService))

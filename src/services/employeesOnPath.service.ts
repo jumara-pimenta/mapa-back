@@ -1,3 +1,4 @@
+import { EmployeesOnPath } from './../entities/employeesOnPath.entity';
 import {
   forwardRef,
   HttpException,
@@ -8,7 +9,6 @@ import {
 import { CreateEmployeesOnPathDTO } from '../dtos/employeesOnPath/createEmployeesOnPath.dto';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
 import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employeesOnPath.repository.contract';
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
@@ -21,6 +21,7 @@ export class EmployeesOnPathService {
   constructor(
     @Inject('IEmployeesOnPathRepository')
     private readonly employeesOnPathRepository: IEmployeesOnPathRepository,
+    @Inject(forwardRef(() => EmployeeService))
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
@@ -317,10 +318,57 @@ export class EmployeesOnPathService {
     }
   }
 
+  private async listByEmployeeAndPath(
+    employeeId: string,
+    pathId: string,
+  ): Promise<EmployeesOnPath> {
+    const employeesOnPath =
+      await this.employeesOnPathRepository.findByEmployeeAndPath(
+        employeeId,
+        pathId,
+      );
+
+    if (!employeesOnPath)
+      throw new HttpException(
+        'Não foi encontrado um colaborador no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return employeesOnPath;
+  }
+
+  async updateEmployeePositionByEmployeeAndPath(
+    employeeId: string,
+    pathId: string,
+    newPosition: number,
+  ): Promise<EmployeesOnPath> {
+    const employeeOnPath = await this.listByEmployeeAndPath(employeeId, pathId);
+
+    employeeOnPath.position = newPosition;
+
+    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
+      employeeOnPath,
+    );
+
+    return updatedEmployeeOnPath;
+  }
+
+  async removeEmployeeOnPath(employeeId: string, pathId: string) {
+    const employee = await this.employeeService.listById(employeeId);
+
+    const employeeOnPath = await this.listByEmployeeAndPath(
+      employee.id,
+      pathId,
+    );
+
+    await this.delete(employeeOnPath.id);
+
+    return;
+  }
+
   private mappedOne(
     employeesOnPath: EmployeesOnPath,
   ): MappedEmployeesOnPathDTO {
-
     const { employee } = employeesOnPath;
     const { pins } = employee;
 
