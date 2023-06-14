@@ -6,7 +6,7 @@ import { EmployeeModule } from './employee.module';
 import { PathModule } from './path.module';
 
 @Module({
-  imports: [EmployeeModule, forwardRef(() => PathModule)],
+  imports: [forwardRef(() => EmployeeModule), forwardRef(() => PathModule)],
   controllers: [EmployeesOnPathController],
   providers: [
     EmployeesOnPathService,
