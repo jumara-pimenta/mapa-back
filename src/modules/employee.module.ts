@@ -5,12 +5,17 @@ import { EmployeeRepository } from '../repositories/employee/employee.repository
 import { EmployeeService } from '../services/employee.service';
 import { EmployeesOnPinModule } from './employeesOnPin.module';
 import { PinModule } from './pin.module';
+import { PathModule } from './path.module';
+import { EmployeesOnPathModule } from './employeesOnPath.module';
 
 @Module({
   controllers: [EmployeeController],
   imports: [
     forwardRef(() => EmployeesOnPinModule),
     forwardRef(() => PinModule),
+    forwardRef(() => PathModule),
+    forwardRef(() => EmployeesOnPathModule),
+    
   ],
   providers: [
     EmployeeService,
