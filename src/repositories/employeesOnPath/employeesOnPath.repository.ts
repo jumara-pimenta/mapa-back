@@ -16,6 +16,30 @@ export class EmployeesOnPathRepository
     super();
   }
 
+  findByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath> {
+    return this.repository.employeesOnPath.findFirst({
+      where: { pathId, employeeId },
+      select: {
+        id: true,
+        description: true,
+        boardingAt: true,
+        confirmation: true,
+        disembarkAt: true,
+        position: true,
+        createdAt: true,
+        present: true,
+        employee: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
   create(data: EmployeesOnPath): Promise<EmployeesOnPath> {
     return this.repository.employeesOnPath.create({
       data: {
@@ -70,6 +94,7 @@ export class EmployeesOnPathRepository
       },
     });
   }
+
   findByIds(id: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: { employeeId: id },
