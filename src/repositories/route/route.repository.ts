@@ -341,7 +341,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'desc',
+                    position: 'asc',
                   },
                   where: {
                     employee: {
@@ -394,7 +394,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'desc',
+                    position: 'asc',
                   },
                   where: {
                     employee: {
