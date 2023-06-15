@@ -17,6 +17,7 @@ import { SinisterModule } from './sinister.module';
     VehicleModule,
     RouteHistoryModule,
     forwardRef(() => SinisterModule),
+    forwardRef(() => RouteModule),
   ],
   controllers: [PathController],
   providers: [

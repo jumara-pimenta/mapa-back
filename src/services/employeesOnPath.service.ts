@@ -15,6 +15,7 @@ import { PathService } from './path.service';
 import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
 import { EStatusPath, ETypePath } from '../utils/ETypes';
 import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
+import { RouteService } from './route.service';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -25,6 +26,8 @@ export class EmployeesOnPathService {
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
+    @Inject(forwardRef(() => RouteService))
+    private readonly routeService: RouteService,
   ) {}
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
@@ -321,12 +324,28 @@ export class EmployeesOnPathService {
   private async listByEmployeeAndPath(
     employeeId: string,
     pathId: string,
-  ): Promise<EmployeesOnPath[]> {
-    const employeesOnPath =
-      await this.employeesOnPathRepository.findManyByEmployeeAndPath(
+  ): Promise<EmployeesOnPath> {
+    const employeeOnPath =
+      await this.employeesOnPathRepository.findByEmployeeAndPath(
         employeeId,
         pathId,
       );
+
+    if (!employeeOnPath)
+      throw new HttpException(
+        'Não foi encontrado um colaborador no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return employeeOnPath;
+  }
+
+  private async listByEmployeeAndRoute(
+    employeeId: string,
+    routeId: string,
+  ): Promise<EmployeesOnPath[]> {
+    const employeesOnPath =
+      await this.employeesOnPathRepository.findManyByEmployeeAndRoute(employeeId, routeId);
 
     if (!employeesOnPath)
       throw new HttpException(
@@ -341,31 +360,36 @@ export class EmployeesOnPathService {
     employeeId: string,
     pathId: string,
     newPosition: number,
-  ): Promise<EmployeesOnPath> {
-    const employeeOnPath = await this.listByEmployeeAndPath(employeeId, pathId);
-
-    const updatedEmployeeOnPath = await this.employeesOnPathRepository.updatePosition(
-      employeeOnPath.id,
-      newPosition
+  ): Promise<void> {
+    const employeeOnPath = await this.listByEmployeeAndPath(
+      employeeId,
+      pathId,
     );
 
-    return updatedEmployeeOnPath;
+    await this.employeesOnPathRepository.updatePosition(
+      employeeOnPath.id,
+      newPosition,
+    );
+    
+    return;
   }
 
-  async removeEmployeeOnPath(employeeId: string, pathId: string) {
+  async removeEmployeeOnPath(
+    employeeId: string,
+    routeId: string,
+  ) {
     const employee = await this.employeeService.listById(employeeId);
 
-    const employeesOnPath = await this.listByEmployeeAndPath(
+    const employeesOnPath = await this.listByEmployeeAndRoute(
       employee.id,
-      pathId,
+      routeId,
     );
 
     for await (const employeeOnPath of employeesOnPath) {
       await this.delete(employeeOnPath.id);
     }
 
-
-    await this.pathService.updateEmployeePositionOnPath(pathId);
+    await this.routeService.updateEmployeePositionOnPath(routeId);
 
     return;
   }

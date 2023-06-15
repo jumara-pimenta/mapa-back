@@ -12,7 +12,7 @@ export class Path {
   type: string | ETypePath;
   status: string | EStatusPath;
   employeesOnPath?: Partial<EmployeesOnPath>[];
-  route?: Partial<Route>;
+  route?: Route | Partial<Route>;
   createdAt: Date;
   updatedAt?: Date;
   deletedAt?: Date;

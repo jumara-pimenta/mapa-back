@@ -317,7 +317,7 @@ export class EmployeeService {
         for await (const path of pathsThatTheEmployeeIsIncluded) {
           await this.employeeOnPathService.removeEmployeeOnPath(
             employee.id,
-            path.id,
+            path.route.id
           );
         }
       }

@@ -24,9 +24,36 @@ export class EmployeesOnPathRepository
     });
   }
 
-  findManyByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath[]> {
-    return this.repository.employeesOnPath.findMany({
+  findByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath> {
+    return this.repository.employeesOnPath.findFirst({
       where: { pathId, employeeId },
+      select: {
+        id: true,
+        description: true,
+        boardingAt: true,
+        confirmation: true,
+        disembarkAt: true,
+        position: true,
+        createdAt: true,
+        present: true,
+        employee: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
+  findManyByEmployeeAndRoute(employeeId: string, routeId: string): Promise<EmployeesOnPath[]> {
+    return this.repository.employeesOnPath.findMany({
+      where: {
+        employeeId, path: {
+        routeId
+      }},
       select: {
         id: true,
         description: true,

@@ -17,5 +17,6 @@ export default interface IEmployeesOnPathRepository {
     data: EmployeesOnPath[],
     confirmation: boolean,
   ): Promise<EmployeesOnPath[]>;
-  findManyByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath[]>;
+  findByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath>;
+  findManyByEmployeeAndRoute(employeeId: string, routeId: string): Promise<EmployeesOnPath[]>;
 }

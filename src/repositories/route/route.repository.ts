@@ -257,6 +257,11 @@ export class RouteRepository
             status: true,
             type: true,
             createdAt: true,
+            route: {
+              select: {
+                id: true
+              }
+            },
             employeesOnPath: {
               orderBy: {
                 position: 'asc',

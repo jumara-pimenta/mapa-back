@@ -74,6 +74,7 @@ import {
   ROUTE_LIMIT_EMPLOYEES,
 } from '../utils/Constants';
 import { Path } from '../entities/path.entity';
+import { EmployeesOnPathService } from './employeesOnPath.service';
 
 @Injectable()
 export class RouteService {
@@ -91,6 +92,8 @@ export class RouteService {
     private readonly mapBoxServiceIntegration: IMapBoxServiceIntegration,
     @Inject('IGoogleApiServiceIntegration')
     private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
+    @Inject(forwardRef(() => EmployeesOnPathService))
+    private readonly employeesOnPathService: EmployeesOnPathService
   ) {}
 
   async onModuleInit() {
@@ -1694,6 +1697,7 @@ export class RouteService {
   }
 
   async updateTotalDistanceRoute(path: Path): Promise<void> {
+
     const route = await this.listById(path.route.id);
 
     const employees = await this.employeeService.listManyEmployeesByPath(
@@ -1708,12 +1712,43 @@ export class RouteService {
     await this.routeRepository.updateTotalDistance(route.id, totalDistance);
   }
 
+  async updateEmployeePositionOnPath(routeId: string): Promise<void> {
+    const route = await this.listByIdNotMapped(routeId);
+    
+    const { path: paths } = route;
+
+    let newPosition = 1;
+    let currentPathId = '';
+
+    for await (const path of paths) {
+      if (currentPathId === '') currentPathId = path.id;
+
+      if (currentPathId !== '' && currentPathId !== path.id) {
+        currentPathId = path.id;
+        newPosition = 1;
+      }
+
+      for await (const employeeOnPath of path.employeesOnPath) {
+        await this.employeesOnPathService.updateEmployeePositionByEmployeeAndPath(
+          employeeOnPath.employee.id,
+          path.id,
+          newPosition,
+        );
+
+        newPosition++;
+      }
+
+      await this.updateTotalDistanceRoute(path as Path);
+    }
+
+  }
+
   async getTotalDistanceRoute(
     employees: Employee[],
     type: ETypePath,
   ): Promise<string> {
     if (!employees.length) return;
-    
+
     let farthestEmployee: Employee = null;
     let MAX_DISTANCE = 0;
 

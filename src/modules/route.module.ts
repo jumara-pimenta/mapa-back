@@ -9,6 +9,7 @@ import { EmployeeModule } from './employee.module';
 import { PathModule } from './path.module';
 import { RouteHistoryModule } from './routeHistory.module';
 import { VehicleModule } from './vehicle.module';
+import { EmployeesOnPathModule } from './employeesOnPath.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VehicleModule } from './vehicle.module';
     forwardRef(() => EmployeeModule),
     forwardRef(() => PathModule),
     forwardRef(() => RouteHistoryModule),
+    forwardRef(() => EmployeesOnPathModule)
   ],
   controllers: [RouteController],
   providers: [
