@@ -20,6 +20,40 @@ export class EmployeeRepository
     super();
   }
 
+  async findManyByPath(pathId: string): Promise<Employee[]> {
+    const items = await this.repository.employee.findMany({
+      where: {
+        deletedAt: null,
+        employeeOnPath: {
+          some: {
+            pathId,
+          },
+        },
+      },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
+              select: {
+                details: true,
+                local: true,
+                title: true,
+                lat: true,
+                lng: true
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+
+    return items;
+  }
+
   delete(id: string): Promise<Employee> {
     return this.repository.employee.update({
       where: { id },

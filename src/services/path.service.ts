@@ -393,6 +393,7 @@ export class PathService {
 
   async listById(id: string): Promise<MappedPathDTO> {
     const path = await this.pathRepository.findById(id);
+
     if (!path)
       throw new HttpException(
         `Não foi encontrado trajeto com o id: ${id}!`,
@@ -636,9 +637,7 @@ export class PathService {
     return this.mapperOne(path);
   }
 
-  async listPathsNotStartedByEmployee(
-    employeeId: string,
-  ): Promise<Path[]> {
+  async listPathsNotStartedByEmployee(employeeId: string): Promise<Path[]> {
     const paths = await this.pathRepository.findManyPathsNotStartedByEmployee(
       employeeId,
     );
@@ -706,6 +705,36 @@ export class PathService {
       );
 
     return path;
+  }
+
+  async listByIdNotMapped(id: string): Promise<Path> {
+    const path = await this.pathRepository.findById(id);
+
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado trajeto com o id: ${id}!`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return path;
+  }
+
+  async updateEmployeePositionOnPath(pathId: string): Promise<void> {
+    const path = await this.listByIdNotMapped(pathId);
+
+    let newPosition = 1;
+
+    for await (const employeeOnPath of path.employeesOnPath) {
+      await this.employeesOnPathService.updateEmployeePositionByEmployeeAndPath(
+        employeeOnPath.employee.id,
+        path.id,
+        newPosition,
+      );
+
+      newPosition++;
+    }
+
+    await this.routeService.updateTotalDistanceRoute(path);
   }
 
   private mapperOne(path: Path): MappedPathDTO {

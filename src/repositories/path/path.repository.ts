@@ -262,6 +262,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             description: true,
             employee: {
               select: {
+                id: true,
                 name: true,
                 address: true,
                 shift: true,
@@ -281,6 +282,9 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
                 },
               },
             },
+          },
+          orderBy: {
+            position: 'asc',
           },
         },
       },

@@ -321,9 +321,9 @@ export class EmployeesOnPathService {
   private async listByEmployeeAndPath(
     employeeId: string,
     pathId: string,
-  ): Promise<EmployeesOnPath> {
+  ): Promise<EmployeesOnPath[]> {
     const employeesOnPath =
-      await this.employeesOnPathRepository.findByEmployeeAndPath(
+      await this.employeesOnPathRepository.findManyByEmployeeAndPath(
         employeeId,
         pathId,
       );
@@ -344,10 +344,9 @@ export class EmployeesOnPathService {
   ): Promise<EmployeesOnPath> {
     const employeeOnPath = await this.listByEmployeeAndPath(employeeId, pathId);
 
-    employeeOnPath.position = newPosition;
-
-    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
-      employeeOnPath,
+    const updatedEmployeeOnPath = await this.employeesOnPathRepository.updatePosition(
+      employeeOnPath.id,
+      newPosition
     );
 
     return updatedEmployeeOnPath;
@@ -356,12 +355,17 @@ export class EmployeesOnPathService {
   async removeEmployeeOnPath(employeeId: string, pathId: string) {
     const employee = await this.employeeService.listById(employeeId);
 
-    const employeeOnPath = await this.listByEmployeeAndPath(
+    const employeesOnPath = await this.listByEmployeeAndPath(
       employee.id,
       pathId,
     );
 
-    await this.delete(employeeOnPath.id);
+    for await (const employeeOnPath of employeesOnPath) {
+      await this.delete(employeeOnPath.id);
+    }
+
+
+    await this.pathService.updateEmployeePositionOnPath(pathId);
 
     return;
   }

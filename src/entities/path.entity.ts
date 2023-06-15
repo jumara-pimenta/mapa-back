@@ -1,4 +1,4 @@
-import { EStatusPath } from '../utils/ETypes';
+import { EStatusPath, ETypePath } from '../utils/ETypes';
 import { v4 as uuid } from 'uuid';
 import { EmployeesOnPath } from './employeesOnPath.entity';
 import { Route } from './route.entity';
@@ -9,7 +9,7 @@ export class Path {
   startsAt: string;
   startedAt?: Date;
   finishedAt?: Date;
-  type: string;
+  type: string | ETypePath;
   status: string | EStatusPath;
   employeesOnPath?: Partial<EmployeesOnPath>[];
   route?: Partial<Route>;

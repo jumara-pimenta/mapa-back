@@ -15,9 +15,17 @@ export class EmployeesOnPathRepository
   constructor(private readonly repository: PrismaService) {
     super();
   }
+  updatePosition(id: string, newPosition: number): Promise<EmployeesOnPath> {
+    return this.repository.employeesOnPath.update({
+      where: { id },
+      data: {
+        position: newPosition
+      }
+    });
+  }
 
-  findByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath> {
-    return this.repository.employeesOnPath.findFirst({
+  findManyByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath[]> {
+    return this.repository.employeesOnPath.findMany({
       where: { pathId, employeeId },
       select: {
         id: true,

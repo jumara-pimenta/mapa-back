@@ -1,3 +1,4 @@
+import { TGoogleWaypointsStatus } from './../utils/TTypes';
 import {
   forwardRef,
   HttpException,
@@ -72,6 +73,7 @@ import {
   MIN_MINUTE_DURATION,
   ROUTE_LIMIT_EMPLOYEES,
 } from '../utils/Constants';
+import { Path } from '../entities/path.entity';
 
 @Injectable()
 export class RouteService {
@@ -263,7 +265,7 @@ export class RouteService {
 
     await this.employeesInPins(employeesPins, payload.type);
 
-    const emplopyeeOrdened = await this.getWaypoints(
+    const employeeOrdened = await this.getWaypoints(
       employeesPins,
       payload.pathDetails.type,
       payload.pathDetails.duration,
@@ -290,7 +292,7 @@ export class RouteService {
       await this.checkIfEmployeesOnAnotherRoute(
         employeeInRoute,
         payload.type,
-        emplopyeeOrdened.employeesIds,
+        employeeOrdened.employeesIds,
         payload.pathDetails.type,
       );
 
@@ -309,7 +311,7 @@ export class RouteService {
 
     await this.pathService.generate({
       routeId: createdRoute.id,
-      employeeIds: emplopyeeOrdened.employeesIds,
+      employeeIds: employeeOrdened.employeesIds,
       details: {
         ...payload.pathDetails,
         startsAt: initRouteDate,
@@ -320,7 +322,7 @@ export class RouteService {
     });
 
     const updatedRoute = await this.update(createdRoute.id, {
-      distance: emplopyeeOrdened.distance,
+      distance: employeeOrdened.distance,
     });
 
     return updatedRoute;
@@ -452,7 +454,6 @@ export class RouteService {
   async createSuggestedRoutes(
     payload: CreateSugestedRouteDTO,
   ): Promise<SuggenstionResultDTO[]> {
-
     const routes = payload.suggestedExtras.map((route) => {
       return {
         description: route.description,
@@ -482,7 +483,6 @@ export class RouteService {
     const resolvedRoutes: SuggenstionResultDTO[] = manyRoutesProcessed.map(
       (resolved, routePosition) => {
         if (resolved.status === 'rejected') {
-          
           return {
             description: routes[routePosition].description,
             status: 400,
@@ -548,6 +548,7 @@ export class RouteService {
 
   async listById(id: string): Promise<MappedRouteDTO> {
     const route = await this.routeRepository.findById(id);
+
     if (!route)
       throw new HttpException(
         'Não foi encontrada está rota!',
@@ -1373,7 +1374,7 @@ export class RouteService {
   ): Promise<DetailsRoute> {
     if (employees.length > ROUTE_LIMIT_EMPLOYEES)
       throw new HttpException(
-        'A roterização automática não pode ter mais de 26 colaboradores',
+        `A roterização automática não pode ter mais de ${ROUTE_LIMIT_EMPLOYEES} colaboradores`,
         HttpStatus.BAD_REQUEST,
       );
 
@@ -1422,6 +1423,18 @@ export class RouteService {
         waypoints: waypoints.join('|'),
         travelMode: 'DRIVING',
       });
+
+    if (
+      (generatedWaypoints?.status &&
+        (generatedWaypoints.status as TGoogleWaypointsStatus) ==
+          'ZERO_RESULTS') ||
+      !generatedWaypoints
+    ) {
+      throw new HttpException(
+        'Não foi possível traçar um trajeto entre os pontos. Verifique se o ponto dos colaboradores estão dentro do limite permitido!',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
 
     const legs = generatedWaypoints.routes[0].legs;
 
@@ -1633,7 +1646,6 @@ export class RouteService {
   }
 
   private getValidationCriteriaToCreateRoute(payload: CreateRouteDTO) {
-    
     const numberOfEmployeesIsInsufficient =
       payload.employeeIds?.length <= 1 ? true : false;
 
@@ -1667,6 +1679,121 @@ export class RouteService {
       itsAnOneWayPath,
       oneWayTimeNotProvided,
     };
+  }
+
+  async listByIdNotMapped(id: string): Promise<Route> {
+    const route = await this.routeRepository.findById(id);
+
+    if (!route)
+      throw new HttpException(
+        'Não foi encontrada está rota!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return route;
+  }
+
+  async updateTotalDistanceRoute(path: Path): Promise<void> {
+    const route = await this.listById(path.route.id);
+
+    const employees = await this.employeeService.listManyEmployeesByPath(
+      path.id,
+    );
+
+    const totalDistance = await this.getTotalDistanceRoute(
+      employees,
+      path.type as ETypePath,
+    );
+
+    await this.routeRepository.updateTotalDistance(route.id, totalDistance);
+  }
+
+  async getTotalDistanceRoute(
+    employees: Employee[],
+    type: ETypePath,
+  ): Promise<string> {
+    if (!employees.length) return;
+    
+    let farthestEmployee: Employee = null;
+    let MAX_DISTANCE = 0;
+
+    for (const employee of employees) {
+      const EMPLOYEE_COORDINATES = {
+        lat: employee.pins[0].pin.lat,
+        lng: employee.pins[0].pin.lng,
+      };
+
+      const distance = distanceBetweenPoints(
+        DENSO_COORDINATES,
+        EMPLOYEE_COORDINATES,
+      );
+
+      if (distance > MAX_DISTANCE) {
+        MAX_DISTANCE = distance;
+        farthestEmployee = employee;
+      }
+    }
+
+    const index = employees.indexOf(farthestEmployee);
+
+    if (index > -1) {
+      employees.splice(index, 1);
+    }
+
+    const waypoints = employees.map((employee) => {
+      return `${employee.pins[0].pin.lat},${employee.pins[0].pin.lng}`;
+    });
+
+    const FARTHEST_EMPLOYEE_LOCATION = `${farthestEmployee.pins[0].pin.lat},${farthestEmployee.pins[0].pin.lng}`;
+
+    const generatedWaypoints =
+      await this.googleApiServiceIntegration.getWaypoints({
+        origin:
+          type === ETypePath.RETURN
+            ? DENSO_LOCATION
+            : FARTHEST_EMPLOYEE_LOCATION,
+        destination:
+          type === ETypePath.RETURN
+            ? FARTHEST_EMPLOYEE_LOCATION
+            : DENSO_LOCATION,
+        waypoints: waypoints.join('|'),
+        travelMode: 'DRIVING',
+      });
+
+    if (
+      (generatedWaypoints?.status &&
+        (generatedWaypoints.status as TGoogleWaypointsStatus) ==
+          'ZERO_RESULTS') ||
+      !generatedWaypoints
+    ) {
+      throw new HttpException(
+        'Não foi possível traçar um trajeto entre os pontos. Verifique se o ponto dos colaboradores estão dentro do limite permitido!',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+
+    const legs = generatedWaypoints.routes[0].legs;
+
+    let totalDistance = 0;
+
+    for (const leg of legs) {
+      totalDistance += leg.distance.value;
+    }
+
+    const waypointsOrder: number[] =
+      generatedWaypoints.routes[0]?.waypoint_order;
+
+    const order = waypointsOrder.map((item) => {
+      return employees[item];
+    });
+
+    const FINISH_DISTANCE = totalDistance / 1000 + 'km';
+
+    type === ETypePath.RETURN
+      ? order.push(farthestEmployee)
+      : order.unshift(farthestEmployee);
+
+    return FINISH_DISTANCE;
   }
 
   private async checkForEmployeesOnAnotherConventionalRoute(

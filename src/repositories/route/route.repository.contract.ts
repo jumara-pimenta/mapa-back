@@ -32,4 +32,6 @@ export default interface IRouteRepository {
     employeeId: string,
     type: TTypeRoute,
   ): Promise<Route>;
+
+  updateTotalDistance(id: string, totalDistance: string): Promise<Route>;
 }

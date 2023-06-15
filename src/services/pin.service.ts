@@ -71,8 +71,6 @@ export class PinService {
         employee,
       );
     }
-
-    return await this.pinRepository.create(new Pin(data));
   }
 
   validateUpdateEmployeePin(

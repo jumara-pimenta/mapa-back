@@ -19,7 +19,6 @@ import { EmployeesOnPinService } from './employeesOnPin.service';
 import {
   ETypeCreationPin,
   ETypePin,
-  ETypeRoute,
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
 } from '../utils/ETypes';
@@ -271,6 +270,13 @@ export class EmployeeService {
       );
   }
 
+  async listManyEmployeesByPath(pathId: string): Promise<Employee[]> {
+
+    const employees = await this.employeeRepository.findManyByPath(pathId);
+
+    return employees;
+  }
+
   async update(
     id: string,
     data: UpdateEmployeeDTO,
@@ -308,27 +314,11 @@ export class EmployeeService {
         await this.pathService.listPathsNotStartedByEmployee(employee.id);
 
       if (pathsThatTheEmployeeIsIncluded.length > 0) {
-        let newEmployeePosition = 1;
-
         for await (const path of pathsThatTheEmployeeIsIncluded) {
           await this.employeeOnPathService.removeEmployeeOnPath(
             employee.id,
             path.id,
           );
-
-          if (path.route.type === ETypeRoute.CONVENTIONAL) {
-            await this.employeeOnPathService.updateEmployeePositionByEmployeeAndPath(
-              employee.id,
-              path.id,
-              newEmployeePosition,
-            );
-
-            newEmployeePosition++;
-          }
-
-          if (path.route.type === ETypeRoute.EXTRA) {
-            // Reordenar e salva
-          }
         }
       }
 

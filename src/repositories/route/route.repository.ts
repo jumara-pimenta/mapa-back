@@ -24,6 +24,14 @@ export class RouteRepository
   ) {
     super();
   }
+  async updateTotalDistance(id: string, totalDistance: string): Promise<Route> {
+    return await this.repository.route.update({
+      data: {
+        distance: totalDistance,
+      },
+      where: { id },
+    });
+  }
 
   async findEmployeeOnRouteByType(
     employeeId: string,

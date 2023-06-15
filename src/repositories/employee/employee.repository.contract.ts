@@ -21,4 +21,5 @@ export default interface IEmployeeRepository {
   findJokerPin(ids: string[]): Promise<Partial<Employee>[]>;
   updateEmployeePassword(registration: string, password: string): Promise<Employee>;
   resetEmployeePassword(registration: string): Promise<Employee>;
+  findManyByPath(pathId: string): Promise<Employee[]>;
 }
