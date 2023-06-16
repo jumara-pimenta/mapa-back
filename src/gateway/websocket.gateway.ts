@@ -14,6 +14,7 @@ import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { RouteService } from '../services/route.service';
+import { Observable, catchError, from, map, throwError } from 'rxjs';
 
 @WebSocketGateway()
 export class WebsocketGateway {
@@ -133,19 +134,19 @@ export class WebsocketGateway {
       }),
     )
     data: IdUpdateDTO,
-  ): Promise<void> {
-    try {
-      const employeeOnPath = await this.employeesOnPathService.onboardEmployee(
-        data,
-      );
+  ): Promise<Observable<any>> {
+    return from(this.employeesOnPathService.onboardEmployee(data)).pipe(
+      map((employeeOnPath) => ({
+        event: employeeOnPath.id,
+        data: employeeOnPath,
+      })),
+      catchError((error) => {
+        const { status, message } = error;
 
-      this.server.emit(employeeOnPath.id, {
-        ...employeeOnPath,
-      });
-    } catch (error) {
-      this.server.except(error).emit('error', error);
-      throw new WsException(error.message);
-    }
+        this.server.except(error).emit('exception', { status, message });
+        return throwError(() => new WsException({ status, message }));
+      }),
+    );
   }
 
   @SubscribeMessage('disembarkEmployee')

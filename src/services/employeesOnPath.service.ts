@@ -83,6 +83,7 @@ export class EmployeesOnPathService {
 
   async onboardEmployee(payload: IdUpdateDTO): Promise<any> {
     await this.listById(payload.id);
+    
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
     if (payload.present === false) {
