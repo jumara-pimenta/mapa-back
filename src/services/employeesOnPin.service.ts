@@ -29,7 +29,7 @@ export class EmployeesOnPinService {
 
     const pin = await this.pinService.listById(props.pinId);
 
-    if (employee.pins.length) {
+    if (employee.pins?.length > 0) {
       for await (const _pin of employee.pins) {
         if (_pin.id === pin.id) {
           return await this.employeesOnPinRepository.find(

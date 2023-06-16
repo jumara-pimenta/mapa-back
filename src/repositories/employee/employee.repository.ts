@@ -237,13 +237,6 @@ export class EmployeeRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
-            pins: {
-              some: {
-                NOT: {
-                  pinId: process.env.DENSO_ID,
-                },
-              },
-            },
           },
           orderBy: {
             createdAt: 'desc',

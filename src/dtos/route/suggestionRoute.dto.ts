@@ -32,4 +32,6 @@ export class SuggestionExtraDTO {
   time: string;
 
   distance: string;
+
+  finishedAt: string;
 }
