@@ -92,6 +92,7 @@ export class EmployeeService {
         HttpStatus.CONFLICT,
       );
     }
+
     const deletedEmployee =
       await this.employeeRepository.findByRegistrationDeleted(
         props.registration,
@@ -876,7 +877,7 @@ export class EmployeeService {
               type: employeesOnPin.type as ETypePin,
             };
           })
-        : null,
+        : [],
     };
   }
 

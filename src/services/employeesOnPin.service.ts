@@ -26,9 +26,10 @@ export class EmployeesOnPinService {
     props: AssociateEmployeeOnPinDTO,
   ): Promise<EmployeesOnPin> {
     const employee = await this.employeeService.listById(props.employeeId);
+
     const pin = await this.pinService.listById(props.pinId);
 
-    if (employee.pins.length > 0) {
+    if (employee.pins.length) {
       for await (const _pin of employee.pins) {
         if (_pin.id === pin.id) {
           return await this.employeesOnPinRepository.find(
@@ -39,6 +40,7 @@ export class EmployeesOnPinService {
 
         if (_pin.type === props.type) {
           await this.employeesOnPinRepository.delete(props.employeeId, _pin.id);
+
           return await this.employeesOnPinRepository.create(
             new EmployeesOnPin({ type: props.type }, employee, pin),
           );
