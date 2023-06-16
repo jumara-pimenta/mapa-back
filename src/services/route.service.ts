@@ -470,7 +470,7 @@ export class RouteService {
           type:
             payload.type === 'VOLTA' ? ETypePath.RETURN : ETypePath.ROUND_TRIP,
           startsAt: route.time,
-          startsReturnAt: route.time,
+          startsReturnAt: route.finishedAt,
           isAutoRoute: true,
           scheduleDate: payload.schedule
             ? new Date(payload.date)
