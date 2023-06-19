@@ -93,7 +93,7 @@ export class RouteService {
     @Inject('IGoogleApiServiceIntegration')
     private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
     @Inject(forwardRef(() => EmployeesOnPathService))
-    private readonly employeesOnPathService: EmployeesOnPathService
+    private readonly employeesOnPathService: EmployeesOnPathService,
   ) {}
 
   async onModuleInit() {
@@ -220,7 +220,9 @@ export class RouteService {
       );
     }
 
-    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(payload.employeeIds);
+    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(
+      payload.employeeIds,
+    );
 
     if (itsAnConventionalRoute) {
       if (shiftWasNotProvided) {
@@ -270,13 +272,6 @@ export class RouteService {
 
     await this.employeesInPins(employeesPins, payload.type);
 
-    const employeeOrdened = await this.getWaypoints(
-      employeesPins,
-      payload.pathDetails.type,
-      payload.pathDetails.duration,
-      ETypeRoute.CONVENTIONAL,
-    );
-
     const driverInRoute = await this.routeRepository.findByDriverId(driver.id);
 
     const employeeInRoute = await this.routeRepository.findByEmployeeIds(
@@ -293,44 +288,97 @@ export class RouteService {
     if (vehicle.id !== process.env.DENSO_ID)
       await this.vehiclesInRoute(vehicleInRoute, initRouteDate, endRouteDate);
 
-    if (!scheduled)
-      await this.checkIfEmployeesOnAnotherRoute(
-        employeeInRoute,
-        payload.type,
-        employeeOrdened.employeesIds,
+    if (payload.pathDetails.isAutoRoute === true) {
+      const employeeOrdened = await this.routeEmployeesToTheBestRoute(
+        employeesPins,
+        payload.pathDetails.type,
+        payload.pathDetails.duration,
+        ETypeRoute.CONVENTIONAL,
+      );
+
+      if (!scheduled)
+        await this.checkIfEmployeesOnAnotherRoute(
+          employeeInRoute,
+          payload.type,
+          employeeOrdened.employeesIds,
+          payload.pathDetails.type,
+        );
+
+      const createdRoute = await this.routeRepository.create(
+        new Route(
+          {
+            description: payload.description,
+            distance: 'EM PROCESSAMENTO',
+            status: EStatusRoute.PENDING,
+            type: payload.type,
+          },
+          driver,
+          vehicle,
+        ),
+      );
+
+      await this.pathService.generate({
+        routeId: createdRoute.id,
+        employeeIds: employeeOrdened.employeesIds,
+        details: {
+          ...payload.pathDetails,
+          startsAt: initRouteDate,
+          startsReturnAt: endRouteDate,
+          scheduleDate:
+            payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
+        },
+      });
+
+      const updatedRoute = await this.update(createdRoute.id, {
+        distance: employeeOrdened.distance,
+      });
+
+      return updatedRoute;
+    } else {
+      if (!scheduled)
+        await this.checkIfEmployeesOnAnotherRoute(
+          employeeInRoute,
+          payload.type,
+          payload.employeeIds,
+          payload.pathDetails.type,
+        );
+
+      const createdRoute = await this.routeRepository.create(
+        new Route(
+          {
+            description: payload.description,
+            distance: 'EM PROCESSAMENTO',
+            status: EStatusRoute.PENDING,
+            type: payload.type,
+          },
+          driver,
+          vehicle,
+        ),
+      );
+
+      await this.pathService.generate({
+        routeId: createdRoute.id,
+        employeeIds: payload.employeeIds,
+        details: {
+          ...payload.pathDetails,
+          startsAt: initRouteDate,
+          startsReturnAt: endRouteDate,
+          scheduleDate:
+            payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
+        },
+      });
+
+      const totalDistance = await this.getTotalDistanceRoute(
+        employeesPins,
         payload.pathDetails.type,
       );
 
-    const createdRoute = await this.routeRepository.create(
-      new Route(
-        {
-          description: payload.description,
-          distance: 'EM PROCESSAMENTO',
-          status: EStatusRoute.PENDING,
-          type: payload.type,
-        },
-        driver,
-        vehicle,
-      ),
-    );
+      const updatedRoute = await this.update(createdRoute.id, {
+        distance: totalDistance,
+      });
 
-    await this.pathService.generate({
-      routeId: createdRoute.id,
-      employeeIds: employeeOrdened.employeesIds,
-      details: {
-        ...payload.pathDetails,
-        startsAt: initRouteDate,
-        startsReturnAt: endRouteDate,
-        scheduleDate:
-          payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
-      },
-    });
-
-    const updatedRoute = await this.update(createdRoute.id, {
-      distance: employeeOrdened.distance,
-    });
-
-    return updatedRoute;
+      return updatedRoute;
+    }
   }
 
   async createOrderedRoute(payload: CreateRouteDTO): Promise<any> {
@@ -384,7 +432,9 @@ export class RouteService {
       payload.employeeIds,
     );
 
-    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(payload.employeeIds);
+    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(
+      payload.employeeIds,
+    );
 
     const { endRouteDate, initRouteDate } = this.getTimesForRoute(payload);
 
@@ -528,7 +578,9 @@ export class RouteService {
       }
     }
 
-    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(payload.employeeIds);
+    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(
+      payload.employeeIds,
+    );
 
     await this.employeeService.checkExtraEmployee(
       payload.employeeIds,
@@ -1372,7 +1424,7 @@ export class RouteService {
     return routes;
   }
 
-  async getWaypoints(
+  async routeEmployeesToTheBestRoute(
     employees: Employee[],
     type: ETypePath,
     duration: string,
@@ -1481,7 +1533,7 @@ export class RouteService {
     return { employeesIds, distance: FINISH_DISTANCE };
   }
 
-  async getWaypointsExtra(
+  async routeEmployeesToTheBestRouteExtra(
     employees: any[],
     duration: string,
     typeRoute: ETypeRoute,
@@ -1613,11 +1665,12 @@ export class RouteService {
       : [];
 
     for await (const route of routes) {
-      const path: SuggestionExtra = await this.getWaypointsExtra(
-        route,
-        duration,
-        ETypeRoute.EXTRA,
-      );
+      const path: SuggestionExtra =
+        await this.routeEmployeesToTheBestRouteExtra(
+          route,
+          duration,
+          ETypeRoute.EXTRA,
+        );
 
       if (path.totalDurationTime > getDuration(duration)) extraTime.push(path);
 
@@ -1700,7 +1753,6 @@ export class RouteService {
   }
 
   async updateTotalDistanceRoute(path: Path): Promise<void> {
-
     const route = await this.listById(path.route.id);
 
     const employees = await this.employeeService.listManyEmployeesByPath(
@@ -1717,7 +1769,7 @@ export class RouteService {
 
   async updateEmployeePositionOnPath(routeId: string): Promise<void> {
     const route = await this.listByIdNotMapped(routeId);
-    
+
     const { path: paths } = route;
 
     let newPosition = 1;
@@ -1743,7 +1795,6 @@ export class RouteService {
 
       await this.updateTotalDistanceRoute(path as Path);
     }
-
   }
 
   async getTotalDistanceRoute(
