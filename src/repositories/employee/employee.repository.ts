@@ -372,7 +372,7 @@ export class EmployeeRepository
     });
   }
 
-  async findJokerPin(ids: string[]): Promise<Partial<Employee>[]> {
+  async findEmployeeAtDenso(ids: string[]): Promise<Partial<Employee>[]> {
     return await this.repository.employee.findMany({
       where: {
         id: {

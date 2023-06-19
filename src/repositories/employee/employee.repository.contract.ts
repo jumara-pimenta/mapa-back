@@ -18,7 +18,7 @@ export default interface IEmployeeRepository {
   findByIds(ids: string[]): Promise<Employee[]>;
   listAllEmployeesDeleted(ids: string[]): Promise<Employee[]>;
   checkExtraEmployee(ids: string[], date: string): Promise<Employee[]>;
-  findJokerPin(ids: string[]): Promise<Partial<Employee>[]>;
+  findEmployeeAtDenso(ids: string[]): Promise<Partial<Employee>[]>;
   updateEmployeePassword(registration: string, password: string): Promise<Employee>;
   resetEmployeePassword(registration: string): Promise<Employee>;
   findManyByPath(pathId: string): Promise<Employee[]>;

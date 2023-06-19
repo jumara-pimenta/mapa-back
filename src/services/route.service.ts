@@ -220,6 +220,8 @@ export class RouteService {
       );
     }
 
+    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(payload.employeeIds);
+
     if (itsAnConventionalRoute) {
       if (shiftWasNotProvided) {
         throw new HttpException(
@@ -382,6 +384,8 @@ export class RouteService {
       payload.employeeIds,
     );
 
+    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(payload.employeeIds);
+
     const { endRouteDate, initRouteDate } = this.getTimesForRoute(payload);
 
     const driver = await this.driverService.listById(
@@ -524,7 +528,7 @@ export class RouteService {
       }
     }
 
-    await this.employeeService.findJokerPin(payload.employeeIds);
+    await this.employeeService.checksIfThereAreEmployeesWithPinAtDenso(payload.employeeIds);
 
     await this.employeeService.checkExtraEmployee(
       payload.employeeIds,
@@ -1254,7 +1258,6 @@ export class RouteService {
     const workSheetName = 'Rotas';
     const workSheetPath = 'Trajetos';
 
-    // const employees = await this.listAll(page, filters);
     const route = await this.routeRepository.findById(id);
 
     if (!route)

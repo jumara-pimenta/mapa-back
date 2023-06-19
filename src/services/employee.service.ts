@@ -259,8 +259,8 @@ export class EmployeeService {
     };
   }
 
-  async findJokerPin(ids: string[]): Promise<any> {
-    const employees = await this.employeeRepository.findJokerPin(ids);
+  async checksIfThereAreEmployeesWithPinAtDenso(ids: string[]): Promise<any> {
+    const employees = await this.employeeRepository.findEmployeeAtDenso(ids);
 
     if (employees.length >= 1)
       throw new HttpException(
