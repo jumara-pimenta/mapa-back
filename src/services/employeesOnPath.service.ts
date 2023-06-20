@@ -83,7 +83,7 @@ export class EmployeesOnPathService {
 
   async onboardEmployee(payload: IdUpdateDTO): Promise<any> {
     await this.listById(payload.id);
-    
+
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
     if (payload.present === false) {
@@ -193,17 +193,20 @@ export class EmployeesOnPathService {
         employeesOnPath.id,
       );
 
+      const employeeIsAlreadyConfirmedOnTheRoute =
+        employeesOnPath.confirmation === true ? true : false;
+
       if (path.status === EStatusPath.FINISHED) {
         throw new HttpException(
-          'Não é possível alterar presença em um trajeto finalizado!',
+          'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
           HttpStatus.NOT_ACCEPTABLE,
         );
       }
 
-      if (employeesOnPath.confirmation === true && confirmation !== true) {
-        if (path.status === (EStatusPath.IN_PROGRESS || EStatusPath.FINISHED)) {
+      if (path.status === EStatusPath.IN_PROGRESS) {
+        if (employeeIsAlreadyConfirmedOnTheRoute) {
           throw new HttpException(
-            'Não é possível desconfirmar presença em um trajeto em andamento ou finalizado!',
+            'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
             HttpStatus.NOT_ACCEPTABLE,
           );
         }
@@ -242,7 +245,7 @@ export class EmployeesOnPathService {
         );
       }
     }
-   
+
     await this.employeesOnPathRepository.update(
       Object.assign(employeeOnPath, { ...employeeOnPath, ...data }),
     );
@@ -366,7 +369,10 @@ export class EmployeesOnPathService {
     routeId: string,
   ): Promise<EmployeesOnPath[]> {
     const employeesOnPath =
-      await this.employeesOnPathRepository.findManyByEmployeeAndRoute(employeeId, routeId);
+      await this.employeesOnPathRepository.findManyByEmployeeAndRoute(
+        employeeId,
+        routeId,
+      );
 
     if (!employeesOnPath)
       throw new HttpException(
@@ -382,23 +388,17 @@ export class EmployeesOnPathService {
     pathId: string,
     newPosition: number,
   ): Promise<void> {
-    const employeeOnPath = await this.listByEmployeeAndPath(
-      employeeId,
-      pathId,
-    );
+    const employeeOnPath = await this.listByEmployeeAndPath(employeeId, pathId);
 
     await this.employeesOnPathRepository.updatePosition(
       employeeOnPath.id,
       newPosition,
     );
-    
+
     return;
   }
 
-  async removeEmployeeOnPath(
-    employeeId: string,
-    routeId: string,
-  ) {
+  async removeEmployeeOnPath(employeeId: string, routeId: string) {
     const employee = await this.employeeService.listById(employeeId);
 
     const employeesOnPath = await this.listByEmployeeAndRoute(
