@@ -193,8 +193,6 @@ export class EmployeesOnPathService {
         employeesOnPath.id,
       );
 
-      console.log(path);
-
       const employeeIsAlreadyConfirmedOnTheRoute =
         employeesOnPath.confirmation === true ? true : false;
 

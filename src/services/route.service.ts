@@ -1672,9 +1672,19 @@ export class RouteService {
           ETypeRoute.EXTRA,
         );
 
-      if (path.totalDurationTime > getDuration(duration)) extraTime.push(path);
+      if (path.totalDurationTime > getDuration(duration)) {
+        if (route.length && route.length === 1) {
+          throw new HttpException(
+            'Não foi possível gerar trajetos com o tempo e quantidade de colaboradores providos!',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
+        }
+        extraTime.push(path);
+      }
 
-      if (path.totalDurationTime < getDuration(duration)) extra.push(path);
+      if (path.totalDurationTime < getDuration(duration)) {
+        extra.push(path);
+      }
     }
 
     if (extraTime.length > 0) {
