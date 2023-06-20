@@ -221,10 +221,30 @@ export class EmployeesOnPathService {
     id: string,
     data: UpdateEmployeesOnPathDTO,
   ): Promise<void> {
-    const employeesOnPath = await this.listById(id);
+    const employeeOnPath = await this.listById(id);
+    const path = await this.pathService.listByEmployeeOnPath(employeeOnPath.id);
 
+    const employeeIsAlreadyConfirmedOnTheRoute =
+      employeeOnPath.confirmation === true ? true : false;
+
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    if (path.status === EStatusPath.IN_PROGRESS) {
+      if (employeeIsAlreadyConfirmedOnTheRoute) {
+        throw new HttpException(
+          'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+    }
+   
     await this.employeesOnPathRepository.update(
-      Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
+      Object.assign(employeeOnPath, { ...employeeOnPath, ...data }),
     );
   }
 

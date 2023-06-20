@@ -113,6 +113,7 @@ export class WebsocketGateway {
         payload.employeeOnPathId,
         payload.payload,
       );
+      
       const data = await this.routeService.listById(payload.routeId);
 
       this.server.emit(payload.pathId, {
