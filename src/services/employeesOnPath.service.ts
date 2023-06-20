@@ -188,10 +188,12 @@ export class EmployeesOnPathService {
 
     const { confirmation } = data;
 
-    if (confirmation) {
+    if (typeof confirmation === 'boolean') {
       const path = await this.pathService.listByEmployeeOnPath(
         employeesOnPath.id,
       );
+
+      console.log(path);
 
       const employeeIsAlreadyConfirmedOnTheRoute =
         employeesOnPath.confirmation === true ? true : false;
