@@ -15,6 +15,7 @@ import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { RouteService } from '../services/route.service';
 import { Observable, catchError, from, map, throwError } from 'rxjs';
+import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
 
 @WebSocketGateway()
 export class WebsocketGateway {
@@ -159,7 +160,7 @@ export class WebsocketGateway {
         },
       }),
     )
-    data: IdUpdateDTO,
+    data: DisembarkEmployeeDTO,
   ): Promise<void> {
     try {
       const employeeOnPath = await this.employeesOnPathService.offboardEmployee(

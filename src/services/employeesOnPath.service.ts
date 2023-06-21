@@ -16,6 +16,8 @@ import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
 import { EStatusPath, ETypePath } from '../utils/ETypes';
 import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
 import { RouteService } from './route.service';
+import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
+import { getDateInLocaleTime } from '../utils/Date';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -105,23 +107,25 @@ export class EmployeesOnPathService {
     return data;
   }
 
-  async offboardEmployee(payload: IdUpdateDTO): Promise<any> {
-    await this.listById(payload.id);
+  async offboardEmployee(payload: DisembarkEmployeeDTO): Promise<any> {
+    const employeeOnPath = await this.listById(payload.id);
+
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
-    if (payload.present === false) {
-      await this.updateWebsocket(payload.id, {
-        present: payload.present,
-        disembarkAt: null,
-      });
+    const employeeIsAlreadyDisembarked = employeeOnPath.disembarkAt
+      ? true
+      : false;
+
+    if (employeeIsAlreadyDisembarked) {
+      throw new HttpException(
+        'Colaborador já desembarcou da rota!',
+        HttpStatus.CONFLICT,
+      );
     }
-    if (payload.present === true) {
-      await this.updateWebsocket(payload.id, {
-        confirmation: true,
-        present: payload.present,
-        disembarkAt: new Date(),
-      });
-    }
+
+    employeeOnPath.disembarkAt = getDateInLocaleTime(new Date());
+
+    await this.employeesOnPathRepository.update(employeeOnPath);
 
     const data = await this.pathService.listEmployeesByPathAndPin(path.id);
 
