@@ -4,4 +4,4 @@ export type TTypeRoute = 'CONVENCIONAL' | 'EXTRA';
 
 export type TTypePathExtra = 'VOLTA' | 'IDA E VOLTA';
 
-export type TGoogleWaypointsStatus = 'ZERO_RESULTS'
+export type TGoogleWaypointsStatus = 'ZERO_RESULTS' | 'REQUEST_DENIED' | 'OK';

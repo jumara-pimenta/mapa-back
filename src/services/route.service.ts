@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
   StreamableFile,
 } from '@nestjs/common';
 import { Route } from '../entities/route.entity';
@@ -866,8 +867,6 @@ export class RouteService {
 
     const path = await this.pathService.listByIdMobile(payload.pathId);
 
-    // check if this date: finishedAt is equal to today
-
     const today = new Date();
     const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
 
@@ -1482,16 +1481,38 @@ export class RouteService {
         travelMode: 'DRIVING',
       });
 
-    if (
-      (generatedWaypoints?.status &&
-        (generatedWaypoints.status as TGoogleWaypointsStatus) ==
-          'ZERO_RESULTS') ||
-      !generatedWaypoints
-    ) {
-      throw new HttpException(
-        'Não foi possível traçar um trajeto entre os pontos. Verifique se o ponto dos colaboradores estão dentro do limite permitido!',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+    if (generatedWaypoints?.status) {
+      const statusCodeGoogleMapsApi =
+        generatedWaypoints.status as TGoogleWaypointsStatus;
+
+      if (statusCodeGoogleMapsApi !== 'OK') {
+        if (statusCodeGoogleMapsApi == 'ZERO_RESULTS' || !generatedWaypoints) {
+          throw new HttpException(
+            'Não foi possível traçar um trajeto entre os pontos. Verifique se o ponto dos colaboradores estão dentro do limite permitido!',
+            HttpStatus.SERVICE_UNAVAILABLE,
+          );
+        }
+
+        if (statusCodeGoogleMapsApi == 'REQUEST_DENIED') {
+          new Logger('googleApi service integration').debug(
+            generatedWaypoints?.error_message,
+            'get waypoints',
+          );
+          throw new HttpException(
+            'Não foi possível traçar um trajeto entre os pontos. Ocorreu um erro na autenticação com o serviço de Mapas.',
+            HttpStatus.SERVICE_UNAVAILABLE,
+          );
+        }
+
+        new Logger('googleApi service integration').debug(
+          generatedWaypoints?.error_message ?? generatedWaypoints,
+          'get waypoints',
+        );
+        throw new HttpException(
+          'Não foi possível traçar um trajeto entre os pontos. Ocorreu um erro com o serviço de Mapas!',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
+      }
     }
 
     const legs = generatedWaypoints.routes[0].legs;

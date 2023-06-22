@@ -31,6 +31,8 @@ export class MappedEmployeesOnPathDTO {
   @ApiProperty()
   disembarkAt?: Date;
   @ApiProperty()
+  present?: boolean;
+  @ApiProperty()
   position: number;
   @ApiProperty()
   details: IEmployee;

@@ -337,10 +337,10 @@ export class PathService {
       const pathData = this.mapperOne(path) as any;
       const denso = {
         id: process.env.DENSO_ID,
+        position: 99,
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
-        position: 99,
         details: {
           name: 'DENSO',
           address: 'null',
@@ -769,11 +769,11 @@ export class PathService {
 
         return {
           id: item.id,
-          boardingAt: item.boardingAt,
-          confirmation: item.confirmation,
-          disembarkAt: item.disembarkAt,
           position: item.position,
+          confirmation: item.confirmation,
           present: item.present,
+          boardingAt: item.boardingAt,
+          disembarkAt: item.disembarkAt,
           details: {
             employeeId: employee.id,
             name: employee.name,

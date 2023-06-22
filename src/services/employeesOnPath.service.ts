@@ -83,28 +83,52 @@ export class EmployeesOnPathService {
     return employeesOnPath;
   }
 
-  async onboardEmployee(payload: IdUpdateDTO): Promise<any> {
-    await this.listById(payload.id);
+  async onboardEmployee(payload: IdUpdateDTO): Promise<MappedEmployeesOnPathDTO> {
+    const employeeOnPath = await this.listById(payload.id);
+    const path = await this.pathService.listByEmployeeOnPath(employeeOnPath.id);
 
-    const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
+    const {
+      confirmPresence,
+      disconfirmPresence,
+      employeeIsAlreadyAusentOnTheRoute,
+      employeeIsAlreadyPresentOnTheRoute,
+    } = this.getParamsToValidateOnboardingEmployee(
+      employeeOnPath.present,
+      payload.present,
+    );
 
-    if (payload.present === false) {
-      await this.updateWebsocket(payload.id, {
-        present: payload.present,
-        boardingAt: null,
-      });
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
-    if (payload.present === true) {
-      await this.updateWebsocket(payload.id, {
-        confirmation: true,
-        present: payload.present,
-        boardingAt: new Date(),
-      });
+
+    if (confirmPresence && employeeIsAlreadyPresentOnTheRoute) {
+      throw new HttpException(
+        'Colaborador já está presente na rota.',
+        HttpStatus.CONFLICT,
+      );
     }
 
-    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
+    if (disconfirmPresence && employeeIsAlreadyAusentOnTheRoute) {
+      throw new HttpException(
+        'Ausência do colaborador na rota já foi informada.',
+        HttpStatus.CONFLICT,
+      );
+    }
 
-    return data;
+    if (confirmPresence) {
+      employeeOnPath.boardingAt = getDateInLocaleTime(new Date());
+    } else {
+      Object.assign(employeeOnPath, {...employeeOnPath, boardingAt: null})
+    }
+
+    employeeOnPath.present = payload.present;
+
+    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(employeeOnPath);
+
+    return this.mappedOne(updatedEmployeeOnPath);
   }
 
   async offboardEmployee(payload: DisembarkEmployeeDTO): Promise<any> {
@@ -419,6 +443,46 @@ export class EmployeesOnPathService {
     return;
   }
 
+  private checksIfPathCanBeUpdated(pathStatus: EStatusPath): void {
+    if (pathStatus === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    if (pathStatus === EStatusPath.IN_PROGRESS) {
+      // if (employeeIsAlreadyConfirmedOnTheRoute) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+      // }
+    }
+  }
+
+  private getParamsToValidateOnboardingEmployee(
+    employeePresence: boolean,
+    isToConfirm: boolean,
+  ) {
+    const employeeIsAlreadyPresentOnTheRoute =
+      employeePresence === true ? true : false;
+
+    const employeeIsAlreadyAusentOnTheRoute =
+      employeePresence === false ? true : false;
+
+    const confirmPresence = isToConfirm === true ? true : false;
+
+    const disconfirmPresence = isToConfirm === false ? true : false;
+
+    return {
+      employeeIsAlreadyAusentOnTheRoute,
+      employeeIsAlreadyPresentOnTheRoute,
+      confirmPresence,
+      disconfirmPresence,
+    };
+  }
+
   private mappedOne(
     employeesOnPath: EmployeesOnPath,
   ): MappedEmployeesOnPathDTO {
@@ -427,10 +491,11 @@ export class EmployeesOnPathService {
 
     return {
       id: employeesOnPath.id,
-      boardingAt: employeesOnPath.boardingAt,
-      confirmation: employeesOnPath.confirmation,
-      disembarkAt: employeesOnPath.disembarkAt,
       position: employeesOnPath.position,
+      confirmation: employeesOnPath.confirmation,
+      present: employeesOnPath.present,
+      boardingAt: employeesOnPath.boardingAt,
+      disembarkAt: employeesOnPath.disembarkAt,
       createdAt: employeesOnPath.createdAt,
       details: {
         name: employee.name,
@@ -454,10 +519,11 @@ export class EmployeesOnPathService {
 
       return {
         id: employeesOnPath.id,
-        boardingAt: employeesOnPath.boardingAt,
-        confirmation: employeesOnPath.confirmation,
-        disembarkAt: employeesOnPath.disembarkAt,
         position: employeesOnPath.position,
+        confirmation: employeesOnPath.confirmation,
+        present: employeesOnPath.present,
+        boardingAt: employeesOnPath.boardingAt,
+        disembarkAt: employeesOnPath.disembarkAt,
         createdAt: employeesOnPath.createdAt,
         details: {
           name: employee.name,
