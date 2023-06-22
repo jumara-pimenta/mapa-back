@@ -43,9 +43,18 @@ export class VehicleService {
 
   async create(payload: CreateVehicleDTO): Promise<Vehicle> {
     const plateExists = await this.vehicleRepository.findByPlate(payload.plate);
-    const renavamExists = await this.vehicleRepository.findByRenavam(
-      payload.renavam,
-    );
+
+    if (payload.renavam) {
+      const renavamExists = await this.vehicleRepository.findByRenavam(
+        payload.renavam,
+      );
+
+      if (renavamExists)
+        throw new HttpException(
+          'Renavam cadastrado para outro veículo',
+          HttpStatus.CONFLICT,
+        );
+    }
 
     if (plateExists)
       throw new HttpException(
@@ -53,18 +62,10 @@ export class VehicleService {
         HttpStatus.CONFLICT,
       );
 
-    if (renavamExists)
-      throw new HttpException(
-        'Renavam cadastrado para outro veículo',
-        HttpStatus.CONFLICT,
-      );
-
     return await this.vehicleRepository.create(
       new Vehicle({
         ...payload,
         expiration: new Date(payload.expiration),
-        lastMaintenance: new Date(payload.lastMaintenance),
-        lastSurvey: new Date(payload.lastSurvey),
       }),
     );
   }
@@ -154,11 +155,11 @@ export class VehicleService {
         company: vehicle.company,
         expiration: vehicle.expiration,
         isAccessibility: vehicle.isAccessibility,
-        lastMaintenance: vehicle.lastMaintenance,
-        lastSurvey: vehicle.lastSurvey,
+        lastMaintenance: vehicle?.lastMaintenance,
+        lastSurvey: vehicle?.lastSurvey,
         note: vehicle.note,
         plate: vehicle.plate,
-        renavam: vehicle.renavam,
+        renavam: vehicle?.renavam,
         type: vehicle.type,
         createdAt: vehicle.createdAt,
       };
@@ -286,12 +287,12 @@ export class VehicleService {
               plate: item.vehicle.plate,
               company: item.vehicle.company,
               type: item.vehicle.type,
-              lastSurvey: item.vehicle.lastSurvey,
+              lastSurvey: item.vehicle?.lastSurvey,
               expiration: item.vehicle.expiration,
               capacity: item.vehicle.capacity,
               renavam: item.vehicle.renavam,
-              lastMaintenance: item.vehicle.lastMaintenance,
-              note: item.vehicle.note,
+              lastMaintenance: item.vehicle?.lastMaintenance,
+              note: item.vehicle?.note,
               isAccessibility: item.vehicle.isAccessibility,
             }),
           );

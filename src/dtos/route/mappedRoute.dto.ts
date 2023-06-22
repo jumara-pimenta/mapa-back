@@ -102,7 +102,7 @@ class IVehicle {
   @ApiProperty()
   renavam: string;
   @ApiProperty()
-  lastMaintenance: Date;
+  lastMaintenance?: Date;
   @ApiProperty()
   note: string;
   @ApiProperty()

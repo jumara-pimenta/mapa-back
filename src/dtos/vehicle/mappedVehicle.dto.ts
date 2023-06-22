@@ -16,11 +16,11 @@ export class MappedVehicleDTO {
   @ApiProperty()
   capacity: number;
   @ApiProperty()
-  renavam: string;
+  renavam?: string;
   @ApiProperty()
-  lastMaintenance: Date | null;
+  lastMaintenance?: Date | null;
   @ApiProperty()
-  note: string;
+  note?: string;
   @ApiProperty()
   isAccessibility: boolean;
   @ApiProperty()
