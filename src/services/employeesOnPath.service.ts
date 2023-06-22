@@ -12,7 +12,7 @@ import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployee
 import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employeesOnPath.repository.contract';
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
-import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { OnboardEmployeeDTO } from '../dtos/employeesOnPath/onboardEmployee.dto';
 import { EStatusPath, ETypePath } from '../utils/ETypes';
 import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
 import { RouteService } from './route.service';
@@ -83,7 +83,9 @@ export class EmployeesOnPathService {
     return employeesOnPath;
   }
 
-  async onboardEmployee(payload: IdUpdateDTO): Promise<MappedEmployeesOnPathDTO> {
+  async onboardEmployee(
+    payload: OnboardEmployeeDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
     const employeeOnPath = await this.listById(payload.id);
     const path = await this.pathService.listByEmployeeOnPath(employeeOnPath.id);
 
@@ -95,7 +97,14 @@ export class EmployeesOnPathService {
     } = this.getParamsToValidateOnboardingEmployee(
       employeeOnPath.present,
       payload.present,
-    );
+      );
+    
+    if (path.type === ETypePath.RETURN) {
+      throw new HttpException(
+        'Não é permitido realizar embarque em trajetos de volta!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
 
     if (path.status === EStatusPath.FINISHED) {
       throw new HttpException(
@@ -121,20 +130,37 @@ export class EmployeesOnPathService {
     if (confirmPresence) {
       employeeOnPath.boardingAt = getDateInLocaleTime(new Date());
     } else {
-      Object.assign(employeeOnPath, {...employeeOnPath, boardingAt: null})
+      Object.assign(employeeOnPath, { ...employeeOnPath, boardingAt: null });
     }
 
     employeeOnPath.present = payload.present;
 
-    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(employeeOnPath);
+    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
+      employeeOnPath,
+    );
 
     return this.mappedOne(updatedEmployeeOnPath);
   }
 
-  async offboardEmployee(payload: DisembarkEmployeeDTO): Promise<any> {
+  async offboardEmployee(
+    payload: DisembarkEmployeeDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
     const employeeOnPath = await this.listById(payload.id);
-
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
+
+    if (path.type === ETypePath.ONE_WAY) {
+      throw new HttpException(
+        'Não é permitido realizar desembarque em trajetos de ida!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível desembarcar colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
 
     const employeeIsAlreadyDisembarked = employeeOnPath.disembarkAt
       ? true
@@ -149,14 +175,14 @@ export class EmployeesOnPathService {
 
     employeeOnPath.disembarkAt = getDateInLocaleTime(new Date());
 
-    await this.employeesOnPathRepository.update(employeeOnPath);
+    const updatedEmployee = await this.employeesOnPathRepository.update(
+      employeeOnPath,
+    );
 
-    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
-
-    return data;
+    return this.mappedOne(updatedEmployee);
   }
 
-  async employeeNotConfirmed(payload: IdUpdateDTO): Promise<any> {
+  async employeeNotConfirmed(payload: OnboardEmployeeDTO): Promise<any> {
     await this.listById(payload.id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
@@ -320,7 +346,7 @@ export class EmployeesOnPathService {
     if (path.status === EStatusPath.IN_PROGRESS) {
       if (employeeIsAlreadyConfirmedOnTheRoute) {
         throw new HttpException(
-          'Não é possível desconfirmar presença do colaborador em um trajeto em andamento!',
+          'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
           HttpStatus.NOT_ACCEPTABLE,
         );
       }
@@ -499,7 +525,7 @@ export class EmployeesOnPathService {
       createdAt: employeesOnPath.createdAt,
       details: {
         name: employee.name,
-        address: employee.address,
+        address: JSON.parse(employee.address),
         shift: employee.shift,
         registration: employee.registration,
         location: {

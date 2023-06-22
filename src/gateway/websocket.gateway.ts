@@ -7,7 +7,7 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { OnboardEmployeeDTO } from '../dtos/employeesOnPath/onboardEmployee.dto';
 import { PathService } from '../services/path.service';
 import { WebsocketUpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
 import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
@@ -114,7 +114,7 @@ export class WebsocketGateway {
         payload.employeeOnPathId,
         payload.payload,
       );
-      
+
       const data = await this.routeService.listById(payload.routeId);
 
       this.server.emit(payload.pathId, {
@@ -135,7 +135,7 @@ export class WebsocketGateway {
         },
       }),
     )
-    data: IdUpdateDTO,
+    data: OnboardEmployeeDTO,
   ): Promise<Observable<any>> {
     return from(this.employeesOnPathService.onboardEmployee(data)).pipe(
       map((employeeOnPath) => ({
@@ -166,30 +166,6 @@ export class WebsocketGateway {
       const employeeOnPath = await this.employeesOnPathService.offboardEmployee(
         data,
       );
-
-      this.server.emit(employeeOnPath.id, {
-        ...employeeOnPath,
-      });
-    } catch (error) {
-      this.server.except(error).emit('error', error);
-      throw new WsException(error.message);
-    }
-  }
-
-  @SubscribeMessage('employeeNotComming')
-  async handleEmployeeNotComming(
-    @MessageBody(
-      new ValidationPipe({
-        exceptionFactory: (errors) => {
-          return new WsException(errors);
-        },
-      }),
-    )
-    data: IdUpdateDTO,
-  ): Promise<void> {
-    try {
-      const employeeOnPath =
-        await this.employeesOnPathService.employeeNotConfirmed(data);
 
       this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,

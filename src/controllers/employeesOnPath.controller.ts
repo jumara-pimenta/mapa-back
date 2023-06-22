@@ -20,7 +20,7 @@ import {
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
-import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { OnboardEmployeeDTO } from '../dtos/employeesOnPath/onboardEmployee.dto';
 
 @Controller('/api/routes/paths/employees')
 @ApiTags('EmployeesOnPath')
@@ -65,16 +65,14 @@ export class EmployeesOnPathController {
     description: 'Update Confirmation a Employee On Path.',
     schema: {
       type: 'object',
-      example: IdUpdateDTO,
+      example: OnboardEmployeeDTO,
     },
   })
   @HttpCode(HttpStatus.OK)
   async updateEmployeeConfirmation(
-    @Body() payload: IdUpdateDTO,
+    @Body() payload: OnboardEmployeeDTO,
   ): Promise<MappedEmployeesOnPathDTO> {
-    return await this.employeeOnPathService.onboardEmployee(
-      payload,
-    );
+    return await this.employeeOnPathService.onboardEmployee(payload);
   }
 
   @Put(':id')

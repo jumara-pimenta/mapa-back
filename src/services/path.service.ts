@@ -90,22 +90,6 @@ export class PathService {
 
     let totalConfirmed = 0;
 
-    /*  for await (const employeesPins of route.employeesOnPins) {
-      itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
-      for await (const employee of employeesPins.employees) {
-        if (employee.confirmation === true) totalConfirmed++;
-
-        if (employee.confirmation === true && employee.present === true) {
-          employeeArray.push(employee.employeeId);
-          if (path.type === ETypePath.ONE_WAY) {
-            await this.employeesOnPathService.update(employee.id, {
-              disembarkAt: getDateInLocaleTime(new Date()),
-            });
-          }
-        }
-      }
-    } */
-
     for await (const employee of employeesOnPath) {
       if (employee.confirmation === true) totalConfirmed++;
 
