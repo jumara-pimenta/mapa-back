@@ -174,6 +174,7 @@ export class EmployeesOnPathService {
     }
 
     employeeOnPath.disembarkAt = getDateInLocaleTime(new Date());
+    employeeOnPath.present = true;
 
     const updatedEmployee = await this.employeesOnPathRepository.update(
       employeeOnPath,
