@@ -1,5 +1,5 @@
 import { FiltersRouteHistoryDTO } from './../dtos/routeHistory/filtersRouteHistory.dto';
-import { Page, PageResponse } from 'src/configs/database/page.model';
+import { Page, PageResponse } from '../configs/database/page.model';
 import {
   forwardRef,
   HttpException,
@@ -14,26 +14,17 @@ import {
   LatAndLong,
   MappedRouteHistoryDTO,
 } from '../dtos/routeHistory/mappedRouteHistory.dto';
-import {
-  compareDates,
-  convertDate,
-  getDateStartToEndOfDay,
-  getPeriod,
-} from 'src/utils/Date';
+import { convertDate, getDateStartToEndOfDay, getPeriod } from '../utils/Date';
 import {
   RouteByDateAndShift,
   RouteHistoryByDate,
   RouteSeparated,
-  Shifts,
   ShiftsByDate,
-} from 'src/dtos/routeHistory/routeHistoryByDate.dto';
-import { MappedPathHistoryDTO } from 'src/dtos/routeHistory/mappedPathHistory.dto';
+} from '../dtos/routeHistory/routeHistoryByDate.dto';
+import { MappedPathHistoryDTO } from '../dtos/routeHistory/mappedPathHistory.dto';
 import { SinisterService } from './sinister.service';
-import { ETypePeriodHistory } from 'src/utils/ETypes';
-import {
-  getShiftToGraphic,
-  getStartAtAndFinishAt,
-} from 'src/utils/date.service';
+import { ETypePeriodHistory } from '../utils/ETypes';
+import { getShiftToGraphic } from '../utils/date.service';
 
 @Injectable()
 export class RouteHistoryService {

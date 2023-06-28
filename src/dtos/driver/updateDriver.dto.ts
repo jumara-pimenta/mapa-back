@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsDateString, IsEnum } from 'class-validator';
-import { ETypeCategoryDrivers } from 'src/utils/ETypes';
+import { ETypeCategoryDrivers } from '../../utils/ETypes';
 
 export class UpdateDriverDTO {
   @ApiProperty({

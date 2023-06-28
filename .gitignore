@@ -18,6 +18,7 @@
 /build
 /logs
 
+.yarn
 # misc
 .DS_Store
 .env.local

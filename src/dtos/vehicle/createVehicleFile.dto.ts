@@ -8,6 +8,7 @@ import {
   IsNumber,
   Min,
   Max,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateVehicleFileDTO {
@@ -73,27 +74,25 @@ export class CreateVehicleFileDTO {
     description: 'Código Renavam do Veículo',
   })
   @IsString({ message: '[renavam] O RENAVAM deve ser do tipo texto.' })
-  @IsNotEmpty({ message: '[renavam] O RENAVAM deve ser preenchido.' })
+  @IsOptional()
   @Length(11, 11, {
     message: '[renavam] O RENAVAM deve possuir 11 caracteres.',
   })
-  renavam: string;
+  renavam?: string;
 
   @ApiProperty({
     default: new Date(),
     description: 'Data da última manutenção do veículo',
   })
-  @IsNotEmpty({
-    message: '[lastMaintenance] A última manutenção deve ser preenchida.',
-  })
-  lastMaintenance: Date;
+  @IsOptional()
+  lastMaintenance?: Date;
 
   @ApiProperty({ default: 'Teste', description: 'Campo de observação' })
   @IsString({
     message: '[note] O campo de observação deve ser do tipo texto.',
   })
-  @IsNotEmpty({ message: '[note] O campo de observação deve ser preenchido.' })
-  note: string;
+  @IsOptional()
+  note?: string;
 
   @ApiProperty({
     default: true,

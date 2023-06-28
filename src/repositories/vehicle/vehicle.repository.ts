@@ -29,9 +29,13 @@ export class VehicleRepository
         id: data.id,
         capacity: data.capacity,
         company: data.company,
-        expiration: getDateInLocaleTime(new Date(data.expiration)),
-        lastMaintenance: getDateInLocaleTime(new Date(data.lastMaintenance)),
-        lastSurvey: getDateInLocaleTime(new Date(data.lastSurvey)),
+        expiration: getDateInLocaleTime(data.expiration),
+        lastMaintenance: data.lastMaintenance
+          ? getDateInLocaleTime(data.lastMaintenance)
+          : null,
+        lastSurvey: data.lastSurvey
+          ? getDateInLocaleTime(data.lastSurvey)
+          : null,
         note: data.note,
         plate: data.plate,
         renavam: data.renavam,
@@ -111,12 +115,14 @@ export class VehicleRepository
         id: data.id,
         capacity: data.capacity,
         company: data.company,
-        expiration: data.expiration,
-        lastMaintenance: data.lastMaintenance,
-        lastSurvey: data.lastSurvey,
-        note: data.note,
+        expiration: getDateInLocaleTime(data.expiration),
+        lastMaintenance: data.lastMaintenance
+          && getDateInLocaleTime(data.lastMaintenance),
+        lastSurvey: data.lastSurvey
+          && getDateInLocaleTime(data.lastSurvey),
+        note: data.note ?? null,
         plate: data.plate,
-        renavam: data.renavam,
+        renavam: data.renavam ?? null,
         type: data.type,
         isAccessibility: data.isAccessibility,
         createdAt: data.createdAt,

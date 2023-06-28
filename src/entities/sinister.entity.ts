@@ -1,6 +1,5 @@
 import { getDateInLocaleTime } from '../utils/Date';
 import { v4 as uuid } from 'uuid';
-import { Path } from './path.entity';
 import { RouteHistory } from './routeHistory.entity';
 
 export class Sinister {

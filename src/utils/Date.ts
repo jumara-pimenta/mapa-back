@@ -1,13 +1,18 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { getDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import * as moment from 'moment';
-import { PeriodInDate } from 'src/dtos/routeHistory/dateFilter.dto';
+import { PeriodInDate } from '../dtos/routeHistory/dateFilter.dto';
 import { ETypePeriodHistory } from './ETypes';
 
 interface DateStartEnd {
   start: Date;
   end: Date;
+}
+
+interface Options {
+  maxHour: number;
+  maxMinute: number;
+  minMinute: number;
 }
 
 export function getDateInLocaleTime(date: Date): Date {
@@ -87,10 +92,75 @@ export function getPeriod(period: ETypePeriodHistory): PeriodInDate {
   }
 }
 
-export function getDuration(duration: string) {
-  if (duration === '01:00') return 1.16 * 60 * 60;
-  if (duration === '01:30') return 1.66 * 60 * 60;
-  if (duration === '02:00') return 2.16 * 60 * 60;
+// export function getDuration(duration: string) {
+//   if (duration === '01:00') return 1.16 * 60 * 60;
+//   if (duration === '01:30') return 1.66 * 60 * 60;
+//   if (duration === '02:00') return 2.16 * 60 * 60;
+// }
+
+export function getDuration(duration: string): number | undefined {
+  const [hours, minutes] = duration.split(':');
+
+  const parsedHours = parseInt(hours, 10);
+  const parsedMinutes = parseInt(minutes, 10);
+
+  if (
+    parsedHours >= 0 &&
+    parsedHours <= 2 &&
+    parsedMinutes >= 0 &&
+    parsedMinutes <= 59
+  ) {
+    const totalSeconds = parsedHours * 3600 + parsedMinutes * 60;
+    return totalSeconds;
+  }
+
+  return undefined;
+}
+
+export function validateDurationIsInTheRange(
+  duration: string,
+  options: Options,
+) {
+  
+  const [hours, minutes] = duration.split(':');
+
+  const parsedHours = parseInt(hours, 10);
+  const parsedMinutes = parseInt(minutes, 10);
+
+  if (parsedHours === 0 && parsedMinutes === 0) {
+    throw new HttpException(
+      `A duração deve ser, no mínimo, ${options.minMinute} minutos!`,
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  if (parsedHours > options.maxHour) {
+    throw new HttpException(
+      `A duração não deve ser maior do que ${options.maxHour} horas!`,
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  if (parsedMinutes > options.maxMinute) {
+    throw new HttpException(
+      `A duração não deve ser maior do que ${options.maxMinute} minutos!`,
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  if (parsedMinutes < options.minMinute) {
+    throw new HttpException(
+      `A duração deve ser, no mínimo, ${options.minMinute} minutos!`,
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  if (parsedHours >= options.maxHour && parsedMinutes > 0) {
+    throw new HttpException(
+      `A duração não deve ser maior do que ${options.maxHour} horas!`,
+      HttpStatus.BAD_REQUEST,
+    );
+  }
 }
 
 export function verifyDateFilter(date?: string) {

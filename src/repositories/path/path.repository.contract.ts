@@ -1,6 +1,6 @@
 import { EStatusPath } from '../../utils/ETypes';
 import { Path } from '../../entities/path.entity';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
 
 export default interface IPathRepository {
   create(data: Path): Promise<Path>;
@@ -15,6 +15,9 @@ export default interface IPathRepository {
     employeeId: string,
     status: EStatusPath,
   ): Promise<Path>;
+  findManyPathsNotStartedByEmployee(
+    employeeId: string,
+  ): Promise<Path[]>;
   findByEmployeeOnPath(employeeId: string): Promise<Partial<Path>>;
   findAll(filter?: FiltersPathDTO): Promise<Path[]>;
   softDelete(id: string): Promise<Path>;

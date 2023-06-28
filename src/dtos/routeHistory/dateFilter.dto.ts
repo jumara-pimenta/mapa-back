@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsDefined, IsEnum, IsNotEmpty } from 'class-validator';
-import { ETypePeriodHistory } from 'src/utils/ETypes';
+import { ETypePeriodHistory } from '../../utils/ETypes';
 
 export class PeriodInDate {
   dateInitial: Date;

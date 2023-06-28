@@ -18,10 +18,10 @@ import * as path from 'path';
 import * as XLSX from 'xlsx';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { CreateDriverFileDTO } from 'src/dtos/driver/createDriverFile.dto';
-import { convertToDate } from 'src/utils/date.service';
-import { verifyDateFilter } from 'src/utils/Date';
-import { FirstAccessDriverDTO } from 'src/dtos/driver/firstAccess.dto';
+import { CreateDriverFileDTO } from '../dtos/driver/createDriverFile.dto';
+import { convertToDate } from '../utils/date.service';
+import { verifyDateFilter } from '../utils/Date';
+import { FirstAccessDriverDTO } from '../dtos/driver/firstAccess.dto';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -294,9 +294,8 @@ export class DriverService {
     return errors;
   }
 
-  async exportDriverFile(page: Page, filters?: FiltersDriverDTO) {
+  async exportDriverFile() {
     const headers = ['Nome', 'CPF', 'CNH', 'Validade', 'Categoria'];
-    const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './driver.xlsx';
     const workSheetName = 'Motoristas';
@@ -384,40 +383,50 @@ export class DriverService {
     return exportedDriverToXLSX(headers, workSheetName, filePath);
   }
 
-  async firstAccess(data: FirstAccessDriverDTO): Promise<Driver>{
+  async firstAccess(data: FirstAccessDriverDTO): Promise<Driver> {
+    const driversAlreadyExists = await this.driverRepository.findByCpf(
+      data.cpf,
+    );
 
-    const driversAlreadyExists = await this.driverRepository.findByCpf(data.cpf)
-
-    if(!driversAlreadyExists){
-      throw new HttpException('Motorista não encontrado', HttpStatus.NOT_FOUND)
+    if (!driversAlreadyExists) {
+      throw new HttpException('Motorista não encontrado', HttpStatus.NOT_FOUND);
     }
 
-    if(driversAlreadyExists.firstAccess == false){
-      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST)
-    }
-    
-    const checkIfPasswordMatches = data.password === data.confirmPassword
-
-    if(!checkIfPasswordMatches){
-      throw new HttpException('Senhas não correspondem', HttpStatus.BAD_REQUEST)
+    if (driversAlreadyExists.firstAccess == false) {
+      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST);
     }
 
-    const passwordHashed = await bcrypt.hash(data.password, 10)
+    const checkIfPasswordMatches = data.password === data.confirmPassword;
 
-    return await this.driverRepository.updateDriverPassword(data.cpf, passwordHashed)
+    if (!checkIfPasswordMatches) {
+      throw new HttpException(
+        'Senhas não correspondem',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const passwordHashed = await bcrypt.hash(data.password, 10);
+
+    return await this.driverRepository.updateDriverPassword(
+      data.cpf,
+      passwordHashed,
+    );
   }
 
-  async resetDriverPassword(cpf: string): Promise<Driver>{
-    const driversAlreadyExists = await this.driverRepository.findByCpf(cpf)
+  async resetDriverPassword(cpf: string): Promise<Driver> {
+    const driversAlreadyExists = await this.driverRepository.findByCpf(cpf);
 
-    if(!driversAlreadyExists){
-      throw new HttpException('Motorista não encontrado', HttpStatus.NOT_FOUND)
+    if (!driversAlreadyExists) {
+      throw new HttpException('Motorista não encontrado', HttpStatus.NOT_FOUND);
     }
 
-    if(driversAlreadyExists.firstAccess == true){
-      throw new HttpException('Motorista ainda não definiu sua senha', HttpStatus.BAD_REQUEST)
+    if (driversAlreadyExists.firstAccess == true) {
+      throw new HttpException(
+        'Motorista ainda não definiu sua senha',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    return await this.driverRepository.resetDriverPassword(cpf)
+    return await this.driverRepository.resetDriverPassword(cpf);
   }
 }

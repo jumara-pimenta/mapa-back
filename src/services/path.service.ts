@@ -28,8 +28,9 @@ import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { SinisterService } from './sinister.service';
-import { RouteMobile } from 'src/utils/Utils';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+import { RouteMobile } from '../utils/Utils';
+import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
+import { DENSO_LOCATION } from '../utils/Constants';
 
 @Injectable()
 export class PathService {
@@ -64,6 +65,7 @@ export class PathService {
     );
 
     const sinister = await this.sinisterService.listByPathId(path.id);
+
     if (path.finishedAt !== null)
       throw new HttpException(
         'Não é possível alterar uma rota que já foi finalizada!',
@@ -75,37 +77,29 @@ export class PathService {
         'Não é possível finalizar uma rota que não foi iniciada!',
         HttpStatus.CONFLICT,
       );
+
     const totalInEachPin = route.employeesOnPins.map((item) => {
       return item.employees.length;
     });
+
     const employeeArray = [] as string[];
+
     const itinerariesArray = [];
+
     const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
+
     let totalConfirmed = 0;
-
-    /*  for await (const employeesPins of route.employeesOnPins) {
-      itinerariesArray.push([`${employeesPins.lat},${employeesPins.lng}`]);
-      for await (const employee of employeesPins.employees) {
-        if (employee.confirmation === true) totalConfirmed++;
-
-        if (employee.confirmation === true && employee.present === true) {
-          employeeArray.push(employee.employeeId);
-          if (path.type === ETypePath.ONE_WAY) {
-            await this.employeesOnPathService.update(employee.id, {
-              disembarkAt: getDateInLocaleTime(new Date()),
-            });
-          }
-        }
-      }
-    } */
 
     for await (const employee of employeesOnPath) {
       if (employee.confirmation === true) totalConfirmed++;
+
       itinerariesArray.push([
         `${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`,
       ]);
+
       if (employee.confirmation === true && employee.present === true) {
         employeeArray.push(employee.employee.id);
+
         if (path.type === ETypePath.ONE_WAY) {
           await this.employeesOnPathService.update(employee.id, {
             disembarkAt: getDateInLocaleTime(new Date()),
@@ -115,8 +109,8 @@ export class PathService {
     }
 
     path.type === ETypePath.RETURN
-      ? itinerariesArray.unshift(['-3.110944,-59.962604'])
-      : itinerariesArray.push(['-3.110944,-59.962604']);
+      ? itinerariesArray.unshift([DENSO_LOCATION])
+      : itinerariesArray.push([DENSO_LOCATION]);
 
     if (employeeArray.length === 0)
       throw new HttpException(
@@ -136,6 +130,7 @@ export class PathService {
         substituteId: null,
       },
     };
+
     path.status = EStatusPath.FINISHED;
 
     const props = new RouteHistory(
@@ -167,13 +162,10 @@ export class PathService {
 
     return await this.routeService.updateWebsocket(finishAt);
   }
+
   async startPath(id: string): Promise<any> {
     const path = await this.listById(id);
-    /* if (path.finishedAt !== null)
-      throw new HttpException(
-        'Não é possível alterar uma rota que já foi finalizada!',
-        HttpStatus.CONFLICT,
-      ); */
+
     const hasHistoric = await this.routeHistoryService.listByPathId(id);
 
     if (hasHistoric.length > 0)
@@ -235,7 +227,9 @@ export class PathService {
 
   async generate(props: CreatePathDTO): Promise<void> {
     const { type, duration, startsAt, startsReturnAt } = props.details;
+
     const route = await this.routeService.listById(props.routeId);
+
     if (type === ETypePath.ONE_WAY || type === ETypePath.RETURN) {
       const path = await this.pathRepository.create(
         new Path(
@@ -267,6 +261,7 @@ export class PathService {
           route,
         ),
       );
+
       const pathReturn = await this.pathRepository.create(
         new Path(
           {
@@ -326,10 +321,10 @@ export class PathService {
       const pathData = this.mapperOne(path) as any;
       const denso = {
         id: process.env.DENSO_ID,
+        position: 99,
         boardingAt: null,
         confirmation: true,
         disembarkAt: null,
-        position: 99,
         details: {
           name: 'DENSO',
           address: 'null',
@@ -382,6 +377,7 @@ export class PathService {
 
   async listById(id: string): Promise<MappedPathDTO> {
     const path = await this.pathRepository.findById(id);
+
     if (!path)
       throw new HttpException(
         `Não foi encontrado trajeto com o id: ${id}!`,
@@ -405,9 +401,6 @@ export class PathService {
 
   async listAll(filters?: FiltersPathDTO): Promise<any[]> {
     const paths = await this.pathRepository.findAll(filters);
-
-    // const manyPath = await this.mapperMany(paths);
-    // add driver name and plate of vehicle
 
     return paths.map((path: Path) => {
       const { driver, vehicle } = path.route;
@@ -450,11 +443,7 @@ export class PathService {
         let data = {} as EmployeesByPin;
 
         employeesOnSamePin.forEach((employeeOnPath) => {
-          const {
-            name,
-            registration,
-            id: employeeId,
-          } = employeeOnPath.employee;
+          const { name, registration } = employeeOnPath.employee;
 
           if (agroupedEmployees.includes(employeeOnPath.id)) return;
 
@@ -547,11 +536,13 @@ export class PathService {
 
   async listManyByEmployee(employeeId: string): Promise<MappedPathDTO[]> {
     const path = await this.pathRepository.findByEmployee(employeeId);
+
     if (!path.length)
       throw new HttpException(
         'Não foram encontrados trajetos para este colaborador!',
         HttpStatus.NOT_FOUND,
       );
+
     return this.mapperMany(path);
   }
 
@@ -630,10 +621,18 @@ export class PathService {
     return this.mapperOne(path);
   }
 
+  async listPathsNotStartedByEmployee(employeeId: string): Promise<Path[]> {
+    const paths = await this.pathRepository.findManyPathsNotStartedByEmployee(
+      employeeId,
+    );
+
+    return paths;
+  }
+
   async addSubstituteDriver(driverId: string, pathId: string): Promise<Path> {
     const path = await this.listById(pathId);
 
-    const driver = await this.driverService.listById(driverId);
+    await this.driverService.listById(driverId);
 
     if (path.status === EStatusPath.IN_PROGRESS)
       throw new HttpException(
@@ -678,6 +677,50 @@ export class PathService {
     };
   }
 
+  async listByEmployeeOnPath(employeeOnPathId: string): Promise<Partial<Path>> {
+    const path = await this.pathRepository.findByEmployeeOnPath(
+      employeeOnPathId,
+    );
+
+    if (!path)
+      throw new HttpException(
+        'Colaborador não encontrado no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return path;
+  }
+
+  async listByIdNotMapped(id: string): Promise<Path> {
+    const path = await this.pathRepository.findById(id);
+
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado trajeto com o id: ${id}!`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return path;
+  }
+
+  async updateEmployeePositionOnPath(pathId: string): Promise<void> {
+    const path = await this.listByIdNotMapped(pathId);
+
+    let newPosition = 1;
+
+    for await (const employeeOnPath of path.employeesOnPath) {
+      await this.employeesOnPathService.updateEmployeePositionByEmployeeAndPath(
+        employeeOnPath.employee.id,
+        path.id,
+        newPosition,
+      );
+
+      newPosition++;
+    }
+
+    await this.routeService.updateTotalDistanceRoute(path);
+  }
+
   private mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 
@@ -710,11 +753,11 @@ export class PathService {
 
         return {
           id: item.id,
-          boardingAt: item.boardingAt,
-          confirmation: item.confirmation,
-          disembarkAt: item.disembarkAt,
           position: item.position,
+          confirmation: item.confirmation,
           present: item.present,
+          boardingAt: item.boardingAt,
+          disembarkAt: item.disembarkAt,
           details: {
             employeeId: employee.id,
             name: employee.name,

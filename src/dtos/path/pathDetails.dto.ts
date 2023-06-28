@@ -29,8 +29,9 @@ export class PathDetailsDTO {
     description: 'Tempo de duração do trajeto',
   })
   @IsDefined()
+  @IsNotEmpty({ message: '[duration] A duração da rota deve ser enviada.' })
   @Matches(durationPathRgx, {
-    message: '[duration] A duração do trajeto deve ser do formato: HH:MM',
+    message: '[duration] O formato da duração deve ser HH:MM.',
   })
   duration: string;
 

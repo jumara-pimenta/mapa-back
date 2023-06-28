@@ -11,7 +11,7 @@ export class Route {
   status: string;
   driver?: Driver;
   driverId?: string;
-  path?: Partial<Path>[];
+  path?: Partial<Path>[] | Path[];
   vehicle?: Vehicle;
   vehicleId?: string;
   createdAt: Date;

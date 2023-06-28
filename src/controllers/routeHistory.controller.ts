@@ -1,4 +1,4 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
+import { Page, PageResponse } from '../configs/database/page.model';
 import {
   Controller,
   Get,
@@ -8,19 +8,22 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { DateFilterDTO } from 'src/dtos/routeHistory/dateFilter.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { DateFilterDTO } from '../dtos/routeHistory/dateFilter.dto';
 import {
   GetRouteHistories,
   ListRouteHistories,
   GetRouteHistoriesByDate,
   GetRouteHistoriesByQuantity,
-} from 'src/utils/examples.swagger';
+} from '../utils/examples.swagger';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { RouteHistoryService } from '../services/routeHistory.service';
-import { FiltersRouteHistoryDTO } from 'src/dtos/routeHistory/filtersRouteHistory.dto';
-import { MappedRouteHistoryDTO } from 'src/dtos/routeHistory/mappedRouteHistory.dto';
-import { DateShift, EmployeeHistoryDTO } from 'src/dtos/routeHistory/employeesHistory.dto';
+import { FiltersRouteHistoryDTO } from '../dtos/routeHistory/filtersRouteHistory.dto';
+import { MappedRouteHistoryDTO } from '../dtos/routeHistory/mappedRouteHistory.dto';
+import {
+  DateShift,
+  EmployeeHistoryDTO,
+} from '../dtos/routeHistory/employeesHistory.dto';
 
 @Controller('/api/routes/histories')
 @ApiTags('RouteHistories')
@@ -88,7 +91,6 @@ export class RouteHistoryController {
   ): Promise<PageResponse<MappedRouteHistoryDTO>> {
     return await this.RouteHistoryService.listAll(page, filters);
   }
-  
 
   @Get('/pathId/id')
   @Roles('list-historic')
@@ -132,6 +134,9 @@ export class RouteHistoryController {
   })
   @HttpCode(HttpStatus.OK)
   async getRoutesByDateAndShift(@Query() query: DateShift): Promise<any> {
-    return await this.RouteHistoryService.getRoutesByDateAndShift(query.data, query.shift);
+    return await this.RouteHistoryService.getRoutesByDateAndShift(
+      query.data,
+      query.shift,
+    );
   }
 }

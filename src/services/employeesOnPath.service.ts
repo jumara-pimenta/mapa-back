@@ -1,3 +1,4 @@
+import { EmployeesOnPath } from './../entities/employeesOnPath.entity';
 import {
   forwardRef,
   HttpException,
@@ -5,29 +6,35 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { UpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
 import { CreateEmployeesOnPathDTO } from '../dtos/employeesOnPath/createEmployeesOnPath.dto';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { EmployeesOnPath } from '../entities/employeesOnPath.entity';
 import IEmployeesOnPathRepository from '../repositories/employeesOnPath/employeesOnPath.repository.contract';
 import { EmployeeService } from './employee.service';
 import { PathService } from './path.service';
-import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
-import { ETypePath } from 'src/utils/ETypes';
+import { OnboardEmployeeDTO } from '../dtos/employeesOnPath/onboardEmployee.dto';
+import { EStatusPath, ETypePath } from '../utils/ETypes';
+import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
+import { RouteService } from './route.service';
+import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
+import { getDateInLocaleTime } from '../utils/Date';
 
 @Injectable()
 export class EmployeesOnPathService {
   constructor(
     @Inject('IEmployeesOnPathRepository')
     private readonly employeesOnPathRepository: IEmployeesOnPathRepository,
+    @Inject(forwardRef(() => EmployeeService))
     private readonly employeeService: EmployeeService,
     @Inject(forwardRef(() => PathService))
     private readonly pathService: PathService,
+    @Inject(forwardRef(() => RouteService))
+    private readonly routeService: RouteService,
   ) {}
 
   async create(props: CreateEmployeesOnPathDTO): Promise<EmployeesOnPath> {
     let position = 1;
+
     const path = await this.pathService.listById(props.pathId);
 
     for await (const id of props.employeeIds) {
@@ -76,53 +83,107 @@ export class EmployeesOnPathService {
     return employeesOnPath;
   }
 
-  async onboardEmployee(payload: IdUpdateDTO): Promise<any> {
-    await this.listById(payload.id);
-    const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
+  async onboardEmployee(
+    payload: OnboardEmployeeDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
+    const employeeOnPath = await this.listById(payload.id);
+    const path = await this.pathService.listByEmployeeOnPath(employeeOnPath.id);
 
-    if (payload.present === false) {
-      await this.updateWebsocket(payload.id, {
-        present: payload.present,
-        boardingAt: null,
-      });
+    const {
+      confirmPresence,
+      disconfirmPresence,
+      employeeIsAlreadyAusentOnTheRoute,
+      employeeIsAlreadyPresentOnTheRoute,
+    } = this.getParamsToValidateOnboardingEmployee(
+      employeeOnPath.present,
+      payload.present,
+      );
+    
+    if (path.type === ETypePath.RETURN) {
+      throw new HttpException(
+        'Não é permitido realizar embarque em trajetos de volta!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
-    if (payload.present === true) {
-      await this.updateWebsocket(payload.id, {
-        confirmation: true,
-        present: payload.present,
-        boardingAt: new Date(),
-      });
+
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
 
-    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
+    if (confirmPresence && employeeIsAlreadyPresentOnTheRoute) {
+      throw new HttpException(
+        'Colaborador já está presente na rota.',
+        HttpStatus.CONFLICT,
+      );
+    }
 
-    return data;
+    if (disconfirmPresence && employeeIsAlreadyAusentOnTheRoute) {
+      throw new HttpException(
+        'Ausência do colaborador na rota já foi informada.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (confirmPresence) {
+      employeeOnPath.boardingAt = getDateInLocaleTime(new Date());
+    } else {
+      Object.assign(employeeOnPath, { ...employeeOnPath, boardingAt: null });
+    }
+
+    employeeOnPath.present = payload.present;
+
+    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
+      employeeOnPath,
+    );
+
+    return this.mappedOne(updatedEmployeeOnPath);
   }
 
-  async offboardEmployee(payload: IdUpdateDTO): Promise<any> {
-    await this.listById(payload.id);
+  async offboardEmployee(
+    payload: DisembarkEmployeeDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
+    const employeeOnPath = await this.listById(payload.id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
-    if (payload.present === false) {
-      await this.updateWebsocket(payload.id, {
-        present: payload.present,
-        disembarkAt: null,
-      });
-    }
-    if (payload.present === true) {
-      await this.updateWebsocket(payload.id, {
-        confirmation: true,
-        present: payload.present,
-        disembarkAt: new Date(),
-      });
+    if (path.type === ETypePath.ONE_WAY) {
+      throw new HttpException(
+        'Não é permitido realizar desembarque em trajetos de ida!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
 
-    const data = await this.pathService.listEmployeesByPathAndPin(path.id);
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível desembarcar colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
 
-    return data;
+    const employeeIsAlreadyDisembarked = employeeOnPath.disembarkAt
+      ? true
+      : false;
+
+    if (employeeIsAlreadyDisembarked) {
+      throw new HttpException(
+        'Colaborador já desembarcou da rota!',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    employeeOnPath.disembarkAt = getDateInLocaleTime(new Date());
+    employeeOnPath.present = true;
+
+    const updatedEmployee = await this.employeesOnPathRepository.update(
+      employeeOnPath,
+    );
+
+    return this.mappedOne(updatedEmployee);
   }
 
-  async employeeNotConfirmed(payload: IdUpdateDTO): Promise<any> {
+  async employeeNotConfirmed(payload: OnboardEmployeeDTO): Promise<any> {
     await this.listById(payload.id);
     const path = await this.pathService.getPathidByEmployeeOnPathId(payload.id);
 
@@ -180,6 +241,33 @@ export class EmployeesOnPathService {
   async update(id: string, data: UpdateEmployeesOnPathDTO): Promise<any> {
     const employeesOnPath = await this.listById(id);
 
+    const { confirmation } = data;
+
+    if (typeof confirmation === 'boolean') {
+      const path = await this.pathService.listByEmployeeOnPath(
+        employeesOnPath.id,
+      );
+
+      const employeeIsAlreadyConfirmedOnTheRoute =
+        employeesOnPath.confirmation === true ? true : false;
+
+      if (path.status === EStatusPath.FINISHED) {
+        throw new HttpException(
+          'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      if (path.status === EStatusPath.IN_PROGRESS) {
+        if (employeeIsAlreadyConfirmedOnTheRoute) {
+          throw new HttpException(
+            'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
+            HttpStatus.NOT_ACCEPTABLE,
+          );
+        }
+      }
+    }
+
     const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
       Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
     );
@@ -191,23 +279,81 @@ export class EmployeesOnPathService {
     id: string,
     data: UpdateEmployeesOnPathDTO,
   ): Promise<void> {
-    const employeesOnPath = await this.listById(id);
+    const employeeOnPath = await this.listById(id);
+    const path = await this.pathService.listByEmployeeOnPath(employeeOnPath.id);
+
+    const employeeIsAlreadyConfirmedOnTheRoute =
+      employeeOnPath.confirmation === true ? true : false;
+
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    if (path.status === EStatusPath.IN_PROGRESS) {
+      if (employeeIsAlreadyConfirmedOnTheRoute) {
+        throw new HttpException(
+          'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+    }
 
     await this.employeesOnPathRepository.update(
-      Object.assign(employeesOnPath, { ...employeesOnPath, ...data }),
+      Object.assign(employeeOnPath, { ...employeeOnPath, ...data }),
     );
   }
 
-  async updateStatus(payload: UpdateEmployeesStatusOnPathDTO): Promise<any> {
-    const employeesOnPath = await this.findById(payload.id);
+  async updateEmployeeParticipationOnPath(
+    id: string,
+    payload: UpdateEmployeePresenceOnPathDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
+    const employeeOnPath = await this.findById(id);
 
-    const updatedEmployeeOnPath = await this.employeesOnPathRepository.update(
-      Object.assign(employeesOnPath, {
-        ...employeesOnPath,
-        confirmation: payload.status,
-      }),
-    );
-    return updatedEmployeeOnPath;
+    const path = await this.pathService.listByEmployeeOnPath(employeeOnPath.id);
+
+    const employeeIsAlreadyConfirmedOnTheRoute =
+      employeeOnPath.confirmation === true ? true : false;
+
+    const updateEmployeePresence =
+      async (): Promise<MappedEmployeesOnPathDTO> => {
+        const updatedEmployeeOnPath =
+          await this.employeesOnPathRepository.update(
+            Object.assign(employeeOnPath, {
+              ...employeeOnPath,
+              confirmation: payload.confirmation,
+            }),
+          );
+
+        return this.mappedOne(updatedEmployeeOnPath);
+      };
+
+    // Se a rota já finalizou, colaborador não pode fazer nada
+    if (path.status === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    // Se a rota ainda não iniciou, colaborador pode confirmar e desconfirmar
+    if (path.status === EStatusPath.PENDING) {
+      return await updateEmployeePresence();
+    }
+
+    // Se o trajeto está em andamento, colaborador pode confirmar presença
+    if (path.status === EStatusPath.IN_PROGRESS) {
+      if (employeeIsAlreadyConfirmedOnTheRoute) {
+        throw new HttpException(
+          'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      return await updateEmployeePresence();
+    }
   }
 
   async listByPathAndPin(
@@ -250,8 +396,118 @@ export class EmployeesOnPathService {
     }
 
     if (path.type === ETypePath.RETURN) {
-      await this.employeesOnPathRepository.updateMany(employeesOnPath, false);
+      await this.employeesOnPathRepository.updateMany(employeesOnPath, true);
     }
+  }
+
+  private async listByEmployeeAndPath(
+    employeeId: string,
+    pathId: string,
+  ): Promise<EmployeesOnPath> {
+    const employeeOnPath =
+      await this.employeesOnPathRepository.findByEmployeeAndPath(
+        employeeId,
+        pathId,
+      );
+
+    if (!employeeOnPath)
+      throw new HttpException(
+        'Não foi encontrado um colaborador no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return employeeOnPath;
+  }
+
+  private async listByEmployeeAndRoute(
+    employeeId: string,
+    routeId: string,
+  ): Promise<EmployeesOnPath[]> {
+    const employeesOnPath =
+      await this.employeesOnPathRepository.findManyByEmployeeAndRoute(
+        employeeId,
+        routeId,
+      );
+
+    if (!employeesOnPath)
+      throw new HttpException(
+        'Não foi encontrado um colaborador no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return employeesOnPath;
+  }
+
+  async updateEmployeePositionByEmployeeAndPath(
+    employeeId: string,
+    pathId: string,
+    newPosition: number,
+  ): Promise<void> {
+    const employeeOnPath = await this.listByEmployeeAndPath(employeeId, pathId);
+
+    await this.employeesOnPathRepository.updatePosition(
+      employeeOnPath.id,
+      newPosition,
+    );
+
+    return;
+  }
+
+  async removeEmployeeOnPath(employeeId: string, routeId: string) {
+    const employee = await this.employeeService.listById(employeeId);
+
+    const employeesOnPath = await this.listByEmployeeAndRoute(
+      employee.id,
+      routeId,
+    );
+
+    for await (const employeeOnPath of employeesOnPath) {
+      await this.delete(employeeOnPath.id);
+    }
+
+    await this.routeService.updateEmployeePositionOnPath(routeId);
+
+    return;
+  }
+
+  private checksIfPathCanBeUpdated(pathStatus: EStatusPath): void {
+    if (pathStatus === EStatusPath.FINISHED) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto finalizado!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    if (pathStatus === EStatusPath.IN_PROGRESS) {
+      // if (employeeIsAlreadyConfirmedOnTheRoute) {
+      throw new HttpException(
+        'Não é possível alterar a presença do colaborador em um trajeto em andamento!',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+      // }
+    }
+  }
+
+  private getParamsToValidateOnboardingEmployee(
+    employeePresence: boolean,
+    isToConfirm: boolean,
+  ) {
+    const employeeIsAlreadyPresentOnTheRoute =
+      employeePresence === true ? true : false;
+
+    const employeeIsAlreadyAusentOnTheRoute =
+      employeePresence === false ? true : false;
+
+    const confirmPresence = isToConfirm === true ? true : false;
+
+    const disconfirmPresence = isToConfirm === false ? true : false;
+
+    return {
+      employeeIsAlreadyAusentOnTheRoute,
+      employeeIsAlreadyPresentOnTheRoute,
+      confirmPresence,
+      disconfirmPresence,
+    };
   }
 
   private mappedOne(
@@ -262,14 +518,15 @@ export class EmployeesOnPathService {
 
     return {
       id: employeesOnPath.id,
-      boardingAt: employeesOnPath.boardingAt,
-      confirmation: employeesOnPath.confirmation,
-      disembarkAt: employeesOnPath.disembarkAt,
       position: employeesOnPath.position,
+      confirmation: employeesOnPath.confirmation,
+      present: employeesOnPath.present,
+      boardingAt: employeesOnPath.boardingAt,
+      disembarkAt: employeesOnPath.disembarkAt,
       createdAt: employeesOnPath.createdAt,
       details: {
         name: employee.name,
-        address: employee.address,
+        address: JSON.parse(employee.address),
         shift: employee.shift,
         registration: employee.registration,
         location: {
@@ -289,10 +546,11 @@ export class EmployeesOnPathService {
 
       return {
         id: employeesOnPath.id,
-        boardingAt: employeesOnPath.boardingAt,
-        confirmation: employeesOnPath.confirmation,
-        disembarkAt: employeesOnPath.disembarkAt,
         position: employeesOnPath.position,
+        confirmation: employeesOnPath.confirmation,
+        present: employeesOnPath.present,
+        boardingAt: employeesOnPath.boardingAt,
+        disembarkAt: employeesOnPath.disembarkAt,
         createdAt: employeesOnPath.createdAt,
         details: {
           name: employee.name,

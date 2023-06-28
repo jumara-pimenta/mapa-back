@@ -10,7 +10,8 @@ import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
-import { ETypeRouteExport } from 'src/utils/ETypes';
+import { ETypeRouteExport } from '../../utils/ETypes';
+import { TTypeRoute } from '../../utils/TTypes';
 
 @Injectable()
 export class RouteRepository
@@ -22,6 +23,39 @@ export class RouteRepository
     private readonly driverService: DriverService,
   ) {
     super();
+  }
+  async updateTotalDistance(id: string, totalDistance: string): Promise<Route> {
+    return await this.repository.route.update({
+      data: {
+        distance: totalDistance,
+      },
+      where: { id },
+    });
+  }
+
+  async findEmployeeOnRouteByType(
+    employeeId: string,
+    type: TTypeRoute,
+  ): Promise<Route> {
+    return await this.repository.route.findFirst({
+      where: {
+        type,
+        NOT: {
+          status: 'deleted',
+        },
+        path: {
+          some: {
+            employeesOnPath: {
+              some: {
+                employee: {
+                  id: employeeId,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async findByIdWebsocket(id: string): Promise<any> {
@@ -223,6 +257,11 @@ export class RouteRepository
             status: true,
             type: true,
             createdAt: true,
+            route: {
+              select: {
+                id: true
+              }
+            },
             employeesOnPath: {
               orderBy: {
                 position: 'asc',
@@ -302,7 +341,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'desc',
+                    position: 'asc',
                   },
                   where: {
                     employee: {
@@ -355,7 +394,7 @@ export class RouteRepository
               include: {
                 employeesOnPath: {
                   orderBy: {
-                    position: 'desc',
+                    position: 'asc',
                   },
                   where: {
                     employee: {

@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { BackofficeUserModule } from './backofficeUser.module';
+import { Module, forwardRef } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { RoleGuard } from '../configs/authentication/auth.guard';
@@ -6,8 +7,8 @@ import { AuthService } from '../services/auth.service';
 import { AuthController } from '../controllers/auth.controller';
 import { RequestContextModule } from 'nestjs-request-context';
 import { CoreServiceIntegration } from '../integrations/services/coreService/core.service.integration';
-import { BackOfficeUserRepository } from 'src/repositories/backOfficeUser/backOffice.repository';
-import { PrismaModule } from 'src/database/prisma.module';
+import { BackOfficeUserRepository } from '../repositories/backOfficeUser/backOffice.repository';
+import { PrismaModule } from '../database/prisma.module';
 import { EmployeeModule } from './employee.module';
 import { DriverModule } from './driver.module';
 
@@ -19,6 +20,7 @@ import { DriverModule } from './driver.module';
         expiresIn: process.env.EXPIRES_IN_ACCESS_TOKEN,
       },
     }),
+    forwardRef(() => BackofficeUserModule),
     EmployeeModule,
     DriverModule,
     RequestContextModule,

@@ -1,7 +1,7 @@
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
-import { Path } from 'src/entities/path.entity';
-import { Sinister } from 'src/entities/sinister.entity';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { FiltersSinisterDTO } from '../../dtos/sinister/filtersSinister.dto';
+import { Path } from '../../entities/path.entity';
+import { Sinister } from '../../entities/sinister.entity';
 
 export default interface ISinisterRepository {
   create(data: Sinister): Promise<Sinister>;

@@ -109,5 +109,6 @@ export const setPermissions = (roles: ERoles) => {
       'edit-route',
       'create-path',
       'edit-path',
+      'list-historic',
     ];
 };

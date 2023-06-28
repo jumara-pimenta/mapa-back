@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
-import { MapBoxServiceIntegration } from 'src/integrations/services/mapBoxService/mapbox.service.integration';
+import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
+import { MapBoxServiceIntegration } from '../integrations/services/mapBoxService/mapbox.service.integration';
 import { RouteController } from '../controllers/route.controller';
 import { RouteRepository } from '../repositories/route/route.repository';
 import { RouteService } from '../services/route.service';
@@ -9,6 +9,7 @@ import { EmployeeModule } from './employee.module';
 import { PathModule } from './path.module';
 import { RouteHistoryModule } from './routeHistory.module';
 import { VehicleModule } from './vehicle.module';
+import { EmployeesOnPathModule } from './employeesOnPath.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VehicleModule } from './vehicle.module';
     forwardRef(() => EmployeeModule),
     forwardRef(() => PathModule),
     forwardRef(() => RouteHistoryModule),
+    forwardRef(() => EmployeesOnPathModule)
   ],
   controllers: [RouteController],
   providers: [

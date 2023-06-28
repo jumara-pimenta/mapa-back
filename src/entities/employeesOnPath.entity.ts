@@ -10,7 +10,7 @@ export class EmployeesOnPath {
   disembarkAt?: Date;
   description?: string;
   present?: boolean;
-  employee?: Partial<Employee>;
+  employee?: Partial<Employee> | Employee;
   path?: Path;
   createdAt: Date;
   updatedAt?: Date;

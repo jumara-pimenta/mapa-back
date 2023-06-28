@@ -15,6 +15,65 @@ export class EmployeesOnPathRepository
   constructor(private readonly repository: PrismaService) {
     super();
   }
+  updatePosition(id: string, newPosition: number): Promise<EmployeesOnPath> {
+    return this.repository.employeesOnPath.update({
+      where: { id },
+      data: {
+        position: newPosition
+      }
+    });
+  }
+
+  findByEmployeeAndPath(employeeId: string, pathId: string): Promise<EmployeesOnPath> {
+    return this.repository.employeesOnPath.findFirst({
+      where: { pathId, employeeId },
+      select: {
+        id: true,
+        description: true,
+        boardingAt: true,
+        confirmation: true,
+        disembarkAt: true,
+        position: true,
+        createdAt: true,
+        present: true,
+        employee: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
+  findManyByEmployeeAndRoute(employeeId: string, routeId: string): Promise<EmployeesOnPath[]> {
+    return this.repository.employeesOnPath.findMany({
+      where: {
+        employeeId, path: {
+        routeId
+      }},
+      select: {
+        id: true,
+        description: true,
+        boardingAt: true,
+        confirmation: true,
+        disembarkAt: true,
+        position: true,
+        createdAt: true,
+        present: true,
+        employee: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
 
   create(data: EmployeesOnPath): Promise<EmployeesOnPath> {
     return this.repository.employeesOnPath.create({
@@ -70,10 +129,11 @@ export class EmployeesOnPathRepository
       },
     });
   }
+
   findByIds(id: string): Promise<EmployeesOnPath[]> {
     return this.repository.employeesOnPath.findMany({
       where: { employeeId: id },
-      
+
       select: {
         id: true,
         confirmation: true,
@@ -284,11 +344,22 @@ export class EmployeesOnPathRepository
         confirmation: data.confirmation,
         description: data.description,
         present: data.present,
-        disembarkAt: getDateInLocaleTime(data.disembarkAt),
-        boardingAt: getDateInLocaleTime(data.boardingAt),
+        disembarkAt: data.disembarkAt,
+        boardingAt: data.boardingAt,
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
+      include: {
+        employee: {
+          include: {
+            pins: {
+              include: {
+                pin: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 

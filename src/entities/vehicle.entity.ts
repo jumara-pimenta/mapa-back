@@ -10,9 +10,9 @@ export class Vehicle {
   lastSurvey?: Date;
   expiration: Date;
   capacity: number;
-  renavam: string;
+  renavam?: string;
   lastMaintenance?: Date;
-  note: string;
+  note?: string;
   isAccessibility: boolean;
   route?: Route;
   createdAt: Date;

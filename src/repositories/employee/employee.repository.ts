@@ -8,7 +8,7 @@ import IEmployeeRepository from './employee.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
-import { getDateStartToEndOfDay } from 'src/utils/Date';
+import { getDateStartToEndOfDay } from '../../utils/Date';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -18,6 +18,40 @@ export class EmployeeRepository
 {
   constructor(private readonly repository: PrismaService) {
     super();
+  }
+
+  async findManyByPath(pathId: string): Promise<Employee[]> {
+    const items = await this.repository.employee.findMany({
+      where: {
+        deletedAt: null,
+        employeeOnPath: {
+          some: {
+            pathId,
+          },
+        },
+      },
+      include: {
+        pins: {
+          select: {
+            type: true,
+            pin: {
+              select: {
+                details: true,
+                local: true,
+                title: true,
+                lat: true,
+                lng: true
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+
+    return items;
   }
 
   delete(id: string): Promise<Employee> {
@@ -203,13 +237,6 @@ export class EmployeeRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
-            pins: {
-              some: {
-                NOT: {
-                  pinId: process.env.DENSO_ID,
-                },
-              },
-            },
           },
           orderBy: {
             createdAt: 'desc',
@@ -345,7 +372,7 @@ export class EmployeeRepository
     });
   }
 
-  async findJokerPin(ids: string[]): Promise<Partial<Employee>[]> {
+  async findEmployeeAtDenso(ids: string[]): Promise<Partial<Employee>[]> {
     return await this.repository.employee.findMany({
       where: {
         id: {
@@ -367,29 +394,32 @@ export class EmployeeRepository
     });
   }
 
-  updateEmployeePassword(registration: string, password: string): Promise<Employee>{
-    return  this.repository.employee.update({
+  updateEmployeePassword(
+    registration: string,
+    password: string,
+  ): Promise<Employee> {
+    return this.repository.employee.update({
       where: {
-        registration: registration
+        registration: registration,
       },
       data: {
         password: password,
         firstAccess: false,
-        updatedAt: new Date()
-      }
-    })
+        updatedAt: new Date(),
+      },
+    });
   }
 
-  async resetEmployeePassword(registration: string): Promise<Employee>{
-    return  this.repository.employee.update({
+  async resetEmployeePassword(registration: string): Promise<Employee> {
+    return this.repository.employee.update({
       where: {
-        registration: registration
+        registration: registration,
       },
       data: {
         password: await bcrypt.hash(registration, 10),
         firstAccess: true,
-        updatedAt: new Date()
-      }
-    })
+        updatedAt: new Date(),
+      },
+    });
   }
 }

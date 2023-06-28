@@ -9,19 +9,18 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/decorators/roles.decorator';
-import { IdUpdateDTO } from 'src/dtos/employeesOnPath/idUpdateWebsocket';
-import { UpdateEmployeesOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesOnPath.dto';
-import { UpdateEmployeesStatusOnPathDTO } from 'src/dtos/employeesOnPath/updateEmployeesStatusOnPath.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { UpdateEmployeesOnPathDTO } from '../dtos/employeesOnPath/updateEmployeesOnPath.dto';
 import {
   GetEmmployeesOnPathByRoute,
   GetEmployeesOnPath,
-  UpdateConfirmationEmployeesOnPath,
   UpdateConfirmationEmployeesOnPathById,
   UpdateEmployeesOnPathById,
 } from '../utils/examples.swagger';
 import { MappedEmployeesOnPathDTO } from '../dtos/employeesOnPath/mappedEmployeesOnPath.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
+import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
+import { OnboardEmployeeDTO } from '../dtos/employeesOnPath/onboardEmployee.dto';
 
 @Controller('/api/routes/paths/employees')
 @ApiTags('EmployeesOnPath')
@@ -60,20 +59,20 @@ export class EmployeesOnPathController {
     return await this.employeeOnPathService.listManyByRoute(route);
   }
 
-  @Put()
+  @Put('/onboard')
   @Roles('edit-employeeOnPath')
   @ApiCreatedResponse({
     description: 'Update Confirmation a Employee On Path.',
     schema: {
       type: 'object',
-      example: UpdateConfirmationEmployeesOnPath,
+      example: OnboardEmployeeDTO,
     },
   })
   @HttpCode(HttpStatus.OK)
   async updateEmployeeConfirmation(
-    @Body() payload: UpdateEmployeesStatusOnPathDTO,
-  ): Promise<MappedEmployeesOnPathDTO[]> {
-    return await this.employeeOnPathService.updateStatus(payload);
+    @Body() payload: OnboardEmployeeDTO,
+  ): Promise<MappedEmployeesOnPathDTO> {
+    return await this.employeeOnPathService.onboardEmployee(payload);
   }
 
   @Put(':id')
@@ -105,8 +104,11 @@ export class EmployeesOnPathController {
   })
   async updateManyEmployeeConfirmation(
     @Param('id') id: string,
-    @Body() payload: UpdateEmployeesOnPathDTO,
+    @Body() payload: UpdateEmployeePresenceOnPathDTO,
   ): Promise<MappedEmployeesOnPathDTO> {
-    return await this.employeeOnPathService.update(id, payload);
+    return await this.employeeOnPathService.updateEmployeeParticipationOnPath(
+      id,
+      payload,
+    );
   }
 }

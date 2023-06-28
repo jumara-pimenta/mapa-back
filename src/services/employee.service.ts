@@ -18,7 +18,6 @@ import { PinService } from './pin.service';
 import { EmployeesOnPinService } from './employeesOnPin.service';
 import {
   ETypeCreationPin,
-  ETypeEditionPin,
   ETypePin,
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
@@ -30,16 +29,17 @@ import { plainToClass } from 'class-transformer';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as bcrypt from 'bcrypt';
-import { json } from 'stream/consumers';
 import {
   convertToDate,
   getShiftStartAtAndExports,
   getStartAtAndFinishEmployee,
-} from 'src/utils/date.service';
-import { GoogleApiServiceIntegration } from 'src/integrations/services/googleService/google.service.integration';
-import { getShift } from 'src/utils/Utils';
-import { verifyDateFilter } from 'src/utils/Date';
-import { FirstAccessEmployeeDTO } from 'src/dtos/employee/firstAccessEmployee.dto';
+} from '../utils/date.service';
+import { GoogleApiServiceIntegration } from '../integrations/services/googleService/google.service.integration';
+import { getShift } from '../utils/Utils';
+import { verifyDateFilter } from '../utils/Date';
+import { FirstAccessEmployeeDTO } from '../dtos/employee/firstAccessEmployee.dto';
+import { PathService } from './path.service';
+import { EmployeesOnPathService } from './employeesOnPath.service';
 
 const validateAsync = (schema: any): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -48,6 +48,7 @@ const validateAsync = (schema: any): Promise<any> => {
       .catch((error: any) => reject(error));
   });
 };
+
 interface abc {
   line: number;
   employee: CreateEmployeeFileDTO;
@@ -64,6 +65,10 @@ export class EmployeeService {
     private readonly pinService: PinService,
     @Inject('IGoogleApiServiceIntegration')
     private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
+    @Inject(forwardRef(() => PathService))
+    private readonly pathService: PathService,
+    @Inject(forwardRef(() => EmployeesOnPathService))
+    private readonly employeeOnPathService: EmployeesOnPathService,
   ) {}
 
   async getLocation(address: string): Promise<any> {
@@ -87,6 +92,7 @@ export class EmployeeService {
         HttpStatus.CONFLICT,
       );
     }
+
     const deletedEmployee =
       await this.employeeRepository.findByRegistrationDeleted(
         props.registration,
@@ -151,12 +157,13 @@ export class EmployeeService {
           : pin.id,
       type: ETypePin.CONVENTIONAL,
     });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...data } = employee;
 
     return { ...data, address: JSON.parse(data.address) };
   }
 
-  async ListAllEmployeesDeleted(ids: string[]): Promise<any> {
+  async checkIfThereAreDeletedEmployees(ids: string[]): Promise<any> {
     const employees = await this.employeeRepository.listAllEmployeesDeleted(
       ids,
     );
@@ -252,8 +259,8 @@ export class EmployeeService {
     };
   }
 
-  async findJokerPin(ids: string[]): Promise<any> {
-    const employees = await this.employeeRepository.findJokerPin(ids);
+  async checksIfThereAreEmployeesWithPinAtDenso(ids: string[]): Promise<any> {
+    const employees = await this.employeeRepository.findEmployeeAtDenso(ids);
 
     if (employees.length >= 1)
       throw new HttpException(
@@ -264,12 +271,20 @@ export class EmployeeService {
       );
   }
 
+  async listManyEmployeesByPath(pathId: string): Promise<Employee[]> {
+
+    const employees = await this.employeeRepository.findManyByPath(pathId);
+
+    return employees;
+  }
+
   async update(
     id: string,
     data: UpdateEmployeeDTO,
   ): Promise<MappedEmployeeDTO> {
     const employee = await this.listById(id);
-    let pin: Pin;
+
+    const { typeEdition, details, district, lat, lng, local, title } = data.pin;
 
     if (data.registration) {
       const registrationExists =
@@ -285,46 +300,41 @@ export class EmployeeService {
         );
       }
     }
+
     if (data.pin) {
-      if (data.pin.typeEdition === ETypeEditionPin.IS_EXISTENT) {
-        if (!data.pin.id)
-          throw new HttpException(
-            'O ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
-            HttpStatus.BAD_REQUEST,
-          );
-
-        await this.employeeOnPinService.associateEmployeeByService(
-          data.pin.id,
+      this.pinService.validateUpdateEmployeePin(
+        {
+          typeEdition,
+          pinId: data.pin.id,
           employee,
-        );
-      }
-      if (data.pin.typeEdition === ETypeEditionPin.IS_NEW) {
-        const { title, local, details, lat, lng, district } = data.pin;
+        },
+        { details, district, lat, lng, local, title },
+      );
 
-        if (!title || !local || !details || !lat || !lng) {
-          throw new HttpException(
-            'Todas as informações são obrigatórias para editar um colaborador a um ponto de embarque inexistente: título, local e detalhes.',
-            HttpStatus.BAD_REQUEST,
+      const pathsThatTheEmployeeIsIncluded =
+        await this.pathService.listPathsNotStartedByEmployee(employee.id);
+
+      if (pathsThatTheEmployeeIsIncluded.length > 0) {
+        for await (const path of pathsThatTheEmployeeIsIncluded) {
+          await this.employeeOnPathService.removeEmployeeOnPath(
+            employee.id,
+            path.route.id
           );
         }
-
-        pin = await this.pinService.create({
-          title,
-          local,
-          details,
-          district,
-          lat,
-          lng,
-        });
-
-        await this.employeeOnPinService.associateEmployeeByService(
-          pin.id,
-          employee,
-        );
       }
+
+      await this.pinService.changeEmployeePin(
+        {
+          typeEdition,
+          pinId: data.pin.id,
+          employee,
+        },
+        { details, district, lat, lng, local, title },
+      );
     }
 
     let shiftScheduleUpdate: string = null;
+
     if (data.shift) {
       const getShiftUpdate = getStartAtAndFinishEmployee(data.shift);
 
@@ -333,6 +343,7 @@ export class EmployeeService {
       if (getShiftUpdate)
         shiftScheduleUpdate = `${getShiftUpdate.startAt} às ${getShiftUpdate.finishAt}`;
     }
+
     const address = JSON.stringify(data?.address);
 
     const employeeDataUpdated = { ...data, address };
@@ -592,7 +603,7 @@ export class EmployeeService {
     return errors;
   }
 
-  async exportsEmployeeFile(page: Page, filters?: FiltersEmployeeDTO) {
+  async exportsEmployeeFile() {
     const headers = [
       'Matricula',
       'Nome Colaborador',
@@ -603,7 +614,6 @@ export class EmployeeService {
       'PONTO DE COLETA',
       'Referencia',
     ];
-    const today = new Date().toLocaleDateString('pt-BR');
 
     const filePath = './employee.xlsx';
     const workSheetName = 'LISTA DE COLABORADORES';
@@ -854,18 +864,20 @@ export class EmployeeService {
       role: employee.role,
       shift: employee.shift,
       createdAt: employee.createdAt,
-      pins: employee.pins.map((employeesOnPin) => {
-        return {
-          id: employeesOnPin.pin.id,
-          title: employeesOnPin.pin.title,
-          local: employeesOnPin.pin.local,
-          details: employeesOnPin.pin.details,
-          district: employeesOnPin.pin.district,
-          lat: employeesOnPin.pin.lat,
-          lng: employeesOnPin.pin.lng,
-          type: employeesOnPin.type as ETypePin,
-        };
-      }),
+      pins: employee.pins?.length
+        ? employee.pins.map((employeesOnPin) => {
+            return {
+              id: employeesOnPin.pin.id,
+              title: employeesOnPin.pin.title,
+              local: employeesOnPin.pin.local,
+              details: employeesOnPin.pin.details,
+              district: employeesOnPin.pin.district,
+              lat: employeesOnPin.pin.lat,
+              lng: employeesOnPin.pin.lng,
+              type: employeesOnPin.type as ETypePin,
+            };
+          })
+        : [],
     };
   }
 
@@ -928,40 +940,56 @@ export class EmployeeService {
     return exportedEmployeeToXLSX(headers, workSheetName, filePath);
   }
 
-  async firstAccess(data: FirstAccessEmployeeDTO): Promise<Employee>{
+  async firstAccess(data: FirstAccessEmployeeDTO): Promise<MappedEmployeeDTO> {
+    const employeeAlreadyExists =
+      await this.employeeRepository.findByRegistration(data.registration);
 
-    const employeeAlreadyExists = await this.employeeRepository.findByRegistration(data.registration)
-
-    if(!employeeAlreadyExists){
-      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND)
+    if (!employeeAlreadyExists) {
+      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND);
     }
 
-    if(employeeAlreadyExists.firstAccess == false){
-      throw new HttpException('Senha já foi definida', HttpStatus.BAD_REQUEST)
-    }
-    
-    const checkIfPasswordMatches = data.password === data.confirmPassword
-
-    if(!checkIfPasswordMatches){
-      throw new HttpException('Senhas não correspondem', HttpStatus.BAD_REQUEST)
+    if (employeeAlreadyExists.firstAccess == false) {
+      throw new HttpException(
+        'A senha de primeiro acesso já foi definida. Entre em contato com a administração!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    const passwordHashed = await bcrypt.hash(data.password, 10)
+    const checkIfPasswordMatches = data.password === data.confirmPassword;
 
-    return await this.employeeRepository.updateEmployeePassword(data.registration, passwordHashed)
+    if (!checkIfPasswordMatches) {
+      throw new HttpException(
+        'Senhas não correspondem',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const passwordHashed = await bcrypt.hash(data.password, 10);
+
+    const updatedEmployee =
+      await this.employeeRepository.updateEmployeePassword(
+        data.registration,
+        passwordHashed,
+      );
+
+    return this.mapperOne(updatedEmployee);
   }
 
-  async resetEmployeePassword(registration: string): Promise<Employee>{
-    const employeeAlreadyExists = await this.employeeRepository.findByRegistration(registration)
+  async resetEmployeePassword(registration: string): Promise<Employee> {
+    const employeeAlreadyExists =
+      await this.employeeRepository.findByRegistration(registration);
 
-    if(!employeeAlreadyExists){
-      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND)
+    if (!employeeAlreadyExists) {
+      throw new HttpException('Employee não encontrado', HttpStatus.NOT_FOUND);
     }
 
-    if(employeeAlreadyExists.firstAccess == true){
-      throw new HttpException('Colaborador ainda não definiu sua senha', HttpStatus.BAD_REQUEST)
+    if (employeeAlreadyExists.firstAccess == true) {
+      throw new HttpException(
+        'Colaborador ainda não definiu sua senha',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    return await this.employeeRepository.resetEmployeePassword(registration)
+    return await this.employeeRepository.resetEmployeePassword(registration);
   }
 }

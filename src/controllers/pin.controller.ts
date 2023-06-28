@@ -23,8 +23,8 @@ import {
   GetAllPin,
   GetPin,
   UpdatePin,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('/api/pins')
 @ApiTags('Pins')

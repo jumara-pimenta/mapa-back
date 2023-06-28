@@ -78,11 +78,11 @@ export class CreateVehicleDTO {
     description: 'Código Renavam do Veículo',
   })
   @IsString({ message: '[renavam] O RENAVAM deve ser do tipo texto.' })
-  @IsNotEmpty({ message: '[renavam] O RENAVAM deve ser preenchido.' })
+  @IsOptional()
   @Length(11, 11, {
     message: '[renavam] O RENAVAM deve possuir 11 caracteres.',
   })
-  renavam: string;
+  renavam?: string;
 
   @ApiProperty({
     default: new Date(),
@@ -99,8 +99,8 @@ export class CreateVehicleDTO {
   @IsString({
     message: '[note] O campo de observação deve ser do tipo texto.',
   })
-  @IsNotEmpty({ message: '[note] O campo de observação deve ser preenchido.' })
-  note: string;
+  @IsOptional()
+  note?: string;
 
   @ApiProperty({
     default: true,

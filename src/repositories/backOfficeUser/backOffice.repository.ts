@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Page, PageResponse } from 'src/configs/database/page.model';
-import { Pageable } from 'src/configs/database/pageable.service';
-import { generateQueryByFiltersForUser } from 'src/configs/database/Queries';
+import { Page, PageResponse } from '../../configs/database/page.model';
+import { Pageable } from '../../configs/database/pageable.service';
+import { generateQueryByFiltersForUser } from '../../configs/database/Queries';
 import { PrismaService } from '../../configs/database/prisma.service';
-import {
-  BackOfficeUserCreateDTO,
-  BackOfficeUserUpdateDTO,
-} from 'src/dtos/auth/backOfficeUserLogin.dto';
-import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
-import { BackOfficeUser } from 'src/entities/backOfficeUser.entity';
-import { generateQueryForEmployee } from 'src/utils/QueriesEmployee';
+import { BackOfficeUserUpdateDTO } from '../../dtos/auth/backOfficeUserLogin.dto';
+import { FilterBackOfficeUserDTO } from '../../dtos/auth/filterBackOfficeUser.dto';
+import { BackOfficeUser } from '../../entities/backOfficeUser.entity';
 import IBackOfficeUserRepository from './backOffice.repository.contract';
 
 @Injectable()
@@ -19,6 +15,15 @@ export class BackOfficeUserRepository
 {
   constructor(private readonly repository: PrismaService) {
     super();
+  }
+
+  async updatePassword(id: string, password: string): Promise<BackOfficeUser> {
+    return await this.repository.backOfficeUser.update({
+      where: { id },
+      data: {
+        password,
+      },
+    });
   }
 
   async create(data: BackOfficeUser): Promise<BackOfficeUser> {

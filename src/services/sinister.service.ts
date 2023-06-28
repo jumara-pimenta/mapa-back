@@ -1,15 +1,15 @@
 import { Page, PageResponse } from '../configs/database/page.model';
 import { Sinister } from '../entities/sinister.entity';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CreateSinisterDTO } from 'src/dtos/sinister/createSinister.dto';
-import { UpdateSinisterDTO } from 'src/dtos/sinister/updateSinister.dto';
-import ISinisterRepository from 'src/repositories/sinister/sinister.repository.contract';
-import { FiltersSinisterDTO } from 'src/dtos/sinister/filtersSinister.dto';
-import { MappedSinisterDTO } from 'src/dtos/sinister/mappedSinister.dto';
+import { CreateSinisterDTO } from '../dtos/sinister/createSinister.dto';
+import { UpdateSinisterDTO } from '../dtos/sinister/updateSinister.dto';
+import ISinisterRepository from '../repositories/sinister/sinister.repository.contract';
+import { FiltersSinisterDTO } from '../dtos/sinister/filtersSinister.dto';
+import { MappedSinisterDTO } from '../dtos/sinister/mappedSinister.dto';
 import { PathService } from './path.service';
 import { JwtService } from '@nestjs/jwt';
-import { EStatusPath } from 'src/utils/ETypes';
-import { Path } from 'src/entities/path.entity';
+import { EStatusPath } from '../utils/ETypes';
+import { Path } from '../entities/path.entity';
 @Injectable()
 export class SinisterService {
   constructor(

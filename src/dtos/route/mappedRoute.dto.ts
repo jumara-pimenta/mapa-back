@@ -102,7 +102,7 @@ class IVehicle {
   @ApiProperty()
   renavam: string;
   @ApiProperty()
-  lastMaintenance: Date;
+  lastMaintenance?: Date;
   @ApiProperty()
   note: string;
   @ApiProperty()
@@ -163,13 +163,4 @@ class IVehicleShort {
   id: string;
   @ApiProperty()
   plate: string;
-}
-
-class IPathShort {
-  @ApiProperty()
-  id: string;
-  @ApiProperty()
-  startsAt: string;
-  @ApiProperty()
-  employeesOnPath: IEmployeesOnPathDTO[];
 }

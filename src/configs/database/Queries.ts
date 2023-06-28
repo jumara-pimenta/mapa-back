@@ -10,13 +10,13 @@ import { FiltersVehicleDTO } from '../../dtos/vehicle/filtersVehicle.dto';
 import { IQueryVehicle } from '../../dtos/vehicle/queryVehicle.dto';
 import { convertAndVerifyNumber } from '../../utils/Utils';
 import { IQueryPin } from '../../dtos/pin/queryPin.dto';
-import { FiltersRouteDTO } from 'src/dtos/route/filtersRoute.dto';
-import { ETypePath } from 'src/utils/ETypes';
-import { getDateStartToEndOfDay } from 'src/utils/Date';
-import { IQueryBackOfficeUser } from 'src/dtos/auth/queryBackOfficeUser.dto';
-import { FilterBackOfficeUserDTO } from 'src/dtos/auth/filterBackOfficeUser.dto';
-import { IQuerySinister } from 'src/dtos/sinister/querySinister.dto';
-import { FiltersPathDTO } from 'src/dtos/path/filtersPath.dto';
+import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
+import { ETypePath } from '../../utils/ETypes';
+import { getDateStartToEndOfDay } from '../../utils/Date';
+import { IQueryBackOfficeUser } from '../../dtos/auth/queryBackOfficeUser.dto';
+import { FilterBackOfficeUserDTO } from '../../dtos/auth/filterBackOfficeUser.dto';
+import { IQuerySinister } from '../../dtos/sinister/querySinister.dto';
+import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
 
 export function generateQueryByFiltersForEmployee(
   filters: any,
@@ -370,8 +370,10 @@ export function generateQueryByFiltersForRouteHistory(
       };
     },
 
-    driverName: () => ({ driver: { name: { contains: filters.driverName }} }),
-    vehiclePlate: () => ({ vehicle: { plate: { contains: filters.vehiclePlate }} })
+    driverName: () => ({ driver: { name: { contains: filters.driverName } } }),
+    vehiclePlate: () => ({
+      vehicle: { plate: { contains: filters.vehiclePlate } },
+    }),
   };
 
   const keysFields = Object.keys(fields);

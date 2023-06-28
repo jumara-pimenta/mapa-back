@@ -22,7 +22,9 @@ export class UpdateRouteDTO {
   type?: ETypeRoute;
 
   @ApiProperty({ description: 'Duração da rota' })
-  @IsString({ message: '[duration] Duração da rota tem que ser do tipo texto.' })
+  @IsString({
+    message: '[duration] Duração da rota tem que ser do tipo texto.',
+  })
   @IsOptional()
   duration?: string;
 
@@ -59,7 +61,7 @@ export class UpdateRouteDTO {
     message: '[startsAt] O horário da ida tem que ser do tipo texto.',
   })
   @IsOptional()
-  startsAt?: string
+  startsAt?: string;
 
   @ApiProperty({ description: 'Horário da volta' })
   @IsString({
@@ -67,13 +69,13 @@ export class UpdateRouteDTO {
     message: '[startsReturnAt] O horário da volta tem que ser do tipo texto.',
   })
   @IsOptional()
-  startsReturnAt?: string
+  startsReturnAt?: string;
 
   @ApiProperty({ description: 'Horário da volta' })
   @IsEnum(ETypeShiftRotue, {
-    message: '[shift] O turno deve ser do tipo enum: PRIMEIRO ou SEGUNDO ou TERCEIRO',
+    message:
+      '[shift] O turno deve ser do tipo enum: PRIMEIRO ou SEGUNDO ou TERCEIRO',
   })
   @IsOptional()
-  shift?: ETypeShiftRotue
-
+  shift?: ETypeShiftRotue;
 }

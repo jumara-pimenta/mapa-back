@@ -1,5 +1,5 @@
-import { Path } from 'src/entities/path.entity';
-import { Sinister } from 'src/entities/sinister.entity';
+import { Path } from '../../entities/path.entity';
+import { Sinister } from '../../entities/sinister.entity';
 
 export class RouteByDateAndShift {
   date: string;

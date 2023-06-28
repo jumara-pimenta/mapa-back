@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsString, IsNotEmpty, IsDateString, Length, IsEnum } from 'class-validator';
-import { ETypeCategoryDrivers } from 'src/utils/ETypes';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  Length,
+  IsEnum,
+} from 'class-validator';
+import { ETypeCategoryDrivers } from '../../utils/ETypes';
 
 export class CreateDriverDTO {
   @ApiProperty({
@@ -67,6 +73,6 @@ export class CreateDriverDTO {
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty({ message: '[category] O campo categoria deve ser preenchido.' })
-  @Length(1, 2, {message: 'A categoria deve ser as opções C, D ou E'})
+  @Length(1, 2, { message: 'A categoria deve ser as opções C, D ou E' })
   category: ETypeCategoryDrivers;
 }

@@ -7,13 +7,15 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { IdUpdateDTO } from '../dtos/employeesOnPath/idUpdateWebsocket';
+import { OnboardEmployeeDTO } from '../dtos/employeesOnPath/onboardEmployee.dto';
 import { PathService } from '../services/path.service';
 import { WebsocketUpdateEmployeesStatusOnPathDTO } from '../dtos/employeesOnPath/websocketUpdateEmployeesOnPath.dto';
 import { CurrentLocalDTO } from '../dtos/websocket/currentLocal.dto';
 import { StatusRouteDTO } from '../dtos/websocket/StatusRoute.dto';
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { RouteService } from '../services/route.service';
+import { Observable, catchError, from, map, throwError } from 'rxjs';
+import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
 
 @WebSocketGateway()
 export class WebsocketGateway {
@@ -112,6 +114,7 @@ export class WebsocketGateway {
         payload.employeeOnPathId,
         payload.payload,
       );
+
       const data = await this.routeService.listById(payload.routeId);
 
       this.server.emit(payload.pathId, {
@@ -132,20 +135,20 @@ export class WebsocketGateway {
         },
       }),
     )
-    data: IdUpdateDTO,
-  ): Promise<void> {
-    try {
-      const employeeOnPath = await this.employeesOnPathService.onboardEmployee(
-        data,
-      );
+    data: OnboardEmployeeDTO,
+  ): Promise<Observable<any>> {
+    return from(this.employeesOnPathService.onboardEmployee(data)).pipe(
+      map((employeeOnPath) => ({
+        event: employeeOnPath.id,
+        data: employeeOnPath,
+      })),
+      catchError((error) => {
+        const { status, message } = error;
 
-      this.server.emit(employeeOnPath.id, {
-        ...employeeOnPath,
-      });
-    } catch (error) {
-      this.server.except(error).emit('error', error);
-      throw new WsException(error.message);
-    }
+        this.server.except(error).emit('exception', { status, message });
+        return throwError(() => new WsException({ status, message }));
+      }),
+    );
   }
 
   @SubscribeMessage('disembarkEmployee')
@@ -157,36 +160,12 @@ export class WebsocketGateway {
         },
       }),
     )
-    data: IdUpdateDTO,
+    data: DisembarkEmployeeDTO,
   ): Promise<void> {
     try {
       const employeeOnPath = await this.employeesOnPathService.offboardEmployee(
         data,
       );
-
-      this.server.emit(employeeOnPath.id, {
-        ...employeeOnPath,
-      });
-    } catch (error) {
-      this.server.except(error).emit('error', error);
-      throw new WsException(error.message);
-    }
-  }
-
-  @SubscribeMessage('employeeNotComming')
-  async handleEmployeeNotComming(
-    @MessageBody(
-      new ValidationPipe({
-        exceptionFactory: (errors) => {
-          return new WsException(errors);
-        },
-      }),
-    )
-    data: IdUpdateDTO,
-  ): Promise<void> {
-    try {
-      const employeeOnPath =
-        await this.employeesOnPathService.employeeNotConfirmed(data);
 
       this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,

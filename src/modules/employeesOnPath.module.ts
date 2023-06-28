@@ -4,9 +4,14 @@ import { EmployeesOnPathRepository } from '../repositories/employeesOnPath/emplo
 import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { EmployeeModule } from './employee.module';
 import { PathModule } from './path.module';
+import { RouteModule } from './route.module';
 
 @Module({
-  imports: [EmployeeModule, forwardRef(() => PathModule)],
+  imports: [
+    forwardRef(() => EmployeeModule),
+    forwardRef(() => PathModule),
+    forwardRef(() => RouteModule),
+  ],
   controllers: [EmployeesOnPathController],
   providers: [
     EmployeesOnPathService,

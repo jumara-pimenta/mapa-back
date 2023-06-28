@@ -6,16 +6,97 @@ import { CreatePinDTO } from '../dtos/pin/createPin.dto';
 import { UpdatePinDTO } from '../dtos/pin/updatePin.dto';
 import { Page, PageResponse } from '../configs/database/page.model';
 import { FiltersPinDTO } from '../dtos/pin/filtersPin.dto';
+import { ETypeEditionPin } from '../utils/ETypes';
+import { EmployeesOnPinService } from './employeesOnPin.service';
+import { Employee } from '../entities/employee.entity';
+
+interface OptionsChangeEmployeePin {
+  typeEdition: ETypeEditionPin;
+  pinId?: string;
+  employee: Employee;
+}
 
 @Injectable()
 export class PinService {
   constructor(
     @Inject('IPinRepository')
     private readonly pinRepository: IPinRepository,
+    private readonly employeeOnPinService: EmployeesOnPinService,
   ) {}
 
   async create(payload: CreatePinDTO): Promise<Pin> {
     return await this.pinRepository.create(new Pin(payload));
+  }
+
+  async changeEmployeePin(
+    options: OptionsChangeEmployeePin,
+    data: CreatePinDTO,
+  ) {
+    const { employee, typeEdition, pinId } = options;
+
+    if (typeEdition === ETypeEditionPin.IS_EXISTENT) {
+      if (!pinId)
+        throw new HttpException(
+          'O ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+          HttpStatus.BAD_REQUEST,
+        );
+
+      await this.employeeOnPinService.associateEmployeeByService(
+        pinId,
+        employee,
+      );
+    }
+
+    if (typeEdition === ETypeEditionPin.IS_NEW) {
+      const { title, local, details, lat, lng, district } = data;
+
+      if (!title || !local || !details || !lat || !lng || !district) {
+        throw new HttpException(
+          'Todas as informações são obrigatórias alterar o ponto de embarque do colaborar para um novo: título, local, detalhes, latitude, longitude e distrito.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const createdPin = await this.create({
+        title,
+        local,
+        details,
+        district,
+        lat,
+        lng,
+      });
+
+      await this.employeeOnPinService.associateEmployeeByService(
+        createdPin.id,
+        employee,
+      );
+    }
+  }
+
+  validateUpdateEmployeePin(
+    options: OptionsChangeEmployeePin,
+    data: CreatePinDTO,
+  ): void {
+    const { typeEdition, pinId } = options;
+
+    if (typeEdition === ETypeEditionPin.IS_EXISTENT) {
+      if (!pinId)
+        throw new HttpException(
+          'O ponto de embarque precisa ser enviado para associar ao ponto de embarque existente!',
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    if (typeEdition === ETypeEditionPin.IS_NEW) {
+      const { title, local, details, lat, lng, district } = data;
+
+      if (!title || !local || !details || !lat || !lng || !district) {
+        throw new HttpException(
+          'Todas as informações são obrigatórias alterar o ponto de embarque do colaborar para um novo: título, local, detalhes, latitude, longitude e distrito.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
   }
 
   async delete(id: string): Promise<Pin> {
@@ -41,7 +122,6 @@ export class PinService {
     const pin = await this.pinRepository.findByLocalExcel(local);
     return pin;
   }
-
 
   async listAll(
     page: Page,

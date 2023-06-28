@@ -21,12 +21,7 @@ import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { CreateDriverDTO } from '../dtos/driver/createDriver.dto';
 import { UpdateDriverDTO } from '../dtos/driver/updateDriver.dto';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiCreatedResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiConsumes, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateDriver,
   DeleteDriver,
@@ -36,12 +31,13 @@ import {
   resetDriverPasswordExample,
   UpdateDriver,
   UploadFileDrivers,
-} from 'src/utils/examples.swagger';
-import { Roles } from 'src/decorators/roles.decorator';
+} from '../utils/examples.swagger';
+import { Roles } from '../decorators/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { xlsxFileFilter } from 'src/middlewares/image.middleware';
-import { FirstAccessDriverDTO } from 'src/dtos/driver/firstAccess.dto';
-import { resetDriverPasswordDTO } from 'src/dtos/driver/resetPassword.dto';
+import { xlsxFileFilter } from '../middlewares/image.middleware';
+import { FirstAccessDriverDTO } from '../dtos/driver/firstAccess.dto';
+import { resetDriverPasswordDTO } from '../dtos/driver/resetPassword.dto';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('/api/drivers')
 @ApiTags('Drivers')
@@ -131,8 +127,6 @@ export class DriverController {
   @HttpCode(HttpStatus.OK)
   async exportDriverFile(
     @Response({ passthrough: true }) res,
-    @Query() page: Page,
-    @Query() filters: FiltersDriverDTO,
   ): Promise<StreamableFile> {
     const fileName = 'Sonar Rotas - Motoristas Exportados.xlsx';
 
@@ -141,7 +135,7 @@ export class DriverController {
       'Content-Disposition': `attachment; filename="${fileName}"`,
     });
 
-    return await this.driverService.exportDriverFile(page, filters);
+    return await this.driverService.exportDriverFile();
   }
 
   @Post('/upload')
@@ -192,9 +186,9 @@ export class DriverController {
 
     return await this.driverService.exportDriverEmptFile();
   }
-  
+
   @Post('/firstAccess')
-  @Roles('driver-first-access')
+  @Public()
   @ApiCreatedResponse({
     description: 'Primeiro acesso de motorista.',
     schema: {
@@ -203,8 +197,8 @@ export class DriverController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async firstAccessDriver(@Body() data: FirstAccessDriverDTO): Promise<Driver>{
-    return await this.driverService.firstAccess(data)
+  async firstAccessDriver(@Body() data: FirstAccessDriverDTO): Promise<Driver> {
+    return await this.driverService.firstAccess(data);
   }
 
   @Post('/resetPassword')
@@ -217,7 +211,9 @@ export class DriverController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async resetDriverPassword(@Body() data: resetDriverPasswordDTO): Promise<Driver>{
-    return await this.driverService.resetDriverPassword(data.cpf)
+  async resetDriverPassword(
+    @Body() data: resetDriverPasswordDTO,
+  ): Promise<Driver> {
+    return await this.driverService.resetDriverPassword(data.cpf);
   }
 }
