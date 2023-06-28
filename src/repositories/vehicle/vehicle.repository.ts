@@ -112,6 +112,7 @@ export class VehicleRepository
   create(data: Vehicle): Promise<Vehicle> {
     return this.repository.vehicle.create({
       data: {
+        ...data,
         id: data.id,
         capacity: data.capacity,
         company: data.company,
@@ -120,12 +121,9 @@ export class VehicleRepository
           && getDateInLocaleTime(data.lastMaintenance),
         lastSurvey: data.lastSurvey
           && getDateInLocaleTime(data.lastSurvey),
-        note: data.note ?? null,
         plate: data.plate,
-        renavam: data.renavam ?? null,
         type: data.type,
         isAccessibility: data.isAccessibility,
-        createdAt: data.createdAt,
       },
     });
   }
@@ -137,7 +135,7 @@ export class VehicleRepository
   }
 
   findByRenavam(renavam: string): Promise<Vehicle> {
-    return this.repository.vehicle.findUnique({
+    return this.repository.vehicle.findFirst({
       where: {
         renavam: renavam,
       },
