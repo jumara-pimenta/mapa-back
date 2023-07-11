@@ -123,6 +123,7 @@ export class PathService {
       pathId: path.id,
       route: {
         status: EStatusRoute.PENDING,
+        type: route.routeType as ETypeRoute
       },
       path: {
         finishedAt: getDateInLocaleTime(new Date()),
@@ -157,8 +158,8 @@ export class PathService {
 
     // get type of route
 
-    if (route.routeType === ETypeRoute.EXTRA || route.routeType === 'EXTRA')
-      await this.softDelete(path.id);
+    // if (route.routeType === ETypeRoute.EXTRA || route.routeType === 'EXTRA')
+    //   await this.softDelete(path.id);
 
     return await this.routeService.updateWebsocket(finishAt);
   }
@@ -327,9 +328,16 @@ export class PathService {
   }
 
   async softDelete(id: string): Promise<Path> {
-    await this.listById(id);
+    const path = await this.pathRepository.findByIdToDelete(id);
 
-    const deleted = await this.pathRepository.softDelete(id);
+    if (!path)
+      throw new HttpException(
+        `Não foi encontrado trajeto com o id: ${id}!`,
+        HttpStatus.NOT_FOUND,
+      );
+
+    const deleted = await this.pathRepository.softDelete(path.id);
+    
     return deleted;
   }
 
@@ -399,7 +407,7 @@ export class PathService {
   }
 
   async listById(id: string): Promise<MappedPathDTO> {
-    const path = await this.pathRepository.findById(id);
+    const path = await this.pathRepository.findByIdToDelete(id);
 
     if (!path)
       throw new HttpException(

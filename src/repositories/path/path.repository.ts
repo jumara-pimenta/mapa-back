@@ -346,6 +346,75 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     });
   }
 
+  findByIdToDelete(id: string): Promise<Path | null> {
+    return this.repository.path.findUnique({
+      where: {
+        id: id
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        substituteId: true,
+        route: {
+          select: {
+            id: true,
+            description: true,
+            vehicle: true,
+            driver: true,
+          },
+        },
+        employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
+          select: {
+            employeeId: true,
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            present: true,
+            position: true,
+            description: true,
+            employee: {
+              select: {
+                id: true,
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        details: true,
+                        id: true,
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            position: 'asc',
+          },
+        },
+      },
+    });
+  }
+
   findByDriver(driverId: string): Promise<Path[]> {
     return this.repository.path.findMany({
       where: {

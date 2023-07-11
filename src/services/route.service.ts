@@ -812,7 +812,9 @@ export class RouteService {
       rest.id,
     );
 
-    return await this.routeRepository.update(UpdateRoute);
+    const updatedRoute = await this.routeRepository.update(UpdateRoute);
+
+    return updatedRoute;
   }
 
   async routeReplacementDriver(data: RouteReplacementDriverDTO): Promise<void> {
@@ -848,9 +850,14 @@ export class RouteService {
     if (payload.route) {
       await this.update(payload.routeId, payload.route);
     }
-    
-    if (payload.path) {
+
+    if (payload.path && payload.pathId) {
       await this.pathService.update(payload.pathId, payload.path);
+
+      if (payload.route.type === ETypeRoute.EXTRA && payload.path.finishedAt) {
+        await this.pathService.softDelete(payload.pathId);
+        return;
+      }
     }
 
     const dataFilter = await this.listByIdWebsocket(payload.routeId);

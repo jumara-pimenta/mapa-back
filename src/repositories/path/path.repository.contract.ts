@@ -22,4 +22,5 @@ export default interface IPathRepository {
   findAll(filter?: FiltersPathDTO): Promise<Path[]>;
   softDelete(id: string): Promise<Path>;
   findByStatusAndDriver(status: EStatusPath, driverId: string): Promise<Path[]>
+  findByIdToDelete(id: string): Promise<Path | null>
 }

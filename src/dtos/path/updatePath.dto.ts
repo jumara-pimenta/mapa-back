@@ -54,4 +54,8 @@ export class UpdatePathDTO {
   @IsDateString()
   @IsOptional()
   deletedAt?: Date;
+
+  @IsDateString()
+  @IsOptional()
+  finishedAt?: Date
 }
