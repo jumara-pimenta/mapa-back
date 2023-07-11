@@ -54,6 +54,7 @@ export class PathService {
   async finishPath(id: string): Promise<any> {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
+    const routeTypePath = await this.routeService.getRouteType(path.route.id);
 
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const employeesOnPath = await this.employeesOnPathService.listByPath(
@@ -118,16 +119,26 @@ export class PathService {
         HttpStatus.BAD_REQUEST,
       );
 
+    const statusRoute =
+      routeTypePath === ETypePath.ONE_WAY && path.type === ETypePath.ONE_WAY
+        ? EStatusRoute.FINISHED
+        : routeTypePath === ETypePath.RETURN && path.type === ETypePath.RETURN
+        ? EStatusRoute.FINISHED
+        : routeTypePath === ETypePath.ROUND_TRIP &&
+          path.type === ETypePath.ONE_WAY
+        ? EStatusRoute.PENDING
+        : EStatusRoute.FINISHED;
+
     const finishAt = {
       routeId: path.route.id,
       pathId: path.id,
       route: {
-        status: EStatusRoute.PENDING,
-        type: route.routeType as ETypeRoute
+        status: statusRoute,
+        type: route.routeType as ETypeRoute,
       },
       path: {
         finishedAt: getDateInLocaleTime(new Date()),
-        status: EStatusPath.PENDING,
+        status: EStatusPath.FINISHED,
         substituteId: null,
       },
     };
@@ -175,10 +186,7 @@ export class PathService {
 
     driverAlreadyInAnotherRoute.forEach((_path) => {
       if (_path.id === path.id) {
-        throw new HttpException(
-          'A rota já foi iniciada!',
-          HttpStatus.CONFLICT,
-        );
+        throw new HttpException('A rota já foi iniciada!', HttpStatus.CONFLICT);
       }
 
       if (_path.id !== path.id) {
@@ -337,7 +345,7 @@ export class PathService {
       );
 
     const deleted = await this.pathRepository.softDelete(path.id);
-    
+
     return deleted;
   }
 

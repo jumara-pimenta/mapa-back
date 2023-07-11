@@ -16,6 +16,7 @@ export enum ETypeRouteExport {
 export enum EStatusRoute {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
+  FINISHED = 'FINALIZADA',
 }
 
 export enum ETypePath {

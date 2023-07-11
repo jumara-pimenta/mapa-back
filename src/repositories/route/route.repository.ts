@@ -24,6 +24,23 @@ export class RouteRepository
   ) {
     super();
   }
+
+  async findRouteWithPaths(id: string): Promise<Partial<Route>> { 
+    return await this.repository.route.findUnique({
+      where: {
+        id
+      },
+      select: {
+        description: true,
+        path: {
+          select: {
+            type: true
+          }
+        }
+      }
+    })
+  }
+
   async updateTotalDistance(id: string, totalDistance: string): Promise<Route> {
     return await this.repository.route.update({
       data: {

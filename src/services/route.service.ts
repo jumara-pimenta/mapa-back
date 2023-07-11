@@ -1,4 +1,4 @@
-import { TGoogleWaypointsStatus } from './../utils/TTypes';
+import { TGoogleWaypointsStatus, TTypePathRoute } from './../utils/TTypes';
 import {
   forwardRef,
   HttpException,
@@ -2039,6 +2039,25 @@ export class RouteService {
 
       return this.separateWays(ordemListRest, route);
     }
+  }
+
+  async getRouteType(id: string): Promise<TTypePathRoute> {
+    const route = await this.routeRepository.findRouteWithPaths(id);
+
+    if (!route) {
+      throw new HttpException('Rota não encontrada', HttpStatus.NOT_FOUND);
+    }
+
+    const types = route.path.map((_path) => _path.type as ETypePath);
+
+    if (types.includes(ETypePath.ONE_WAY) && types.length === 1)
+      return ETypePath.ONE_WAY;
+
+    if (types.includes(ETypePath.RETURN) && types.length === 1)
+      return ETypePath.RETURN;
+
+    if (types.includes(ETypePath.ONE_WAY) && types.includes(ETypePath.RETURN))
+      return ETypePath.ROUND_TRIP;
   }
 
   private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {

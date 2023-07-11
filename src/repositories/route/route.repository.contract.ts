@@ -34,4 +34,5 @@ export default interface IRouteRepository {
   ): Promise<Route>;
 
   updateTotalDistance(id: string, totalDistance: string): Promise<Route>;
+  findRouteWithPaths(id: string): Promise<Partial<Route>>
 }
