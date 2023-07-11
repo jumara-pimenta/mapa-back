@@ -166,6 +166,28 @@ export class PathService {
   async startPath(id: string): Promise<any> {
     const path = await this.listById(id);
 
+    const driverAlreadyInAnotherRoute =
+      await this.pathRepository.findByStatusAndDriver(
+        EStatusPath.IN_PROGRESS,
+        path.driver,
+      );
+
+    driverAlreadyInAnotherRoute.forEach((_path) => {
+      if (_path.id === path.id) {
+        throw new HttpException(
+          'A rota já foi iniciada!',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (_path.id !== path.id) {
+        throw new HttpException(
+          'Não é possível iniciar uma rota com o motorista em outra rota em andamento!',
+          HttpStatus.CONFLICT,
+        );
+      }
+    });
+
     const hasHistoric = await this.routeHistoryService.listByPathId(id);
 
     if (hasHistoric.length > 0)
@@ -175,6 +197,7 @@ export class PathService {
       );
 
     let confirmationCount = 0;
+
     path.employeesOnPath.forEach((employee) => {
       if (employee.confirmation == true) confirmationCount++;
     });

@@ -848,6 +848,7 @@ export class RouteService {
     if (payload.route) {
       await this.update(payload.routeId, payload.route);
     }
+    
     if (payload.path) {
       await this.pathService.update(payload.pathId, payload.path);
     }
