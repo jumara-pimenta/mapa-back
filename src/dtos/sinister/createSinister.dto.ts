@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateSinisterDTO {
   @ApiProperty({
@@ -13,6 +13,9 @@ export class CreateSinisterDTO {
   })
   @IsNotEmpty({ message: '[type] O campo tipo deve ser preenchido.' })
   @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Length(10, 100, {
+    message: '[type] O tipo deve possuir, no mínimo, 10 caracteres e, no máximo, 100 caracteres.'
+  })
   type: string;
 
   @ApiProperty({
@@ -27,6 +30,9 @@ export class CreateSinisterDTO {
     message: '[description] O campo descrição deve ser preenchido.',
   })
   @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Length(5, 1000, {
+    message: '[description] A descrição deve possuir, no mínimo, 5 caracteres e, no máximo, 1000 caracteres.'
+  })
   description: string;
 
   @ApiProperty({

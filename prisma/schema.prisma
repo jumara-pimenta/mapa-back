@@ -173,8 +173,8 @@ model BackOfficeUser {
 model Sinister {
   id             String        @id @unique
   pathId         String?
-  type           String
-  description    String
+  type           String        @db.VarChar(100)
+  description    String        @db.VarChar(1000)
   createdBy      String
   createdAt      DateTime      @default(now()) @db.DateTimeOffset
   updatedAt      DateTime?     @db.DateTimeOffset
