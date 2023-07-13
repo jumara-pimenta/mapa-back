@@ -265,6 +265,62 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         updatedAt: getDateInLocaleTime(new Date()),
       },
       where: { id: data.id },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        substituteId: true,
+        route: {
+          select: {
+            id: true,
+            description: true,
+            vehicle: true,
+            driver: true,
+          },
+        },
+        employeesOnPath: {
+          select: {
+            employeeId: true,
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            present: true,
+            position: true,
+            description: true,
+            employee: {
+              select: {
+                id: true,
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        details: true,
+                        id: true,
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            position: 'asc',
+          },
+        },
+      },
     });
   }
 

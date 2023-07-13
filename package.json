@@ -1,6 +1,6 @@
 {
   "name": "sonar-rotas-backend",
-  "version": "1.0.0",
+  "version": "2.5",
   "description": "API de gerenciamento de rotas de colaboradores",
   "author": "Grupo ICTS",
   "private": true,

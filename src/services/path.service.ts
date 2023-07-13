@@ -167,11 +167,6 @@ export class PathService {
       await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
 
-    // get type of route
-
-    // if (route.routeType === ETypeRoute.EXTRA || route.routeType === 'EXTRA')
-    //   await this.softDelete(path.id);
-
     return await this.routeService.updateWebsocket(finishAt);
   }
 
@@ -760,7 +755,7 @@ export class PathService {
     await this.routeService.updateTotalDistanceRoute(path);
   }
 
-  private mapperOne(path: Path): MappedPathDTO {
+  public mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 
     const today = new Date();
