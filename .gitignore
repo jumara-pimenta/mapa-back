@@ -36,7 +36,6 @@ package-lock.log
 
 # Cache ESlint
 .eslintcache
-/prisma/migrations
 
 */tmp/reports
 
