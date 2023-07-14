@@ -459,6 +459,13 @@ export class RouteService {
       payload.employeeIds,
     );
 
+    await this.checkIfEmployeesOnAnotherRoute(
+      employeeInRoute,
+      payload.type,
+      payload.employeeIds,
+      payload.pathDetails.type,
+    );
+
     const vehicleInRoute = await this.routeRepository.findByVehicleId(
       vehicle.id,
     );
@@ -836,7 +843,6 @@ export class RouteService {
   }
 
   async updateWebsocket(payload: StatusRouteDTO): Promise<unknown> {
-    
     if (payload.path.startedAt) {
       const Pathdata = await this.pathService.listById(payload.pathId);
 
@@ -853,10 +859,12 @@ export class RouteService {
     }
 
     if (payload.path && payload.pathId) {
-      const updatedPath = await this.pathService.update(payload.pathId, payload.path);
+      const updatedPath = await this.pathService.update(
+        payload.pathId,
+        payload.path,
+      );
 
       if (payload.route.type === ETypeRoute.EXTRA && payload.path.finishedAt) {
-
         await this.pathService.softDelete(payload.pathId);
 
         return this.pathService.mapperOne(updatedPath);
