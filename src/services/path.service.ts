@@ -5,11 +5,13 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { Path } from '../entities/path.entity';
 import IPathRepository from '../repositories/path/path.repository.contract';
 import {
   EmployeesByPin,
+  IEmployeesOnPathDTO,
   MappedPathDTO,
   MappedPathPinsDTO,
 } from '../dtos/path/mappedPath.dto';
@@ -17,13 +19,13 @@ import { CreatePathDTO } from '../dtos/path/createPath.dto';
 import { UpdatePathDTO } from '../dtos/path/updatePath.dto';
 import { RouteService } from './route.service';
 import {
+  ERoutePathStatus,
+  ERoutePathType,
   EStatusPath,
-  EStatusRoute,
   ETypePath,
   ETypeRoute,
 } from '../utils/ETypes';
 import { EmployeesOnPathService } from './employeesOnPath.service';
-import { getDateInLocaleTime } from '../utils/date.service';
 import { RouteHistory } from '../entities/routeHistory.entity';
 import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
@@ -31,6 +33,9 @@ import { SinisterService } from './sinister.service';
 import { RouteMobile } from '../utils/Utils';
 import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
 import { DENSO_LOCATION } from '../utils/Constants';
+import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
+import { getDateInLocaleTime } from '../utils/Date';
+import { getNextBusinessDay, isDateAfterToday } from '../utils/date.service';
 
 @Injectable()
 export class PathService {
@@ -54,7 +59,7 @@ export class PathService {
   async finishPath(id: string): Promise<any> {
     const path = await this.getPathById(id);
     const route = await this.listEmployeesByPathAndPin(id);
-    const routeTypePath = await this.routeService.getRouteType(path.route.id);
+    const typeRoute = await this.routeService.getRouteType(path.route.id);
 
     const vehicle = await this.vehicleService.listById(route.vehicle);
     const employeesOnPath = await this.employeesOnPathService.listByPath(
@@ -83,7 +88,7 @@ export class PathService {
       return item.employees.length;
     });
 
-    const employeeArray = [] as string[];
+    const confirmedAndPresentedEmployees = [] as string[];
 
     const itinerariesArray = [];
 
@@ -99,7 +104,7 @@ export class PathService {
       ]);
 
       if (employee.confirmation === true && employee.present === true) {
-        employeeArray.push(employee.employee.id);
+        confirmedAndPresentedEmployees.push(employee.employee.id);
 
         if (path.type === ETypePath.ONE_WAY) {
           await this.employeesOnPathService.update(employee.id, {
@@ -113,21 +118,16 @@ export class PathService {
       ? itinerariesArray.unshift([DENSO_LOCATION])
       : itinerariesArray.push([DENSO_LOCATION]);
 
-    if (employeeArray.length === 0)
+    if (confirmedAndPresentedEmployees.length === 0)
       throw new HttpException(
         'Nenhum colaborador confirmado foi pego no seu ponto de embarque.',
         HttpStatus.BAD_REQUEST,
       );
 
-    const statusRoute =
-      routeTypePath === ETypePath.ONE_WAY && path.type === ETypePath.ONE_WAY
-        ? EStatusRoute.FINISHED
-        : routeTypePath === ETypePath.RETURN && path.type === ETypePath.RETURN
-        ? EStatusRoute.FINISHED
-        : routeTypePath === ETypePath.ROUND_TRIP &&
-          path.type === ETypePath.ONE_WAY
-        ? EStatusRoute.PENDING
-        : EStatusRoute.FINISHED;
+    const statusRoute = this.getStatusThatTheRouteShouldHave(
+      typeRoute,
+      path.type as ETypePath,
+    );
 
     const finishAt = {
       routeId: path.route.id,
@@ -149,7 +149,7 @@ export class PathService {
       {
         typeRoute: path.type,
         nameRoute: route.routeDescription,
-        employeeIds: employeeArray.join(),
+        employeeIds: confirmedAndPresentedEmployees.join(),
         itinerary: itinerariesArray.join(),
         totalEmployees: totalEmployees,
         totalConfirmed: totalConfirmed,
@@ -167,7 +167,7 @@ export class PathService {
       await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
 
-    return await this.routeService.updateWebsocket(finishAt);
+    return await this.routeService.finishRoute(finishAt);
   }
 
   async startPath(id: string): Promise<any> {
@@ -221,13 +221,22 @@ export class PathService {
       }
     }
 
+    if (path.scheduledDate) {
+      if (isDateAfterToday(path.scheduledDate)) {
+        throw new HttpException(
+          'Não é possível iniciar uma rota agendada para uma data posterior à atual!',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+    }
+
     const route = await this.routeService.routeIdByPathId(id);
 
     const startAt = {
       routeId: route,
       pathId: id,
       route: {
-        status: EStatusRoute.IN_PROGRESS,
+        status: ERoutePathStatus.IN_PROGRESS,
       },
       path: {
         startedAt: getDateInLocaleTime(new Date()),
@@ -236,7 +245,7 @@ export class PathService {
       },
     };
 
-    return await this.routeService.updateWebsocket(startAt);
+    return await this.routeService.startRoute(startAt);
   }
 
   async getPathidByEmployeeOnPathId(id: string): Promise<Partial<Path>> {
@@ -313,6 +322,34 @@ export class PathService {
         pathId: pathReturn.id,
         confirmation: true,
       });
+    }
+
+    return;
+  }
+
+  async regeneratePaths(route: MappedRouteDTO): Promise<void> {
+    for await (const _path of route.paths) {
+      const { duration, startsAt, type } = _path;
+
+      const props = new Path(
+        {
+          duration,
+          startsAt,
+          type,
+          status: EStatusPath.PENDING,
+          scheduleDate: getNextBusinessDay()
+        },
+        route,
+      );
+
+     const createdPath = await this.pathRepository.create(props);
+
+      for await (const employeeOnPath of _path.employeesOnPath) {
+        await this.employeesOnPathService.recreateEmployeesOnPath(
+          createdPath,
+          employeeOnPath as IEmployeesOnPathDTO,
+        );
+      }
     }
 
     return;
@@ -755,6 +792,42 @@ export class PathService {
     await this.routeService.updateTotalDistanceRoute(path);
   }
 
+  private getStatusThatTheRouteShouldHave(
+    typeRoute: ERoutePathType,
+    typePath: ETypePath,
+  ): ERoutePathStatus {
+    // se a rota for só ida e o trajeto for ida
+    if (
+      typeRoute === ERoutePathType.ONE_WAY &&
+      typePath === ETypePath.ONE_WAY
+    ) {
+      return ERoutePathStatus.FINISHED;
+    }
+
+    // se a rota só volta e o trajeto for volta
+    if (typeRoute === ERoutePathType.RETURN && typePath === ETypePath.RETURN) {
+      return ERoutePathStatus.FINISHED;
+    }
+
+    // se a rota for ida/volta e o trajeto for ida
+    if (
+      typeRoute === ERoutePathType.ROUND_TRIP &&
+      typePath === ETypePath.ONE_WAY
+    ) {
+      return ERoutePathStatus.PENDING;
+    }
+
+    // se a rota for ida/volta e o trajeto for volta
+    if (
+      typeRoute === ERoutePathType.ROUND_TRIP &&
+      typePath === ETypePath.RETURN
+    ) {
+      return ERoutePathStatus.FINISHED;
+    }
+
+    new Logger('path service').error('get status that the route should have');
+  }
+
   public mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 
@@ -781,6 +854,7 @@ export class PathService {
       driver: path.route.driver!.id,
       type: path.type,
       createdAt: path.createdAt,
+      scheduledDate: path.scheduleDate,
       employeesOnPath: employeesOnPath.map((item) => {
         const { employee } = item;
         const { pins } = employee;

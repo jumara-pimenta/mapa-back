@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { EStatusRoute, ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
+import { ERoutePathStatus, ETypeRoute, ETypeShiftRotue } from '../../utils/ETypes';
 
 export class UpdateRouteDTO {
   @ApiProperty({ description: 'Descrição da rota' })
@@ -29,11 +29,11 @@ export class UpdateRouteDTO {
   duration?: string;
 
   @ApiProperty({ description: 'Status da Rota: Pendente ou Em Andamento' })
-  @IsEnum(EStatusRoute, {
+  @IsEnum(ERoutePathStatus, {
     message: '[status] O status deve ser do tipo enum: PENDENTE | EM ANDAMENTO',
   })
   @IsOptional()
-  status?: EStatusRoute;
+  status?: ERoutePathStatus;
 
   @ApiProperty({ description: 'Id do motorista' })
   @IsString({

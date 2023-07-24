@@ -3,7 +3,6 @@ import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IRouteRepository from './route.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
 import { FiltersRouteDTO } from '../../dtos/route/filtersRoute.dto';
 import { generateQueryByFiltersForRoute } from '../../configs/database/Queries';
 import { Route } from '../../entities/route.entity';
@@ -12,6 +11,7 @@ import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
 import { ETypeRouteExport } from '../../utils/ETypes';
 import { TTypeRoute } from '../../utils/TTypes';
+import { getDateInLocaleTime } from '../../utils/Date';
 
 @Injectable()
 export class RouteRepository
@@ -62,6 +62,7 @@ export class RouteRepository
         },
         path: {
           some: {
+            deletedAt: null,
             employeesOnPath: {
               some: {
                 employee: {

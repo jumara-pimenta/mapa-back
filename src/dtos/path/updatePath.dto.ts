@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsOptional, Matches } from 'class-validator';
+import { IsBoolean, IsDateString, IsEnum, IsOptional, Matches } from 'class-validator';
 import { DurationRgx, StartsAtRgx } from '../../utils/Regex';
 import { EStatusPath } from '../../utils/ETypes';
 import { ApiProperty } from '@nestjs/swagger';
@@ -58,4 +58,8 @@ export class UpdatePathDTO {
   @IsDateString()
   @IsOptional()
   finishedAt?: Date
+
+  @IsBoolean()
+  @IsOptional()
+  isScheduled?: boolean
 }

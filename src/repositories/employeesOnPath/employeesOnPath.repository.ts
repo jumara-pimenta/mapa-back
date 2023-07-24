@@ -15,6 +15,22 @@ export class EmployeesOnPathRepository
   constructor(private readonly repository: PrismaService) {
     super();
   }
+
+  async findEmployeeIdByEmployeeOnPathId(employeeOnPathId: string): Promise<string> {
+    const response = await this.repository.employeesOnPath.findUnique({
+      where: { id: employeeOnPathId },
+      select: {
+        employee: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    return response.employee.id;
+  }
+
   updatePosition(id: string, newPosition: number): Promise<EmployeesOnPath> {
     return this.repository.employeesOnPath.update({
       where: { id },

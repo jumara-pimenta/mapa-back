@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { differenceInDays, differenceInSeconds, isDate } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
+import { addDays, differenceInDays, differenceInSeconds, isDate } from 'date-fns';
 import {
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
@@ -11,16 +10,26 @@ import {
   dateInFormatThreeRgx,
   dateInFormatTwoRgx,
 } from './Regex';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 class startAndFinishAt {
   startAt: string;
   finishAt: string;
 }
 
-export function getDateInLocaleTime(date: Date): Date {
-  const newDate = zonedTimeToUtc(date, 'UTC');
+function isWeekendDay(date: Date) {
+  const dayOfWeek = date.getDay();
+  return dayOfWeek === 0 || dayOfWeek === 6;
+}
 
-  return newDate;
+export function getNextBusinessDay(): Date {
+  let nextDay = addDays(new Date(), 1);
+
+  while (isWeekendDay(nextDay)) {
+    nextDay = addDays(nextDay, 1);
+  }
+
+  return nextDay;
 }
 
 export function getDuration(previousTime: Date, currentTime: Date): number {
@@ -178,4 +187,18 @@ export function getShiftStartAtAndExports(type: ETypeShiftEmployeeExports) {
   if (type === ETypeShiftEmployeeExports.THIRD) return '3';
   if (type === ETypeShiftEmployeeExports.NOT_DEFINED)
     return 'Sem Turno Estabelecido';
+}
+
+export function getDateInLocaleTime(date: Date): Date {
+  const newDate = zonedTimeToUtc(date, 'UTC');
+
+  return newDate;
+}
+
+export function isDateAfterToday(date: Date): boolean {
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  return date > today;
 }

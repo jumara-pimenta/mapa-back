@@ -3,10 +3,10 @@ import { Page, PageResponse } from '../../configs/database/page.model';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IVehicleRepository from './vehicle.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryByFiltersForVehicle } from '../../configs/database/Queries';
 import { FiltersVehicleDTO } from '../../dtos/vehicle/filtersVehicle.dto';
 import { Vehicle } from '../../entities/vehicle.entity';
+import { getDateInLocaleTime } from '../../utils/Date';
 
 @Injectable()
 export class VehicleRepository

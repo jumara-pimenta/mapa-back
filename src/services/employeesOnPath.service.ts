@@ -1,3 +1,4 @@
+import { IEmployeesOnPathDTO } from './../dtos/path/mappedPath.dto';
 import { EmployeesOnPath } from './../entities/employeesOnPath.entity';
 import {
   forwardRef,
@@ -18,6 +19,7 @@ import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateE
 import { RouteService } from './route.service';
 import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
 import { getDateInLocaleTime } from '../utils/Date';
+import { Path } from '../entities/path.entity';
 
 @Injectable()
 export class EmployeesOnPathService {
@@ -51,6 +53,30 @@ export class EmployeesOnPathService {
     }
 
     return;
+  }
+
+  async recreateEmployeesOnPath(
+    path: Partial<Path>,
+    props: IEmployeesOnPathDTO,
+  ): Promise<EmployeesOnPath> {
+    const { position } = props;
+
+    const employeeId =
+      await this.employeesOnPathRepository.findEmployeeIdByEmployeeOnPathId(
+        props.id,
+      );
+
+    const employee = await this.employeeService.listById(employeeId);
+
+    const created =  await this.employeesOnPathRepository.create(
+      new EmployeesOnPath(
+        { position, confirmation: true },
+        employee,
+        path as Path,
+      ),
+    );
+
+    return created;
   }
 
   async delete(id: string): Promise<EmployeesOnPath> {
@@ -97,8 +123,8 @@ export class EmployeesOnPathService {
     } = this.getParamsToValidateOnboardingEmployee(
       employeeOnPath.present,
       payload.present,
-      );
-    
+    );
+
     if (path.type === ETypePath.RETURN) {
       throw new HttpException(
         'Não é permitido realizar embarque em trajetos de volta!',
@@ -391,6 +417,7 @@ export class EmployeesOnPathService {
     const employeesOnPath = await this.employeesOnPathRepository.findByPath(
       pathId,
     );
+
     if (path.type === ETypePath.ONE_WAY) {
       await this.employeesOnPathRepository.updateMany(employeesOnPath, true);
     }

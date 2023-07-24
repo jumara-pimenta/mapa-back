@@ -66,6 +66,7 @@ export class MappedPathDTO {
   vehicle?: string;
   @ApiProperty()
   driver?: string;
+  scheduledDate?: Date;
   @ApiProperty()
   employeesOnPath: IEmployeesOnPathDTO[];
 }

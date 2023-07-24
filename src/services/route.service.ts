@@ -1,4 +1,4 @@
-import { TGoogleWaypointsStatus, TTypePathRoute } from './../utils/TTypes';
+import { TGoogleWaypointsStatus } from './../utils/TTypes';
 import {
   forwardRef,
   HttpException,
@@ -19,6 +19,8 @@ import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import {
+  ERoutePathStatus,
+  ERoutePathType,
   EStatusPath,
   EStatusRoute,
   ETypePath,
@@ -29,7 +31,6 @@ import {
 import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
-  getDateInLocaleTime,
   getSpecialHour,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
@@ -52,6 +53,7 @@ import { GoogleApiServiceIntegration } from '../integrations/services/googleServ
 import { DetailsRoute } from '../dtos/route/waypoints.dto';
 import {
   canSchedule,
+  getDateInLocaleTime,
   getDuration,
   validateDurationIsInTheRange,
   verifyDateFilter,
@@ -901,6 +903,146 @@ export class RouteService {
       driver: dataFilterWebsocket.driver,
       ...path,
     };
+  }
+
+  async startRoute(props: StatusRouteDTO): Promise<unknown> {
+    if (props.path.startedAt) {
+      const pathDetails = await this.pathService.listById(props.pathId);
+
+      if (pathDetails.employeesOnPath.length === 0) {
+        throw new HttpException(
+          'Não é possível iniciar uma rota sem colaboradores!',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+    }
+
+    if (props.route) {
+      await this.update(props.routeId, props.route);
+    }
+
+    if (props.path && props.pathId) {
+      const updatedPath = await this.pathService.update(
+        props.pathId,
+        props.path,
+      );
+
+      if (props.route.type === ETypeRoute.EXTRA && props.path.finishedAt) {
+        await this.pathService.softDelete(props.pathId);
+
+        return this.pathService.mapperOne(updatedPath);
+      }
+    }
+
+    const dataFilter = await this.listByIdWebsocket(props.routeId);
+
+    const dataFilterWebsocket = {
+      id: dataFilter.id,
+      description: dataFilter.description,
+      distance: dataFilter.distance,
+      status: dataFilter.status,
+      type: dataFilter.type,
+      driver: dataFilter.driver.name,
+      vehicle: dataFilter.vehicle.plate,
+      path: dataFilter.path,
+    };
+
+    const path = await this.pathService.listByIdMobile(props.pathId);
+
+    const today = new Date();
+    const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+    if (
+      today.getDay() === date.getDay() &&
+      today.getMonth() === date.getMonth() &&
+      today.getFullYear() === date.getFullYear()
+    ) {
+      path.status = EStatusPath.FINISHED;
+    }
+    
+    return {
+      vehicle: dataFilterWebsocket.vehicle,
+      driver: dataFilterWebsocket.driver,
+      ...path,
+    };
+  }
+
+  async finishRoute(props: StatusRouteDTO): Promise<unknown> {
+
+    if (props.path && props.pathId) {
+      const updatedPath = await this.pathService.update(
+        props.pathId,
+        props.path,
+      );
+
+      if (props.route.type === ETypeRoute.EXTRA && props.path.finishedAt) {
+        await this.pathService.softDelete(props.pathId);
+
+        return this.pathService.mapperOne(updatedPath);
+      }
+    }
+
+    const routeToValidate = await this.listById(props.routeId);
+
+    const allPathsFinished = await this.checkAllPathsFinished(
+      routeToValidate.paths,
+    );
+
+    props.route.status = !allPathsFinished
+      ? ERoutePathStatus.PENDING
+      : ERoutePathStatus.FINISHED;
+
+    if (props.route) {
+      await this.update(props.routeId, props.route);
+    }
+
+    const dataFilter = await this.listByIdWebsocket(props.routeId);
+
+    const dataFilterWebsocket = {
+      id: dataFilter.id,
+      description: dataFilter.description,
+      distance: dataFilter.distance,
+      status: dataFilter.status,
+      type: dataFilter.type,
+      driver: dataFilter.driver.name,
+      vehicle: dataFilter.vehicle.plate,
+      path: dataFilter.path,
+    };
+
+    const path = await this.pathService.listByIdMobile(props.pathId);
+
+    if (allPathsFinished && routeToValidate.type === ETypeRoute.CONVENTIONAL) {
+      for await (const _path of routeToValidate.paths) {
+        await this.pathService.softDelete(_path.id);
+      }
+
+      await this.pathService.regeneratePaths(routeToValidate);
+    }
+
+    const today = new Date();
+    const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+    if (
+      today.getDay() === date.getDay() &&
+      today.getMonth() === date.getMonth() &&
+      today.getFullYear() === date.getFullYear()
+    ) {
+      path.status = EStatusPath.FINISHED;
+    }
+    return {
+      vehicle: dataFilterWebsocket.vehicle,
+      driver: dataFilterWebsocket.driver,
+      ...path,
+    };
+  }
+
+  async checkAllPathsFinished(paths: Path[]): Promise<boolean> {
+    for (const path of paths) {
+      if (path.status !== ERoutePathStatus.FINISHED) {
+        return false;
+      }
+    }
+    return true;
   }
 
   async softDelete(id: string): Promise<Route> {
@@ -2052,7 +2194,7 @@ export class RouteService {
     }
   }
 
-  async getRouteType(id: string): Promise<TTypePathRoute> {
+  async getRouteType(id: string): Promise<ERoutePathType> {
     const route = await this.routeRepository.findRouteWithPaths(id);
 
     if (!route) {
@@ -2062,13 +2204,13 @@ export class RouteService {
     const types = route.path.map((_path) => _path.type as ETypePath);
 
     if (types.includes(ETypePath.ONE_WAY) && types.length === 1)
-      return ETypePath.ONE_WAY;
+      return ERoutePathType.ONE_WAY;
 
     if (types.includes(ETypePath.RETURN) && types.length === 1)
-      return ETypePath.RETURN;
+      return ERoutePathType.RETURN;
 
     if (types.includes(ETypePath.ONE_WAY) && types.includes(ETypePath.RETURN))
-      return ETypePath.ROUND_TRIP;
+      return ERoutePathType.ROUND_TRIP;
   }
 
   private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {

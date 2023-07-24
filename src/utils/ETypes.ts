@@ -25,12 +25,24 @@ export enum ETypePath {
   ROUND_TRIP = 'IDA E VOLTA',
 }
 
+export enum ERoutePathType {
+  ONE_WAY = 'IDA',
+  RETURN = 'VOLTA',
+  ROUND_TRIP = 'IDA E VOLTA',
+}
+
 export enum ETypePathExtra {
   RETURN = 'VOLTA',
   ROUND_TRIP = 'IDA E VOLTA',
 }
 
 export enum EStatusPath {
+  PENDING = 'PENDENTE',
+  IN_PROGRESS = 'EM ANDAMENTO',
+  FINISHED = 'FINALIZADA',
+}
+
+export enum ERoutePathStatus {
   PENDING = 'PENDENTE',
   IN_PROGRESS = 'EM ANDAMENTO',
   FINISHED = 'FINALIZADA',
