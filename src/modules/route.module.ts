@@ -10,6 +10,7 @@ import { PathModule } from './path.module';
 import { RouteHistoryModule } from './routeHistory.module';
 import { VehicleModule } from './vehicle.module';
 import { EmployeesOnPathModule } from './employeesOnPath.module';
+import { ScheduledWorkRepository } from '../repositories/scheduledWork/scheduledWork.repository';
 
 @Module({
   imports: [
@@ -35,6 +36,10 @@ import { EmployeesOnPathModule } from './employeesOnPath.module';
       provide: 'IGoogleApiServiceIntegration',
       useClass: GoogleApiServiceIntegration,
     },
+    {
+      provide: 'IScheduledWorkRepository',
+      useClass: ScheduledWorkRepository,
+    }
   ],
   exports: [RouteService],
 })

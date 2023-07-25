@@ -14,6 +14,7 @@ import { VehicleModule } from './vehicle.module';
 import { EmployeesOnPinModule } from './employeesOnPin.module';
 import { WebsocketModule } from './websocket.module';
 import { AuthModule } from './auth.module';
+import { JobsModule } from './job.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth.module';
     VehicleModule,
     WebsocketModule,
     SinisterModule,
+    JobsModule
   ],
 })
 export class AppModule {}

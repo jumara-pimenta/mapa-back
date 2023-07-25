@@ -327,7 +327,7 @@ export class PathService {
     return;
   }
 
-  async regeneratePaths(route: MappedRouteDTO): Promise<void> {
+  async regeneratePaths(route: MappedRouteDTO, scheduledDate?: Date): Promise<void> {
     for await (const _path of route.paths) {
       const { duration, startsAt, type } = _path;
 
@@ -337,7 +337,7 @@ export class PathService {
           startsAt,
           type,
           status: EStatusPath.PENDING,
-          scheduleDate: getNextBusinessDay()
+          scheduleDate: scheduledDate ?? getNextBusinessDay()
         },
         route,
       );

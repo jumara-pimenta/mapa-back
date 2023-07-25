@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { addDays, differenceInDays, differenceInSeconds, isDate } from 'date-fns';
+import { addDays, differenceInDays, differenceInSeconds, isDate, setHours, setMilliseconds, setMinutes, setSeconds } from 'date-fns';
 import {
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
@@ -28,6 +28,12 @@ export function getNextBusinessDay(): Date {
   while (isWeekendDay(nextDay)) {
     nextDay = addDays(nextDay, 1);
   }
+
+  // Zerando as horas, minutos, segundos e milissegundos
+  nextDay = setHours(nextDay, 0);
+  nextDay = setMinutes(nextDay, 0);
+  nextDay = setSeconds(nextDay, 0);
+  nextDay = setMilliseconds(nextDay, 0);
 
   return nextDay;
 }
@@ -197,8 +203,18 @@ export function getDateInLocaleTime(date: Date): Date {
 
 export function isDateAfterToday(date: Date): boolean {
   const today = new Date();
-
   today.setHours(0, 0, 0, 0);
 
-  return date > today;
+  const inputDate = new Date(date);
+  inputDate.setHours(0, 0, 0, 0);
+
+  return inputDate > today;
+}
+
+import { startOfDay } from 'date-fns';
+
+export function getTodayWithZeroTimeISO(): string {
+  const today = new Date();
+  const todayWithZeroTime = startOfDay(today);
+  return todayWithZeroTime.toISOString();
 }

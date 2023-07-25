@@ -41,6 +41,16 @@ model Route {
   deletedAt   DateTime? @db.DateTimeOffset
 }
 
+model ScheduledWork {
+  id            String    @id @unique
+  idEntity      String
+  entity        String
+  status        String
+  scheduledDate DateTime  @db.DateTimeOffset
+  createdAt     DateTime  @default(now()) @db.DateTimeOffset
+  updatedAt     DateTime? @db.DateTimeOffset
+}
+
 model Path {
   id              String            @id @unique
   duration        String            @db.VarChar(10)

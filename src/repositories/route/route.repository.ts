@@ -274,6 +274,7 @@ export class RouteRepository
             startsAt: true,
             status: true,
             type: true,
+            scheduleDate: true,
             createdAt: true,
             route: {
               select: {

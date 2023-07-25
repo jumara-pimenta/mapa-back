@@ -109,3 +109,13 @@ export enum EShiftType {
   THIRD = 'Turno 3',
   EXTRA = 'Extra',
 }
+
+export enum EEntity {
+  ROUTE = 'route',
+}
+
+export enum EStatusWork {
+  COMPLETED = 'completed',
+  PENDING = 'pendente',
+  CANCELED = 'canceled',
+}

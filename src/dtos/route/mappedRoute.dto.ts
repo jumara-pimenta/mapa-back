@@ -59,6 +59,7 @@ class IPath {
   status: string;
   @ApiProperty()
   type: string;
+  scheduledDate?: Date
   @ApiProperty()
   createdAt: Date;
   @ApiProperty()

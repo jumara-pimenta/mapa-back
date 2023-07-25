@@ -19,10 +19,12 @@ import { DriverService } from './driver.service';
 import { VehicleService } from './vehicle.service';
 import { PathService } from './path.service';
 import {
+  EEntity,
   ERoutePathStatus,
   ERoutePathType,
   EStatusPath,
   EStatusRoute,
+  EStatusWork,
   ETypePath,
   ETypeRoute,
   ETypeRouteExport,
@@ -31,6 +33,7 @@ import {
 import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
+  getNextBusinessDay,
   getSpecialHour,
   getStartAtAndFinishAt,
 } from '../utils/date.service';
@@ -78,6 +81,8 @@ import {
 } from '../utils/Constants';
 import { Path } from '../entities/path.entity';
 import { EmployeesOnPathService } from './employeesOnPath.service';
+import IScheduledWorkRepository from '../repositories/scheduledWork/scheduledWork.repository.contract';
+import { ScheduledWork } from '../entities/scheduledWork.entity';
 
 @Injectable()
 export class RouteService {
@@ -97,6 +102,8 @@ export class RouteService {
     private readonly googleApiServiceIntegration: GoogleApiServiceIntegration,
     @Inject(forwardRef(() => EmployeesOnPathService))
     private readonly employeesOnPathService: EmployeesOnPathService,
+    @Inject('IScheduledWorkRepository')
+    private readonly scheduledWorkRepository: IScheduledWorkRepository,
   ) {}
 
   async onModuleInit() {
@@ -202,6 +209,16 @@ export class RouteService {
         }
       }
     }, 10000);
+  }
+
+  async resetStatusRoute(id: string): Promise<Route> {
+    const route = await this.listById(id);
+
+    route.status = ERoutePathStatus.PENDING;
+
+    const updatedRoute = await this.routeRepository.update(route);
+
+    return updatedRoute;
   }
 
   async create(payload: CreateRouteDTO): Promise<any> {
@@ -959,7 +976,7 @@ export class RouteService {
     ) {
       path.status = EStatusPath.FINISHED;
     }
-    
+
     return {
       vehicle: dataFilterWebsocket.vehicle,
       driver: dataFilterWebsocket.driver,
@@ -968,7 +985,6 @@ export class RouteService {
   }
 
   async finishRoute(props: StatusRouteDTO): Promise<unknown> {
-
     if (props.path && props.pathId) {
       const updatedPath = await this.pathService.update(
         props.pathId,
@@ -1015,8 +1031,18 @@ export class RouteService {
       for await (const _path of routeToValidate.paths) {
         await this.pathService.softDelete(_path.id);
       }
+      const scheduledDate = getNextBusinessDay();
 
-      await this.pathService.regeneratePaths(routeToValidate);
+      const scheduledWorkProps = new ScheduledWork({
+        entity: EEntity.ROUTE,
+        idEntity: routeToValidate.id,
+        status: EStatusWork.PENDING,
+        scheduledDate
+      })
+
+      await this.scheduledWorkRepository.create(scheduledWorkProps)
+
+      await this.pathService.regeneratePaths(routeToValidate, scheduledDate);
     }
 
     const today = new Date();
@@ -2337,6 +2363,7 @@ export class RouteService {
           startsAt: item.startsAt,
           status: item.status,
           type: item.type,
+          scheduleDate: item.scheduleDate,
           createdAt: item.createdAt,
           employeesOnPath: employeesOnPath.map((item) => {
             const { employee } = item;
