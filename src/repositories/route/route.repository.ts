@@ -12,6 +12,7 @@ import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 import { ETypeRouteExport } from '../../utils/ETypes';
 import { TTypeRoute } from '../../utils/TTypes';
 import { getDateInLocaleTime } from '../../utils/Date';
+import { getTodayWithZeroTimeISO } from '../../utils/date.service';
 
 @Injectable()
 export class RouteRepository
@@ -25,20 +26,20 @@ export class RouteRepository
     super();
   }
 
-  async findRouteWithPaths(id: string): Promise<Partial<Route>> { 
+  async findRouteWithPaths(id: string): Promise<Partial<Route>> {
     return await this.repository.route.findUnique({
       where: {
-        id
+        id,
       },
       select: {
         description: true,
         path: {
           select: {
-            type: true
-          }
-        }
-      }
-    })
+            type: true,
+          },
+        },
+      },
+    });
   }
 
   async updateTotalDistance(id: string, totalDistance: string): Promise<Route> {
@@ -153,6 +154,7 @@ export class RouteRepository
         path: {
           some: {
             deletedAt: null,
+            scheduleDate: getTodayWithZeroTimeISO()
           },
         },
       },
@@ -278,8 +280,8 @@ export class RouteRepository
             createdAt: true,
             route: {
               select: {
-                id: true
-              }
+                id: true,
+              },
             },
             employeesOnPath: {
               orderBy: {
@@ -330,13 +332,12 @@ export class RouteRepository
     page: Page,
     filters: FiltersRouteDTO,
   ): Promise<PageResponse<Route>> {
+    
     const condition = generateQueryByFiltersForRoute(filters);
 
     const items = condition
       ? await this.repository.route.findMany({
           ...this.buildPage(page),
-          // not show where employe is deletedAt: null
-
           where: {
             ...condition,
             deletedAt: null,
@@ -344,6 +345,7 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
+                scheduleDate: getTodayWithZeroTimeISO()
               },
             },
           },
@@ -398,6 +400,7 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
+                scheduleDate: getTodayWithZeroTimeISO()
               },
             },
           },
@@ -458,6 +461,7 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
+                scheduleDate: getTodayWithZeroTimeISO()
               },
             },
           },
@@ -471,6 +475,7 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
+                scheduleDate: getTodayWithZeroTimeISO()
               },
             },
           },
