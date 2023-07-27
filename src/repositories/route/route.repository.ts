@@ -12,7 +12,7 @@ import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 import { ETypeRouteExport } from '../../utils/ETypes';
 import { TTypeRoute } from '../../utils/TTypes';
 import { getDateInLocaleTime } from '../../utils/Date';
-import { getTodayWithZeroTimeISO } from '../../utils/date.service';
+import { addOneDayToDate, getTodayWithZeroTimeISO } from '../../utils/date.service';
 
 @Injectable()
 export class RouteRepository
@@ -154,7 +154,10 @@ export class RouteRepository
         path: {
           some: {
             deletedAt: null,
-            scheduleDate: getTodayWithZeroTimeISO()
+            scheduleDate: {
+                  gte: getTodayWithZeroTimeISO(),
+                  lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+                }
           },
         },
       },
@@ -345,7 +348,10 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
-                scheduleDate: getTodayWithZeroTimeISO()
+                scheduleDate: {
+                  gte: getTodayWithZeroTimeISO(),
+                  lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+                }
               },
             },
           },
@@ -400,7 +406,10 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
-                scheduleDate: getTodayWithZeroTimeISO()
+                scheduleDate: {
+                  gte: getTodayWithZeroTimeISO(),
+                  lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+                }
               },
             },
           },
@@ -461,7 +470,10 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
-                scheduleDate: getTodayWithZeroTimeISO()
+                scheduleDate: {
+                  gte: getTodayWithZeroTimeISO(),
+                  lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+                }
               },
             },
           },
@@ -475,7 +487,10 @@ export class RouteRepository
             path: {
               some: {
                 deletedAt: null,
-                scheduleDate: getTodayWithZeroTimeISO()
+                scheduleDate: {
+                  gte: getTodayWithZeroTimeISO(),
+                  lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+                }
               },
             },
           },

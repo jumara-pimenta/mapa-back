@@ -1,5 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { addDays, differenceInDays, differenceInSeconds, isDate, setHours, setMilliseconds, setMinutes, setSeconds } from 'date-fns';
+import {
+  addDays,
+  differenceInDays,
+  differenceInSeconds,
+  isDate,
+  setHours,
+  setMilliseconds,
+  setMinutes,
+  setSeconds,
+} from 'date-fns';
 import {
   ETypeShiftEmployee,
   ETypeShiftEmployeeExports,
@@ -103,9 +112,9 @@ export function verifyAndFormatDate(date: string): Date {
 
     dateInString = `${year}-${month}-${day}`;
 
-    dateInFormatExpected = resetHour(new Date(dateInString))
+    dateInFormatExpected = resetHour(new Date(dateInString));
 
-    return (dateInFormatExpected);
+    return dateInFormatExpected;
   }
 
   const dateInFormatValue = new Date(date);
@@ -217,4 +226,10 @@ export function getTodayWithZeroTimeISO(): string {
   const today = new Date();
   const todayWithZeroTime = startOfDay(today);
   return todayWithZeroTime.toISOString();
+}
+
+export function addOneDayToDate(date: Date): Date {
+  const newDate = addDays(date, 1);
+
+  return newDate;
 }
