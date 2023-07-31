@@ -342,27 +342,27 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
-            OR: [
-                {
-                path: {
-                  some: {
-                    deletedAt: null,
-                    scheduleDate: null
-                  },
-                  },
-                },
-                {
-                path: {
-                  some: {
-                    deletedAt: null,
-                    scheduleDate: {
-                      gte: getTodayWithZeroTimeISO(),
-                      lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
-                    }
-                  },
-                  },
-                }
-            ]
+            // OR: [
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: null
+            //       },
+            //       },
+            //     },
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: {
+            //           gte: getTodayWithZeroTimeISO(),
+            //           lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+            //         }
+            //       },
+            //       },
+            //     }
+            // ]
           },
           orderBy: {
             createdAt: 'desc',
@@ -412,27 +412,27 @@ export class RouteRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
-            OR: [
-              {
-              path: {
-                some: {
-                  deletedAt: null,
-                  scheduleDate: null
-                },
-                },
-              },
-              {
-              path: {
-                some: {
-                  deletedAt: null,
-                  scheduleDate: {
-                    gte: getTodayWithZeroTimeISO(),
-                    lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
-                  }
-                },
-                },
-              }
-          ]
+          //   OR: [
+          //     {
+          //     path: {
+          //       some: {
+          //         deletedAt: null,
+          //         scheduleDate: null
+          //       },
+          //       },
+          //     },
+          //     {
+          //     path: {
+          //       some: {
+          //         deletedAt: null,
+          //         scheduleDate: {
+          //           gte: getTodayWithZeroTimeISO(),
+          //           lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+          //         }
+          //       },
+          //       },
+          //     }
+          // ]
           },
           orderBy: {
             createdAt: 'desc',
@@ -488,27 +488,27 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
-            OR: [
-                {
-                path: {
-                  some: {
-                    deletedAt: null,
-                    scheduleDate: null
-                  },
-                  },
-                },
-                {
-                path: {
-                  some: {
-                    deletedAt: null,
-                    scheduleDate: {
-                      gte: getTodayWithZeroTimeISO(),
-                      lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
-                    }
-                  },
-                  },
-                }
-            ]
+            // OR: [
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: null
+            //       },
+            //       },
+            //     },
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: {
+            //           gte: getTodayWithZeroTimeISO(),
+            //           lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+            //         }
+            //       },
+            //       },
+            //     }
+            // ]
           },
         })
       : await this.repository.route.count({
@@ -517,27 +517,27 @@ export class RouteRepository
           },
           where: {
             deletedAt: null,
-            OR: [
-                {
-                path: {
-                  some: {
-                    deletedAt: null,
-                    scheduleDate: null
-                  },
-                  },
-                },
-                {
-                path: {
-                  some: {
-                    deletedAt: null,
-                    scheduleDate: {
-                      gte: getTodayWithZeroTimeISO(),
-                      lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
-                    }
-                  },
-                  },
-                }
-            ]
+            // OR: [
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: null
+            //       },
+            //       },
+            //     },
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: {
+            //           gte: getTodayWithZeroTimeISO(),
+            //           lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+            //         }
+            //       },
+            //       },
+            //     }
+            // ]
           },
         });
 
