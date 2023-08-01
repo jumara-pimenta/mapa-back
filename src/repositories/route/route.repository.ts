@@ -12,7 +12,6 @@ import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 import { ETypeRouteExport } from '../../utils/ETypes';
 import { TTypeRoute } from '../../utils/TTypes';
 import { getDateInLocaleTime } from '../../utils/Date';
-import { addOneDayToDate, getTodayWithZeroTimeISO } from '../../utils/date.service';
 
 @Injectable()
 export class RouteRepository
@@ -342,6 +341,11 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null
+              }
+            }
             // OR: [
             //     {
             //     path: {
@@ -412,6 +416,11 @@ export class RouteRepository
           ...this.buildPage(page),
           where: {
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null
+              }
+            }
           //   OR: [
           //     {
           //     path: {
@@ -488,6 +497,11 @@ export class RouteRepository
           where: {
             ...condition,
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null
+              }
+            }
             // OR: [
             //     {
             //     path: {
@@ -517,6 +531,11 @@ export class RouteRepository
           },
           where: {
             deletedAt: null,
+            path: {
+              some: {
+                deletedAt: null
+              }
+            }
             // OR: [
             //     {
             //     path: {
