@@ -138,10 +138,14 @@ export class WebsocketGateway {
     data: OnboardEmployeeDTO,
   ): Promise<Observable<any>> {
     return from(this.employeesOnPathService.onboardEmployee(data)).pipe(
-      map((employeeOnPath) => ({
-        event: employeeOnPath.id,
-        data: employeeOnPath,
-      })),
+      map((employeeOnPath) => {
+        this.server.emit('admin', employeeOnPath);
+
+        return {
+          event: employeeOnPath.id,
+          data: employeeOnPath,
+        };
+      }),
       catchError((error) => {
         const { status, message } = error;
 
@@ -166,6 +170,10 @@ export class WebsocketGateway {
       const employeeOnPath = await this.employeesOnPathService.offboardEmployee(
         data,
       );
+
+      this.server.emit('admin', {
+        ...employeeOnPath,
+      });
 
       this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,
