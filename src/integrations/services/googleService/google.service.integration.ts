@@ -11,7 +11,7 @@ export class GoogleApiServiceIntegration implements IGoogleServiceIntegration {
   async getLocation(payload: any): Promise<any> {
     try {
       const { data }: AxiosResponse<RootObject> = await googleApi().get(
-        `/maps/api/geocode/json?address=${payload}&key=${process.env.API_KEY_GOOGLE}`,
+        `/maps/api/geocode/json?address=${payload}&key=${process.env.GOOGLE_MAPS_API_KEY}`,
       );
 
       return {
@@ -25,9 +25,9 @@ export class GoogleApiServiceIntegration implements IGoogleServiceIntegration {
 
   async getWaypoints(payload: Waypoints): Promise<any> {
     try {
-      const url = `/maps/api/directions/json?origin=${payload.origin}&destination=${payload.destination}&waypoints=optimize%3Atrue|${payload.waypoints}&travelMode=${payload.travelMode}&key=${process.env.API_KEY_GOOGLE}`;
+      const url = `/maps/api/directions/json?origin=${payload.origin}&destination=${payload.destination}&waypoints=optimize%3Atrue|${payload.waypoints}&travelMode=${payload.travelMode}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
       const { data }: AxiosResponse<RootObject> = await googleApi().get(url);
-      
+
       return data;
     } catch (e) {
       new Logger('googleApi service integration').error('get waypoints', e);

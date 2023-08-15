@@ -27,39 +27,47 @@ CORE_API_URL=
 - [Authentication configuration](#authentication-configuration)
 - [Provider: Google Maps](#provider-google-maps)
 - [Provider: MapBox](#provider-mapbox)
-- [Encryption configuration](#encryption-configuration)
+- [Populate Database](#encryption-configuration)
 - [SqlServer connection](#sqlserver-connection)
 - [Crons configuration](#crons-configuration)
 
 ### Server configuration
 
 ```shell
-*NODE_ENV=
+# Values: development or production
+# In mode development the authentication JWT will be disable
+*NODE_ENV=<STRING>
 
+# Values: type number. Port to access application local or from Docker
+*PORT_BACKEND=<NUMBER>ww
 ```
 
 ### Authentication configuration
 
 ```shell
-
+# Secret to encode and decode JWT tokens
+*SECRET_KEY_ACCESS_TOKEN=<STRING>
 ```
 
 ### Provider: Google Maps
 
 ```shell
-
+# Api key to application use map services
+*MAP_BOX_API_KEY=<STRING>
 ```
 
 ### Provider: MapBox
 
 ```shell
-
+# Api key to application use map services
+*GOOGLE_MAPS_API_KEY=<STRING>
 ```
 
-### Encryption configuration
+### Populate Database
 
 ```shell
-
+# UUID entity Denso on server
+*DENSO_ID=<STRING>
 ```
 
 ### Crons configuration
