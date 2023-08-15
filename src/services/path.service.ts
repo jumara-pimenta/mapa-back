@@ -327,7 +327,10 @@ export class PathService {
     return;
   }
 
-  async regeneratePaths(route: MappedRouteDTO, scheduledDate?: Date): Promise<void> {
+  async regeneratePaths(
+    route: MappedRouteDTO,
+    scheduledDate?: Date,
+  ): Promise<void> {
     for await (const _path of route.paths) {
       const { duration, startsAt, type } = _path;
 
@@ -337,12 +340,12 @@ export class PathService {
           startsAt,
           type,
           status: EStatusPath.PENDING,
-          scheduleDate: scheduledDate ?? getNextBusinessDay()
+          scheduleDate: scheduledDate ?? getNextBusinessDay(),
         },
         route,
       );
 
-     const createdPath = await this.pathRepository.create(props);
+      const createdPath = await this.pathRepository.create(props);
 
       for await (const employeeOnPath of _path.employeesOnPath) {
         await this.employeesOnPathService.recreateEmployeesOnPath(
@@ -828,6 +831,12 @@ export class PathService {
     new Logger('path service').error('get status that the route should have');
   }
 
+  async listAllByStatus(status: ERoutePathStatus): Promise<MappedPathDTO[]> {
+    const paths = await this.pathRepository.findManyByStatus(status);
+
+    return this.mapperMany(paths);
+  }
+
   public mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 
@@ -847,7 +856,7 @@ export class PathService {
       routeDescription: path?.route.description,
       duration: path.duration,
       finishedAt: path.finishedAt,
-      startedAt: path.startedAt,
+      startedAt: new Date(path.startedAt),
       startsAt: path.startsAt,
       status: path.status,
       vehicle: path.route.vehicle!.id,
@@ -904,7 +913,7 @@ export class PathService {
         routeType: path?.route.type,
         duration: path.duration,
         finishedAt: path.finishedAt,
-        startedAt: path.startedAt,
+        startedAt: new Date(path.startedAt),
         startsAt: path.startsAt,
         status: path.status,
         type: path.type,

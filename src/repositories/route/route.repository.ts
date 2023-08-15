@@ -9,7 +9,7 @@ import { Route } from '../../entities/route.entity';
 import { DriverService } from '../../services/driver.service';
 import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
-import { ETypeRouteExport } from '../../utils/ETypes';
+import { ERoutePathStatus, ETypeRouteExport } from '../../utils/ETypes';
 import { TTypeRoute } from '../../utils/TTypes';
 import { getDateInLocaleTime } from '../../utils/Date';
 
@@ -23,6 +23,64 @@ export class RouteRepository
     private readonly driverService: DriverService,
   ) {
     super();
+  }
+
+  async findManyByStatus(status: ERoutePathStatus): Promise<Array<Route>> {
+    return await this.repository.route.findMany({
+      where: {
+        status,
+        deletedAt: null,
+        path: {
+          some: {
+            deletedAt: null,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        driver: true,
+        path: {
+          where: {
+            deletedAt: null,
+          },
+          include: {
+            employeesOnPath: {
+              orderBy: {
+                position: 'asc',
+              },
+              where: {
+                employee: {
+                  deletedAt: null,
+                },
+              },
+              include: {
+                employee: {
+                  select: {
+                    name: true,
+                    pins: {
+                      include: {
+                        pin: {
+                          select: {
+                            lat: true,
+                            lng: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        vehicle: true,
+      },
+    });
   }
 
   async findRouteWithPaths(id: string): Promise<Partial<Route>> {
@@ -255,7 +313,8 @@ export class RouteRepository
     return this.repository.route.findFirst({
       where: {
         id,
-        deletedAt: null},
+        deletedAt: null,
+      },
       select: {
         id: true,
         description: true,
@@ -332,7 +391,6 @@ export class RouteRepository
     page: Page,
     filters: FiltersRouteDTO,
   ): Promise<PageResponse<Route>> {
-    
     const condition = generateQueryByFiltersForRoute(filters);
 
     const items = condition
@@ -343,9 +401,9 @@ export class RouteRepository
             deletedAt: null,
             path: {
               some: {
-                deletedAt: null
-              }
-            }
+                deletedAt: null,
+              },
+            },
             // OR: [
             //     {
             //     path: {
@@ -418,30 +476,30 @@ export class RouteRepository
             deletedAt: null,
             path: {
               some: {
-                deletedAt: null
-              }
-            }
-          //   OR: [
-          //     {
-          //     path: {
-          //       some: {
-          //         deletedAt: null,
-          //         scheduleDate: null
-          //       },
-          //       },
-          //     },
-          //     {
-          //     path: {
-          //       some: {
-          //         deletedAt: null,
-          //         scheduleDate: {
-          //           gte: getTodayWithZeroTimeISO(),
-          //           lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
-          //         }
-          //       },
-          //       },
-          //     }
-          // ]
+                deletedAt: null,
+              },
+            },
+            //   OR: [
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: null
+            //       },
+            //       },
+            //     },
+            //     {
+            //     path: {
+            //       some: {
+            //         deletedAt: null,
+            //         scheduleDate: {
+            //           gte: getTodayWithZeroTimeISO(),
+            //           lt: addOneDayToDate(new Date(getTodayWithZeroTimeISO()))
+            //         }
+            //       },
+            //       },
+            //     }
+            // ]
           },
           orderBy: {
             createdAt: 'desc',
@@ -499,9 +557,9 @@ export class RouteRepository
             deletedAt: null,
             path: {
               some: {
-                deletedAt: null
-              }
-            }
+                deletedAt: null,
+              },
+            },
             // OR: [
             //     {
             //     path: {
@@ -533,9 +591,9 @@ export class RouteRepository
             deletedAt: null,
             path: {
               some: {
-                deletedAt: null
-              }
-            }
+                deletedAt: null,
+              },
+            },
             // OR: [
             //     {
             //     path: {

@@ -1,4 +1,4 @@
-import { EStatusPath } from '../../utils/ETypes';
+import { ERoutePathStatus, EStatusPath } from '../../utils/ETypes';
 import { Path } from '../../entities/path.entity';
 import { FiltersPathDTO } from '../../dtos/path/filtersPath.dto';
 
@@ -23,4 +23,5 @@ export default interface IPathRepository {
   softDelete(id: string): Promise<Path>;
   findByStatusAndDriver(status: EStatusPath, driverId: string): Promise<Path[]>
   findByIdToDelete(id: string): Promise<Path | null>
+  findManyByStatus(status: ERoutePathStatus): Promise<Path[]>
 }

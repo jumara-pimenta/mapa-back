@@ -1037,10 +1037,10 @@ export class RouteService {
         entity: EEntity.ROUTE,
         idEntity: routeToValidate.id,
         status: EStatusWork.PENDING,
-        scheduledDate
-      })
+        scheduledDate,
+      });
 
-      await this.scheduledWorkRepository.create(scheduledWorkProps)
+      await this.scheduledWorkRepository.create(scheduledWorkProps);
 
       await this.pathService.regeneratePaths(routeToValidate, scheduledDate);
     }
@@ -2237,6 +2237,10 @@ export class RouteService {
 
     if (types.includes(ETypePath.ONE_WAY) && types.includes(ETypePath.RETURN))
       return ERoutePathType.ROUND_TRIP;
+  }
+
+  async listAllByStatus(status: ERoutePathStatus): Promise<Route[]> {
+    return await this.routeRepository.findManyByStatus(status);
   }
 
   private async mapperMany(routes: Route[]): Promise<MappedRouteDTO[]> {

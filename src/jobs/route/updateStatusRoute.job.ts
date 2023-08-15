@@ -14,7 +14,7 @@ export class UpdateStatusRouteJob {
 
   private readonly logger = new Logger(UpdateStatusRouteJob.name);
 
-  @Cron(process.env.JOB_UPDATE_TIME)
+  @Cron(process.env.TIME_TO_UPDATE_JOB_UPDATE_STATUS)
   async execute() {
     this.logger.debug('Iniciando atualização do status das rotas...');
 

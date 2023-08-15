@@ -4,7 +4,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Path } from '../../entities/path.entity';
 import IPathRepository from './path.repository.contract';
 import { getDateInLocaleTime } from '../../utils/date.service';
-import { EStatusPath } from '../../utils/ETypes';
+import { ERoutePathStatus, EStatusPath } from '../../utils/ETypes';
 import { generateQueryByFiltersForPaths } from '../../configs/database/Queries';
 
 @Injectable()
@@ -690,6 +690,117 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         route: {
           deletedAt: null,
         },
+      },
+    });
+  }
+
+  async findManyByStatus(status: ERoutePathStatus): Promise<Path[]> {
+    return await this.repository.path.findMany({
+      where: {
+        deletedAt: null,
+        status,
+        AND: {
+          route: {
+            deletedAt: null,
+          },
+          OR: [
+            {
+              employeesOnPath: {
+                some: {
+                  present: true
+                }
+              }
+            }
+          ]
+        },
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        createdAt: true,
+        route: {
+          select: {
+            type: true,
+            id: true,
+            description: true,
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                cpf: true,
+                cnh: true,
+                createdAt: true,
+                validation: true,
+                updatedAt: false,
+                category: true,
+                deletedAt: false,
+                password: false,
+                RouteHistory: false,
+              },
+            },
+            vehicle: {
+              select: {
+                plate: true,
+                id: true,
+                capacity: true,
+                company: true,
+                createdAt: true,
+                expiration: true,
+                updatedAt: false,
+                isAccessibility: true,
+                lastMaintenance: true,
+                lastSurvey: true,
+                note: true,
+                renavam: true,
+                RouteHistory: false,
+                routes: false,
+                type: true,
+              },
+            },
+          },
+        },
+
+        employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        status: 'asc',
       },
     });
   }

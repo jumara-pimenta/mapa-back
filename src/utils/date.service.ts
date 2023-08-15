@@ -2,6 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import {
   addDays,
   differenceInDays,
+  differenceInHours,
   differenceInSeconds,
   isDate,
   setHours,
@@ -19,11 +20,19 @@ import {
   dateInFormatThreeRgx,
   dateInFormatTwoRgx,
 } from './Regex';
-import { zonedTimeToUtc } from 'date-fns-tz';
+import { toDate, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
 class startAndFinishAt {
   startAt: string;
   finishAt: string;
+}
+
+export function convertToOriginalTimezone(dateTimeString: string): Date {
+  const timeZone = 'UTC';
+
+  const zonedDate = utcToZonedTime(dateTimeString, timeZone);
+  const originalDate = toDate(zonedDate);
+  return originalDate;
 }
 
 function isWeekendDay(date: Date) {
@@ -232,4 +241,15 @@ export function addOneDayToDate(date: Date): Date {
   const newDate = addDays(date, 1);
 
   return newDate;
+}
+
+export function getDifferenceInHours(dateToCompare: Date): number {
+  const timeZone = 'UTC'; // Use o fuso horário do banco de dados
+
+  const zonedDateToCompare = utcToZonedTime(dateToCompare, timeZone);
+  const currentZonedDate = new Date(); // Já está no fuso horário local
+
+  const differenceInHrs = differenceInHours(currentZonedDate, zonedDateToCompare);
+
+  return differenceInHrs;
 }
