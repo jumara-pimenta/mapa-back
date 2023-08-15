@@ -16,6 +16,7 @@ import { EmployeesOnPathService } from '../services/employeesOnPath.service';
 import { RouteService } from '../services/route.service';
 import { Observable, catchError, from, map, throwError } from 'rxjs';
 import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
+import { formatTimeInManausTimeZone } from '../utils/date.service';
 
 @WebSocketGateway()
 export class WebsocketGateway {
@@ -65,10 +66,24 @@ export class WebsocketGateway {
     payload: StatusRouteDTO,
   ): Promise<void> {
     try {
-      const data = await this.pathService.startPath(payload.pathId);
+      const refreshedRoute = await this.pathService.startPath(payload.pathId);
+
+      for await (const employee of refreshedRoute.employeesOnPath) {
+        this.server.emit(employee.id, {
+          id: employee.id,
+          details: {
+            title: `Rota Iniciada: ${refreshedRoute.routeDescription}`,
+            message: `A sua rota de ${refreshedRoute.type} foi iniciada às ${formatTimeInManausTimeZone(refreshedRoute.startedAt)}. Confirme a sua presença e prepare-se para embarcar!`,
+          },
+        });
+      }
+
+      this.server.emit('admin', {
+        ...refreshedRoute,
+      });
 
       this.server.emit(payload.pathId, {
-        ...data,
+        ...refreshedRoute,
       });
     } catch (error) {
       this.server.except(error).emit('error', error);
@@ -88,9 +103,24 @@ export class WebsocketGateway {
     payload: StatusRouteDTO,
   ): Promise<void> {
     try {
-      const data = await this.pathService.finishPath(payload.pathId);
+      const refreshedRoute = await this.pathService.finishPath(payload.pathId);
+      
+      for await (const employee of refreshedRoute.employeesOnPath) {
+        this.server.emit(employee.id, {
+          id: employee.id,
+          details: {
+            title: `Rota Finalizada: ${refreshedRoute.routeDescription}`,
+            message: `A sua rota de ${refreshedRoute.type} foi finalizada às ${formatTimeInManausTimeZone(refreshedRoute.startedAt)}!`,
+          },
+        });
+      }
+
+      this.server.emit('admin', {
+        ...refreshedRoute,
+      });
+
       this.server.emit(payload.pathId, {
-        ...data,
+        ...refreshedRoute,
       });
     } catch (error) {
       this.server.except(error).emit('error', error);

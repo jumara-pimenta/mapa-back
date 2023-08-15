@@ -20,7 +20,7 @@ import {
   dateInFormatThreeRgx,
   dateInFormatTwoRgx,
 } from './Regex';
-import { toDate, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { format, toDate, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
 class startAndFinishAt {
   startAt: string;
@@ -252,4 +252,13 @@ export function getDifferenceInHours(dateToCompare: Date): number {
   const differenceInHrs = differenceInHours(currentZonedDate, zonedDateToCompare);
 
   return differenceInHrs;
+}
+
+export function formatTimeInManausTimeZone(date: Date): string {
+  const timeZone = 'UTC'; // Use o fuso horário do banco de dados
+
+  const zonedDate = utcToZonedTime(date, timeZone);
+
+  const formattedTime = format(zonedDate, 'hh:mm a');
+  return formattedTime;
 }
