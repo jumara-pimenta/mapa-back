@@ -917,6 +917,7 @@ export class PathService {
         startsAt: path.startsAt,
         status: path.status,
         type: path.type,
+        scheduledDate: path.scheduleDate,
         createdAt: path.createdAt,
         employeesOnPath: employeesOnPath.map((item) => {
           const { employee } = item;
