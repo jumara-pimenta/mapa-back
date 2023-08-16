@@ -68,9 +68,9 @@ export class WebsocketGateway {
     try {
       const refreshedRoute = await this.pathService.startPath(payload.pathId);
 
-      for await (const employee of refreshedRoute.employeesOnPath) {
-        this.server.emit(employee.id, {
-          id: employee.id,
+      for await (const employeeOnPath of refreshedRoute.employeesOnPath) {
+        this.server.emit(employeeOnPath.details.employeeId, {
+          pathId: employeeOnPath.id,
           details: {
             title: `Rota Iniciada: ${refreshedRoute.routeDescription}`,
             message: `A sua rota de ${refreshedRoute.type} foi iniciada às ${formatTimeInManausTimeZone(refreshedRoute.startedAt)}. Confirme a sua presença e prepare-se para embarcar!`,
@@ -105,9 +105,9 @@ export class WebsocketGateway {
     try {
       const refreshedRoute = await this.pathService.finishPath(payload.pathId);
       
-      for await (const employee of refreshedRoute.employeesOnPath) {
-        this.server.emit(employee.id, {
-          id: employee.id,
+      for await (const employeeOnPath of refreshedRoute.employeesOnPath) {
+        this.server.emit(employeeOnPath.details.employeeId, {
+          pathId: employeeOnPath.id,
           details: {
             title: `Rota Finalizada: ${refreshedRoute.routeDescription}`,
             message: `A sua rota de ${refreshedRoute.type} foi finalizada às ${formatTimeInManausTimeZone(refreshedRoute.startedAt)}!`,
