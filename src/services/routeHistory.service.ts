@@ -46,7 +46,7 @@ export class RouteHistoryService {
         itinerary: props.itinerary,
         startedAt: props.path.startedAt ?? new Date(),
         finishedAt: new Date(),
-        employeesNotPresent: JSON.stringify(props.employeesNotPresent)
+        employeesNotPresent: props.employeesNotPresent
       },
       props.path,
       props.driver,

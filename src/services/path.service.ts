@@ -122,7 +122,7 @@ export class PathService {
         }
       }
 
-      if (employee.present === false) {
+      if (employee.present === (false || null)) {
         employeeNotPresents.push({
           name: employee.employee.name,
           registration: employee.employee.registration,
@@ -169,7 +169,7 @@ export class PathService {
         nameRoute: route.routeDescription,
         employeeIds: confirmedAndPresentedEmployees.join(),
         itinerary: itinerariesArray.join(),
-        employeesNotPresent: employeeNotPresents.join(),
+        employeesNotPresent: JSON.stringify(employeeNotPresents),
         totalEmployees: totalEmployees,
         totalConfirmed: totalConfirmed,
         startedAt: getDateInLocaleTime(new Date(path.startedAt)),
