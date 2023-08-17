@@ -46,6 +46,7 @@ export class RouteHistoryService {
         itinerary: props.itinerary,
         startedAt: props.path.startedAt ?? new Date(),
         finishedAt: new Date(),
+        employeesNotPresent: JSON.stringify(props.employeesNotPresent)
       },
       props.path,
       props.driver,
@@ -143,6 +144,7 @@ export class RouteHistoryService {
         driver: routeHistory.driver.name,
         vehicle: routeHistory.vehicle.plate,
         itinerary: this.separateItinerary(routeHistory.itinerary),
+        employeesNotPresent: JSON.parse(routeHistory.employeesNotPresent),
         startedAt: routeHistory.startedAt,
         finishedAt: routeHistory.finishedAt,
       };
@@ -160,6 +162,7 @@ export class RouteHistoryService {
       driverName: routeHistory.driver.name,
       vehiclePlate: routeHistory.vehicle.plate,
       itinerary: this.separateItinerary(routeHistory.itinerary),
+      employeesNotPresent: JSON.parse(routeHistory.employeesNotPresent),
       startedAt: routeHistory.startedAt,
       finishedAt: routeHistory.finishedAt,
     };

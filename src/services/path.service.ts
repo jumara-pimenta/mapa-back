@@ -37,6 +37,13 @@ import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
 import { getDateInLocaleTime } from '../utils/Date';
 import { getNextBusinessDay, isDateAfterToday } from '../utils/date.service';
 
+interface IEmployeeNotPresent {
+  name: string,
+  registration: string,
+  present: boolean,
+  confirmed: boolean
+}
+
 @Injectable()
 export class PathService {
   constructor(
@@ -92,6 +99,8 @@ export class PathService {
 
     const itinerariesArray = [];
 
+    const employeeNotPresents: IEmployeeNotPresent[] = [];
+
     const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
 
     let totalConfirmed = 0;
@@ -111,6 +120,15 @@ export class PathService {
             disembarkAt: getDateInLocaleTime(new Date()),
           });
         }
+      }
+
+      if (employee.present === false) {
+        employeeNotPresents.push({
+          name: employee.employee.name,
+          registration: employee.employee.registration,
+          confirmed: employee.confirmation,
+          present: employee.present
+        });
       }
     }
 
@@ -151,6 +169,7 @@ export class PathService {
         nameRoute: route.routeDescription,
         employeeIds: confirmedAndPresentedEmployees.join(),
         itinerary: itinerariesArray.join(),
+        employeesNotPresent: employeeNotPresents.join(),
         totalEmployees: totalEmployees,
         totalConfirmed: totalConfirmed,
         startedAt: getDateInLocaleTime(new Date(path.startedAt)),

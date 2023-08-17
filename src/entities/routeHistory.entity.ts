@@ -17,6 +17,7 @@ export class RouteHistory {
   driver?: Driver;
   vehicle?: Vehicle;
   itinerary: string;
+  employeesNotPresent?: string;
   startedAt: Date;
   finishedAt: Date;
   createdAt: Date;

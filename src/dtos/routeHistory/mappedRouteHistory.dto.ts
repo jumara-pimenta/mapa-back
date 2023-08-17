@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+interface IEmployeeNotPresent {
+  name: string,
+  registration: string,
+  present: boolean,
+  confirmed: boolean
+}
+
 export class LatAndLong {
   @ApiProperty()
   lat: string;
@@ -52,6 +59,7 @@ export class MappedRouteHistoryDTO {
   vehicle: string;
   @ApiProperty()
   itinerary: LatAndLong[];
+  employeesNotPresent?: IEmployeeNotPresent[];
   @ApiProperty()
   startedAt: Date;
   @ApiProperty()

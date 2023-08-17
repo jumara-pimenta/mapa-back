@@ -37,6 +37,7 @@ export class RouteHistoryRepository
         totalEmployees: true,
         totalConfirmed: true,
         sinister: true,
+        employeesNotPresent: true,
         driver: {
           select: {
             name: true,
@@ -98,6 +99,7 @@ export class RouteHistoryRepository
             driver: true,
             vehicle: true,
             itinerary: true,
+            employeesNotPresent: true,
             startedAt: true,
             finishedAt: true,
             createdAt: true,
@@ -120,6 +122,7 @@ export class RouteHistoryRepository
             driver: true,
             vehicle: true,
             itinerary: true,
+            employeesNotPresent: true,
             startedAt: true,
             finishedAt: true,
             createdAt: true,
@@ -151,6 +154,7 @@ export class RouteHistoryRepository
         vehicleId: data.vehicle.id,
         driverId: data.driver.id,
         itinerary: data.itinerary,
+        employeesNotPresent: data.employeesNotPresent,
         shift: data.path.startsAt,
         startedAt: data.startedAt,
         finishedAt: data.finishedAt,
