@@ -827,6 +827,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startsAt: true,
         startedAt: true,
         finishedAt: true,
+        scheduleDate: true,
         createdAt: true,
         route: {
           select: {
