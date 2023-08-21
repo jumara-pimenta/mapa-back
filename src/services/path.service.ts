@@ -415,6 +415,15 @@ export class PathService {
     if (path.type === ETypePath.ONE_WAY) {
       const pathData = this.mapperOne(path) as any;
 
+      const { employeesOnPath } = pathData;
+
+      const confirmedEmployees = employeesOnPath.map((employee) => {
+        if (employee.confirmation) return employee;
+        return;
+      });
+
+      pathData.employeesOnPath = confirmedEmployees;
+
       const denso = {
         id: process.env.DENSO_ID,
         position: 99,
@@ -443,6 +452,15 @@ export class PathService {
 
     if (path.type === ETypePath.RETURN) {
       const pathData = this.mapperOne(path) as any;
+
+      const { employeesOnPath } = pathData;
+
+      const confirmedEmployees = employeesOnPath.map((employee) => {
+        if (employee.confirmation) return employee;
+        return;
+      });
+
+      pathData.employeesOnPath = confirmedEmployees;
 
       const denso = {
         id: path.employeesOnPath[0]?.id,
