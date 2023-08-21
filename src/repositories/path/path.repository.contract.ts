@@ -19,6 +19,7 @@ export default interface IPathRepository {
     employeeId: string,
   ): Promise<Path[]>;
   findByEmployeeOnPath(employeeId: string): Promise<Partial<Path>>;
+  findByEmployeeOnPathMobile(id: string): Promise<Path>;
   findAll(filter?: FiltersPathDTO): Promise<Path[]>;
   softDelete(id: string): Promise<Path>;
   findByStatusAndDriver(status: EStatusPath, driverId: string): Promise<Path[]>

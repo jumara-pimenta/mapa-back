@@ -806,6 +806,20 @@ export class PathService {
     return path;
   }
 
+  async listByEmployeeOnPathFromMobile(employeeOnPathId: string): Promise<Partial<Path>> {
+    const path = await this.pathRepository.findByEmployeeOnPathMobile(
+      employeeOnPathId,
+    );
+
+    if (!path)
+      throw new HttpException(
+        'Colaborador não encontrado no trajeto!',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.mapperOne(path);
+  }
+
   async listByIdNotMapped(id: string): Promise<Path> {
     const path = await this.pathRepository.findById(id);
 

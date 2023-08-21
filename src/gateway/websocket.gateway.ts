@@ -73,7 +73,11 @@ export class WebsocketGateway {
           pathId: employeeOnPath.id,
           details: {
             title: `Rota Iniciada: ${refreshedRoute.routeDescription}`,
-            message: `A sua rota de ${refreshedRoute.type} foi iniciada às ${formatTimeInManausTimeZone(refreshedRoute.startedAt)}. Confirme a sua presença e prepare-se para embarcar!`,
+            message: `A sua rota de ${
+              refreshedRoute.type
+            } foi iniciada às ${formatTimeInManausTimeZone(
+              refreshedRoute.startedAt,
+            )}. Confirme a sua presença e prepare-se para embarcar!`,
           },
         });
       }
@@ -104,22 +108,26 @@ export class WebsocketGateway {
   ): Promise<void> {
     try {
       const refreshedRoute = await this.pathService.finishPath(payload.pathId);
-      
+
       for await (const employeeOnPath of refreshedRoute.employeesOnPath) {
         this.server.emit(employeeOnPath.details.employeeId, {
           pathId: employeeOnPath.id,
           details: {
             title: `Rota Finalizada: ${refreshedRoute.routeDescription}`,
-            message: `A sua rota de ${refreshedRoute.type} foi finalizada às ${formatTimeInManausTimeZone(refreshedRoute.startedAt)}!`,
+            message: `A sua rota de ${
+              refreshedRoute.type
+            } foi finalizada às ${formatTimeInManausTimeZone(
+              refreshedRoute.startedAt,
+            )}!`,
           },
         });
       }
 
-      this.server.emit('admin', {
+      this.server.emit(payload.pathId, {
         ...refreshedRoute,
       });
 
-      this.server.emit(payload.pathId, {
+      this.server.emit('admin', {
         ...refreshedRoute,
       });
     } catch (error) {
@@ -168,8 +176,13 @@ export class WebsocketGateway {
     data: OnboardEmployeeDTO,
   ): Promise<Observable<any>> {
     return from(this.employeesOnPathService.onboardEmployee(data)).pipe(
-      map((employeeOnPath) => {
-        this.server.emit('admin', employeeOnPath);
+      map(async (employeeOnPath) => {
+        const updatedPath =
+          await this.pathService.listByEmployeeOnPathFromMobile(data.id);
+
+        this.server.emit('admin', {
+          ...updatedPath,
+        });
 
         return {
           event: employeeOnPath.id,
@@ -201,12 +214,16 @@ export class WebsocketGateway {
         data,
       );
 
-      this.server.emit('admin', {
+      this.server.emit(employeeOnPath.id, {
         ...employeeOnPath,
       });
 
-      this.server.emit(employeeOnPath.id, {
-        ...employeeOnPath,
+      const updatedPath = await this.pathService.listByEmployeeOnPathFromMobile(
+        data.id,
+      );
+
+      this.server.emit('admin', {
+        ...updatedPath,
       });
     } catch (error) {
       this.server.except(error).emit('error', error);
