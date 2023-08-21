@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EmployeeAddressDTO } from '../employee/employeeAddress.dto';
+import { ETypeRoute } from '../../utils/ETypes';
 
 class IPin {
   @ApiProperty()
@@ -48,6 +49,8 @@ export class MappedPathDTO {
   id: string;
   @ApiProperty()
   routeDescription: string;
+  @ApiProperty()
+  routeType?: ETypeRoute;
   @ApiProperty()
   duration: string;
   @ApiProperty()

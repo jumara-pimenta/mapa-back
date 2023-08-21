@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PathService } from '../../services/path.service';
-import { ERoutePathStatus } from '../../utils/ETypes';
+import { ERoutePathStatus, ETypeRoute } from '../../utils/ETypes';
 import { getDifferenceInHours } from '../../utils/date.service';
 
 @Injectable()
@@ -22,11 +22,13 @@ export class FinishRouteJob {
       return this.logger.debug('Não há rotas pendentes para finalizar.');
     }
 
-    for await (const path of paths) {
-      const { startedAt } = path;
+    let diffInHours: number;
 
-      if (startedAt) {
-        const diffInHours = getDifferenceInHours(startedAt);
+    for await (const path of paths) {
+      const { startedAt, createdAt } = path;
+
+      if (startedAt && path.routeType === ETypeRoute.EXTRA) {
+        diffInHours = getDifferenceInHours(startedAt);
 
         if (
           diffInHours >= Number(process.env.TIME_LIMIT_TO_FINISH_ROUTE_IN_HR)
@@ -37,7 +39,22 @@ export class FinishRouteJob {
 
           this.logger.debug('Rota finalizada com sucesso!');
           this.logger.debug(`Estava pendente a ${diffInHours}h...`);
+
+          return;
         }
+      }
+
+      diffInHours = getDifferenceInHours(createdAt);
+
+      if (diffInHours >= Number(process.env.TIME_LIMIT_TO_FINISH_ROUTE_IN_HR)) {
+        this.logger.debug(`Finalizando a rota ${path.id}...`);
+
+        await this.pathService.finishPath(path.id);
+
+        this.logger.debug('Rota finalizada com sucesso!');
+        this.logger.debug(`Estava pendente a ${diffInHours}h...`);
+
+        return;
       }
     }
   }

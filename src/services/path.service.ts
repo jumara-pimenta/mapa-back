@@ -38,10 +38,10 @@ import { getDateInLocaleTime } from '../utils/Date';
 import { getNextBusinessDay, isDateAfterToday } from '../utils/date.service';
 
 interface IEmployeeNotPresent {
-  name: string,
-  registration: string,
-  present: boolean,
-  confirmed: boolean
+  name: string;
+  registration: string;
+  present: boolean;
+  confirmed: boolean;
 }
 
 @Injectable()
@@ -127,7 +127,7 @@ export class PathService {
           name: employee.employee.name,
           registration: employee.employee.registration,
           confirmed: employee.confirmation,
-          present: employee.present
+          present: employee.present,
         });
       }
     }
@@ -405,13 +405,16 @@ export class PathService {
 
   async listByIdMobile(id: string): Promise<any> {
     const path = await this.pathRepository.findById(id);
-    if (!path)
+    if (!path) {
       throw new HttpException(
         `Não foi encontrado trajeto com o id: ${id}!`,
         HttpStatus.NOT_FOUND,
       );
+    }
+
     if (path.type === ETypePath.ONE_WAY) {
       const pathData = this.mapperOne(path) as any;
+
       const denso = {
         id: process.env.DENSO_ID,
         position: 99,
@@ -432,6 +435,7 @@ export class PathService {
           },
         },
       };
+
       pathData.employeesOnPath.push(denso);
 
       return pathData;
@@ -439,6 +443,7 @@ export class PathService {
 
     if (path.type === ETypePath.RETURN) {
       const pathData = this.mapperOne(path) as any;
+
       const denso = {
         id: path.employeesOnPath[0]?.id,
         boardingAt: null,
@@ -460,12 +465,11 @@ export class PathService {
           },
         },
       };
+
       pathData.employeesOnPath.unshift(denso);
 
       return pathData;
     }
-
-    // return this.mapperOne(path);
   }
 
   async listById(id: string): Promise<MappedPathDTO> {
@@ -929,7 +933,7 @@ export class PathService {
       return {
         id: path.id,
         routeDescription: path?.route.description,
-        routeType: path?.route.type,
+        routeType: path?.route.type as ETypeRoute,
         duration: path.duration,
         finishedAt: path.finishedAt,
         startedAt: new Date(path.startedAt),
