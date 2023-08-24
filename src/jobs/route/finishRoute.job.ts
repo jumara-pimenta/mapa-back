@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PathService } from '../../services/path.service';
-import { ERoutePathStatus, ETypeRoute } from '../../utils/ETypes';
+import { ERoutePathStatus, EStatusPath } from '../../utils/ETypes';
 import { getDifferenceInHours } from '../../utils/date.service';
 
 @Injectable()
@@ -12,22 +12,28 @@ export class FinishRouteJob {
 
   @Cron(process.env.TIME_TO_UPDATE_JOB_FINISH_ROUTES)
   async execute() {
-    this.logger.debug('Iniciando finalização de rotas pendentes...');
+    this.logger.debug('Iniciando finalização de rotas em andamento...');
 
     const paths = await this.pathService.listAllByStatus(
       ERoutePathStatus.IN_PROGRESS,
     );
 
+    paths.concat(
+      await this.pathService.listAllByStatus(ERoutePathStatus.PENDING),
+    );
+
     if (paths.length == 0) {
-      return this.logger.debug('Não há rotas pendentes para finalizar.');
+      return this.logger.debug(
+        'Não há rotas pendentes ou em andamento para finalizar.',
+      );
     }
 
     let diffInHours: number;
 
     for await (const path of paths) {
-      const { startedAt, createdAt } = path;
+      const { startedAt, scheduledDate } = path;
 
-      if (startedAt && path.routeType === ETypeRoute.EXTRA) {
+      if (path.status === EStatusPath.IN_PROGRESS) {
         diffInHours = getDifferenceInHours(startedAt);
 
         if (
@@ -44,17 +50,21 @@ export class FinishRouteJob {
         }
       }
 
-      diffInHours = getDifferenceInHours(createdAt);
+      if (path.status === EStatusPath.PENDING && scheduledDate) {
+        diffInHours = getDifferenceInHours(scheduledDate);
 
-      if (diffInHours >= Number(process.env.TIME_LIMIT_TO_FINISH_ROUTE_IN_HR)) {
-        this.logger.debug(`Finalizando a rota ${path.id}...`);
+        if (
+          diffInHours >= Number(process.env.TIME_LIMIT_TO_FINISH_ROUTE_IN_HR)
+        ) {
+          this.logger.debug(`Finalizando a rota ${path.id}...`);
 
-        await this.pathService.finishPath(path.id);
+          await this.pathService.finishPath(path.id);
 
-        this.logger.debug('Rota finalizada com sucesso!');
-        this.logger.debug(`Estava pendente a ${diffInHours}h...`);
+          this.logger.debug('Rota finalizada com sucesso!');
+          this.logger.debug(`Estava pendente a ${diffInHours}h...`);
 
-        return;
+          return;
+        }
       }
     }
   }

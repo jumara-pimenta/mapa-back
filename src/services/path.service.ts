@@ -34,7 +34,7 @@ import { RouteMobile } from '../utils/Utils';
 import { FiltersPathDTO } from '../dtos/path/filtersPath.dto';
 import { DENSO_LOCATION } from '../utils/Constants';
 import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
-import { getDateInLocaleTime } from '../utils/Date';
+import { getDateInLocaleTime, getDateInLocaleTimeManaus } from '../utils/Date';
 import { getNextBusinessDay, isDateAfterToday } from '../utils/date.service';
 
 interface IEmployeeNotPresent {
@@ -117,7 +117,7 @@ export class PathService {
 
         if (path.type === ETypePath.ONE_WAY) {
           await this.employeesOnPathService.update(employee.id, {
-            disembarkAt: getDateInLocaleTime(new Date()),
+            disembarkAt: getDateInLocaleTimeManaus(new Date()),
           });
         }
       }
@@ -155,7 +155,7 @@ export class PathService {
         type: route.routeType as ETypeRoute,
       },
       path: {
-        finishedAt: getDateInLocaleTime(new Date()),
+        finishedAt: getDateInLocaleTimeManaus(new Date()),
         status: EStatusPath.FINISHED,
         substituteId: null,
       },
@@ -172,7 +172,7 @@ export class PathService {
         employeesNotPresent: JSON.stringify(employeeNotPresents),
         totalEmployees: totalEmployees,
         totalConfirmed: totalConfirmed,
-        startedAt: getDateInLocaleTime(new Date(path.startedAt)),
+        startedAt: path.startedAt,
         finishedAt: new Date(),
       },
       path,
@@ -235,7 +235,7 @@ export class PathService {
       for await (const employee of path.employeesOnPath) {
         if (employee.confirmation === true)
           await this.employeesOnPathService.update(employee.id, {
-            boardingAt: getDateInLocaleTime(new Date()),
+            boardingAt: getDateInLocaleTimeManaus(new Date()),
           });
       }
     }

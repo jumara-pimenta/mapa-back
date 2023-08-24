@@ -5,10 +5,9 @@ import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import { Employee } from '../../entities/employee.entity';
 import IEmployeeRepository from './employee.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForEmployee } from '../../utils/QueriesEmployee';
 import { ETypePath, ETypePin, ETypeRoute } from '../../utils/ETypes';
-import { getDateStartToEndOfDay } from '../../utils/Date';
+import { getDateInLocaleTimeManaus, getDateStartToEndOfDay } from '../../utils/Date';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -58,14 +57,14 @@ export class EmployeeRepository
     return this.repository.employee.update({
       where: { id },
       data: {
-        deletedAt: getDateInLocaleTime(new Date()),
+        deletedAt: getDateInLocaleTimeManaus(new Date()),
       },
     });
   }
 
   update(data: Employee): Promise<any> {
     const dataAdmission = data.admission
-      ? getDateInLocaleTime(new Date(data.admission))
+      ? getDateInLocaleTimeManaus(new Date(data.admission))
       : undefined;
     return this.repository.employee.update({
       data: {
@@ -77,7 +76,7 @@ export class EmployeeRepository
         registration: data.registration!,
         role: data.role!,
         shift: data.shift!,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
       include: {
@@ -168,7 +167,7 @@ export class EmployeeRepository
   }
 
   async checkExtraEmployee(ids: string[], date: string): Promise<Employee[]> {
-    const data = date ? new Date(date) : getDateInLocaleTime(new Date());
+    const data = date ? new Date(date) : getDateInLocaleTimeManaus(new Date());
     const { start, end } = getDateStartToEndOfDay(data.toISOString());
     return this.repository.employee.findMany({
       where: {

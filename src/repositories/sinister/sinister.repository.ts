@@ -6,7 +6,7 @@ import { Sinister } from '../../entities/sinister.entity';
 import ISinisterRepository from './sinister.repository.contract';
 import { FiltersSinisterDTO } from '../../dtos/sinister/filtersSinister.dto';
 import { generateQueryByFiltersForSinister } from '../../configs/database/Queries';
-import { getDateInLocaleTime } from '../../utils/Date';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 
 @Injectable()
 export class SinisterRepository
@@ -92,7 +92,7 @@ export class SinisterRepository
       data: {
         routeHistoryId: routeHistoryId,
         pathId: '',
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: {
         id: sinister.id,

@@ -15,6 +15,12 @@ interface Options {
   minMinute: number;
 }
 
+export function getDateInLocaleTimeManaus(date: Date): Date {
+  const newDate = zonedTimeToUtc(date, 'UTC');
+
+  return newDate;
+}
+
 export function getDateInLocaleTime(date: Date): Date {
   const newDate = zonedTimeToUtc(date, 'UTC');
 

@@ -5,8 +5,8 @@ import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import { Pin } from '../../entities/pin.entity';
 import IPinRepository from './pin.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
 import { generateQueryForPins } from '../../utils/QueriesPins';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 
 @Injectable()
 export class PinRepository extends Pageable<Pin> implements IPinRepository {
@@ -46,7 +46,7 @@ export class PinRepository extends Pageable<Pin> implements IPinRepository {
         district: data.district,
         lat: data.lat,
         lng: data.lng,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
     });

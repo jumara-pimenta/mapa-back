@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import IRouteHistoryRepository from './routeHistory.repository.contract';
 import { RouteHistory } from '../../entities/routeHistory.entity';
 import { EmployeeHistoryDTO } from '../../dtos/routeHistory/mappedRouteHistory.dto';
-import { getDateInLocaleTime, getDateStartToEndOfDay } from '../../utils/Date';
+import { getDateInLocaleTimeManaus, getDateStartToEndOfDay } from '../../utils/Date';
 import { generateQueryByFiltersForRouteHistory } from '../../configs/database/Queries';
 import { RouteHistoryByDateAndShift } from '../../dtos/routeHistory/routeHistoryByDate.dto';
 
@@ -58,7 +58,7 @@ export class RouteHistoryRepository
 
   async findByPathId(id: string): Promise<any> {
     const date = getDateStartToEndOfDay(
-      getDateInLocaleTime(new Date()).toISOString(),
+      getDateInLocaleTimeManaus(new Date()).toISOString(),
     );
     const routeHistory = await this.repository.routeHistory.findMany({
       where: {

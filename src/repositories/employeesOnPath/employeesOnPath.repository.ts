@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import IEmployeesOnPathRepository from './employeesOnPath.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
 import { EmployeesOnPath } from '../../entities/employeesOnPath.entity';
 import { Page, PageResponse } from '../../configs/database/page.model';
 import { generateQueryByFiltersForEmployeesOnPath } from '../../configs/database/Queries';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 
 @Injectable()
 export class EmployeesOnPathRepository
@@ -362,7 +362,7 @@ export class EmployeesOnPathRepository
         present: data.present,
         disembarkAt: data.disembarkAt,
         boardingAt: data.boardingAt,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
       include: {

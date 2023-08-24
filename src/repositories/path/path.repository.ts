@@ -3,9 +3,9 @@ import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 import { Path } from '../../entities/path.entity';
 import IPathRepository from './path.repository.contract';
-import { getDateInLocaleTime } from '../../utils/date.service';
 import { ERoutePathStatus, EStatusPath } from '../../utils/ETypes';
 import { generateQueryByFiltersForPaths } from '../../configs/database/Queries';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 
 @Injectable()
 export class PathRepository extends Pageable<Path> implements IPathRepository {
@@ -263,7 +263,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         status: data.status,
         type: data.type,
         substituteId: data.substituteId,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
       select: {
@@ -347,6 +347,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startsAt: true,
         startedAt: true,
         finishedAt: true,
+        scheduleDate: true,
         createdAt: true,
         substituteId: true,
         route: {

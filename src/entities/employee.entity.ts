@@ -1,4 +1,4 @@
-import { getDateInLocaleTime } from '../utils/Date';
+import { getDateInLocaleTimeManaus } from '../utils/Date';
 import { v4 as uuid } from 'uuid';
 import { EmployeesOnPath } from './employeesOnPath.entity';
 import { EmployeesOnPin } from './employeesOnPin.entity';
@@ -31,7 +31,7 @@ export class Employee {
     id?: string,
   ) {
     Object.assign(this, props);
-    this.createdAt = getDateInLocaleTime(new Date());
+    this.createdAt = getDateInLocaleTimeManaus(new Date());
     this.id = id ?? uuid();
     this.pin = pin;
   }

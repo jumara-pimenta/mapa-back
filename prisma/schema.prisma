@@ -55,7 +55,7 @@ model Path {
   id              String            @id @unique
   duration        String            @db.VarChar(10)
   startsAt        String            @db.VarChar(10)
-  startedAt       DateTime?         @db.Date
+  startedAt       DateTime?         @db.DateTimeOffset
   finishedAt      DateTime?         @db.DateTimeOffset
   type            String
   status          String

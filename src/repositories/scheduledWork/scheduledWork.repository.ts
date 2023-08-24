@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Pageable } from '../../configs/database/pageable.service';
 import { PrismaService } from '../../configs/database/prisma.service';
 
-import { getDateInLocaleTime } from '../../utils/Date';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 import IScheduledWorkRepository from './scheduledWork.repository.contract';
 import { ScheduledWork } from '../../entities/scheduledWork.entity';
 import { getTodayWithZeroTimeISO } from '../../utils/date.service';
@@ -24,7 +24,7 @@ export class ScheduledWorkRepository
         idEntity: data.idEntity,
         status: data.status,
         scheduledDate: data.scheduledDate,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
     });

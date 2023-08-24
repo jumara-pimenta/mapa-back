@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker/locale/pt_BR';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { getDateInLocaleTime } from '../../utils/Date';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 import { ETypePin } from '../../utils/ETypes';
 import { v4 as uuid } from 'uuid';
 
@@ -27,7 +27,7 @@ export class PrismaService
         name: 'Adm',
         role: 'ADMIN',
         roleType: 'ADMIN',
-        createdAt: getDateInLocaleTime(new Date()),
+        createdAt: getDateInLocaleTimeManaus(new Date()),
       },
       update: {
         email: 'adm@rotas.com.br',
@@ -52,7 +52,7 @@ export class PrismaService
         district: 'Distrito Industrial I',
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
-        createdAt: getDateInLocaleTime(new Date()),
+        createdAt: getDateInLocaleTimeManaus(new Date()),
       },
       update: {
         id: process.env.DENSO_ID,
@@ -64,7 +64,7 @@ export class PrismaService
 
         lat: '-3.111024790307586',
         lng: '-59.96232450142952',
-        createdAt: getDateInLocaleTime(new Date()),
+        createdAt: getDateInLocaleTimeManaus(new Date()),
       },
     });
 
@@ -82,7 +82,7 @@ export class PrismaService
             district: 'Distrito Industrial I',
             lat: '-3.1368534098377596',
             lng: '-59.98132250432473',
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           },
           {
             id: uuid(),
@@ -93,7 +93,7 @@ export class PrismaService
             district: 'Crespo',
             lat: '-3.1379972441350534',
             lng: '-59.984713639689815',
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           },
           {
             id: uuid(),
@@ -104,7 +104,7 @@ export class PrismaService
             district: 'Distrito Industrial I',
             lat: '-3.1356565487524675',
             lng: '-59.98612092294195',
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           },
           {
             id: uuid(),
@@ -115,7 +115,7 @@ export class PrismaService
             district: 'Distrito Industrial I',
             lat: '-3.119582454197964',
             lng: '-59.97671361130084',
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           },
           {
             id: uuid(),
@@ -125,7 +125,7 @@ export class PrismaService
             district: 'São Lázaro',
             lat: '-3.138758531627776',
             lng: '-59.98713727671988',
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           },
           {
             id: uuid(),
@@ -135,7 +135,7 @@ export class PrismaService
             district: 'São Lázaro',
             lat: '-3.1376438100682718',
             lng: '-59.988923509861465',
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           },
         ];
 
@@ -159,7 +159,7 @@ export class PrismaService
             role: faker.company.name(),
             shift: '07:30 às 17:30',
             id: uuid(),
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           });
         }
 
@@ -190,7 +190,7 @@ export class PrismaService
             category: 'D',
             firstAccess: true,
             cnh: faker.string.numeric(11).toString(),
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
 
             cpf: faker.string.numeric(11).toString(),
             password: await bcrypt.hash('Denso', 10),
@@ -217,7 +217,7 @@ export class PrismaService
             type: faker.vehicle.type(),
             isAccessibility: true,
             company: faker.company.name(),
-            createdAt: getDateInLocaleTime(new Date()),
+            createdAt: getDateInLocaleTimeManaus(new Date()),
           });
         }
 
@@ -235,7 +235,7 @@ export class PrismaService
         category: 'D',
         cnh: '12345678910',
         firstAccess: true,
-        createdAt: getDateInLocaleTime(new Date()),
+        createdAt: getDateInLocaleTimeManaus(new Date()),
         cpf: '12345678910',
         password: await bcrypt.hash('Denso', 10),
         validation: faker.date.future(),
@@ -263,7 +263,7 @@ export class PrismaService
         type: 'Van',
         isAccessibility: true,
         company: 'Denso',
-        createdAt: getDateInLocaleTime(new Date()),
+        createdAt: getDateInLocaleTimeManaus(new Date()),
       },
       update: {
         id: process.env.DENSO_ID,

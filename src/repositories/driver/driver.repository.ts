@@ -6,7 +6,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { Driver } from '../../entities/driver.entity';
 import IDriverRepository from './driver.repository.contract';
 import { generateQueryByFiltersForDriver } from '../../configs/database/Queries';
-import { getDateInLocaleTime } from '../../utils/Date';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class DriverRepository
         cnh: data.cnh,
         cpf: data.cpf,
         name: data.name,
-        validation: getDateInLocaleTime(new Date(data.validation)),
+        validation: getDateInLocaleTimeManaus(new Date(data.validation)),
       },
       where: {
         id: data.id,

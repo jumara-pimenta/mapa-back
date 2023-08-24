@@ -1,6 +1,6 @@
-import { getDateInLocaleTime } from '../utils/date.service';
 import { v4 as uuid } from 'uuid';
 import { Route } from './route.entity';
+import { getDateInLocaleTimeManaus } from '../utils/Date';
 
 export class Vehicle {
   id: string;
@@ -20,7 +20,7 @@ export class Vehicle {
 
   constructor(props: Omit<Vehicle, 'id' | 'createdAt' | 'route'>, id?: string) {
     Object.assign(this, props);
-    this.createdAt = getDateInLocaleTime(new Date());
+    this.createdAt = getDateInLocaleTimeManaus(new Date());
     this.id = id ?? uuid();
   }
 }

@@ -18,7 +18,7 @@ import { EStatusPath, ETypePath } from '../utils/ETypes';
 import { UpdateEmployeePresenceOnPathDTO } from '../dtos/employeesOnPath/updateEmployeePresenceOnPath.dto';
 import { RouteService } from './route.service';
 import { DisembarkEmployeeDTO } from '../dtos/employeesOnPath/disembarkEmployee.dto';
-import { getDateInLocaleTime } from '../utils/Date';
+import { getDateInLocaleTimeManaus } from '../utils/Date';
 import { Path } from '../entities/path.entity';
 
 @Injectable()
@@ -154,7 +154,7 @@ export class EmployeesOnPathService {
     }
 
     if (confirmPresence) {
-      employeeOnPath.boardingAt = getDateInLocaleTime(new Date());
+      employeeOnPath.boardingAt = getDateInLocaleTimeManaus(new Date());
     } else {
       Object.assign(employeeOnPath, { ...employeeOnPath, boardingAt: null });
     }
@@ -199,7 +199,7 @@ export class EmployeesOnPathService {
       );
     }
 
-    employeeOnPath.disembarkAt = getDateInLocaleTime(new Date());
+    employeeOnPath.disembarkAt = getDateInLocaleTimeManaus(new Date());
     employeeOnPath.present = true;
 
     const updatedEmployee = await this.employeesOnPathRepository.update(

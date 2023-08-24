@@ -1,6 +1,6 @@
-import { getDateInLocaleTime } from '../utils/date.service';
 import { v4 as uuid } from 'uuid';
 import { EmployeesOnPin } from './employeesOnPin.entity';
+import { getDateInLocaleTimeManaus } from '../utils/Date';
 
 export class Pin {
   id: string;
@@ -17,6 +17,6 @@ export class Pin {
   constructor(props: Omit<Pin, 'id' | 'createdAt' | 'employees'>, id?: string) {
     Object.assign(this, props);
     this.id = id ?? uuid();
-    this.createdAt = getDateInLocaleTime(new Date());
+    this.createdAt = getDateInLocaleTimeManaus(new Date());
   }
 }

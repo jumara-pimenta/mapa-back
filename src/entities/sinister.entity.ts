@@ -1,4 +1,4 @@
-import { getDateInLocaleTime } from '../utils/Date';
+import { getDateInLocaleTimeManaus } from '../utils/Date';
 import { v4 as uuid } from 'uuid';
 import { RouteHistory } from './routeHistory.entity';
 
@@ -21,7 +21,7 @@ export class Sinister {
     Object.assign(this, props);
     this.pathId = pathId;
     this.createdBy = createdBy;
-    this.createdAt = getDateInLocaleTime(new Date());
+    this.createdAt = getDateInLocaleTimeManaus(new Date());
     this.id = id ?? uuid();
   }
 }

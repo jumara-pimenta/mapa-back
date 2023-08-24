@@ -184,6 +184,10 @@ export class WebsocketGateway {
           ...updatedPath,
         });
 
+        this.server.emit(employeeOnPath.id, {
+          ...employeeOnPath,
+        });
+
         return {
           event: employeeOnPath.id,
           data: employeeOnPath,

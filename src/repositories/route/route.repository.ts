@@ -11,7 +11,7 @@ import { RouteWebsocket } from '../../entities/routeWebsocket.entity';
 
 import { ERoutePathStatus, ETypeRouteExport } from '../../utils/ETypes';
 import { TTypeRoute } from '../../utils/TTypes';
-import { getDateInLocaleTime } from '../../utils/Date';
+import { getDateInLocaleTimeManaus } from '../../utils/Date';
 
 @Injectable()
 export class RouteRepository
@@ -281,7 +281,7 @@ export class RouteRepository
         distance: data.distance,
         status: data.status,
         type: data.type,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
     });
@@ -303,7 +303,7 @@ export class RouteRepository
         distance: data.distance,
         status: data.status,
         type: data.type,
-        updatedAt: getDateInLocaleTime(new Date()),
+        updatedAt: getDateInLocaleTimeManaus(new Date()),
       },
       where: { id: data.id },
     });
@@ -922,7 +922,7 @@ export class RouteRepository
       where: { id },
       data: {
         status: 'deleted',
-        deletedAt: getDateInLocaleTime(new Date()),
+        deletedAt: getDateInLocaleTimeManaus(new Date()),
       },
     });
   }
