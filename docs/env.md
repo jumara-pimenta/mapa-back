@@ -39,7 +39,7 @@ CORE_API_URL=
 *NODE_ENV=<STRING>
 
 # Values: type number. Port to access application local or from Docker
-*PORT_BACKEND=<NUMBER>ww
+*PORT_BACKEND=<NUMBER>
 ```
 
 ### Authentication configuration
@@ -76,13 +76,13 @@ CORE_API_URL=
 # Pay attention to format time to set cron
 
 # Job to update finished routes to pending
-TIME_TO_UPDATE_JOB_UPDATE_STATUS=<'* * * * * *'>
+*TIME_TO_UPDATE_JOB_UPDATE_STATUS=<'* * * * * *'>
 
 # Job to execute each time to finish routes not finisheds
-TIME_TO_UPDATE_JOB_FINISH_ROUTES=<'* * * * * *'>
+*TIME_TO_UPDATE_JOB_FINISH_ROUTES=<'* * * * * *'>
 
 # Duration in hours after started route to finish her
-TIME_LIMIT_TO_FINISH_ROUTE_IN_HR=<NUMBER>
+*TIME_LIMIT_TO_FINISH_ROUTE_IN_HR=<NUMBER>
 ```
 
 ### SqlServer connection
