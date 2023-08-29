@@ -173,7 +173,7 @@ export class PathService {
         totalEmployees: totalEmployees,
         totalConfirmed: totalConfirmed,
         startedAt: path.startedAt,
-        finishedAt: new Date(),
+        finishedAt: getDateInLocaleTimeManaus(new Date()),
       },
       path,
       driver,

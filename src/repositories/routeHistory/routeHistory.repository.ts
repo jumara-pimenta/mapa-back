@@ -74,6 +74,7 @@ export class RouteHistoryRepository
 
     return routeHistory;
   }
+  
   async findAll(
     page: Page,
     filters: FiltersRouteHistoryDTO,

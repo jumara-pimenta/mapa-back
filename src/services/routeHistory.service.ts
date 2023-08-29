@@ -36,30 +36,13 @@ export class RouteHistoryService {
   ) {}
 
   async create(props: RouteHistory): Promise<RouteHistory> {
-    const newRouteHistory = new RouteHistory(
-      {
-        typeRoute: props.typeRoute,
-        nameRoute: props.nameRoute,
-        employeeIds: props.employeeIds,
-        totalEmployees: props.totalEmployees,
-        totalConfirmed: props.totalConfirmed,
-        itinerary: props.itinerary,
-        startedAt: props.path.startedAt ?? new Date(),
-        finishedAt: new Date(),
-        employeesNotPresent: props.employeesNotPresent
-      },
-      props.path,
-      props.driver,
-      props.vehicle,
-      props.sinister,
-      props.createdAt,
-    );
+    
     const routeHistory = await this.routeHistoryRepository.create(
-      newRouteHistory,
+      props,
     );
 
-    if (newRouteHistory.sinister) {
-      for await (const sinister of newRouteHistory.sinister) {
+    if (props.sinister) {
+      for await (const sinister of props.sinister) {
         await this.sinisterService.vinculatePath(
           sinister,
           routeHistory.id,
