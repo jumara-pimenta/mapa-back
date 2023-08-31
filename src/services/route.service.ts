@@ -32,6 +32,7 @@ import {
 import { addHours, addMinutes } from 'date-fns';
 import {
   convertTimeToDate,
+  getExactDate,
   getNextBusinessDay,
   getSpecialHour,
   getStartAtAndFinishAt,
@@ -275,7 +276,7 @@ export class RouteService {
       payload.employeeIds,
     );
 
-    const { endRouteDate, initRouteDate } = this.getTimesForRoute(payload);
+    const { endRouteDate, initRouteDate, startAndReturnAt  } = this.getTimesForRoute(payload);
 
     const driver = await this.driverService.listById(
       payload.driverId ?? process.env.DENSO_ID,
@@ -343,8 +344,8 @@ export class RouteService {
           ...payload.pathDetails,
           startsAt: initRouteDate,
           startsReturnAt: endRouteDate,
-          scheduleDate:
-            payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
+          scheduleDate: getExactDate(initRouteDate),
+          returnScheduleDate: getExactDate(endRouteDate),
         },
       });
 
@@ -382,8 +383,8 @@ export class RouteService {
           ...payload.pathDetails,
           startsAt: initRouteDate,
           startsReturnAt: endRouteDate,
-          scheduleDate:
-            payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
+          scheduleDate: getExactDate(startAndReturnAt.startAt),
+          returnScheduleDate: getExactDate(startAndReturnAt.finishAt),
         },
       });
 
@@ -455,7 +456,7 @@ export class RouteService {
       payload.employeeIds,
     );
 
-    const { endRouteDate, initRouteDate } = this.getTimesForRoute(payload);
+    const { endRouteDate, initRouteDate, startAndReturnAt } = this.getTimesForRoute(payload);
 
     const driver = await this.driverService.listById(
       payload.driverId ?? process.env.DENSO_ID,
@@ -522,8 +523,8 @@ export class RouteService {
         ...payload.pathDetails,
         startsAt: initRouteDate,
         startsReturnAt: endRouteDate,
-        scheduleDate:
-          payload.pathDetails.scheduleDate ?? getDateInLocaleTime(new Date()),
+        scheduleDate: getExactDate(startAndReturnAt.startAt),
+        returnScheduleDate: getExactDate(startAndReturnAt.finishAt),
       },
     });
 
@@ -1030,18 +1031,26 @@ export class RouteService {
       for await (const _path of routeToValidate.paths) {
         await this.pathService.softDelete(_path.id);
       }
-      const scheduledDate = getNextBusinessDay();
+
+      const startsAtPaths = routeToValidate.paths.map((path) => path.startsAt);
+
+      const generatedDatesScheduled = startsAtPaths.map((startAt) =>
+        getNextBusinessDay(startAt),
+      );
 
       const scheduledWorkProps = new ScheduledWork({
         entity: EEntity.ROUTE,
         idEntity: routeToValidate.id,
         status: EStatusWork.PENDING,
-        scheduledDate,
+        scheduledDate: generatedDatesScheduled.at(0),
       });
 
       await this.scheduledWorkRepository.create(scheduledWorkProps);
 
-      await this.pathService.regeneratePaths(routeToValidate, scheduledDate);
+      await this.pathService.regeneratePaths(
+        routeToValidate,
+        generatedDatesScheduled,
+      );
     }
 
     const today = new Date();

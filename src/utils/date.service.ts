@@ -40,20 +40,36 @@ function isWeekendDay(date: Date) {
   return dayOfWeek === 0 || dayOfWeek === 6;
 }
 
-export function getNextBusinessDay(): Date {
+export function getNextBusinessDay(startsAt: string): Date {
+
+  const [hours, minutes] = startsAt.split(':').map(Number);
+
   let nextDay = addDays(new Date(), 1);
 
   while (isWeekendDay(nextDay)) {
     nextDay = addDays(nextDay, 1);
   }
 
-  // Zerando as horas, minutos, segundos e milissegundos
-  nextDay = setHours(nextDay, 0);
-  nextDay = setMinutes(nextDay, 0);
+  nextDay = setHours(nextDay, hours);
+  nextDay = setMinutes(nextDay, minutes);
   nextDay = setSeconds(nextDay, 0);
   nextDay = setMilliseconds(nextDay, 0);
 
-  return nextDay;
+  return getDateInLocaleTimeManaus(nextDay);
+}
+
+export function getExactDate(startsAt: string): Date {
+
+  const [hours, minutes] = startsAt.split(':').map(Number);
+
+  let exactDate = new Date();
+
+  exactDate = setHours(exactDate, hours);
+  exactDate = setMinutes(exactDate, minutes);
+  exactDate = setSeconds(exactDate, 0);
+  exactDate = setMilliseconds(exactDate, 0);
+
+  return getDateInLocaleTimeManaus(exactDate);
 }
 
 export function getDuration(previousTime: Date, currentTime: Date): number {
@@ -230,6 +246,7 @@ export function isDateAfterToday(date: Date): boolean {
 }
 
 import { startOfDay } from 'date-fns';
+import { getDateInLocaleTimeManaus } from './Date';
 
 export function getTodayWithZeroTimeISO(): string {
   const today = new Date();

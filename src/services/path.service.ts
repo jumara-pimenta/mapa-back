@@ -281,7 +281,7 @@ export class PathService {
   }
 
   async generate(props: CreatePathDTO): Promise<void> {
-    const { type, duration, startsAt, startsReturnAt } = props.details;
+    const { type, duration, startsAt, startsReturnAt, returnScheduleDate } = props.details;
 
     const route = await this.routeService.listById(props.routeId);
 
@@ -324,7 +324,7 @@ export class PathService {
             startsAt: startsReturnAt ?? startsAt,
             type: ETypePath.RETURN,
             status: EStatusPath.PENDING,
-            scheduleDate: props.details.scheduleDate,
+            scheduleDate: returnScheduleDate,
           },
           route,
         ),
@@ -348,9 +348,14 @@ export class PathService {
 
   async regeneratePaths(
     route: MappedRouteDTO,
-    scheduledDate?: Date,
+    scheduledDate?: Date[],
   ): Promise<void> {
+    let i: number;
+
     for await (const _path of route.paths) {
+
+      i == null ? 0 : i++;
+
       const { duration, startsAt, type } = _path;
 
       const props = new Path(
@@ -359,7 +364,7 @@ export class PathService {
           startsAt,
           type,
           status: EStatusPath.PENDING,
-          scheduleDate: scheduledDate ?? getNextBusinessDay(),
+          scheduleDate: scheduledDate[i] ?? getNextBusinessDay(startsAt),
         },
         route,
       );
@@ -405,6 +410,7 @@ export class PathService {
 
   async listByIdMobile(id: string): Promise<any> {
     const path = await this.pathRepository.findById(id);
+
     if (!path) {
       throw new HttpException(
         `Não foi encontrado trajeto com o id: ${id}!`,
@@ -417,10 +423,9 @@ export class PathService {
 
       const { employeesOnPath } = pathData;
 
-      const confirmedEmployees = employeesOnPath.map((employee) => {
-        if (employee.confirmation) return employee;
-        return;
-      });
+      const confirmedEmployees = employeesOnPath.filter(
+        (employee) => employee.confirmation,
+      );
 
       pathData.employeesOnPath = confirmedEmployees;
 
@@ -455,10 +460,9 @@ export class PathService {
 
       const { employeesOnPath } = pathData;
 
-      const confirmedEmployees = employeesOnPath.map((employee) => {
-        if (employee.confirmation) return employee;
-        return;
-      });
+      const confirmedEmployees = employeesOnPath.filter(
+        (employee) => employee.confirmation,
+      );
 
       pathData.employeesOnPath = confirmedEmployees;
 
@@ -806,7 +810,9 @@ export class PathService {
     return path;
   }
 
-  async listByEmployeeOnPathFromMobile(employeeOnPathId: string): Promise<Partial<Path>> {
+  async listByEmployeeOnPathFromMobile(
+    employeeOnPathId: string,
+  ): Promise<Partial<Path>> {
     const path = await this.pathRepository.findByEmployeeOnPathMobile(
       employeeOnPathId,
     );

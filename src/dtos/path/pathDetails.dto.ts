@@ -100,4 +100,6 @@ export class PathDetailsDTO {
   departureTime?: string;
 
   scheduleDate?: Date;
+
+  returnScheduleDate?: Date
 }
