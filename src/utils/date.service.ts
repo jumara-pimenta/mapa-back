@@ -60,7 +60,7 @@ export function getNextBusinessDay(startsAt: string): Date {
 
 export function getExactDate(startsAt: string): Date {
 
-  const [hours, minutes] = startsAt.split(':').map(Number);
+  const [hours, minutes] = startsAt!.split(':').map(Number);
 
   let exactDate = new Date();
 

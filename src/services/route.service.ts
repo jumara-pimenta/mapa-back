@@ -523,8 +523,8 @@ export class RouteService {
         ...payload.pathDetails,
         startsAt: initRouteDate,
         startsReturnAt: endRouteDate,
-        scheduleDate: getExactDate(startAndReturnAt.startAt),
-        returnScheduleDate: getExactDate(startAndReturnAt.finishAt),
+        scheduleDate: getExactDate(startAndReturnAt?.startAt ?? initRouteDate),
+        returnScheduleDate: getExactDate(startAndReturnAt?.finishAt ?? initRouteDate),
       },
     });
 
