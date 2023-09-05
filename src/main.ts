@@ -33,7 +33,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT_BACKEND, () =>
-    console.log(`🤖 server running on port ${process.env.PORT_BACKEND}...`),
+    console.log(`🚀 server running on port ${process.env.PORT_BACKEND}...`),
   );
 }
 
