@@ -10,13 +10,14 @@
     "build": "nest build",
     "start": "npx prisma migrate dev && nest start",
     "start:dev": "npx prisma migrate dev && nest start --watch",
-    "migrate:prod": "prisma migrate deploy",
+    "migrate:prod": "npx prisma migrate deploy",
     "migrate:dev": "npx prisma migrate dev",
     "generate:schemas": "prisma generate",
     "test:watch": "jest --watchAll",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "MOCK_SERVER=true jest --config ./test/jest-e2e.json --runInBand --forceExit"
+    "test:e2e": "MOCK_SERVER=true jest --config ./test/jest-e2e.json --runInBand --forceExit",
+    "pretest:e2e": "docker-compose -f docker-compose.test.yml down && docker-compose -f docker-compose.test.yml up -d && ./wait-for-it.sh && yarn migrate:prod"
   },
   "dependencies": {
     "@faker-js/faker": "8.0.2",
@@ -60,7 +61,7 @@
   "devDependencies": {
     "@nestjs/cli": "10.1.12",
     "@nestjs/schematics": "10.0.2",
-    "@nestjs/testing": "10.1.3",
+    "@nestjs/testing": "^10.2.4",
     "@types/axios": "^0.14.0",
     "@types/bcrypt": "^5.0.0",
     "@types/date-fns": "^2.6.0",
