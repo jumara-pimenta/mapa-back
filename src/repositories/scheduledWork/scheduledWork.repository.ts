@@ -5,7 +5,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { getDateInLocaleTimeManaus } from '../../utils/Date';
 import IScheduledWorkRepository from './scheduledWork.repository.contract';
 import { ScheduledWork } from '../../entities/scheduledWork.entity';
-import { getTodayWithZeroTimeISO } from '../../utils/date.service';
+import { getMidnightRange, getTodayWithZeroTimeISO } from '../../utils/date.service';
 
 @Injectable()
 export class ScheduledWorkRepository
@@ -34,11 +34,16 @@ export class ScheduledWorkRepository
     entity: string,
     status: string,
   ): Promise<Array<ScheduledWork>> {
+    const { init, end } = getMidnightRange(new Date());
+
     return await this.repository.scheduledWork.findMany({
       where: {
         entity,
         status,
-        scheduledDate: getTodayWithZeroTimeISO(),
+        scheduledDate: {
+          gte: init,
+          lte: end
+        },
       },
     });
   }

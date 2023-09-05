@@ -4,6 +4,8 @@ import {
   differenceInDays,
   differenceInHours,
   differenceInSeconds,
+  endOfDay,
+  formatISO,
   isDate,
   setHours,
   setMilliseconds,
@@ -248,10 +250,18 @@ export function isDateAfterToday(date: Date): boolean {
 import { startOfDay } from 'date-fns';
 import { getDateInLocaleTimeManaus } from './Date';
 
-export function getTodayWithZeroTimeISO(): string {
+export function getTodayWithZeroTimeISO(): Date {
   const today = new Date();
   const todayWithZeroTime = startOfDay(today);
-  return todayWithZeroTime.toISOString();
+
+  return getDateInLocaleTimeManaus(todayWithZeroTime);
+}
+
+export function getMidnightRange(date: Date): { init: string; end: string } {
+  const init = formatISO(startOfDay(date), { representation: 'complete' });
+  const end = formatISO(endOfDay(date), { representation: 'complete' });
+
+  return { init, end };
 }
 
 export function addOneDayToDate(date: Date): Date {

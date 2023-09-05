@@ -36,6 +36,7 @@ import {
   getNextBusinessDay,
   getSpecialHour,
   getStartAtAndFinishAt,
+  resetHour,
 } from '../utils/date.service';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../entities/employee.entity';
@@ -276,7 +277,8 @@ export class RouteService {
       payload.employeeIds,
     );
 
-    const { endRouteDate, initRouteDate, startAndReturnAt  } = this.getTimesForRoute(payload);
+    const { endRouteDate, initRouteDate, startAndReturnAt } =
+      this.getTimesForRoute(payload);
 
     const driver = await this.driverService.listById(
       payload.driverId ?? process.env.DENSO_ID,
@@ -456,7 +458,8 @@ export class RouteService {
       payload.employeeIds,
     );
 
-    const { endRouteDate, initRouteDate, startAndReturnAt } = this.getTimesForRoute(payload);
+    const { endRouteDate, initRouteDate, startAndReturnAt } =
+      this.getTimesForRoute(payload);
 
     const driver = await this.driverService.listById(
       payload.driverId ?? process.env.DENSO_ID,
@@ -524,7 +527,9 @@ export class RouteService {
         startsAt: initRouteDate,
         startsReturnAt: endRouteDate,
         scheduleDate: getExactDate(startAndReturnAt?.startAt ?? initRouteDate),
-        returnScheduleDate: getExactDate(startAndReturnAt?.finishAt ?? initRouteDate),
+        returnScheduleDate: getExactDate(
+          startAndReturnAt?.finishAt ?? initRouteDate,
+        ),
       },
     });
 
@@ -1038,14 +1043,10 @@ export class RouteService {
         getNextBusinessDay(startAt),
       );
 
-      const scheduledWorkProps = new ScheduledWork({
-        entity: EEntity.ROUTE,
-        idEntity: routeToValidate.id,
-        status: EStatusWork.PENDING,
-        scheduledDate: generatedDatesScheduled.at(0),
-      });
-
-      await this.scheduledWorkRepository.create(scheduledWorkProps);
+      await this.makeAppointmentToUpdateStatusRoute(
+        routeToValidate.id,
+        generatedDatesScheduled.at(0),
+      );
 
       await this.pathService.regeneratePaths(
         routeToValidate,
@@ -1068,6 +1069,20 @@ export class RouteService {
       driver: dataFilterWebsocket.driver,
       ...path,
     };
+  }
+
+  private async makeAppointmentToUpdateStatusRoute(
+    routeId: string,
+    scheduleDate: Date,
+  ): Promise<void> {
+    const scheduledWorkProps = new ScheduledWork({
+      entity: EEntity.ROUTE,
+      idEntity: routeId,
+      status: EStatusWork.PENDING,
+      scheduledDate: resetHour(scheduleDate),
+    });
+
+    await this.scheduledWorkRepository.create(scheduledWorkProps);
   }
 
   async checkAllPathsFinished(paths: Path[]): Promise<boolean> {
