@@ -293,6 +293,7 @@ export class PathService {
             startsAt: startsAt,
             type: type,
             status: EStatusPath.PENDING,
+            scheduleDate: props.details.scheduleDate,
           },
           route,
         ),
