@@ -36,6 +36,7 @@ import { DENSO_LOCATION } from '../utils/Constants';
 import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
 import { getDateInLocaleTime, getDateInLocaleTimeManaus } from '../utils/Date';
 import { getNextBusinessDay, isDateAfterToday } from '../utils/date.service';
+// import { FEATURE_ENABLED_LIST_ONLY_DAY_PATHS } from '../settings';
 
 interface IEmployeeNotPresent {
   name: string;
@@ -281,7 +282,8 @@ export class PathService {
   }
 
   async generate(props: CreatePathDTO): Promise<void> {
-    const { type, duration, startsAt, startsReturnAt, returnScheduleDate } = props.details;
+    const { type, duration, startsAt, startsReturnAt, returnScheduleDate } =
+      props.details;
 
     const route = await this.routeService.listById(props.routeId);
 
@@ -354,7 +356,6 @@ export class PathService {
     let i: number;
 
     for await (const _path of route.paths) {
-
       i == null ? 0 : i++;
 
       const { duration, startsAt, type } = _path;
@@ -520,12 +521,15 @@ export class PathService {
   }
 
   async listAll(filters?: FiltersPathDTO): Promise<any[]> {
-    const paths = await this.pathRepository.findAll(filters);
+    const paths = process.env.FEATURE_ENABLED_LIST_ONLY_DAY_PATHS
+      ? await this.pathRepository.findAllToday(filters)
+      : await this.pathRepository.findAll(filters);
 
     return paths.map((path: Path) => {
       const { driver, vehicle } = path.route;
       const { name, id } = driver;
       const { plate } = vehicle;
+
       const path1 = this.mapperOne(path);
 
       return {

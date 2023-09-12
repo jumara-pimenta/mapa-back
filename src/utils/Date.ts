@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { zonedTimeToUtc } from 'date-fns-tz';
-import * as moment from 'moment';
+import moment from 'moment';
 import { PeriodInDate } from '../dtos/routeHistory/dateFilter.dto';
 import { ETypePeriodHistory } from './ETypes';
 

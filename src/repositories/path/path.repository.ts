@@ -6,6 +6,7 @@ import IPathRepository from './path.repository.contract';
 import { ERoutePathStatus, EStatusPath } from '../../utils/ETypes';
 import { generateQueryByFiltersForPaths } from '../../configs/database/Queries';
 import { getDateInLocaleTimeManaus } from '../../utils/Date';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class PathRepository extends Pageable<Path> implements IPathRepository {
@@ -13,14 +14,17 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     super();
   }
 
-  findByStatusAndDriver(status: EStatusPath, driverId: string): Promise<Path[]> {
+  findByStatusAndDriver(
+    status: EStatusPath,
+    driverId: string,
+  ): Promise<Path[]> {
     return this.repository.path.findMany({
       where: {
         deletedAt: null,
         status,
         route: {
-          driverId
-        }
+          driverId,
+        },
       },
       select: {
         id: true,
@@ -489,7 +493,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
   findByIdToDelete(id: string): Promise<Path | null> {
     return this.repository.path.findUnique({
       where: {
-        id: id
+        id: id,
       },
       select: {
         id: true,
@@ -793,11 +797,11 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
             {
               employeesOnPath: {
                 some: {
-                  present: true
-                }
-              }
-            }
-          ]
+                  present: true,
+                },
+              },
+            },
+          ],
         },
       },
       select: {
@@ -896,6 +900,121 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     return await this.repository.path.findMany({
       where: {
         deletedAt: null,
+        ...filter,
+        ...condition,
+        AND: {
+          route: {
+            deletedAt: null,
+          },
+        },
+      },
+      select: {
+        id: true,
+        type: true,
+        duration: true,
+        status: true,
+        startsAt: true,
+        startedAt: true,
+        finishedAt: true,
+        scheduleDate: true,
+        createdAt: true,
+        route: {
+          select: {
+            type: true,
+            id: true,
+            description: true,
+            driver: {
+              select: {
+                id: true,
+                name: true,
+                cpf: true,
+                cnh: true,
+                createdAt: true,
+                validation: true,
+                updatedAt: false,
+                category: true,
+                deletedAt: false,
+                password: false,
+                RouteHistory: false,
+              },
+            },
+            vehicle: {
+              select: {
+                plate: true,
+                id: true,
+                capacity: true,
+                company: true,
+                createdAt: true,
+                expiration: true,
+                updatedAt: false,
+                isAccessibility: true,
+                lastMaintenance: true,
+                lastSurvey: true,
+                note: true,
+                renavam: true,
+                RouteHistory: false,
+                routes: false,
+                type: true,
+              },
+            },
+          },
+        },
+
+        employeesOnPath: {
+          where: {
+            employee: {
+              deletedAt: null,
+            },
+          },
+          select: {
+            id: true,
+            boardingAt: true,
+            confirmation: true,
+            disembarkAt: true,
+            position: true,
+            employee: {
+              select: {
+                name: true,
+                address: true,
+                shift: true,
+                registration: true,
+                pins: {
+                  select: {
+                    type: true,
+                    pin: {
+                      select: {
+                        lat: true,
+                        lng: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        status: 'asc',
+      },
+    });
+  }
+
+  async findAllToday(filter?: any): Promise<Path[]> {
+    const condition = generateQueryByFiltersForPaths(filter);
+
+    const startOfToday = startOfDay(new Date());
+
+  // Obtém a data de fim do dia atual
+    const endOfToday = endOfDay(new Date());
+
+    return await this.repository.path.findMany({
+      where: {
+        deletedAt: null,
+        scheduleDate: {
+          gte: startOfToday,
+          lte: endOfToday
+        },
         ...filter,
         ...condition,
         AND: {
