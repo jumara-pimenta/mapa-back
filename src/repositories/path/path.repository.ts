@@ -7,6 +7,8 @@ import { ERoutePathStatus, EStatusPath } from '../../utils/ETypes';
 import { generateQueryByFiltersForPaths } from '../../configs/database/Queries';
 import { getDateInLocaleTimeManaus } from '../../utils/Date';
 import { endOfDay, startOfDay } from 'date-fns';
+import moment from 'moment';
+import { utcToZonedTime } from 'date-fns-tz';
 
 @Injectable()
 export class PathRepository extends Pageable<Path> implements IPathRepository {
@@ -1006,16 +1008,16 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
 
     const startOfToday = startOfDay(new Date());
 
-  // Obtém a data de fim do dia atual
+    // Obtém a data de fim do dia atual
     const endOfToday = endOfDay(new Date());
 
-    return await this.repository.path.findMany({
+    const paths = await this.repository.path.findMany({
       where: {
         deletedAt: null,
-        scheduleDate: {
-          gte: startOfToday,
-          lte: endOfToday
-        },
+        // scheduleDate: {
+        //   gte: startOfToday.toISOString(),
+        //   lte: endOfToday.toISOString()
+        // },
         ...filter,
         ...condition,
         AND: {
@@ -1114,6 +1116,19 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         status: 'asc',
       },
     });
+
+    // Filtra apenas os registros com scheduleDate correspondente ao dia atual
+    const currentDate = moment().utcOffset(-240).format('YYYY-MM-DD');
+
+    const pathsForToday = paths.filter((path) => {
+      const timeZone = 'UTC'; // Use o fuso horário do banco de dados
+
+      const zonedDateToCompare = utcToZonedTime(path.scheduleDate, timeZone);
+
+      return moment(zonedDateToCompare).format('YYYY-MM-DD') === currentDate;
+    });
+
+    return pathsForToday;
   }
 
   async softDelete(id: string): Promise<Path> {

@@ -21,6 +21,6 @@ sqlcmd -S $server -U $user -P $password -Q "$sql_query"
 echo "Banco de dados '$database' criado com sucesso!"
 
 # Após a criação do banco de dados, execute o comando Prisma
-npx prisma migrate reset
+npx prisma migrate reset --force
 
 echo "Reset de migrações do Prisma concluído!"

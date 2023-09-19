@@ -16,8 +16,8 @@
     "test:watch": "jest --watchAll",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "MOCK_SERVER=true jest --config ./test/jest-e2e.json --runInBand --forceExit",
-    "pretest:e2e": "docker-compose -f docker-compose.test.yml down && docker-compose -f docker-compose.test.yml up -d && ./wait-for-it.sh && yarn migrate:prod"
+    "test:e2e": "jest --i --no-cache --coverage --config ./test/jest-e2e.json --runInBand --forceExit",
+    "pretest:e2e": "docker-compose -f docker-compose.test.yml up -d && ./wait-for-it.sh && yarn migrate:prod"
   },
   "dependencies": {
     "@faker-js/faker": "8.0.2",
@@ -42,6 +42,7 @@
     "crypto": "^1.0.1",
     "date-fns": "2.30.0",
     "date-fns-tz": "2.0.0",
+    "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
     "google-maps": "^4.3.3",
     "googlemaps": "^1.12.0",

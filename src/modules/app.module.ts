@@ -18,7 +18,9 @@ import { JobsModule } from './job.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.env' }),
+    ConfigModule.forRoot({
+      envFilePath: process.env.MOCK_SERVER === 'true' ? '.env.test' : '.env',
+    }),
     RepositoryModule,
     AuthModule,
     ApiModule,
@@ -33,7 +35,7 @@ import { JobsModule } from './job.module';
     VehicleModule,
     WebsocketModule,
     SinisterModule,
-    JobsModule
+    JobsModule,
   ],
 })
 export class AppModule {}
