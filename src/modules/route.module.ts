@@ -19,7 +19,7 @@ import { ScheduledWorkRepository } from '../repositories/scheduledWork/scheduled
     forwardRef(() => EmployeeModule),
     forwardRef(() => PathModule),
     forwardRef(() => RouteHistoryModule),
-    forwardRef(() => EmployeesOnPathModule)
+    forwardRef(() => EmployeesOnPathModule),
   ],
   controllers: [RouteController],
   providers: [
@@ -39,7 +39,7 @@ import { ScheduledWorkRepository } from '../repositories/scheduledWork/scheduled
     {
       provide: 'IScheduledWorkRepository',
       useClass: ScheduledWorkRepository,
-    }
+    },
   ],
   exports: [RouteService],
 })

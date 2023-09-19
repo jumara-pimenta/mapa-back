@@ -15,7 +15,7 @@ import * as bcrypt from 'bcrypt';
 import { MappedBackOfficeUserDTO } from '../dtos/auth/mappedBackOfficeUser.dto';
 import { UpdateBackofficeUserPasswordDTO } from '../dtos/backofficeUser/updateBackofficeUserPassword.dto';
 import { AuthService } from './auth.service';
-import { EMAIL_ADM_ROTAS } from 'src/utils/Constants';
+import { EMAIL_ADM_ROTAS } from '../utils/Constants';
 
 @Injectable()
 export class BackofficeUserService {

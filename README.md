@@ -17,6 +17,7 @@ Este repositório contém as informações necessárias para facilitar deploy e 
 - [Comandos básicos para utilização do SONAR ROTAS back-end no Docker](#comandos-básicos-para-utilização-do-sonar-rotas-back-end-no-docker)
 - [Configuração de deploy back-end do projeto SONAR ROTAS usando o Node.js](#7-configuração-de-deploy-back-end-do-projeto-sonar-rotas-usando-o-nodejs)
 - [Comandos básicos para utilização do SONAR ROTAS back-end no Node.Js](#comandos-básicos-para-utilização-do-sonar-rotas-back-end-no-nodejs)
+- [Testes E2E: Como executar](#testes-e2e-como-executar)
 <!--te-->
 
 ## 1. Status do Projeto
@@ -457,4 +458,102 @@ Para baixar atualizações do SONAR - ROTAS back-end (fazer o git pull, iniciar 
 $ git pull
 $ yarn
 $ yarn start
+```
+
+
+## Testes E2E: Como executar
+
+São conhecidos como os testes de ponta a ponta, testando uma funcionalidade completa incluindo todas as chamadas: banco de dados, apis etc.  
+  
+Atualmente, os testes estão configurados apenas para rodar localmente.
+
+
+### Variáveis de ambiente
+
+Antes de rodar os testes, altere a variável `DATABASE_URL` no arquivo `.env` setando o seu IP local e as credenciais do banco de teste:
+```bash
+DATABASE_URL=sqlserver://<SEU_IP>:1433;database=rotas;user=sa;password=Admin123;encrypt=true;trustServerCertificate=true
+```
+
+
+### Funcionamento
+Execute na primeira vez:
+
+```bash
+  yarn pretest:e2e
+```
+
+O comando vai criar um banco de dados para teste no Docker se baseando no arquivo `docker-compose.test.yml`.
+
+No terminal vai ser solitado uma confirmação para limpar o banco, visto que ele precisa ser resetado toda vez para os testes:
+```bash
+[+] Running 2/2
+ ✔ Network sonar-rotas-back_default  C...                                    0.0s 
+ ✔ Container db-sqlserver-test       Starte...                               0.2s 
+Aguardando o servidor SQL Server iniciar...
+Banco de dados 'rotas' criado com sucesso!
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQL Server database
+
+? Are you sure you want to reset your database? All data will be lost. › (y/N)
+```
+Digite sim `(y)`  
+As migrações vão ser rodadas e a aplicação vai estar pronta para os testes
+```bash
+✔ Are you sure you want to reset your database? All data will be lost. … yes
+
+Applying migration `20230713182418_v2_5`
+Applying migration `20230725145322_create_table_scheduled_work`
+Applying migration `20230817133844_`
+Applying migration `20230824134022_`
+
+Database reset successful
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20230713182418_v2_5/
+    └─ migration.sql
+  └─ 20230725145322_create_table_scheduled_work/
+    └─ migration.sql
+  └─ 20230817133844_/
+    └─ migration.sql
+  └─ 20230824134022_/
+    └─ migration.sql
+
+✔ Generated Prisma Client (v5.2.0) to ./node_modules/@prisma/client in 186ms
+
+Reset de migrações do Prisma concluído!
+$ npx prisma migrate deploy
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQL Server database
+
+4 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+✨  Done in 33.72s.
+```
+Agora execute o comando para rodar os testes
+```bash
+yarn test:e2e
+```
+Depois de pedir as mesmas permissões do comando `yarn pretest:e2e`, os testes vão rodar:
+```bash
+$ MOCK_SERVER=true jest --config ./test/jest-e2e.json --runInBand --forceExit
+ PASS  test/route.e2e-spec.ts (7.528 s)
+  Route Controller (e2e)
+    create conventional route
+      ✓ should be able to list all employees (86 ms)
+      ✓ should be able to create a conventional route (903 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        7.603 s, estimated 8 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
+✨  Done in 49.74s.
 ```
