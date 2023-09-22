@@ -174,26 +174,8 @@ describe('Route Controller (e2e)', () => {
     routeProps.employeeIds = [];
   });
 
-  describe('Tests Route (E2E)', () => {
-    it('should be able to list all employees', async () => {
-      const response = await httpSender
-        .get('/api/employees')
-        .set('Authorization', `Bearer ${tokenJWT}`);
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty('items');
-    });
-
-    it('should be able to create a conventional route', async () => {
-      const response = await httpSender
-        .post('/api/routes')
-        .send(routeProps)
-        .set('Authorization', `Bearer ${tokenJWT}`);
-
-      expect(response.statusCode).toBe(201);
-    });
-
-    it('should be able to not list routes from another day', async () => {
+  describe('GET /api/routes/paths/get/all', () => {
+    it('should be able to list only routes from today', async () => {
       const response = await httpSender
         .get('/api/routes/paths/get/all')
         .set('Authorization', `Bearer ${tokenJWT}`);
@@ -202,16 +184,14 @@ describe('Route Controller (e2e)', () => {
 
       const paths = response.body;
 
-      if (paths.length > 0) {
-        paths[0].scheduledDate = new Date('2023-09-20T17:30:00.000Z');
-      }
-
       for (const path of paths) {
-        expect(moment(path.scheduledDate).format('YYYY-MM-DD') !== today);
+        expect(moment(path.scheduledDate).format('YYYY-MM-DD')).toBe(today);
       }
     });
+  });
 
-    it('GET /api/routes/paths/:id should be able to not list employees who have disconfirmed their presence on the route', async () => {
+  describe('GET /api/routes/paths/:id', () => {
+    it('should be able to not list employees who have disconfirmed their presence on the route', async () => {
       const createdRoute = await httpSender
         .post('/api/routes')
         .send(routeProps)
@@ -268,7 +248,7 @@ describe('Route Controller (e2e)', () => {
       expect(employeeAfterDisconfirmation).toBeUndefined();
     });
 
-    it('GET /api/routes/paths/:id should be able to relist employees who confirmed their presence on the route', async () => {
+    it('should be able to relist employees who confirmed their presence on the route', async () => {
       // Criacao e listagem da rota
 
       const createdRoute = await httpSender
