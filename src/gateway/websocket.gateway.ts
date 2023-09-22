@@ -111,7 +111,7 @@ export class WebsocketGateway {
 
       for await (const employeeOnPath of refreshedRoute.employeesOnPath) {
         this.server.emit(employeeOnPath.details.employeeId, {
-          pathId: employeeOnPath.id,
+          pathId: refreshedRoute.id,
           details: {
             title: `Rota Finalizada: ${refreshedRoute.routeDescription}`,
             message: `A sua rota de ${
