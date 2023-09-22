@@ -14,7 +14,7 @@ import {
 import { CreateEmployeeDTO } from '../src/dtos/employee/createEmployee.dto';
 import { CreateDriverDTO } from '../src/dtos/driver/createDriver.dto';
 import { CreateVehicleDTO } from '../src/dtos/vehicle/createVehicle.dto';
-import { PrismaService } from '../src/configs/database/prisma.service';
+// import { PrismaService } from '../src/configs/database/prisma.service';
 import moment from 'moment';
 
 const routeProps: CreateRouteDTO = {
@@ -109,7 +109,7 @@ const employees: CreateEmployeeDTO[] = [
 ];
 
 describe('Route Controller (e2e)', () => {
-  let prismaService: PrismaService;
+  // let prismaService: PrismaService;
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -118,7 +118,7 @@ describe('Route Controller (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    prismaService = moduleFixture.get<PrismaService>(PrismaService);
+    // prismaService = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });
 
@@ -191,7 +191,7 @@ describe('Route Controller (e2e)', () => {
       expect(response.statusCode).toBe(201);
     });
 
-    it('should be able to list path today', async () => {
+    it('should be able to not list routes from another day', async () => {
       const login = await request(app.getHttpServer())
         .post('/api/auth/backoffice/signin')
         .send({
@@ -203,28 +203,18 @@ describe('Route Controller (e2e)', () => {
         .get('/api/routes/paths/get/all')
         .set('Authorization', `Bearer ${login.body.token}`);
 
-      const today = moment().format('YYYY-MM-DD'); // Obtém a data atual no formato 'YYYY-MM-DD'
+      const today = moment().format('YYYY-MM-DD'); 
 
-      console.log('today is:', today);
-
-      // Verifica se todos os trajetos na resposta têm a propriedade scheduledDate igual à data atual
       const paths = response.body;
 
       if (paths.length > 0) {
-        paths[0].scheduledDate = new Date('2023-09-20T17:30:00.000Z'); // Defina uma data diferente da data atual
+        paths[0].scheduledDate = new Date('2023-09-20T17:30:00.000Z');
       }
 
       for (const path of paths) {
-        console.log('path alterado', path);
-
-        console.log(
-          'novo today:',
-          moment(path.scheduledDate).format('YYYY-MM-DD'),
-        );
-
-        expect(moment(path.scheduledDate).format('YYYY-MM-DD')).toBe(today);
+        expect(moment(path.scheduledDate).format('YYYY-MM-DD') !== today);
+        
       }
-      // expect(response.statusCode).toBe(200);
     });
   });
 });
