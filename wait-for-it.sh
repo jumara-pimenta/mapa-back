@@ -13,7 +13,7 @@ while ! sqlcmd -S $server -U $user -P $password -Q "SELECT 1;" &> /dev/null; do
 done
 
 # Comando SQL para criar o banco de dados
-sql_query="CREATE DATABASE $database;"
+sql_query="CREATE DATABASE IF NOT EXISTS $database;"
 
 # Executar o comando SQL usando sqlcmd
 sqlcmd -S $server -U $user -P $password -Q "$sql_query"
