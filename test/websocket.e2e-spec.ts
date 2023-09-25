@@ -26,12 +26,10 @@ describe('WebSocket Test', () => {
 
   it('should connect to WebSocket server', async () => {
     try {
-      const result = await gateway.handleRouteStart({
+      await gateway.handleRouteStart({
         pathId: '1234',
       });
 
-      console.log('log do resultado:', result);
-      
     } catch (error) {
       // Verifique se a exceção é uma instância de WsException
       expect(error).toBeInstanceOf(WsException);
