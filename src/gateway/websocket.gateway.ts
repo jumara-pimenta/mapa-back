@@ -72,7 +72,7 @@ export class WebsocketGateway {
         this.server.emit(employeeOnPath.details.employeeId, {
           pathId: refreshedRoute.id,
           details: {
-            pathId: `Rota Iniciada: ${refreshedRoute.routeDescription}`,
+            title: `Rota Iniciada: ${refreshedRoute.routeDescription}`,
             message: `A sua rota de ${
               refreshedRoute.type
             } foi iniciada às ${formatTimeInManausTimeZone(
@@ -113,7 +113,7 @@ export class WebsocketGateway {
         this.server.emit(employeeOnPath.details.employeeId, {
           pathId: refreshedRoute.id,
           details: {
-            pathId: `Rota Finalizada: ${refreshedRoute.routeDescription}`,
+            title: `Rota Finalizada: ${refreshedRoute.routeDescription}`,
             message: `A sua rota de ${
               refreshedRoute.type
             } foi finalizada às ${formatTimeInManausTimeZone(
