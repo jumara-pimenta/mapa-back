@@ -22,6 +22,9 @@ export class SinisterRepository
       where: {
         pathId: id,
       },
+      orderBy: {
+        createdAt: 'asc'
+      }
     });
   }
   create(data: Sinister): Promise<Sinister> {
@@ -64,10 +67,16 @@ export class SinisterRepository
     const items = condition
       ? await this.repository.sinister.findMany({
           ...this.buildPage(page),
-          where: condition,
+        where: condition,
+        orderBy: {
+          createdAt: 'asc'
+        }
         })
       : await this.repository.sinister.findMany({
-          ...this.buildPage(page),
+        ...this.buildPage(page),
+        orderBy: {
+          createdAt: 'asc'
+        }
         });
 
     const total = condition
