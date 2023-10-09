@@ -23,7 +23,7 @@ export class SinisterRepository
         pathId: id,
       },
       orderBy: {
-        createdAt: 'asc'
+        createdAt: 'desc'
       }
     });
   }
@@ -69,13 +69,13 @@ export class SinisterRepository
           ...this.buildPage(page),
         where: condition,
         orderBy: {
-          createdAt: 'asc'
+          createdAt: 'desc'
         }
         })
       : await this.repository.sinister.findMany({
         ...this.buildPage(page),
         orderBy: {
-          createdAt: 'asc'
+          createdAt: 'desc'
         }
         });
 

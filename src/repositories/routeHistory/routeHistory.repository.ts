@@ -41,7 +41,7 @@ export class RouteHistoryRepository
         totalConfirmed: true,
         sinister: {
           orderBy: {
-            createdAt: 'asc',
+            createdAt: 'desc',
           },
         },
         employeesNotPresent: true,
@@ -104,7 +104,7 @@ export class RouteHistoryRepository
             totalEmployees: true,
             sinister: {
               orderBy: {
-                createdAt: 'asc',
+                createdAt: 'desc',
               },
             },
             totalConfirmed: true,
@@ -131,7 +131,7 @@ export class RouteHistoryRepository
             totalEmployees: true,
             sinister: {
               orderBy: {
-                createdAt: 'asc',
+                createdAt: 'desc',
               },
             },
             totalConfirmed: true,
@@ -207,7 +207,7 @@ export class RouteHistoryRepository
       include: {
         sinister: {
           orderBy: {
-            createdAt: 'asc',
+            createdAt: 'desc',
           },
         },
         path: true,
