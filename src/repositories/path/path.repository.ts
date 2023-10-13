@@ -792,20 +792,23 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
       where: {
         deletedAt: null,
         status,
-        AND: {
-          route: {
-            deletedAt: null,
-          },
-          OR: [
-            {
-              employeesOnPath: {
-                some: {
-                  present: true,
-                },
-              },
-            },
-          ],
+        route: {
+          deletedAt: null,
         },
+        // AND: {
+        //   route: {
+        //     deletedAt: null,
+        //   },
+        //   OR: [
+        //     {
+        //       employeesOnPath: {
+        //         some: {
+        //           present: true,
+        //         },
+        //       },
+        //     },
+        //   ],
+        // },
       },
       select: {
         id: true,
@@ -815,6 +818,7 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
         startsAt: true,
         startedAt: true,
         finishedAt: true,
+        scheduleDate: true,
         createdAt: true,
         route: {
           select: {
@@ -1014,10 +1018,10 @@ export class PathRepository extends Pageable<Path> implements IPathRepository {
     const paths = await this.repository.path.findMany({
       where: {
         deletedAt: null,
-        // scheduleDate: {
-        //   gte: startOfToday.toISOString(),
-        //   lte: endOfToday.toISOString()
-        // },
+        scheduleDate: {
+          gte: startOfToday.toISOString(),
+          lte: endOfToday.toISOString(),
+        },
         ...filter,
         ...condition,
         AND: {

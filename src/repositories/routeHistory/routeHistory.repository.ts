@@ -158,6 +158,7 @@ export class RouteHistoryRepository
   }
 
   async create(data: RouteHistory): Promise<RouteHistory> {
+
     return await this.repository.routeHistory.create({
       data: {
         id: data.id,
@@ -174,7 +175,7 @@ export class RouteHistoryRepository
         shift: data.path.startsAt,
         startedAt: data.startedAt,
         finishedAt: data.finishedAt,
-        createdAt: data.createdAt,
+        createdAt: data.createdAt
       },
     });
   }

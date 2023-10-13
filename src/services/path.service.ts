@@ -36,7 +36,6 @@ import { DENSO_LOCATION } from '../utils/Constants';
 import { MappedRouteDTO } from '../dtos/route/mappedRoute.dto';
 import { getDateInLocaleTime, getDateInLocaleTimeManaus } from '../utils/Date';
 import { getNextBusinessDay, isDateAfterToday } from '../utils/date.service';
-// import { FEATURE_ENABLED_LIST_ONLY_DAY_PATHS } from '../settings';
 
 interface IEmployeeNotPresent {
   name: string;
@@ -184,6 +183,123 @@ export class PathService {
 
     if (path.status === EStatusPath.FINISHED) {
       await this.routeHistoryService.create(props);
+      await this.employeesOnPathService.clearEmployeesOnPath(path.id);
+    }
+
+    return await this.routeService.finishRoute(finishAt);
+  }
+
+  async finishPathByCron(id: string): Promise<any> {
+    const path = await this.getPathById(id);
+    const route = await this.listEmployeesByPathAndPin(id);
+    const typeRoute = await this.routeService.getRouteType(path.route.id);
+
+    // const vehicle = await this.vehicleService.listById(route.vehicle);
+    const employeesOnPath = await this.employeesOnPathService.listByPath(
+      path.id,
+    );
+    // const driverId = path.substituteId;
+    // const driver = await this.driverService.listById(
+    //   driverId ? driverId : route.driver,
+    // );
+
+    // const sinister = await this.sinisterService.listByPathId(path.id);
+
+    if (path.finishedAt !== null)
+      throw new HttpException(
+        'Não é possível alterar uma rota que já foi finalizada!',
+        HttpStatus.CONFLICT,
+      );
+
+    // const totalInEachPin = route.employeesOnPins.map((item) => {
+    //   return item.employees.length;
+    // });
+
+    const confirmedAndPresentedEmployees = [] as string[];
+
+    const itinerariesArray = [];
+
+    const employeeNotPresents: IEmployeeNotPresent[] = [];
+
+    // const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
+
+    // let totalConfirmed = 0;
+
+    for await (const employee of employeesOnPath) {
+      // if (employee.confirmation === true) totalConfirmed++;
+
+      itinerariesArray.push([
+        `${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`,
+      ]);
+
+      if (employee.confirmation === true && employee.present === true) {
+        confirmedAndPresentedEmployees.push(employee.employee.id);
+
+        if (path.type === ETypePath.ONE_WAY) {
+          await this.employeesOnPathService.update(employee.id, {
+            disembarkAt: getDateInLocaleTimeManaus(new Date()),
+          });
+        }
+      }
+
+      if (employee.present === (false || null)) {
+        employeeNotPresents.push({
+          name: employee.employee.name,
+          registration: employee.employee.registration,
+          confirmed: employee.confirmation,
+          present: employee.present,
+        });
+      }
+    }
+
+    path.type === ETypePath.RETURN
+      ? itinerariesArray.unshift([DENSO_LOCATION])
+      : itinerariesArray.push([DENSO_LOCATION]);
+
+    const statusRoute = this.getStatusThatTheRouteShouldHave(
+      typeRoute,
+      path.type as ETypePath,
+    );
+
+    const finishAt = {
+      routeId: path.route.id,
+      pathId: path.id,
+      route: {
+        status: statusRoute,
+        type: route.routeType as ETypeRoute,
+      },
+      path: {
+        finishedAt: getDateInLocaleTimeManaus(new Date()),
+        status: EStatusPath.FINISHED,
+        substituteId: null,
+      },
+    };
+
+    path.status = EStatusPath.FINISHED;
+
+    // const props = new RouteHistory(
+    //   {
+    //     typeRoute: path.type,
+    //     nameRoute: route.routeDescription,
+    //     employeeIds:
+    //       confirmedAndPresentedEmployees.length > 0
+    //         ? confirmedAndPresentedEmployees.join()
+    //         : 'Rota que não foi iniciada',
+    //     itinerary: itinerariesArray.join(),
+    //     employeesNotPresent: JSON.stringify(employeeNotPresents),
+    //     totalEmployees: totalEmployees,
+    //     totalConfirmed: totalConfirmed,
+    //     startedAt: path.startedAt,
+    //     finishedAt: getDateInLocaleTimeManaus(new Date()),
+    //   },
+    //   path,
+    //   driver,
+    //   vehicle,
+    //   sinister,
+    // );
+
+    if (path.status === EStatusPath.FINISHED) {
+      // await this.routeHistoryService.create(props);
       await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
 
@@ -903,6 +1019,24 @@ export class PathService {
     return this.mapperMany(paths);
   }
 
+  public async checksIfEmployeesHaveBoarded(
+    employeesOnPath: IEmployeesOnPathDTO[],
+  ): Promise<boolean> {
+    const confirmedAndPresentedEmployees = [] as string[];
+
+    for await (const employee of employeesOnPath) {
+      if (employee.confirmation === true && employee.present === true) {
+        confirmedAndPresentedEmployees.push(employee.id);
+      }
+    }
+
+    if (confirmedAndPresentedEmployees.length === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
   public mapperOne(path: Path): MappedPathDTO {
     const { employeesOnPath } = path;
 
@@ -979,7 +1113,7 @@ export class PathService {
         routeType: path?.route.type as ETypeRoute,
         duration: path.duration,
         finishedAt: path.finishedAt,
-        startedAt: new Date(path.startedAt),
+        startedAt: path.startedAt,
         startsAt: path.startsAt,
         status: path.status,
         type: path.type,

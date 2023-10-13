@@ -5,7 +5,7 @@ import { PrismaService } from '../../configs/database/prisma.service';
 import { getDateInLocaleTimeManaus } from '../../utils/Date';
 import IScheduledWorkRepository from './scheduledWork.repository.contract';
 import { ScheduledWork } from '../../entities/scheduledWork.entity';
-import { getMidnightRange, getTodayWithZeroTimeISO } from '../../utils/date.service';
+import { getMidnightRange } from '../../utils/date.service';
 
 @Injectable()
 export class ScheduledWorkRepository

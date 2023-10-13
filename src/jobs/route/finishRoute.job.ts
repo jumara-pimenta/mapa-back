@@ -14,13 +14,15 @@ export class FinishRouteJob {
   async execute() {
     this.logger.debug('Iniciando finalização de rotas em andamento...');
 
-    const paths = await this.pathService.listAllByStatus(
+    let paths = await this.pathService.listAllByStatus(
       ERoutePathStatus.IN_PROGRESS,
     );
 
-    paths.concat(
-      await this.pathService.listAllByStatus(ERoutePathStatus.PENDING),
+    const pendingPaths = await this.pathService.listAllByStatus(
+      ERoutePathStatus.PENDING,
     );
+
+    paths = paths.concat(pendingPaths);
 
     if (paths.length == 0) {
       return this.logger.debug(
@@ -41,7 +43,7 @@ export class FinishRouteJob {
         ) {
           this.logger.debug(`Finalizando a rota ${path.id}...`);
 
-          await this.pathService.finishPath(path.id);
+          await this.pathService.finishPathByCron(path.id);
 
           this.logger.debug('Rota finalizada com sucesso!');
           this.logger.debug(`Estava pendente a ${diffInHours}h...`);
@@ -58,7 +60,7 @@ export class FinishRouteJob {
         ) {
           this.logger.debug(`Finalizando a rota ${path.id}...`);
 
-          await this.pathService.finishPath(path.id);
+          await this.pathService.finishPathByCron(path.id);
 
           this.logger.debug('Rota finalizada com sucesso!');
           this.logger.debug(`Estava pendente a ${diffInHours}h...`);
