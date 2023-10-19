@@ -194,26 +194,9 @@ export class PathService {
     const route = await this.listEmployeesByPathAndPin(id);
     const typeRoute = await this.routeService.getRouteType(path.route.id);
 
-    // const vehicle = await this.vehicleService.listById(route.vehicle);
     const employeesOnPath = await this.employeesOnPathService.listByPath(
       path.id,
     );
-    // const driverId = path.substituteId;
-    // const driver = await this.driverService.listById(
-    //   driverId ? driverId : route.driver,
-    // );
-
-    // const sinister = await this.sinisterService.listByPathId(path.id);
-
-    if (path.finishedAt !== null)
-      throw new HttpException(
-        'Não é possível alterar uma rota que já foi finalizada!',
-        HttpStatus.CONFLICT,
-      );
-
-    // const totalInEachPin = route.employeesOnPins.map((item) => {
-    //   return item.employees.length;
-    // });
 
     const confirmedAndPresentedEmployees = [] as string[];
 
@@ -221,12 +204,7 @@ export class PathService {
 
     const employeeNotPresents: IEmployeeNotPresent[] = [];
 
-    // const totalEmployees = totalInEachPin.reduce((a, b) => a + b, 0);
-
-    // let totalConfirmed = 0;
-
     for await (const employee of employeesOnPath) {
-      // if (employee.confirmation === true) totalConfirmed++;
 
       itinerariesArray.push([
         `${employee.employee.pins[0].pin.lat},${employee.employee.pins[0].pin.lng}`,
@@ -277,33 +255,11 @@ export class PathService {
 
     path.status = EStatusPath.FINISHED;
 
-    // const props = new RouteHistory(
-    //   {
-    //     typeRoute: path.type,
-    //     nameRoute: route.routeDescription,
-    //     employeeIds:
-    //       confirmedAndPresentedEmployees.length > 0
-    //         ? confirmedAndPresentedEmployees.join()
-    //         : 'Rota que não foi iniciada',
-    //     itinerary: itinerariesArray.join(),
-    //     employeesNotPresent: JSON.stringify(employeeNotPresents),
-    //     totalEmployees: totalEmployees,
-    //     totalConfirmed: totalConfirmed,
-    //     startedAt: path.startedAt,
-    //     finishedAt: getDateInLocaleTimeManaus(new Date()),
-    //   },
-    //   path,
-    //   driver,
-    //   vehicle,
-    //   sinister,
-    // );
-
     if (path.status === EStatusPath.FINISHED) {
-      // await this.routeHistoryService.create(props);
       await this.employeesOnPathService.clearEmployeesOnPath(path.id);
     }
 
-    return await this.routeService.finishRoute(finishAt);
+    return await this.routeService.finishRouteByCron(finishAt);
   }
 
   async startPath(id: string): Promise<any> {

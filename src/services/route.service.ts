@@ -1071,6 +1071,102 @@ export class RouteService {
     };
   }
 
+  async finishRouteByCron(props: StatusRouteDTO): Promise<unknown> {
+    if (props.path && props.pathId) {
+      const updatedPath = await this.pathService.update(
+        props.pathId,
+        props.path,
+      );
+
+      if (props.route.type === ETypeRoute.EXTRA) {
+        await this.pathService.softDelete(props.pathId);
+
+        props.route.status = ERoutePathStatus.FINISHED;
+
+        if (props.route) {
+          await this.update(props.routeId, props.route);
+        }
+
+        return this.pathService.mapperOne(updatedPath);
+      }
+    }
+
+    const routeToValidate = await this.listById(props.routeId);
+
+    const allPathsFinished = await this.checkAllPathsFinished(
+      routeToValidate.paths,
+    );
+
+    const allPathsIsPending = await this.checkAllPathsIsPending(
+      routeToValidate.paths,
+    );
+
+    props.route.status = !allPathsFinished
+      ? ERoutePathStatus.PENDING
+      : ERoutePathStatus.FINISHED;
+
+    if (props.route) {
+      await this.update(props.routeId, props.route);
+    }
+
+    const dataFilter = await this.listByIdWebsocket(props.routeId);
+
+    const dataFilterWebsocket = {
+      id: dataFilter.id,
+      description: dataFilter.description,
+      distance: dataFilter.distance,
+      status: dataFilter.status,
+      type: dataFilter.type,
+      driver: dataFilter.driver.name,
+      vehicle: dataFilter.vehicle.plate,
+      path: dataFilter.path,
+    };
+
+    const path = await this.pathService.listByIdMobile(props.pathId);
+
+    if (
+      (allPathsFinished || allPathsIsPending) &&
+      routeToValidate.type === ETypeRoute.CONVENTIONAL
+    ) {
+      for await (const _path of routeToValidate.paths) {
+        await this.pathService.softDelete(_path.id);
+      }
+
+      const startsAtPaths = routeToValidate.paths.map((path) => path.startsAt);
+
+      const generatedDatesScheduled = startsAtPaths.map((startAt) =>
+        getNextBusinessDay(startAt),
+      );
+
+      await this.makeAppointmentToUpdateStatusRoute(
+        routeToValidate.id,
+        generatedDatesScheduled.at(0),
+      );
+
+      await this.pathService.regeneratePaths(
+        routeToValidate,
+        generatedDatesScheduled,
+      );
+    }
+
+    const today = new Date();
+    const date = new Date(path?.finishedAt ?? new Date('2000-01-01'));
+
+    if (
+      today.getDay() === date.getDay() &&
+      today.getMonth() === date.getMonth() &&
+      today.getFullYear() === date.getFullYear()
+    ) {
+      path.status = EStatusPath.FINISHED;
+    }
+
+    return {
+      vehicle: dataFilterWebsocket.vehicle,
+      driver: dataFilterWebsocket.driver,
+      ...path,
+    };
+  }
+
   private async makeAppointmentToUpdateStatusRoute(
     routeId: string,
     scheduleDate: Date,
@@ -1088,6 +1184,15 @@ export class RouteService {
   async checkAllPathsFinished(paths: Path[]): Promise<boolean> {
     for (const path of paths) {
       if (path.status !== ERoutePathStatus.FINISHED) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async checkAllPathsIsPending(paths: Path[]): Promise<boolean> {
+    for (const path of paths) {
+      if (path.status !== ERoutePathStatus.PENDING) {
         return false;
       }
     }
