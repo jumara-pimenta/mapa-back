@@ -4,7 +4,7 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "Debug Attach",
+      "name": "Rotas Backend",
       "port": 9229,
       "restart": true,
       "stopOnEntry": false,
