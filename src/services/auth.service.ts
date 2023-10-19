@@ -20,6 +20,7 @@ import { signInDriverDTO } from '../dtos/driver/signInDriver.dto';
 import { Page, PageResponse } from '../configs/database/page.model';
 import { FilterBackOfficeUserDTO } from '../dtos/auth/filterBackOfficeUser.dto';
 import { MappedBackOfficeUserDTO } from '../dtos/auth/mappedBackOfficeUser.dto';
+import { SigninBackOfficeDTO } from '../dtos/auth/signinBackoffice.dto';
 
 @Injectable()
 export class AuthService {
@@ -95,10 +96,6 @@ export class AuthService {
     return this.generateToken(0, data);
   }
 
-  private getRemainingTokenTime(expireToken: number): number {
-    return differenceInSeconds(fromUnixTime(expireToken), new Date());
-  }
-
   private extractToken(tokenToExtract: string): string {
     const [, token] = tokenToExtract.split('Bearer ');
     return token;
@@ -127,9 +124,7 @@ export class AuthService {
       role: user.roleType,
     });
 
-    const { ...result } = user;
-
-    return { ...result, token };
+    return this.mapperOne(user, token);
   }
 
   async backofficeUserCreate(data: BackOfficeUserCreateDTO): Promise<any> {
@@ -310,5 +305,17 @@ export class AuthService {
     const { ...result } = BackOfficeUser;
 
     return result;
+  }
+
+  private mapperOne(user: BackOfficeUser, token: string): SigninBackOfficeDTO {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      roleType: user.roleType,
+      createdAt: user.createdAt,
+      token,
+    };
   }
 }
