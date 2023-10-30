@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:18-alpine
 
 ARG NODE_ENV
 ARG PORT
@@ -11,6 +11,8 @@ ENV TZ=America/Manaus
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY package.json yarn.lock ./
+
+RUN node -v
 
 RUN yarn cache clean --mirror
 
